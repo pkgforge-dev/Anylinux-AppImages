@@ -21,16 +21,16 @@ UPINFO="gh-releases-zsync|$(echo "$REPO" | tr '/' '|')|latest|*$ARCH.AppImage.zs
 
 
 make_appdir() {
-    mkdir -p .AppDir \
-            .AppDir/share/icon \
-            .AppDir/lib \
-            .AppDir/bin \
+    mkdir -p .AppDir
+    mkdir -p .AppDir/share/icon
+    mkdir -p .AppDir/share/metainfo
+    mkdir -p .AppDir/lib
+    mkdir -p .AppDir/bin
 }
 
 build() {
     CURRENTDIR="$(readlink -f "$(dirname "$0")")"
     git clone $REPO
-
 }
 
 bundle_libs() {
@@ -47,7 +47,7 @@ add_sound_libs() {
     cp -rv /usr/lib/spa-0.2      ./usr/lib
 }
 
-add graphics_libs() {
+add_graphics_libs() {
     cp -vr /usr/lib/libGLX*        ./shared/lib || true
     cp -vr /usr/lib/libEGL*        ./shared/lib || true
     cp -vr /usr/lib/dri            ./shared/lib
