@@ -33,38 +33,8 @@ build() {
     git clone $REPO
 }
 
-bundle_libs() {
-    mv ./usr/bin ./
-    wget "$LIB4BN" -O ./lib4bin
-    chmod +x ./lib4bin
-    ./lib4bin -p -v -r -s ./bin/*
-    rm -f ./lib4bin
-}
-
-add_sound_libs() {
-    cp -rv /usr/lib/alsa-lib     ./usr/lib
-    cp -rv /usr/lib/pipewire-0.3 ./usr/lib
-    cp -rv /usr/lib/spa-0.2      ./usr/lib
-}
-
-add_graphics_libs() {
-    cp -vr /usr/lib/libGLX*        ./shared/lib || true
-    cp -vr /usr/lib/libEGL*        ./shared/lib || true
-    cp -vr /usr/lib/dri            ./shared/lib
-    cp -vn /usr/lib/libvulkan*     ./shared/lib
-    ldd ./shared/lib/dri/* \
-	./shared/lib/libvulkan* \
-	./shared/lib/libEGL* \
-	./shared/lib/libGLX* 2>/dev/null \
-	| awk -F"[> ]" '{print $4}' | xargs -I {} cp -nv {} ./shared/lib || true
-    mkdir -p ./share/vulkan
-    cp -vr /usr/share/glvnd          ./share
-    cp -vr /usr/share/vulkan/icd.d   ./share/vulkan
-    sed -i 's|/usr/lib||g;s|/.*-linux-gnu||g;s|"/|"|g' ./share/vulkan/icd.d/*
-}
-
 sharun() {
-    ln -s ./bin/obs ./AppRun
+    ln -s ./bin/$APP ./AppRun
     ./sharun -g
 }
 
