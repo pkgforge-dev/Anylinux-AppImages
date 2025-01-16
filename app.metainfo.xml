@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id></id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <!-- Also available FSFAP MIT 0BSD CC0-1.0 CC0-1.0 CC-BY-3.0 CC-BY-4.0 CC-BY-SA-3.0 CC-BY-SA-4.0 GFDL-1.1 GFDL-1.2 GFDL-1.3 BSL-1.0 FTL FSFUL -->
+  <name></name>
+  <summary></summary>
+  <summary xml:lang=""></summary>
+  <description>
+    <p>Steam is a software distribution service with an online store, automated installation, automatic updates, achievements, SteamCloud synchronized savegame and screenshot functionality, and many social features.</p>
+  </description>
+    <!-- Follow this guideline https://specifications.freedesktop.org/menu-spec/latest/category-registry.html-->
+  <categories>
+    <category></category>
+    <category></category>
+  </categories>
+  <url type="homepage"></url>
+  <url type="bugtracker"></url>
+  <url type="faq"></url>
+  <url type="help"></url>
+  <url type="donation"></url>
+  <url type="translate"></url>
+  <url type="contact"></url>
+  <url type="vcs-browser"></url>
+  <url type="contribute"></url>
+  <!-- Please follow SPDX License expressions https://spdx.org/specifications -->
+  <project_license>LicenseRef-proprietary=https://example.com/mylicense.html</project_license>
+  <developer></developer>
+  <screenshots>
+    <screenshot type="default">
+      <caption></caption>
+      <caption xml:lang=""></caption>
+      <image type="source" width="1200" height="1026"></image>
+    </screenshot>
+  </screenshots>
+  <launchable type="desktop-id"></launchable>
+  <releases>
+    <release version="1.0.0.82" date="2024-10-03">
+      <description></description>
+    </release>
+  </releases>
+  <bundle type="appimage">pkgname-pkgversion</bundle> 
+  <content_rating type="oars-1.1">
+  <!-- Can be generated via https://hughsie.github.io/oars/generate.html -->
+    <content_attribute id="social-chat">intense</content_attribute>
+  </content_rating>
+</component>
