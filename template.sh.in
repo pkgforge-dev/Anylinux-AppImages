@@ -1,0 +1,84 @@
+#!/bin/sh
+
+## arguments for script and run
+
+set -eu
+export ARCH="$(uname -m)"
+export APPIMAGE_EXTRACT_AND_RUN=1
+
+## tools that will be used next
+APPIMAGETOOL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
+LIB4BN="https://raw.githubusercontent.com/VHSgunzo/sharun/refs/heads/main/lib4bin"
+URUNTIME="$(wget -q https://api.github.com/repos/VHSgunzo/uruntime/releases -O - \
+	| sed 's/[()",{} ]/\n/g' | grep -oi "https.*appimage.*dwarfs.*$ARCH$" | head -1)"
+
+
+## useful meta for appimagetool
+## APP_NAME=
+## DESKTOP=
+## ICON=
+UPINFO="gh-releases-zsync|$(echo "$REPO" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
+
+
+make_appdir() {
+    mkdir -p .AppDir \
+            .AppDir/share/icon \
+            .AppDir/lib \
+            .AppDir/bin \
+}
+
+build() {
+    CURRENTDIR="$(readlink -f "$(dirname "$0")")"
+    git clone $REPO
+
+}
+
+bundle_libs() {
+    mv ./usr/bin ./
+    wget "$LIB4BN" -O ./lib4bin
+    chmod +x ./lib4bin
+    ./lib4bin -p -v -r -s ./bin/*
+    rm -f ./lib4bin
+}
+
+add_sound_libs() {
+    cp -rv /usr/lib/alsa-lib     ./usr/lib
+    cp -rv /usr/lib/pipewire-0.3 ./usr/lib
+    cp -rv /usr/lib/spa-0.2      ./usr/lib
+}
+
+add graphics_libs() {
+    cp -vr /usr/lib/libGLX*        ./shared/lib || true
+    cp -vr /usr/lib/libEGL*        ./shared/lib || true
+    cp -vr /usr/lib/dri            ./shared/lib
+    cp -vn /usr/lib/libvulkan*     ./shared/lib
+    ldd ./shared/lib/dri/* \
+	./shared/lib/libvulkan* \
+	./shared/lib/libEGL* \
+	./shared/lib/libGLX* 2>/dev/null \
+	| awk -F"[> ]" '{print $4}' | xargs -I {} cp -nv {} ./shared/lib || true
+    mkdir -p ./share/vulkan
+    cp -vr /usr/share/glvnd          ./share
+    cp -vr /usr/share/vulkan/icd.d   ./share/vulkan
+    sed -i 's|/usr/lib||g;s|/.*-linux-gnu||g;s|"/|"|g' ./share/vulkan/icd.d/*
+}
+
+sharun() {
+    ln -s ./bin/obs ./AppRun
+    ./sharun -g
+}
+
+generate_app() {
+    printf "$UPINFO" > data.upd_info
+    llvm-objcopy --update-section=.upd_info=data.upd_info \
+    --set-section-flags=.upd_info=noload,readonly ./uruntime
+    printf 'AI\x02' | dd of=./uruntime bs=1 count=3 seek=8 conv=notrunc
+    wget -q "$URUNTIME" -O ./uruntime
+    chmod +x ./uruntime
+    ./uruntime --appimage-mkdwarfs -f \
+	--set-owner 0 --set-group 0 \
+	--no-history --no-create-timestamp \
+	--compression zstd:level=22 -S24 -B16 \
+	--header uruntime \
+	-i ./AppDir -o "$PACKAGE"-"$VERSION"-anylinux-"$ARCH".AppImage
+}
