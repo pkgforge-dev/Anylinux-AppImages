@@ -53,3 +53,6 @@ We also try to avoid the usage of containers and other methods that depend on us
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)
 
 [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)
+
+[Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)
+
