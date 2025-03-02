@@ -38,6 +38,8 @@ We also try to avoid the usage of containers and other methods that depend on us
 
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)
 
+[Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)
+
 [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)
 
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)
@@ -54,5 +56,4 @@ We also try to avoid the usage of containers and other methods that depend on us
 
 [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)
 
-[Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)
 
