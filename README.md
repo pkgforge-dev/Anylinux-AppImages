@@ -34,6 +34,8 @@ We also try to avoid the usage of containers and other methods that depend on us
 
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)
 
+[Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)
+
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)
 
 [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)
