@@ -26,6 +26,8 @@ We also try to avoid the usage of containers and other methods that depend on us
 
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)
 
+[Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)
+
 [GIMP](https://github.com/pkgforge-dev/GIMP-AppImage)
 
 [htop](https://github.com/pkgforge-dev/htop-AppImage)
