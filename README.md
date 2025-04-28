@@ -17,6 +17,8 @@ We also try to avoid the usage of containers and other methods, so far the only 
 
 [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)
 
+[ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)
+
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)
 
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)
