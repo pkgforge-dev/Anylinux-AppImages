@@ -6,12 +6,11 @@ Most of the AppImages are made with [sharun](https://github.com/VHSgunzo/sharun)
 
 The uruntime [automatically falls back to using extract and run](https://github.com/VHSgunzo/uruntime?tab=readme-ov-file#built-in-configuration) if fuse is not available at all, so we **truly have 0 requirements.**
 
-We also try to avoid the usage of containers and other methods, so far the only AppImage that depends on them is Lutris. 
-
+We also try to avoid the usage of containers and other methods, so far the only AppImage that depends on them is Lutris.
 
 **How is this possible?** See: [How to guide](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/HOW-TO-MAKE-THESE.md)
 
----------------------------------------------------------------------------------------------
+---
 
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)
 
@@ -40,6 +39,8 @@ We also try to avoid the usage of containers and other methods, so far the only 
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)
 
 [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)
+
+[Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage.git)
 
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)
 
