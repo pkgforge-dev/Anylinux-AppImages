@@ -45,7 +45,8 @@ We also try to avoid the usage of containers and other methods; so far, the only
 | 29  | [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
 | 30  | [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
 | 31  | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
-| 32  | [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
-| 33  | [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
-| 34  | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
-| 35  | [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
+| 32  | [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
+| 33  | [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
+| 34  | [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
+| 35  | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
+| 36  | [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
