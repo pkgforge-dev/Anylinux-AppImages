@@ -1,5 +1,20 @@
 # How to make truly portable AppImages that work on any linux system.
 
+-----------------------------------
+### *Index*
+-----------------------------------
+- [The problem](#the-problem)
+- [The solution](#the-solution)
+- [How do I do it?](#how-do-i-do-it)
+  - [Sharun](#sharun)
+- [Further considerations](#further-considerations)
+  - [Isn’t this very bloated?](#isnt-this-very-bloated)
+  - [What about nvidia?](#what-about-nvidia)
+
+-----------------------------------
+
+## *The problem*
+
 For a long time the suggested practice to make AppImages has been to bundle most of the libraries an application needs but not all like libc, dynamic linker, and several more mentioned in the [exclude list](https://github.com/AppImageCommunity/pkg2appimage/blob/master/excludelist)
 
 This approach has two big issues:
@@ -10,7 +25,14 @@ This approach has two big issues:
 
 And the future stability isn’t that great either, because glibc still sometimes breaks userspace with updates.
 
-**The solution:**
+-----------------------------------
+
+| [Back to Index](#index) |
+| - |
+
+-----------------------------------
+
+## *The solution*
 
 * ~~Lets use a container~~ ❌ nope that has a bunch of limitations and weird quirks, [very bloated](https://i.imgur.com/25AOq00.png) and depends on namespaces [which you cannot even rely on...](https://github.com/linuxmint/mint22-beta/issues/82) Worth adding there are some cases where containers are really the only viable option, specially with applications that depend on both 32 and 64 bit libs in which doing this without a container is going to be a lot of pain, but yeah, always leave this as a last resort method. 
 
@@ -21,7 +43,14 @@ And the future stability isn’t that great either, because glibc still sometime
 
 This is the solution, truly portable application bundles that have everything they need. 
 
-**How do I do it?**
+-----------------------------------
+
+| [Back to Index](#index) |
+| - |
+
+-----------------------------------
+
+## *How do I do it?*
 
 1. First issue to overcome: 
 
@@ -90,6 +119,15 @@ But isn’t this a lot of work to find and set all the env variables that my app
 
 4. Forth issue to overcome, I don’t want to do any of this that’s a lot of work.
 
+-----------------------------------
+
+| [Back to Index](#index) |
+| - |
+
+-----------------------------------
+
+### *Sharun*
+
 There is a solution for this, made by @VHSGunzo called sharun: 
 
 https://github.com/VHSgunzo/sharun
@@ -109,10 +147,18 @@ https://github.com/VHSgunzo/sharun
 
 Any application made with sharun ends up being able to work **on any linux distro**, be it ubuntu 14.04, musl distros and even directly in NixOS without any wrapper (non FHS environment). 
 
+-----------------------------------
 
-Further considerations. 
+| [Back to Index](#index) |
+| - |
 
-* Isn’t this very bloated? 
+-----------------------------------
+
+## *Further considerations*
+
+-----------------------------------
+
+### *Isn’t this very bloated?*
 
 Not really, if your application isn’t hardware accelerated, bundling all the libraries will usually only increase the size of the application by less than 10 MiB.
 
@@ -147,11 +193,24 @@ We already make such version of llvm here: https://github.com/pkgforge-dev/llvm-
 
 Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results a **60 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things. 
 
+-----------------------------------
 
-* What about nvidia?
+| [Back to Index](#index) |
+| - |
+
+-----------------------------------
+
+### *What about nvidia?*
 
 Nvidia releases its proprietary driver as a binary blob that is already widely compatible on its own, it’s only requirement is a new enough version of glibc, which the appimages made here will do as long as you build them on a glibc distro. Then you just need to add the nvidia icds to `VK_DRIVER_FILES` to be able to use it without problem. 
 
 If you don’t have the proprietary nvidia driver, mesa already includes nouveau support for the few GPUs where this driver actually works (anything 16 series or newer). 
 
 Goes without saying that sharun handles all of this already on its own.
+
+-----------------------------------
+
+| [Back to Index](#index) |
+| - |
+
+-----------------------------------
