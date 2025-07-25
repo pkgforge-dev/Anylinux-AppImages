@@ -1,4 +1,6 @@
-**Anylinux AppImages**
+## **Anylinux AppImages**
+
+![Downloads](https://img.shields.io/endpoint?url=https://cdn.jsdelivr.net/gh/pkgforge-dev/Anylinux-AppImages@main/.github/badge.json)
 
 Designed to run seamlessly on any Linux distribution, including older distributions and musl-based ones. Our AppImages bundle all the needed dependencies and do not depend on host libraries to work, unlike most other AppImages.
 
@@ -53,4 +55,4 @@ We also try to avoid the usage of containers and other methods; so far, the only
 
 ---
 
-Also see [other projects](https://github.com/VHSgunzo/sharun?tab=readme-ov-file#projects-that-use-sharun) that use sharun for more. 
+Also see [other projects](https://github.com/VHSgunzo/sharun?tab=readme-ov-file#projects-that-use-sharun) that use sharun for more.
