@@ -1,0 +1,36 @@
+name: Get download stats
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install wget
+        run: sudo apt update && sudo apt install wget
+
+      - name: Get stats
+        run: |
+          LIST="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/README.md"
+          REPOS="$(wget -q "$LIST" -O - | awk -F'[(|)]' '/^|\[/{print $4}' | awk -F'/' '$NF!="" {print $NF}')"
+
+          wget "https://raw.githubusercontent.com/xonixx/gron.awk/refs/heads/main/gron.awk" -O ./gron.awk
+          chmod +x ./gron.awk
+          
+          for REPO in $REPOS; do
+          	NUM=$(wget -q "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
+          		| ./gron.awk | awk -F'=' '/download_count/ {total += $2} END {print total}')
+          
+          	[ -n "$NUM" ] || continue
+          	echo "${REPO}: $NUM "
+          	TOTAL=$(( TOTAL + NUM ))
+          done
+          
+          echo "Total: $TOTAL"
+          echo "$TOTAL" > ./total-downloads
