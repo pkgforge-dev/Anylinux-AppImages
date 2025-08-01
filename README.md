@@ -44,14 +44,15 @@ We also try to avoid the usage of containers and other methods; so far, the only
 | 26  | ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 | 27  | [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
 | 28  | [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
-| 29  | [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
-| 30  | [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
-| 31  | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
-| 32  | [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
-| 33  | [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
-| 34  | [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
-| 35  | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
-| 36  | [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
+| 29  | [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
+| 30  | [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
+| 31  | [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
+| 32  | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
+| 33  | [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
+| 34  | [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
+| 35  | [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
+| 36  | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
+| 37  | [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
 
 ---
 
