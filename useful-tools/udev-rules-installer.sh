@@ -19,6 +19,8 @@
 # Note this will only install udev rules, nothing else, some rules require the
 # user to be in a group, in that case you will need to change this script
 
+set -e
+
 CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
 CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 UDEV_INSTALL_MSG="${UDEV_INSTALL_MSG:-This application needs udev rules in order to work. Do you wish to install them?}"
@@ -26,9 +28,7 @@ DO_NOT_ASK="Do you wish to not see this message again?"
 
 # make sure we are in a FHS env and have the needed deps
 _sanity_check() {
-	if [ ! -d /usr/lib ] || [ ! -d /etc ]; then
-		return 1
-	elif ! command -v cp || ! command -v mkdir; then
+	if ! command -v cp || ! command -v mkdir; then
 		return 1
 	elif ! command -v yad \
 	  && ! command -v zenity \
@@ -42,11 +42,11 @@ _sanity_check() {
 
 _display_message() {
 	if command -v zenity 1>/dev/null; then
-		zenity --question --text "$*"
+		zenity --question --text "$*" || return 1
 	elif command -v kdialog 1>/dev/null; then
-		kdialog --yesno "$*"
+		kdialog --yesno "$*" || return 1
 	elif command -v yad 1>/dev/null; then
-		yad --text="$*"
+		yad --text="$*" || return 1
 	fi
 }
 
@@ -67,7 +67,7 @@ _check_udev() {
 		>&2 echo "AppDir/etc/udev/rules.d"
 		>&2 echo "AppDir/lib/udev/rules.d"
 		>&2 echo "AppDir/usr/lib/udev/rules.d"
-		exit 1
+		return 1
 	fi
 
 	# check if it is already installed on the host, check in multiple
@@ -86,24 +86,33 @@ _check_udev() {
 	fi
 }
 
-# if check fails exit without error so that the app can still launch
-_sanity_check 1>/dev/null || exit 0
-
-_check_udev
-
-APPNAME="$(awk -F'[=| ]' '/^Exec=/{print $2}' "$CURRENTDIR"/*.desktop)"
-LOCKFILEPATH="$CACHEDIR"/."${APPNAME##*/}"-disable-udev-check
-
-if [ -f "$LOCKFILEPATH" ]; then
-	exit 0
-elif _display_message "$UDEV_INSTALL_MSG"; then
+_install_udev() {
 	SUDOCMD="$(command -v pkexec || command -v lxqt-sudo)"
 	"$SUDOCMD" /bin/sh -c "
 	  mkdir -p /usr/local/lib/udev/rules.d
 	  cp -v '$UDEVDIR'/* /usr/local/lib/udev/rules.d
 	  command -v udevadm && udevadm control --reload-rules
 	"
-elif _display_message "$DO_NOT_ASK"; then
+}
+
+_do_not_ask_again() {
 	mkdir -p "$CACHEDIR"
 	echo "delete me to enable again" > "$LOCKFILEPATH"
+}
+
+# if check fails exit without error so that the app can still launch
+_sanity_check 1>/dev/null || exit 0
+
+_check_udev
+
+# exit without error if there is no top level .desktop file
+APPNAME="$(awk -F'=| ' '/^Exec=/{print $2}' "$CURRENTDIR"/*.desktop)" || exit 0
+LOCKFILEPATH="$CACHEDIR"/."${APPNAME##*/}"-disable-udev-check
+
+if [ -f "$LOCKFILEPATH" ]; then
+	exit 0
+elif _display_message "$UDEV_INSTALL_MSG"; then
+	_install_udev
+elif _display_message "$DO_NOT_ASK"; then
+	_do_not_ask_again
 fi
