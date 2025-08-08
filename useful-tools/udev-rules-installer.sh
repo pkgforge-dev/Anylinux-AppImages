@@ -26,7 +26,7 @@ CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 UDEV_INSTALL_MSG="${UDEV_INSTALL_MSG:-This application needs udev rules in order to work. Do you wish to install them?}"
 DO_NOT_ASK="Do you wish to not see this message again?"
 
-# make sure we are in a FHS env and have the needed deps
+# make sure we have the needed deps
 _sanity_check() {
 	if ! command -v cp || ! command -v mkdir; then
 		return 1
