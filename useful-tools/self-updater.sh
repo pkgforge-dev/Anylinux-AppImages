@@ -1,0 +1,89 @@
+#!/bin/sh
+
+# Helper script in POSIX shell to self update appimages in place
+
+# depends on appimageupdatetool which can either be installed by the user
+# or be bundled in this application
+
+# if you want to bundle appimageupdateool check this fork instead since it is
+# a lot smaller:https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition
+
+# simple make sure yo have your AppRun call this script before starting the
+# main application, that is all that's needed.
+
+# you can set teh var UPDATE_MSG to change the displayed update message
+
+set -e
+
+CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+LOCKFILEPATH="$CACHEDIR"/."${APPIMAGE##*/}"-disable-update-check
+UPDATE_MSG="${UPDATE_MSG:-A new version of ${APPIMAGE##*/} is available. Do you wish to update?}"
+POST_UPDATE="${APPIMAGE##*/} updated suscesfully!"
+DO_NOT_ASK="Do you wish to not see this message again?"
+
+# make sure we can update the thing
+_sanity_check() {
+	if [ -z "$APPIMAGE" ]; then
+		return 1
+	elif ! command -v appimageupdatetool; then
+		>&2 echo "Install appimageupdatetool in PATH to get self updates"
+		return 1
+	elif [ ! -w "$APPIMAGE" ]; then
+		>&2 echo "We cannot to overwrite $APPIMAGE due to lack of permissions"
+		>&2 echo "This usually happens when the appimage is placed in /usr/bin"
+		>&2 echo "or similar locations that need elevated rights to replace"
+		return 1
+	elif ! command -v yad \
+	  && ! command -v zenity \
+	  && ! command -v kdialog; then
+		return 1
+	fi
+}
+
+_display_message() {
+	if command -v kdialog 1>/dev/null; then
+		kdialog --yesno "$*" || return 1
+	elif command -v yad 1>/dev/null; then
+		yad --text="$*" || return 1
+	elif command -v zenity 1>/dev/null; then
+		zenity --question --text "$*" || return 1
+	fi
+}
+
+_check_update() {
+	set +e
+	appimageupdatetool -j "$APPIMAGE"
+	status=$?
+	set -e
+	case "$status" in
+		0) >&2 echo " ${APPIMAGE##*/} is up to date"; return 1;;
+		1) >&2 echo " ${APPIMAGE##*/} update is available"; return 0;;
+		*) >&2 echo " ${APPIMAGE##*/} update check failed"; exit 0;;
+	esac
+}
+
+_update() {
+	appimageupdatetool -Or "$APPIMAGE"
+}
+
+_do_not_ask_again() {
+	mkdir -p "$CACHEDIR"
+	echo "delete me to enable again" > "$LOCKFILEPATH"
+}
+
+# if check fails exit without error so that the app can still launch
+_sanity_check 1>/dev/null || exit 0
+
+# now check if there is no lockfile and check for updates
+if [ -f "$LOCKFILEPATH" ]; then
+	exit 0
+elif _check_update; then
+	if _display_message "$UPDATE_MSG"; then
+		_update
+		if command -v notify-send 1>/dev/null; then
+			notify-send "$POST_UPDATE"
+		fi
+	elif _display_message "$DO_NOT_ASK"; then
+		_do_not_ask_again
+	fi
+fi
