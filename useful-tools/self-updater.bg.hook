@@ -3,15 +3,18 @@
 # Helper script in POSIX shell to self update appimages in place
 
 # depends on appimageupdatetool which can either be installed by the user
-# or be bundled in this application
+# or be bundled in the application
 
 # if you want to bundle appimageupdateool check this fork instead since it is
 # a lot smaller:https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition
 
-# simple make sure yo have your AppRun call this script before starting the
+# simple make sure you have your AppRun call this script before starting the
 # main application, that is all that's needed.
 
-# you can set teh var UPDATE_MSG to change the displayed update message
+# you can set the var UPDATE_MSG to change the displayed update message
+
+# this script should be ran in the background as it can take a few
+# seconds to check for update
 
 set -e
 
@@ -55,7 +58,7 @@ _check_update() {
 	appimageupdatetool -j "$APPIMAGE"
 	status=$?
 	set -e
-	# exit code higher than 1 likely means the app was not correctly packaged
+	# exit code >1 likely indicates the app was not correctly packaged
 	case "$status" in
 		0) >&2 echo " ${APPIMAGE##*/} is up to date"; return 1;;
 		1) >&2 echo " ${APPIMAGE##*/} update is available"; return 0;;
