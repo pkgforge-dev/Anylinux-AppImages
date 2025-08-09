@@ -55,15 +55,15 @@ _display_message() {
 
 _check_udev() {
 	# Add any possible udev files in the array
-	if [ -d "$CURRENTDIR"/etc/udev/rules.d ]; then
-		UDEVDIR="$CURRENTDIR"/etc/udev/rules.d
-		set -- "$CURRENTDIR"/etc/udev/rules.d/*
-	elif [ -d "$CURRENTDIR"/lib/rules.d ]; then
-		UDEVDIR="$CURRENTDIR"/lib/rules.d
-		set -- "$CURRENTDIR"/lib/udev/rules.d/*
-	elif [ -d "$CURRENTDIR"/usr/lib/rules.d ]; then
-		UDEVDIR="$CURRENTDIR"/usr/lib/rules.d
-		set -- "$CURRENTDIR"/usr/lib/udev/rules.d/*
+	if [ -d "$APPDIR"/etc/udev/rules.d ]; then
+		UDEVDIR="$APPDIR"/etc/udev/rules.d
+		set -- "$APPDIR"/etc/udev/rules.d/*
+	elif [ -d "$APPDIR"/lib/rules.d ]; then
+		UDEVDIR="$APPDIR"/lib/rules.d
+		set -- "$APPDIR"/lib/udev/rules.d/*
+	elif [ -d "$APPDIR"/usr/lib/rules.d ]; then
+		UDEVDIR="$APPDIR"/usr/lib/rules.d
+		set -- "$APPDIR"/usr/lib/udev/rules.d/*
 	else
 		>&2 echo "ERROR: No udev rules found, make sure to include"
 		>&2 echo "them in one of the following places in the AppDir:"
