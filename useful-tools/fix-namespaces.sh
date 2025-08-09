@@ -1,0 +1,98 @@
+#!/bin/sh
+
+# Script that disables unbuntu's nonsense of restricting namespaces
+
+# This is mostly needed by web browsers and electorn apps
+
+# Also if you have an application that uses bubblewrap internally
+
+CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+LOCKFILEPATH="$CACHEDIR"/.disable-namespaces-check
+
+info_message="
+Starting Ubuntu24.04 Canonical decided that namespaces are not safe and is preventing us from using it to sandbox applications.
+namespaces are safe and a vital part of the security model of all web browsers, flatpak, electron apps, etc
+
+To fix this issue I will need permission to disable the restriction, like all other linux distros do and several ubuntu forks had to undo.
+
+For more details see: https://github.com/pkgforge-dev/Anylinux-AppImage/blob/main/UBUNTU_NONSENSE.md#why
+"
+HOW_TO_UNDO="
+To undo this change remove: '/etc/sysctl.d/20-fix-namespaces.conf', then run
+'sysctl -w kernel.apparmor_restrict_unprivileged_userns=1' or reboot.
+"
+WARNING="
+WARNING: I'm not able to create a namespace and not sure what is preventing it.
+We will continue without prompting but if something breaks you know why.
+"
+DO_NOT_ASK="Do you wish to not see this message again?"
+
+
+_check_namespaces_work() {
+	unshare --user -p /bin/true >/dev/null 2>&1
+}
+
+# Make sure we have all the needed deps
+# Unlikely to be ubuntu or its spins if any of these conditions are true
+_is_false_positive() {
+	if ! command -v /bin/true \
+	  || ! command -v sysctl \
+	  || ! command -v unshare; then
+		FALSE_POSITIVE=1
+	elif ! command -v yad \
+	  && ! command -v zenity \
+	  && ! command -v kdialog; then
+		FALSE_POSITIVE=1
+	elif [ ! -d /etc/sysctl.d ] \
+	  || [ ! -d /etc/apparmor.d ]; then
+		FALSE_POSITIVE=1
+	fi
+
+	if [ "$FALSE_POSITIVE" = 1 ]; then
+		>&2 echo "$WARNING"
+		return 0
+	fi
+	return 1
+}
+
+_display_message() {
+	if command -v kdialog 1>/dev/null; then
+		kdialog --yesno "$*" 2>/dev/null || return 1
+	elif command -v yad 1>/dev/null; then
+		yad --text="$*" 2>/dev/null || return 1
+	elif command -v zenity 1>/dev/null; then
+		zenity --question --text "$*" 2>/dev/null || return 1
+	fi
+}
+
+_fix_ubuntu_mess() {
+	if _display_message "$info_message"; then
+		pkexec /bin/sh -c "
+		  echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
+		    | tee /etc/sysctl.d/20-fix-namespaces.conf
+		  sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+		"
+		if [ -f /etc/sysctl.d/20-fix-namespaces.conf ]; then
+			_display_message "$HOW_TO_UNDO"
+		fi
+	else
+		return 1
+	fi
+}
+
+_do_not_ask_again() {
+	mkdir -p "$CACHEDIR"
+	echo "delete me to enable again" > "$LOCKFILEPATH"
+}
+
+if [ -f /etc/sysctl.d/20-fix-namespaces.conf ] || [ -f "$LOCKFILEPATH" ]; then
+	exit 0
+elif _check_namespaces_work; then
+	exit 0
+elif _is_false_positive 1>/dev/null; then
+	exit 0
+elif _fix_ubuntu_mess; then
+	exit 0
+elif _display_message "$DO_NOT_ASK"; then
+	_do_not_ask_again
+fi
