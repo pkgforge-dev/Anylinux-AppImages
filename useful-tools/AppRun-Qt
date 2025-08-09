@@ -13,9 +13,16 @@ BIN="${ARGV0:-$0}"
 BIN="${BIN##*/}"
 unset ARGV0
 
-# uncomment these if you also need to add udev rules or want to self update
-#"$CURRENTDIR"/self-updater.sh &
-#"$CURRENTDIR"/udev-installer.sh
+# additional scripts can be placed in the top level bin dir
+# those with a name that ends up .hook will be executed in teh current shell
+# while those that end with bg.hook will be executed in the background
+for hook in "$CURRENTDIR"/bin/*.hook; do
+	[ -x "$hook" ] || continue
+	case "$hook" in
+		*.bg.hook) >&2 echo "exec bg hook: $hook"; "$hook" &;;
+		*.hook)    >&2 echo "exec hook: $hook";    "$hook"  ;;
+	esac
+done
 
 # check if there is a custom stylesheet and append it to the arrray
 if [ -f "$APPIMAGE".stylesheet ]; then
@@ -35,4 +42,3 @@ elif [ -f "$CURRENTDIR"/bin/"$1" ]; then
 else
 	exec "$CURRENTDIR"/bin/"$MAIN_BIN" "$@"
 fi
-
