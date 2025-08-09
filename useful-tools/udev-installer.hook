@@ -21,7 +21,7 @@
 
 set -e
 
-APPDIR="${APPDIR:-SHARUN_DIR}"
+APPDIR="${APPDIR:-$SHARUN_DIR}"
 CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 LOCKFILEPATH="$CACHEDIR"/."${APPIMAGE##*/}"-disable-udev-check
 UDEV_INSTALL_MSG="${UDEV_INSTALL_MSG:-${APPIMAGE##*/} needs udev rules in order to work. Do you wish to install them?}"
@@ -45,11 +45,11 @@ _sanity_check() {
 
 _display_message() {
 	if command -v kdialog 1>/dev/null; then
-		kdialog --yesno "$*" || return 1
+		kdialog --yesno "$*" 2>/dev/null || return 1
 	elif command -v yad 1>/dev/null; then
-		yad --text="$*" || return 1
+		yad --text="$*" 2>/dev/null || return 1
 	elif command -v zenity 1>/dev/null; then
-		zenity --question --text "$*" || return 1
+		zenity --question --text "$*" 2>/dev/null || return 1
 	fi
 }
 
