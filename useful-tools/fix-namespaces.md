@@ -17,7 +17,7 @@ If the user decides to NOT disable the restriction, the script will ask if they 
 
 # Usage
 
-To use simply download `fix-namespaces.sh` and execute it before starting your application.
+To use simply download `fix-namespaces.hook` and execute it before starting your application.
 
 The script has several checks to prevent false positives, but if they happen please open an issue and it will be fixed as soon as possible.
 
@@ -47,4 +47,3 @@ For more details see:
 * https://github.com/ivan-hc/AM/blob/main/docs/troubleshooting.md#ubuntu-mess
 
 * https://github.com/probonopd/go-appimage/issues/39#issuecomment-2849803316
-
