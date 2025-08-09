@@ -55,6 +55,7 @@ _check_update() {
 	appimageupdatetool -j "$APPIMAGE"
 	status=$?
 	set -e
+	# exit code higher than 1 likely means the app was not correctly packaged
 	case "$status" in
 		0) >&2 echo " ${APPIMAGE##*/} is up to date"; return 1;;
 		1) >&2 echo " ${APPIMAGE##*/} update is available"; return 0;;
