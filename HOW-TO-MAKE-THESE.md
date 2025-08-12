@@ -223,6 +223,11 @@ We have a helper script over sharun called [`quick-sharun`](https://github.com/p
 
 We also have a hook system that helps deal with common issues like installing [udev-rules](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/udev-installer.hook), [fixing namespaces restriction](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/fix-namespaces.hook) for apps that need them, [making the AppImage self updatable](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/self-updater.bg.hook), etc
 
+See the following examples where these scripts are used: 
+
+* [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/blob/e23bb10d2847875bc8bfe06d20a8db70ec490240/azahar-appimage.sh#L69-L98)
+* [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage/blob/fabd380217cf5e64cd448195674a9bf80c2f521f/cromite-appimage.sh#L5-L55)
+
 
 -----------------------------------
 
