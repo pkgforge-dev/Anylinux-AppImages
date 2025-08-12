@@ -10,7 +10,7 @@
 - [Further considerations](#further-considerations)
   - [Isn’t this very bloated?](#isnt-this-very-bloated)
   - [What about nvidia?](#what-about-nvidia)
-- [Alright I'm sold, how do I start?](#alright I'm sold, how do I start?)
+- [Alright I'm sold, how do I start?](#alright-im-sold-how-do-i-start)
 
 
 -----------------------------------
