@@ -10,6 +10,8 @@
 - [Further considerations](#further-considerations)
   - [Isn’t this very bloated?](#isnt-this-very-bloated)
   - [What about nvidia?](#what-about-nvidia)
+- [Alright I'm sold, how do I start?](#alright I'm sold, how do I start?)
+
 
 -----------------------------------
 
@@ -214,3 +216,19 @@ Goes without saying that sharun handles all of this already on its own.
 | - |
 
 -----------------------------------
+
+### *Alright I'm sold, how do I start?*
+
+We have a helper script over sharun called [`quick-sharun`](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/quick-sharun.sh) that greatly simplifies deployment of AppImages down to a few simple oneliners. 
+
+We also have a hook system that helps deal with common issues like installing [udev-rules](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/udev-installer.hook), [fixing namespaces restriction](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/fix-namespaces.hook) for apps that need them, [making the AppImage self updatable](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/self-updater.bg.hook), etc
+
+
+-----------------------------------
+
+| [Back to Index](#index) |
+| - |
+
+-----------------------------------
+
+
