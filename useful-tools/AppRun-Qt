@@ -11,11 +11,32 @@ fi
 set -e
 
 CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
-MAIN_BIN="$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$CURRENTDIR"/*.desktop)"
-MAIN_BIN="${MAIN_BIN##*/}"
 BIN="${ARGV0:-$0}"
 BIN="${BIN##*/}"
 unset ARGV0
+
+# get name of main binary from the .desktop file
+_get_main_bin_name() {
+	for f in "$CURRENTDIR"/*.desktop; do
+		[ -e "$f" ] || return 1
+		while IFS= read -r line; do
+			case "$line" in
+				Exec=*)
+					# strip Exec=
+					MAIN_BIN="${line#Exec=}"
+					# only get the bin name
+					MAIN_BIN="${MAIN_BIN##*/}"
+					# remove spaces and flags
+					MAIN_BIN="${MAIN_BIN%% *}"
+					return 0
+					;;
+			esac
+		done < "$f"
+	done
+	return 1
+}
+
+_get_main_bin_name
 
 # additional scripts can be placed in the top level bin dir
 # those with a name that ends up .hook will be executed in teh current shell
