@@ -225,8 +225,9 @@ We also have a hook system that helps deal with common issues like installing [u
 
 See the following examples where these scripts are used: 
 
-* [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/blob/e23bb10d2847875bc8bfe06d20a8db70ec490240/azahar-appimage.sh#L69-L98)
 * [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage/blob/fabd380217cf5e64cd448195674a9bf80c2f521f/cromite-appimage.sh#L5-L55)
+* [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/blob/7716accbc41a848b5734e7caa8eb697e38b38bcc/azahar-appimage.sh#L69-L98)
+* [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage/blob/3d69b2be0806dac0b0c8a08d0a5711a297a68761/scrcpy-appimage.sh#L5-L43)
 
 
 -----------------------------------
