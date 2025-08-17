@@ -21,8 +21,6 @@ SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/do
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/fritzw/ld-preload-open.git}
 
-DEFAULT_FLAGS=1
-
 DEPLOY_QT=${DEPLOY_QT:-0}
 DEPLOY_GTK=${DEPLOY_GTK:-0}
 DEPLOY_OPENGL=${DEPLOY_OPENGL:-0}
@@ -37,6 +35,14 @@ LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
 # for sharun
 export DST_DIR="$APPDIR"
 export GEN_LIB_PATH=1
+export HARD_LINKS=1
+export WITH_HOOKS=1
+export STRACE_MODE="${STRACE_MODE:-1}"
+export VERBOSE=1
+
+if [ -z "$NO_STRIP" ]; then
+	export STRIP=1
+fi
 
 _echo() {
 	printf '\033[1;92m%s\033[0m\n' " $*"
@@ -44,6 +50,62 @@ _echo() {
 
 _err_msg(){
 	>&2 printf '\033[1;31m%s\033[0m\n' " $*"
+}
+
+case "$1" in
+	''|--help)
+		_err_msg "USAGE: ${0##*/} /path/to/binaries_and_libraries"
+		_err_msg
+		_err_msg "You can also force bundling with vars, example:"
+		_err_msg "DEPLOY_OPENGL=1 ${0##*/} /path/to/bins"
+		_err_msg
+		exit 1
+		;;
+	*)
+		if [ -e "$1" ] && [ "$2" = "--" ]; then
+			STRACE_ARGS_PROVIDED=1
+		fi
+		;;
+esac
+
+if [ -z "$LIB_DIR" ]; then
+	if [ -d "/usr/lib/$ARCH-linux-gnu" ]; then
+		LIB_DIR="/usr/lib/$ARCH-linux-gnu"
+	elif [ -d "/usr/lib" ]; then
+		LIB_DIR="/usr/lib"
+	else
+		_err_msg "ERROR: there is no /usr/lib directory in this system"
+		_err_msg "set the LIB_DIR variable to where you have libraries"
+		exit 1
+	fi
+fi
+
+if command -v xvfb-run 1>/dev/null; then
+	XVFB_CMD="xvfb-run -a --"
+else
+	_err_msg "WARNING: xvfb-run was not detected on the system"
+	_err_msg "xvfb-run is used with sharun for strace mode, this is needed"
+	_err_msg "to find dlopened libraries as normally this script is going"
+	_err_msg "to be run in a headless enviromment where the application"
+	_err_msg "will fail to start and result strace mode will not be able"
+	_err_msg "to find the libraries dlopened by the application"
+	XVFB_CMD=""
+	sleep 3
+fi
+
+
+# POSIX shell doesn't support arrays we use awk to save it into a variable
+# then with 'eval set -- $var' we add it to the positional array
+# see https://unix.stackexchange.com/questions/421158/how-to-use-pseudo-arrays-in-posix-shell-script
+_save_array() {
+	LC_ALL=C awk -v q="'" '
+	BEGIN{
+		for (i=1; i<ARGC; i++) {
+			gsub(q, q "\\" q q, ARGV[i])
+			printf "%s ", q ARGV[i] q
+		}
+		print ""
+	}' "$@"
 }
 
 _download() {
@@ -60,43 +122,150 @@ _download() {
 	"$DOWNLOAD_CMD" "$@"
 }
 
-case "$1" in
-	''|--help)
-		_err_msg "USAGE: ${0##*/} /path/to/binaries_and_libraries"
-		_err_msg
-		_err_msg "You can also pass flags for sharun, example:"
-		_err_msg "${0##*/} l -p -v -s /path/to/bins_and_libs"
-		_err_msg
-		_err_msg "You can also force bundling with vars, example:"
-		_err_msg "DEPLOY_OPENGL=1 ${0##*/} /path/to/bins"
-		_err_msg
-		_err_msg "If first argument is not a flag we will default to:"
-		_err_msg "--dst-dir ./AppDir"
-		_err_msg "--verbose"
-		_err_msg "--with-hooks"
-		_err_msg "--strace-mode"
-		_err_msg "--gen-lib-path"
-		_err_msg "--hard-links"
-		_err_msg "--strip"
-		exit 1
-		;;
-	l)
-		echo "Using user provided flags instead of defaults"
-		DEFAULT_FLAGS=0
-		;;
-esac
+_determine_what_to_deploy() {
+	for bin do
+		# ignore flags
+		case "$bin" in
+			--) break   ;;
+			-*) continue;;
+		esac
 
-if [ -z "$LIB_DIR" ]; then
-	if [ -d "/usr/lib/$ARCH-linux-gnu" ]; then
-		LIB_DIR="/usr/lib/$ARCH-linux-gnu"
-	elif [ -d "/usr/lib" ]; then
-		LIB_DIR="/usr/lib"
-	else
-		_err_msg "ERROR: there is no /usr/lib directory in this system"
-		_err_msg "set the LIB_DIR variable to where you have libraries"
-		exit 1
+		# check linked libraries and enable each mode accordingly
+		for lib in $(ldd "$bin" | awk '{print $1}'); do
+			case "$lib" in
+				*libQt5Core.so*)
+					DEPLOY_QT=1
+					QT_DIR=qt5
+					;;
+				*libQt6Core.so*)
+					DEPLOY_QT=1
+					QT_DIR=qt6
+					;;
+				*libgtk-3*.so*)
+					DEPLOY_GTK=1
+					GTK_DIR=gtk-3.0
+					;;
+				*libgtk-4*.so*)
+					DEPLOY_GTK=1
+					GTK_DIR=gtk-4.0
+					;;
+				*libgdk_pixbuf*.so*)
+					DEPLOY_GDK=1
+					;;
+				*libpipewire*.so*)
+					DEPLOY_PIPEWIRE=1
+					;;
+			esac
+		done
+	done
+
+	if [ "$DEPLOY_QT" = 1 ] && [ -z "$QT_DIR" ]; then
+		_err_msg
+		_err_msg "WARNING: Qt deployment was forced but we do not know"
+		_err_msg "what version of Qt needs to be deployed!"
+		_err_msg "Defaulting to Qt6, if you do not want that set"
+		_err_msg "QT_DIR to the name of the Qt dir in $LIB_DIR"
+		_err_msg
+		QT_DIR=qt6
 	fi
-fi
+
+	if [ "$DEPLOY_GTK" = 1 ] && [ -z "$GTK_DIR" ]; then
+		_err_msg
+		_err_msg "WARNING: GTK deployment was forced but we do not know"
+		_err_msg "what version of GTK needs to be deployed!"
+		_err_msg "Defaulting to gtk-3.0, if you do not want that set"
+		_err_msg "GTK_DIR to the name of the gtk dir in $LIB_DIR"
+		_err_msg
+		GTK_DIR=gtk-3.0
+	fi
+}
+
+_make_deployment_array() {
+	# always deploy minimal amount of gconv
+	if [ -d "$LIB_DIR"/gconv ]; then
+		_echo "* Deploying minimal gconv"
+		set -- "$@" \
+			"$LIB_DIR"/gconv/UTF*.so*   \
+			"$LIB_DIR"/gconv/ANSI*.so*  \
+			"$LIB_DIR"/gconv/CP*.so*    \
+			"$LIB_DIR"/gconv/LATIN*.so* \
+			"$LIB_DIR"/gconv/UNICODE*.so*
+	fi
+	if [ "$DEPLOY_QT" = 1 ]; then
+		# some distros have a qt dir rather than qt6 or qt5 dir
+		if [ ! -d "$LIB_DIR"/"$QT_DIR" ]; then
+			QT_DIR=qt
+		fi
+		_echo "* Deploying $QT_DIR"
+		set -- "$@" \
+			"$LIB_DIR"/"$QT_DIR"/plugins/imageformats/*.so* \
+			"$LIB_DIR"/"$QT_DIR"/plugins/iconengines/*.so*  \
+			"$LIB_DIR"/"$QT_DIR"/plugins/platform*/*.so*    \
+			"$LIB_DIR"/"$QT_DIR"/plugins/styles/*.so*       \
+			"$LIB_DIR"/"$QT_DIR"/plugins/tls/*.so*          \
+			"$LIB_DIR"/"$QT_DIR"/plugins/wayland-*/*.so*    \
+			"$LIB_DIR"/"$QT_DIR"/plugins/xcbglintegrations/*.so*
+	fi
+	if [ "$DEPLOY_GTK" = 1 ]; then
+		_echo "* Deploying $GTK_DIR"
+		DEPLOY_GDK=1
+		set -- "$@" \
+			"$LIB_DIR"/"$GTK_DIR"/*/immodules/*   \
+			"$LIB_DIR"/gvfs/libgvfscommon.so      \
+			"$LIB_DIR"/gio/modules/libgvfsdbus.so \
+			"$LIB_DIR"/gio/modules/libdconfsettings.so
+	fi
+	if [ "$DEPLOY_GDK" = 1 ]; then
+		_echo "* Deploying gdk-pixbuf"
+		set -- "$@" \
+			"$LIB_DIR"/gdk-pixbuf-*/*/loaders/*
+
+	fi
+	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
+		set -- "$@" \
+			"$LIB_DIR"/dri/*   \
+			"$LIB_DIR"/vdpau/* \
+			"$LIB_DIR"/libgallium*.so*
+		if [ "$DEPLOY_OPENGL" = 1 ]; then
+			_echo "* Deploying OpenGL"
+			set -- "$@" \
+				"$LIB_DIR"/libEGL*.so*   \
+				"$LIB_DIR"/libGLX*.so*   \
+				"$LIB_DIR"/libGL.so*     \
+				"$LIB_DIR"/libOpenGL.so* \
+				"$LIB_DIR"/libGLESv2.so*
+		fi
+		if [ "$DEPLOY_VULKAN" = 1 ]; then
+			_echo "* Deploying vulkan"
+			set -- "$@" \
+				"$LIB_DIR"/libvulkan*.so*  \
+				"$LIB_DIR"/libVkLayer*.so*
+		fi
+	fi
+	if [ "$DEPLOY_PIPEWIRE" = 1 ]; then
+		_echo "* Deploying pipewire"
+		set -- "$@" \
+			"$LIB_DIR"/pipewire-*/* \
+			"$LIB_DIR"/spa-*/*      \
+			"$LIB_DIR"/spa-*/*/*    \
+			"$LIB_DIR"/alsa-lib/*pipewire*.so*
+	fi
+
+	TO_DEPLOY_ARRAY=$(_save_array "$@")
+}
+
+
+_echo "------------------------------------------------------------"
+_echo "Starting deployment, checking if extra libraries need to be added..."
+echo ""
+
+mkdir -p "$APPDIR"
+_determine_what_to_deploy "$@"
+_make_deployment_array
+
+echo ""
+_echo "Now jumping to sharun..."
+_echo "------------------------------------------------------------"
 
 if [ ! -x "$TMPDIR"/sharun-aio ]; then
 	_echo "Downloading sharun..."
@@ -104,160 +273,20 @@ if [ ! -x "$TMPDIR"/sharun-aio ]; then
 	chmod +x "$TMPDIR"/sharun-aio
 fi
 
-for bin do
-	# ignore flags
-	case "$bin" in
-		-*) continue;;
-		--) break   ;;
-	esac
+ARRAY=$(_save_array l "$@")
+eval set -- "$ARRAY"
 
-	# check linked libraries and enable each mode accordingly
-	for lib in $(ldd "$bin" | awk '{print $1}'); do
-		case "$lib" in
-			*libQt5Core.so*)     DEPLOY_QT=1;  QT_DIR=qt5     ;;
-			*libQt6Core.so*)     DEPLOY_QT=1;  QT_DIR=qt6     ;;
-			*libgtk-3*.so*)      DEPLOY_GTK=1; GTK_DIR=gtk-3.0;;
-			*libgtk-4*.so*)      DEPLOY_GTK=1; GTK_DIR=gtk-4.0;;
-			*libgdk_pixbuf*.so*) DEPLOY_GDK=1                 ;;
-			*libpipewire*.so*)   DEPLOY_PIPEWIRE=1            ;;
-		esac
-	done
-done
-
-if [ "$DEPLOY_QT" = 1 ] && [ -z "$QT_DIR" ]; then
-	_err_msg
-	_err_msg "WARNING: Qt deployment was forced but we do not know what"
-	_err_msg "version of Qt needs to be deployed!"
-	_err_msg "We will default to Qt6, if you do not want that set the"
-	_err_msg "QT_DIR variable to the name of the Qt dir in $LIB_DIR"
-	_err_msg
-	QT_DIR=qt6
-fi
-
-if [ "$DEPLOY_GTK" = 1 ] && [ -z "$GTK_DIR" ]; then
-	_err_msg
-	_err_msg "WARNING: GTK deployment was forced but we do not know what"
-	_err_msg "version of GTK needs to be deployed!"
-	_err_msg "We will default to gtk-3.0, if you do not want that set the"
-	_err_msg "GTK_DIR variable to the name of the gtk dir in $LIB_DIR"
-	_err_msg
-	GTK_DIR=gtk-3.0
-fi
-
-_echo "------------------------------------------------------------"
-_echo "Starting deployment, checking if extra libraries need to be added..."
-echo ""
-
-# always deploy minimal amount of gconv
-if [ -d "$LIB_DIR"/gconv ]; then
-	_echo "* Deploying minimal gconv"
-	set -- "$@" \
-		"$LIB_DIR"/gconv/UTF*.so*   \
-		"$LIB_DIR"/gconv/ANSI*.so*  \
-		"$LIB_DIR"/gconv/CP*.so*    \
-		"$LIB_DIR"/gconv/LATIN*.so* \
-		"$LIB_DIR"/gconv/UNICODE*.so*
-fi
-
-if [ "$DEPLOY_QT" = 1 ]; then
-	# some distros have a qt dir rather than qt6 or qt5 dir
-	if [ ! -d "$LIB_DIR"/"$QT_DIR" ]; then
-		QT_DIR=qt
-	fi
-
-	_echo "* Deploying $QT_DIR"
-	set -- "$@" \
-		"$LIB_DIR"/"$QT_DIR"/plugins/imageformats/*.so* \
-		"$LIB_DIR"/"$QT_DIR"/plugins/iconengines/*.so*  \
-		"$LIB_DIR"/"$QT_DIR"/plugins/platform*/*.so*    \
-		"$LIB_DIR"/"$QT_DIR"/plugins/styles/*.so*       \
-		"$LIB_DIR"/"$QT_DIR"/plugins/tls/*.so*          \
-		"$LIB_DIR"/"$QT_DIR"/plugins/wayland-*/*.so*    \
-		"$LIB_DIR"/"$QT_DIR"/plugins/xcbglintegrations/*.so*
-fi
-
-if [ "$DEPLOY_GTK" = 1 ]; then
-	_echo "* Deploying $GTK_DIR"
-	DEPLOY_GDK=1
-	set -- "$@" \
-		"$LIB_DIR"/"$GTK_DIR"/*/immodules/*   \
-		"$LIB_DIR"/gvfs/libgvfscommon.so      \
-		"$LIB_DIR"/gio/modules/libgvfsdbus.so \
-		"$LIB_DIR"/gio/modules/libdconfsettings.so
-fi
-
-if [ "$DEPLOY_GDK" = 1 ]; then
-	_echo "* Deploying gdk-pixbuf"
-	set -- "$@" \
-		"$LIB_DIR"/gdk-pixbuf-*/*/loaders/*
-
-fi
-
-if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
-	set -- "$@" \
-		"$LIB_DIR"/dri/*   \
-		"$LIB_DIR"/vdpau/* \
-		"$LIB_DIR"/libgallium*.so*
-
-	if [ "$DEPLOY_OPENGL" = 1 ]; then
-		_echo "* Deploying OpenGL"
-		set -- "$@" \
-			"$LIB_DIR"/libEGL*.so*   \
-			"$LIB_DIR"/libGLX*.so*   \
-			"$LIB_DIR"/libGL.so*     \
-			"$LIB_DIR"/libOpenGL.so* \
-			"$LIB_DIR"/libGLESv2.so*
-	fi
-
-	if [ "$DEPLOY_VULKAN" = 1 ]; then
-		_echo "* Deploying vulkan"
-		set -- "$@" \
-			"$LIB_DIR"/libvulkan*.so*  \
-			"$LIB_DIR"/libVkLayer*.so*
-	fi
-fi
-
-if [ "$DEPLOY_PIPEWIRE" = 1 ]; then
-	_echo "* Deploying pipewire"
-	set -- "$@" \
-		"$LIB_DIR"/pipewire-*/* \
-		"$LIB_DIR"/spa-*/*      \
-		"$LIB_DIR"/spa-*/*/*    \
-		"$LIB_DIR"/alsa-lib/*pipewire*.so*
-fi
-
-
-if command -v xvfb-run 1>/dev/null; then
-	XVFB_CMD="xvfb-run -a --"
-else
-	_err_msg "WARNING: xvfb-run was not detected on the system"
-	_err_msg "xvfb-run is used with sharun for strace mode, this is needed"
-	_err_msg "to find dlopened libraries as normally this script is going"
-	_err_msg "to be run in a headless enviromment where the application"
-	_err_msg "will fail to start and result strace mode will not be able"
-	_err_msg "to find the libraries dlopened by the application"
-	XVFB_CMD=""
-	sleep 3
-fi
-
-echo ""
-_echo "Now jumping to sharun..."
-_echo "------------------------------------------------------------"
-
-if [ "$DEFAULT_FLAGS" = 1 ]; then
-	mkdir -p ./AppDir
-	$XVFB_CMD \
-		"$TMPDIR"/sharun-aio l  \
-		--verbose               \
-		--with-hooks            \
-		--strace-mode           \
-		--gen-lib-path          \
-		--hard-links            \
-		--strip                 \
-		"$@"
-else
+# when strace args are given sharun will only use them when
+# you pass a single binary to it that is:
+# 'sharun-aio l /path/to/bin -- google.com' works (the app does the action)
+# 'sharun-aio l /path/to/lib /path/to/bin -- google.com' does not work
+if [ "$STRACE_ARGS_PROVIDED" = 1 ]; then
 	$XVFB_CMD "$TMPDIR"/sharun-aio "$@"
 fi
+
+# now merge the deployment array
+eval set -- "$ARRAY" "$TO_DEPLOY_ARRAY"
+$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
 
 echo ""
 _echo "------------------------------------------------------------"
