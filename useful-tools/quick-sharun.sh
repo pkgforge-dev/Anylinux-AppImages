@@ -374,6 +374,24 @@ elif [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
 	echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}' >> "$APPDIR"/.env
 	_echo "* Patched away /usr from binaries..."
 	echo ""
+elif [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
+	_tmp_bin="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 3)"
+	_tmp_lib="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 3)"
+	_tmp_share="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 5)"
+
+	sed -i \
+		-e "s|/usr/bin|/tmp/$_tmp_bin|g" \
+		-e "s|/usr/lib|/tmp/$_tmp_lib|g" \
+		-e "s|/usr/share|/tmp/$_tmp_share|g" \
+		"$APPDIR"/shared/bin/*
+
+	echo "_tmp_bin=$_tmp_bin" >> ./AppDir/.env
+	echo "_tmp_lib=$_tmp_lib" >> ./AppDir/.env
+	echo "_tmp_share=$_tmp_share" >> ./AppDir/.env
+	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
+
+	_echo "* Patched away /usr from binaries for random dirs in /tmp..."
+	echo ""
 fi
 
 if [ "$DEPLOY_DATADIR" = 1 ]; then
