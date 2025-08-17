@@ -12,6 +12,7 @@ fi
 set -e
 
 CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
+export CURRENTDIR
 BIN="${ARGV0:-$0}"
 BIN="${BIN##*/}"
 unset ARGV0
