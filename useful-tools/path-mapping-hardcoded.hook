@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# this script makes symnlinks to the hardcoded random dirs that were
+# patched away when 'PATH_MAPPING_HARDCODED' is used with quick-sharun
+
+if [ -f "$CURRENTDIR"/.env ]; then
+	. "$CURRENTDIR"/.env
+	[ -n "$_tmp_bin" ]   && ln -sfn "$CURRENTDIR"/bin    /tmp/"$_tmp_bin"
+	[ -n "$_tmp_lib" ]   && ln -sfn "$CURRENTDIR"/lib    /tmp/"$_tmp_lib"
+	[ -n "$_tmp_share" ] && ln -sfn "$CURRENTDIR"/share  /tmp/"$_tmp_share"
+fi
+
