@@ -273,19 +273,18 @@ if [ ! -x "$TMPDIR"/sharun-aio ]; then
 	chmod +x "$TMPDIR"/sharun-aio
 fi
 
-ARRAY=$(_save_array l "$@")
-eval set -- "$ARRAY"
-
 # when strace args are given sharun will only use them when
 # you pass a single binary to it that is:
 # 'sharun-aio l /path/to/bin -- google.com' works (the app does the action)
 # 'sharun-aio l /path/to/lib /path/to/bin -- google.com' does not work
 if [ "$STRACE_ARGS_PROVIDED" = 1 ]; then
-	$XVFB_CMD "$TMPDIR"/sharun-aio "$@"
+	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
 fi
 
 # now merge the deployment array
-eval set -- "$ARRAY" "$TO_DEPLOY_ARRAY"
+ARRAY=$(_save_array "$@")
+eval set -- "$TO_DEPLOY_ARRAY" "$ARRAY"
+
 $XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
 
 echo ""
