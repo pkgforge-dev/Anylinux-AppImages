@@ -519,7 +519,7 @@ set -- \
 
 for lib do case "$lib" in
 	*libp11-kit.so*)
-		if ! grep  -Eaoq -m 1 "/usr/lib" "$lib"; then
+		if ! grep -Eaoq -m 1 "/usr/lib" "$lib"; then
 			continue
 		fi
 		sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$lib"
