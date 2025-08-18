@@ -439,17 +439,6 @@ if [ "$DEPLOY_LOCALE" = 1 ]; then
 	echo ""
 fi
 
-set -- "$APPDIR"/bin/*.hook
-if [ -f "$1" ] && [ ! -f "$APPDIR"/AppRun ]; then
-	_echo "* Adding $APPRUN..."
-	_download "$APPDIR"/AppRun "$HOOKSRC"/"$APPRUN"
-elif [ ! -f "$APPDIR"/AppRun ]; then
-	_echo "* Hardlinking $APPDIR/sharun as $APPDIR/AppRun..."
-	ln -v "$APPDIR"/sharun "$APPDIR"/AppRun
-fi
-
-chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook 2>/dev/null || true
-
 if [ "$DESKTOP" = "DUMMY" ]; then
 	# use the first binary name in shared/bin as filename
 	set -- "$APPDIR"/shared/bin/*
@@ -584,6 +573,17 @@ if [ -n "$ADD_HOOKS" ]; then
 		fi
 	done
 fi
+
+set -- "$APPDIR"/bin/*.hook
+if [ -f "$1" ] && [ ! -f "$APPDIR"/AppRun ]; then
+	_echo "* Adding $APPRUN..."
+	_download "$APPDIR"/AppRun "$HOOKSRC"/"$APPRUN"
+elif [ ! -f "$APPDIR"/AppRun ]; then
+	_echo "* Hardlinking $APPDIR/sharun as $APPDIR/AppRun..."
+	ln -v "$APPDIR"/sharun "$APPDIR"/AppRun
+fi
+
+chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook 2>/dev/null || true
 
 
 _echo "------------------------------------------------------------"
