@@ -532,7 +532,7 @@ for lib do case "$lib" in
 		# good path that library should have
 		ssl_path="/etc/ssl/certs/ca-certificates.crt"
 
-		# string has to be same lenght
+		# string has to be same length
 		problem_path="/usr/share/ca-certificates/trust-source"
 		ssl_path_fix="/etc/ssl/certs//////ca-certificates.crt"
 
