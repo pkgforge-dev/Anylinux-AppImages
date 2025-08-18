@@ -44,7 +44,7 @@ We also try to avoid the usage of containers and other methods; so far, the only
 | 26  | [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
 | 27  | ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 | 28  | [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
-| 29  | [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                           |
+| 29  | [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 | 30  | [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
 | 31  | [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
 | 32  | [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
