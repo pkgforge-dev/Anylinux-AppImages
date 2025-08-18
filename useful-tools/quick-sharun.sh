@@ -539,7 +539,6 @@ for lib do case "$lib" in
 		if grep -Eaoq -m 1 "$ssl_path" "$lib"; then
 			continue # all good nothing to fix
 		elif grep -Eaoq -m 1 "$problem_path" "$lib"; then
-
 			sed -i -e "s|$problem_path|$ssl_path_fix|g" "$lib"
 		else
 			continue # TODO add more possible problematic paths
