@@ -32,6 +32,10 @@ DEPLOY_LOCALE=${DEPLOY_LOCALE:-0}
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
 LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
 
+_tmp_bin="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 3)"
+_tmp_lib="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 3)"
+_tmp_share="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 5)"
+
 # for sharun
 export DST_DIR="$APPDIR"
 export GEN_LIB_PATH=1
@@ -276,6 +280,12 @@ _make_deployment_array() {
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
 }
 
+_add_tmp_lib_dir_to_env() {
+	if ! grep -q "_tmp_lib=$_tmp_lib" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_lib=$_tmp_lib" >> "$APPDIR"/.env
+	fi
+}
+
 _echo "------------------------------------------------------------"
 _echo "Starting deployment, checking if extra libraries need to be added..."
 echo ""
@@ -375,19 +385,15 @@ elif [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
 	_echo "* Patched away /usr from binaries..."
 	echo ""
 elif [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
-	_tmp_bin="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 3)"
-	_tmp_lib="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 3)"
-	_tmp_share="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 5)"
-
 	sed -i \
 		-e "s|/usr/bin|/tmp/$_tmp_bin|g" \
 		-e "s|/usr/lib|/tmp/$_tmp_lib|g" \
 		-e "s|/usr/share|/tmp/$_tmp_share|g" \
 		"$APPDIR"/shared/bin/*
 
-	echo "_tmp_bin=$_tmp_bin" >> ./AppDir/.env
-	echo "_tmp_lib=$_tmp_lib" >> ./AppDir/.env
-	echo "_tmp_share=$_tmp_share" >> ./AppDir/.env
+	echo "_tmp_bin=$_tmp_bin" >> "$APPDIR"/.env
+	echo "_tmp_lib=$_tmp_lib" >> "$APPDIR"/.env
+	echo "_tmp_share=$_tmp_share" >> "$APPDIR"/.env
 	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 
 	_echo "* Patched away /usr from binaries for random dirs in /tmp..."
@@ -431,24 +437,6 @@ if [ "$DEPLOY_LOCALE" = 1 ]; then
 		find "$APPDIR"/share/locale "$@" -type f -delete
 	fi
 	echo ""
-fi
-
-if [ -n "$ADD_HOOKS" ]; then
-	old_ifs="$IFS"
-	IFS=':'
-	set -- $ADD_HOOKS
-	IFS="$old_ifs"
-	hook_dst="$APPDIR"/bin
-	for hook do
-		if _download "$hook_dst"/"$hook" "$HOOKSRC"/"$hook"; then
-			_echo "* Added $hook"
-			echo ""
-		else
-			_err_msg "ERROR: Failed to download $hook, valid link?"
-			_err_msg "$HOOKSRC/$hook"
-			exit 1
-		fi
-	done
 fi
 
 set -- "$APPDIR"/bin/*.hook
@@ -530,5 +518,74 @@ find "$APPDIR"/share/icons/hicolor "$@" -type f -delete
 
 echo ""
 _echo "------------------------------------------------------------"
-_echo "Finished deployment!"
+_echo "Finished deployment! Starting post deployment hooks"
+_echo "------------------------------------------------------------"
+echo ""
+
+set -- \
+	"$APPDIR"/lib/*.so*       \
+	"$APPDIR"/lib/*/*.so*     \
+	"$APPDIR"/lib/*/*/*.so*   \
+	"$APPDIR"/lib/*/*/*/*.so*
+
+for lib do case "$lib" in
+	*libp11-kit.so*)
+		if ! grep  -Eaoq -m 1 "/usr/lib" "$lib"; then
+			continue
+		fi
+		sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$lib"
+
+		_echo "* patched away /usr/lib from $lib"
+		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
+		_add_tmp_lib_dir_to_env
+		;;
+	*p11-kit-trust.so*)
+		# good path that library should have
+		ssl_path="/etc/ssl/certs/ca-certificates.crt"
+
+		# string has to be same lenght
+		problem_path="/usr/share/ca-certificates/trust-source"
+		ssl_path_fix="/etc/ssl/certs//////ca-certificates.crt"
+
+		if grep -Eaoq -m 1 "$ssl_path" "$lib"; then
+			continue # all good nothing to fix
+		elif grep -Eaoq -m 1 "$problem_path" "$lib"; then
+
+			sed -i -e "s|$problem_path|$ssl_path_fix|g" "$lib"
+		else
+			continue # TODO add more possible problematic paths
+		fi
+
+		_echo "* fixed path to /etc/ssl/certs in $lib"
+		;;
+	esac
+done
+
+echo ""
+_echo "------------------------------------------------------------"
+echo ""
+
+if [ -n "$ADD_HOOKS" ]; then
+	old_ifs="$IFS"
+	IFS=':'
+	set -- $ADD_HOOKS
+	IFS="$old_ifs"
+	hook_dst="$APPDIR"/bin
+	for hook do
+		if [ -f "$hook_dst"/"$hook" ]; then
+			continue
+		elif _download "$hook_dst"/"$hook" "$HOOKSRC"/"$hook"; then
+			_echo "* Added $hook"
+			echo ""
+		else
+			_err_msg "ERROR: Failed to download $hook, valid link?"
+			_err_msg "$HOOKSRC/$hook"
+			exit 1
+		fi
+	done
+fi
+
+
+_echo "------------------------------------------------------------"
+_echo "All done!"
 _echo "------------------------------------------------------------"
