@@ -618,7 +618,7 @@ _patch_away_usr_share_dir() {
 		return 1
 	fi
 
-	sed -i -e "s|/usr/lib|/tmp/$_tmp_share|g" "$1"
+	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
 
 	if ! grep -q "_tmp_lib='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
 		echo "_tmp_lib='$_tmp_share'" >> "$APPDIR"/.env
