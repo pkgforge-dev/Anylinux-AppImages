@@ -43,7 +43,7 @@ if [ -f "$APPDIR"/.env ]; then
 	done < "$APPDIR"/.env
 fi
 
-regex='A-Za-z0-9_=<>@%-&^+&{}()#'
+regex='A-Za-z0-9_=<>@%-^+{}()#'
 _tmp_bin="${_tmp_bin:-$(tr -dc "$regex" < /dev/urandom | head -c 3)}"
 _tmp_lib="${_tmp_lib:-$(tr -dc "$regex" < /dev/urandom | head -c 3)}"
 _tmp_share="${_tmp_share:-$(tr -dc "$regex" < /dev/urandom | head -c 5)}"
