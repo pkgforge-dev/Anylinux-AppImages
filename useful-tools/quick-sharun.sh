@@ -620,8 +620,8 @@ _patch_away_usr_share_dir() {
 
 	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
 
-	if ! grep -q "_tmp_lib='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
-		echo "_tmp_lib='$_tmp_share'" >> "$APPDIR"/.env
+	if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/share from $1"
