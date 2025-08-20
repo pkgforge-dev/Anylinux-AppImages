@@ -26,15 +26,27 @@ DEPLOY_GTK=${DEPLOY_GTK:-0}
 DEPLOY_OPENGL=${DEPLOY_OPENGL:-0}
 DEPLOY_VULKAN=${DEPLOY_VULKAN:-0}
 DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-0}
+DEPLOY_GSTREAMER=${DEPLOY_PIPEWIRE:-0}
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-0}
 
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
 LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
 
-_tmp_bin="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 3)"
-_tmp_lib="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 3)"
-_tmp_share="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 5)"
+# check if the _tmp_* vars have not be declared already
+# likely to happen if this script run more than once
+if [ -f "$APPDIR"/.env ]; then
+	while IFS= read -r line; do
+		case "$line" in
+			_tmp_*) eval "$line";;
+		esac
+	done < "$APPDIR"/.env
+fi
+
+regex='A-Za-z0-9_=<>@%-&^+&{}()#'
+_tmp_bin="${_tmp_bin:-$(tr -dc "$regex" < /dev/urandom | head -c 3)}"
+_tmp_lib="${_tmp_lib:-$(tr -dc "$regex" < /dev/urandom | head -c 3)}"
+_tmp_share="${_tmp_share:-$(tr -dc "$regex" < /dev/urandom | head -c 5)}"
 
 # for sharun
 export DST_DIR="$APPDIR"
@@ -134,6 +146,11 @@ _download() {
 	"$DOWNLOAD_CMD" "$@"
 }
 
+_remove_empty_dirs() {
+	find "$1" -type d \
+	  -exec rmdir -p --ignore-fail-on-non-empty {} + 2>/dev/null || true
+}
+
 _determine_what_to_deploy() {
 	mkdir -p "$APPDIR"
 	for bin do
@@ -167,6 +184,9 @@ _determine_what_to_deploy() {
 					;;
 				*libpipewire*.so*)
 					DEPLOY_PIPEWIRE=1
+					;;
+				*libgstreamer*.so*)
+					DEPLOY_GSTREAMER=1
 					;;
 			esac
 		done
@@ -277,13 +297,140 @@ _make_deployment_array() {
 			"$LIB_DIR"/spa-*/*/*    \
 			"$LIB_DIR"/alsa-lib/*pipewire*.so*
 	fi
+	if [ "$DEPLOY_GSTREAMER" = 1 ]; then
+		_echo "* Deploying gstreamer"
+		set -- "$@" \
+			"$LIB_DIR"/gstreamer*/* \
+			"$LIB_DIR"/gstreamer*/*/*
+	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
 }
 
+_get_sharun() {
+	if [ ! -x "$TMPDIR"/sharun-aio ]; then
+		_echo "Downloading sharun..."
+		_download "$TMPDIR"/sharun-aio "$SHARUN_LINK"
+		chmod +x "$TMPDIR"/sharun-aio
+	fi
+}
+
+_deploy_libs() {
+	# when strace args are given sharun will only use them when
+	# you pass a single binary to it that is:
+	# 'sharun-aio l /path/to/bin -- google.com' works (site is opened)
+	# 'sharun-aio l /path/to/lib /path/to/bin -- google.com' does not work
+	if [ "$STRACE_ARGS_PROVIDED" = 1 ]; then
+		$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
+	fi
+
+	# now merge the deployment array
+	ARRAY=$(_save_array "$@")
+	eval set -- "$TO_DEPLOY_ARRAY" "$ARRAY"
+
+	if [ -n "$PYTHON_PACKAGES" ]; then
+		STRACE_MODE=0
+	fi
+	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
+
+	# strace the individual python pacakges
+	if [ -n "$PYTHON_PACKAGES" ]; then
+		# if not unsetlib4bin will replace the top level sharun
+		# with a hardlink to python breaking everything
+		unset  WITH_PYTHON PYTHON_VER
+
+		old_ifs="$IFS"
+		IFS=':'
+		set -- $PYTHON_PACKAGES
+		IFS="$old_ifs"
+
+		for pypkg do
+			pybin="$APPDIR"/bin/"$pypkg"
+			[ -e "$pybin" ] || continue
+			_echo "Running strace on python package $pypkg..."
+			$XVFB_CMD "$TMPDIR"/sharun-aio l \
+				--strace-mode  "$APPDIR"/sharun -- "$pybin"
+		done
+	fi
+}
+
+_handle_helper_bins() {
+	# check for gstreamer binaries these need to be in the gstreamer libdir
+	# since sharun will set the following vars to that location:
+	# GST_PLUGIN_PATH
+	# GST_PLUGIN_SYSTEM_PATH
+	# GST_PLUGIN_SYSTEM_PATH_1_0
+	# GST_PLUGIN_SCANNER
+	set -- "$APPDIR"/shared/lib/gstreamer-*
+	if [ -d "$1" ]; then
+		gstlibdir="$1"
+		set -- "$APPDIR"/shared/bin/gst-*
+		for bin do
+			if [ -f "$bin" ]; then
+				ln "$APPDIR"/sharun "$gstlibdir"/"${bin##*/}"
+			fi
+		done
+	fi
+
+	# TODO add more instances of helper bins
+}
+_map_paths_ld_preload_open() {
+	case "$PATH_MAPPING" in
+		*'${SHARUN_DIR}'*) true    ;;
+		'')                return 0;;
+		*)
+			_err_msg 'ERROR: PATH_MAPPING must contain unexpanded'
+			_err_msg '${SHARUN_DIR} variable for this to work'
+			_err_msg 'Example:'
+			_err_msg "'PATH_MAPPING=/etc:\${SHARUN_DIR}/etc'"
+			_err_msg 'NOTE: The braces in the variable are needed'
+			exit 1
+			;;
+	esac
+
+	deps="git make"
+	for d in $deps; do
+		if ! command -v "$d" 1>/dev/null; then
+			_err_msg "ERROR: Using PATH_MAPPING requires $d"
+			exit 1
+		fi
+	done
+
+	_echo "* Building $LD_PRELOAD_OPEN..."
+
+	rm -rf "$TMPDIR"/ld-preload-open
+	git clone "$LD_PRELOAD_OPEN" "$TMPDIR"/ld-preload-open && (
+		cd "$TMPDIR"/ld-preload-open
+		make all
+	)
+
+	mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/lib
+	echo "path-mapping.so" >> "$APPDIR"/.preload
+	echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPDIR"/.env
+	_echo "* PATH_MAPPING successfully added!"
+	echo ""
+}
+
+_map_paths_binary_patch() {
+	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
+		sed -i -e 's|/usr|././|g' "$APPDIR"/shared/bin/*
+		echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}' >> "$APPDIR"/.env
+		_echo "* Patched away /usr from binaries..."
+		echo ""
+	elif [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
+		set -- "$APPDIR"/shared/bin/*
+		for bin do
+			_patch_away_usr_bin_dir   "$bin"
+			_patch_away_usr_lib_dir   "$bin"
+			_patch_away_usr_share_dir "$bin"
+		done
+	fi
+}
+
 _deploy_datadir() {
 	if [ "$DEPLOY_DATADIR" = 1 ]; then
-		for bin in "$APPDIR"/bin/*; do
+		set -- "$APPDIR"/bin/*
+		for bin do
 			[ -x "$bin" ] || continue
 			bin="${bin##*/}"
 			for datadir in /usr/local/share/* /usr/share/*; do
@@ -299,25 +446,36 @@ _deploy_datadir() {
 }
 
 _deploy_locale() {
+	set -- "$APPDIR"/shared/bin/*
+	for bin do
+		if grep -Eaoq -m 1 "/usr/share/locale" "$bin"; then
+			DEPLOY_LOCALE=1
+			_patch_away_usr_share_dir "$bin"
+		fi
+	done
+
 	if [ "$DEPLOY_LOCALE" = 1 ]; then
 		mkdir -p "$APPDIR"/share
 		_echo "* Adding locales..."
-		cp -vr "$LOCALE_DIR" "$APPDIR"/share
+		cp -r "$LOCALE_DIR" "$APPDIR"/share
 		if [ "$DEBLOAT_LOCALE" = 1 ]; then
 			_echo "* Removing unneeded locales..."
 			set -- \
-			! -name '*glib*' \
-			! -name '*gdk*'  \
-			! -name '*gtk*'  \
-			! -name '*tls*'  \
-			! -name '*p11*'  \
-			! -name '*v4l*'  \
-			! -name '*gettext*'
+			! -name '*glib*'       \
+			! -name '*gdk*'        \
+			! -name '*gtk*'        \
+			! -name '*tls*'        \
+			! -name '*p11*'        \
+			! -name '*v4l*'        \
+			! -name '*gettext*'    \
+			! -name '*gst-plugin*' \
+			! -name '*gstreamer*'
 			for f in "$APPDIR"/shared/bin/*; do
 				f=${f##*/}
 				set -- "$@" ! -name "*$f*"
 			done
 			find "$APPDIR"/share/locale "$@" -type f -delete
+			_remove_empty_dirs "$APPDIR"/share/locale
 		fi
 		echo ""
 	fi
@@ -389,6 +547,15 @@ _deploy_icon_and_desktop() {
 	fi
 
 	find "$APPDIR"/share/icons/hicolor "$@" -type f -delete
+	_remove_empty_dirs "$APPDIR"/share/icons/hicolor
+
+	# make sure there is no hardcoded path to /usr/share/icons in bins
+	set -- "$APPDIR"/shared/bin/*
+	for bin do
+		if grep -Eaoq -m 1 "/usr/share" "$bin"; then
+			_patch_away_usr_share_dir "$bin"
+		fi
+	done
 }
 
 _check_window_class() {
@@ -414,7 +581,21 @@ _check_window_class() {
 
 	class=${STARTUPWMCLASS:-$bin}
 	sed -i -e "/\[Desktop Entry\]/a\StartupWMClass=$class" "$1"
+}
 
+_patch_away_usr_bin_dir() {
+	if ! grep -Eaoq -m 1 "/usr/bin" "$1"; then
+		return 1
+	fi
+
+	sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
+
+	if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
+	fi
+
+	_echo "* patched away /usr/bin from $1"
+	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 }
 
 _patch_away_usr_lib_dir() {
@@ -424,8 +605,8 @@ _patch_away_usr_lib_dir() {
 
 	sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
 
-	if ! grep -q "_tmp_lib=$_tmp_lib" "$APPDIR"/.env 2>/dev/null; then
-		echo "_tmp_lib=$_tmp_lib" >> "$APPDIR"/.env
+	if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/lib from $1"
@@ -439,8 +620,8 @@ _patch_away_usr_share_dir() {
 
 	sed -i -e "s|/usr/lib|/tmp/$_tmp_share|g" "$1"
 
-	if ! grep -q "_tmp_lib=$_tmp_share" "$APPDIR"/.env 2>/dev/null; then
-		echo "_tmp_lib=$_tmp_share" >> "$APPDIR"/.env
+	if ! grep -q "_tmp_lib='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_lib='$_tmp_share'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/share from $1"
@@ -458,108 +639,16 @@ echo ""
 _echo "Now jumping to sharun..."
 _echo "------------------------------------------------------------"
 
-if [ ! -x "$TMPDIR"/sharun-aio ]; then
-	_echo "Downloading sharun..."
-	_download "$TMPDIR"/sharun-aio "$SHARUN_LINK"
-	chmod +x "$TMPDIR"/sharun-aio
-fi
-
-# when strace args are given sharun will only use them when
-# you pass a single binary to it that is:
-# 'sharun-aio l /path/to/bin -- google.com' works (the app does the action)
-# 'sharun-aio l /path/to/lib /path/to/bin -- google.com' does not work
-if [ "$STRACE_ARGS_PROVIDED" = 1 ]; then
-	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
-fi
-
-# now merge the deployment array
-ARRAY=$(_save_array "$@")
-eval set -- "$TO_DEPLOY_ARRAY" "$ARRAY"
-
-if [ -n "$PYTHON_PACKAGES" ]; then
-	STRACE_MODE=0
-fi
-$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
-
-# strace the individual python pacakges
-if [ -n "$PYTHON_PACKAGES" ]; then
-	# if not unset for some reason lib4bin will replace the top level
-	# sharun with a hardlink to python breaking everything
-	unset  WITH_PYTHON PYTHON_VER
-
-	old_ifs="$IFS"
-	IFS=':'
-	set -- $PYTHON_PACKAGES
-	IFS="$old_ifs"
-
-	for pypkg do
-		pybin="$APPDIR"/bin/"$pypkg"
-		[ -e "$pybin" ] || continue
-		_echo "Running strace on python package $pypkg..."
-		$XVFB_CMD "$TMPDIR"/sharun-aio l \
-			--strace-mode  "$APPDIR"/sharun -- "$pybin"
-	done
-fi
+_get_sharun
+_deploy_libs "$@"
+_handle_helper_bins
 
 echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
-if [ -n "$PATH_MAPPING" ]; then
-	case "$PATH_MAPPING" in
-		*'${SHARUN_DIR}'*) true;;
-		*)
-			_err_msg 'ERROR: PATH_MAPPING must contain unexpanded'
-			_err_msg '${SHARUN_DIR} variable for this to work'
-			_err_msg 'Example:'
-			_err_msg "'PATH_MAPPING=/etc:\${SHARUN_DIR}/etc'"
-			_err_msg 'NOTE: The braces in the variable are needed'
-			exit 1
-			;;
-	esac
-
-	deps="git make"
-	for d in $deps; do
-		if ! command -v "$d" 1>/dev/null; then
-			_err_msg "ERROR: Using PATH_MAPPING requires $d"
-			exit 1
-		fi
-	done
-
-	_echo "* Building $LD_PRELOAD_OPEN..."
-
-	rm -rf "$TMPDIR"/ld-preload-open
-	git clone "$LD_PRELOAD_OPEN" "$TMPDIR"/ld-preload-open && (
-		cd "$TMPDIR"/ld-preload-open
-		make all
-	)
-
-	mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/lib
-	echo "path-mapping.so" >> "$APPDIR"/.preload
-	echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPDIR"/.env
-	_echo "* PATH_MAPPING successfully added!"
-	echo ""
-elif [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-	sed -i -e 's|/usr|././|g' "$APPDIR"/shared/bin/*
-	echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}' >> "$APPDIR"/.env
-	_echo "* Patched away /usr from binaries..."
-	echo ""
-elif [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
-	sed -i \
-		-e "s|/usr/bin|/tmp/$_tmp_bin|g" \
-		-e "s|/usr/lib|/tmp/$_tmp_lib|g" \
-		-e "s|/usr/share|/tmp/$_tmp_share|g" \
-		"$APPDIR"/shared/bin/*
-
-	echo "_tmp_bin=$_tmp_bin" >> "$APPDIR"/.env
-	echo "_tmp_lib=$_tmp_lib" >> "$APPDIR"/.env
-	echo "_tmp_share=$_tmp_share" >> "$APPDIR"/.env
-	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
-
-	_echo "* Patched away /usr from binaries for random dirs in /tmp..."
-	echo ""
-fi
-
+_map_paths_ld_preload_open
+_map_paths_binary_patch
 _deploy_datadir
 _deploy_locale
 _deploy_icon_and_desktop
