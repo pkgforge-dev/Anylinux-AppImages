@@ -60,10 +60,12 @@ static const char* vars_to_unset[] = {
     "LIBVA_DRIVERS_PATH",
     "PERLLIB",
     "PIPEWIRE_MODULE_DIR",
+    "PYTHONHOME",
     "QT_PLUGIN_PATH",
     "SPA_PLUGIN_DIR",
     "TCL_LIBRARY",
     "TK_LIBRARY",
+    "XKB_CONFIG_ROOT",
     "XTABLES_LIBDIR",
     NULL
 };
