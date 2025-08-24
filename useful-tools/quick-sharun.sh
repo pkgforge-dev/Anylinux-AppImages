@@ -111,6 +111,10 @@ _help_msg() {
 	NO_STRIP         Disable stripping binaries and libraries if set.
 	APPDIR           Destination AppDir (default: ./AppDir).
 	APPRUN           AppRun to use (default: AppRun-generic). Only needed for hooks.
+	EXEC_WRAPPER     Preloads a library that unsets environment variables known to cause
+	                 problems to child processes. Not needed if the app will just use
+	                 xdg-open to spawn child proceeses since in that case sharun has
+	                 a wrapper for xdg-open that handles that.
 
 	NOTE:
 	Several of these options get turned on automatically based on what is being deployed.
