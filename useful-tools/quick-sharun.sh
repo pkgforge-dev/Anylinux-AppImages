@@ -21,6 +21,9 @@ SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/do
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/fritzw/ld-preload-open.git}
 
+EXEC_WRAPPER=${EXEC_WRAPPER:-0}
+EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/exec.c}
+
 DEPLOY_QT=${DEPLOY_QT:-0}
 DEPLOY_GTK=${DEPLOY_GTK:-0}
 DEPLOY_OPENGL=${DEPLOY_OPENGL:-0}
@@ -416,6 +419,27 @@ _handle_helper_bins() {
 
 	# TODO add more instances of helper bins
 }
+
+_add_exec_wrapper() {
+	if [ "$EXEC_WRAPPER" != 1 ]; then
+		return 0
+	fi
+
+	if ! command -v cc 1>/dev/null; then
+		_err_msg "ERROR: Using EXEC_WRAPPER requires cc"
+		exit 1
+	fi
+
+	_echo "* Building exec.so..."
+	_download "$TMPDIR"/exec.c "$EXEC_WRAPPER_SOURCE"
+	cc -shared -fPIC "$TMPDIR"/exec.c -o "$APPDIR"/lib/exec.so
+	echo "exec.so" >> "$APPDIR"/.preload
+
+	_echo "* EXEC_WRAPPER successfully added!"
+	echo ""
+}
+
+
 _map_paths_ld_preload_open() {
 	case "$PATH_MAPPING" in
 		*'${SHARUN_DIR}'*) true    ;;
@@ -699,6 +723,7 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
+_add_exec_wrapper
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _deploy_datadir
