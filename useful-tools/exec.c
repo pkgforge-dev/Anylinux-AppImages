@@ -2,7 +2,7 @@
  * https://github.com/darealshinji/linuxdeploy-plugin-checkrt/blob/master/exec.c
  * Unsets known variables that cause issues rather than restoring to parent enviroment
  * One issue with restoring to the parent enviroment is that it unset variables set by
- * terminals emulators like TERM which need to be presered in the child shell
+ * terminal emulators like TERM which need to be preserved in the child shell
 */
 
 #ifndef _GNU_SOURCE
