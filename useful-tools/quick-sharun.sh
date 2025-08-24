@@ -436,7 +436,6 @@ _add_exec_wrapper() {
 	echo "exec.so" >> "$APPDIR"/.preload
 
 	_echo "* EXEC_WRAPPER successfully added!"
-	echo ""
 }
 
 
