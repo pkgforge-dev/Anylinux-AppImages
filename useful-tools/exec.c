@@ -115,6 +115,46 @@ static int is_portable_home_in_use() {
     return 0;
 }
 
+// Check if XDG_CONFIG_HOME is a portable AppImage config directory ($APPIMAGE.config)
+static int is_portable_xdg_config() {
+    const char *xdg_config = getenv("XDG_CONFIG_HOME");
+    const char *appimage = getenv("APPIMAGE");
+    
+    if (!xdg_config || !appimage) return 0;
+    
+    // Build expected portable config path: $APPIMAGE.config
+    size_t appimage_len = strlen(appimage);
+    size_t expected_len = appimage_len + 7; // ".config"
+    char *expected_path = malloc(expected_len + 1);
+    if (!expected_path) return 0;
+    
+    snprintf(expected_path, expected_len + 1, "%s.config", appimage);
+    int is_portable = (strcmp(xdg_config, expected_path) == 0);
+    free(expected_path);
+    
+    return is_portable;
+}
+
+// Check if XDG_DATA_HOME is a portable AppImage data directory ($APPIMAGE.share)
+static int is_portable_xdg_data() {
+    const char *xdg_data = getenv("XDG_DATA_HOME");
+    const char *appimage = getenv("APPIMAGE");
+    
+    if (!xdg_data || !appimage) return 0;
+    
+    // Build expected portable data path: $APPIMAGE.share
+    size_t appimage_len = strlen(appimage);
+    size_t expected_len = appimage_len + 6; // ".share"
+    char *expected_path = malloc(expected_len + 1);
+    if (!expected_path) return 0;
+    
+    snprintf(expected_path, expected_len + 1, "%s.share", appimage);
+    int is_portable = (strcmp(xdg_data, expected_path) == 0);
+    free(expected_path);
+    
+    return is_portable;
+}
+
 // Detect if any portable AppImage directories are in use
 static int is_portable_appimage_in_use() {
     // Check HOME for .home suffix
@@ -122,22 +162,14 @@ static int is_portable_appimage_in_use() {
         return 1;
     }
     
-    // Check XDG_CONFIG_HOME for .config suffix
-    const char *xdg_config = getenv("XDG_CONFIG_HOME");
-    if (xdg_config) {
-        size_t len = strlen(xdg_config);
-        if (len > 7 && strcmp(xdg_config + len - 7, ".config") == 0) {
-            return 1;
-        }
+    // Check XDG_CONFIG_HOME for portable pattern ($APPIMAGE.config)
+    if (is_portable_xdg_config()) {
+        return 1;
     }
     
-    // Check XDG_DATA_HOME for .share suffix
-    const char *xdg_data = getenv("XDG_DATA_HOME");
-    if (xdg_data) {
-        size_t len = strlen(xdg_data);
-        if (len > 6 && strcmp(xdg_data + len - 6, ".share") == 0) {
-            return 1;
-        }
+    // Check XDG_DATA_HOME for portable pattern ($APPIMAGE.share)
+    if (is_portable_xdg_data()) {
+        return 1;
     }
     
     return 0;
@@ -267,10 +299,8 @@ static char* const* create_cleaned_env(char* const* original_env)
                     is_home_related = 1;
                 }
             } else if (strncmp(original_env[i], "XDG_CONFIG_HOME=", 16) == 0) {
-                const char *current_value = original_env[i] + 16;
-                // Check if this is a portable config dir (ends with .config)
-                size_t value_len = strlen(current_value);
-                int is_portable_config = (value_len > 7 && strcmp(current_value + value_len - 7, ".config") == 0);
+                // Check if this is a portable config dir ($APPIMAGE.config)
+                int is_portable_config = is_portable_xdg_config();
                 
                 if (parent_had_xdg_config_home && original_xdg_config_home) {
                     // Parent had it set, restore to original value
@@ -285,16 +315,14 @@ static char* const* create_cleaned_env(char* const* original_env)
                     is_home_related = 1;
                 } else if (!parent_had_xdg_config_home && is_portable_config) {
                     // Parent didn't have it set and current is portable variant - unset it
-                    DEBUG_PRINT("Unsetting portable XDG_CONFIG_HOME (parent didn't have it set): %s\n", current_value);
+                    DEBUG_PRINT("Unsetting portable XDG_CONFIG_HOME (parent didn't have it set)\n");
                     found_xdg_config = 1;
                     is_home_related = 1;
                     // Don't add anything - effectively unsetting the variable
                 }
             } else if (strncmp(original_env[i], "XDG_DATA_HOME=", 14) == 0) {
-                const char *current_value = original_env[i] + 14;
-                // Check if this is a portable data dir (ends with .share)
-                size_t value_len = strlen(current_value);
-                int is_portable_data = (value_len > 6 && strcmp(current_value + value_len - 6, ".share") == 0);
+                // Check if this is a portable data dir ($APPIMAGE.share)
+                int is_portable_data = is_portable_xdg_data();
                 
                 if (parent_had_xdg_data_home && original_xdg_data_home) {
                     // Parent had it set, restore to original value
@@ -309,7 +337,7 @@ static char* const* create_cleaned_env(char* const* original_env)
                     is_home_related = 1;
                 } else if (!parent_had_xdg_data_home && is_portable_data) {
                     // Parent didn't have it set and current is portable variant - unset it
-                    DEBUG_PRINT("Unsetting portable XDG_DATA_HOME (parent didn't have it set): %s\n", current_value);
+                    DEBUG_PRINT("Unsetting portable XDG_DATA_HOME (parent didn't have it set)\n");
                     found_xdg_data = 1;
                     is_home_related = 1;
                     // Don't add anything - effectively unsetting the variable
