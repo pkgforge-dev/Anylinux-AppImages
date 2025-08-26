@@ -24,6 +24,9 @@ typedef int (*execve_func_t)(const char *filename, char *const argv[], char *con
 static char *original_home = NULL;
 static char *original_xdg_config_home = NULL;
 static char *original_xdg_data_home = NULL;
+// Track whether parent actually had XDG variables set (vs being unset)
+static int parent_had_xdg_config_home = 0;
+static int parent_had_xdg_data_home = 0;
 static int env_initialized = 0;
 
 #define VISIBLE __attribute__ ((visibility ("default")))
@@ -97,29 +100,6 @@ static char* get_real_home_from_passwd() {
     return NULL;
 }
 
-// Calculate standard XDG paths based on real home directory
-static char* calculate_xdg_config_home(const char* real_home) {
-    if (!real_home) return NULL;
-    
-    size_t path_len = strlen(real_home) + strlen("/.config") + 1;
-    char *path = malloc(path_len);
-    if (path) {
-        snprintf(path, path_len, "%s/.config", real_home);
-    }
-    return path;
-}
-
-static char* calculate_xdg_data_home(const char* real_home) {
-    if (!real_home) return NULL;
-    
-    size_t path_len = strlen(real_home) + strlen("/.local/share") + 1;
-    char *path = malloc(path_len);
-    if (path) {
-        snprintf(path, path_len, "%s/.local/share", real_home);
-    }
-    return path;
-}
-
 // Detect if portable home/config is in use
 static int is_portable_home_in_use() {
     const char *current_home = getenv("HOME");
@@ -144,27 +124,24 @@ static void get_original_env_values() {
     original_xdg_config_home = read_parent_env("XDG_CONFIG_HOME");
     original_xdg_data_home = read_parent_env("XDG_DATA_HOME");
     
+    // Track whether parent actually had these variables set
+    parent_had_xdg_config_home = (original_xdg_config_home != NULL);
+    parent_had_xdg_data_home = (original_xdg_data_home != NULL);
+    
     // Second tier: if HOME not found from parent, try passwd
     if (!original_home) {
         original_home = get_real_home_from_passwd();
     }
     
-    // Third tier: calculate standard paths if still missing
-    if (original_home) {
-        if (!original_xdg_config_home) {
-            original_xdg_config_home = calculate_xdg_config_home(original_home);
-        }
-        if (!original_xdg_data_home) {
-            original_xdg_data_home = calculate_xdg_data_home(original_home);
-        }
-    }
+    // Note: We do NOT calculate XDG defaults if parent didn't have them set
+    // Applications will use ~/.config and ~/.local/share defaults when these are unset
     
     env_initialized = 1;
     
-    DEBUG_PRINT("Original environment values: HOME=%s, XDG_CONFIG_HOME=%s, XDG_DATA_HOME=%s\n",
+    DEBUG_PRINT("Original environment values: HOME=%s, XDG_CONFIG_HOME=%s (parent_had=%d), XDG_DATA_HOME=%s (parent_had=%d)\n",
                 original_home ? original_home : "(null)",
-                original_xdg_config_home ? original_xdg_config_home : "(null)",
-                original_xdg_data_home ? original_xdg_data_home : "(null)");
+                original_xdg_config_home ? original_xdg_config_home : "(null)", parent_had_xdg_config_home,
+                original_xdg_data_home ? original_xdg_data_home : "(null)", parent_had_xdg_data_home);
 }
 
 // Library constructor to initialize original environment values
@@ -262,7 +239,13 @@ static char* const* create_cleaned_env(char* const* original_env)
                     is_home_related = 1;
                 }
             } else if (strncmp(original_env[i], "XDG_CONFIG_HOME=", 16) == 0) {
-                if (original_xdg_config_home) {
+                const char *current_value = original_env[i] + 16;
+                // Check if this is a portable config dir (ends with .config)
+                size_t value_len = strlen(current_value);
+                int is_portable_config = (value_len > 7 && strcmp(current_value + value_len - 7, ".config") == 0);
+                
+                if (parent_had_xdg_config_home && original_xdg_config_home) {
+                    // Parent had it set, restore to original value
                     size_t new_len = strlen("XDG_CONFIG_HOME=") + strlen(original_xdg_config_home) + 1;
                     char *new_var = malloc(new_len);
                     if (new_var) {
@@ -272,9 +255,21 @@ static char* const* create_cleaned_env(char* const* original_env)
                     }
                     found_xdg_config = 1;
                     is_home_related = 1;
+                } else if (!parent_had_xdg_config_home && is_portable_config) {
+                    // Parent didn't have it set and current is portable variant - unset it
+                    DEBUG_PRINT("Unsetting portable XDG_CONFIG_HOME (parent didn't have it set): %s\n", current_value);
+                    found_xdg_config = 1;
+                    is_home_related = 1;
+                    // Don't add anything - effectively unsetting the variable
                 }
             } else if (strncmp(original_env[i], "XDG_DATA_HOME=", 14) == 0) {
-                if (original_xdg_data_home) {
+                const char *current_value = original_env[i] + 14;
+                // Check if this is a portable data dir (ends with .share)
+                size_t value_len = strlen(current_value);
+                int is_portable_data = (value_len > 6 && strcmp(current_value + value_len - 6, ".share") == 0);
+                
+                if (parent_had_xdg_data_home && original_xdg_data_home) {
+                    // Parent had it set, restore to original value
                     size_t new_len = strlen("XDG_DATA_HOME=") + strlen(original_xdg_data_home) + 1;
                     char *new_var = malloc(new_len);
                     if (new_var) {
@@ -284,6 +279,12 @@ static char* const* create_cleaned_env(char* const* original_env)
                     }
                     found_xdg_data = 1;
                     is_home_related = 1;
+                } else if (!parent_had_xdg_data_home && is_portable_data) {
+                    // Parent didn't have it set and current is portable variant - unset it
+                    DEBUG_PRINT("Unsetting portable XDG_DATA_HOME (parent didn't have it set): %s\n", current_value);
+                    found_xdg_data = 1;
+                    is_home_related = 1;
+                    // Don't add anything - effectively unsetting the variable
                 }
             }
         }
@@ -317,6 +318,7 @@ static char* const* create_cleaned_env(char* const* original_env)
     }
     
     // Add missing HOME, XDG_CONFIG_HOME, XDG_DATA_HOME if they weren't in the original env
+    // but only if parent actually had them set (for XDG variables)
     if (should_restore_home) {
         if (!found_home && original_home) {
             size_t new_len = strlen("HOME=") + strlen(original_home) + 1;
@@ -327,7 +329,8 @@ static char* const* create_cleaned_env(char* const* original_env)
                 DEBUG_PRINT("Added missing HOME: %s\n", original_home);
             }
         }
-        if (!found_xdg_config && original_xdg_config_home) {
+        // Only add XDG variables if parent actually had them set
+        if (!found_xdg_config && parent_had_xdg_config_home && original_xdg_config_home) {
             size_t new_len = strlen("XDG_CONFIG_HOME=") + strlen(original_xdg_config_home) + 1;
             char *new_var = malloc(new_len);
             if (new_var) {
@@ -336,7 +339,7 @@ static char* const* create_cleaned_env(char* const* original_env)
                 DEBUG_PRINT("Added missing XDG_CONFIG_HOME: %s\n", original_xdg_config_home);
             }
         }
-        if (!found_xdg_data && original_xdg_data_home) {
+        if (!found_xdg_data && parent_had_xdg_data_home && original_xdg_data_home) {
             size_t new_len = strlen("XDG_DATA_HOME=") + strlen(original_xdg_data_home) + 1;
             char *new_var = malloc(new_len);
             if (new_var) {
