@@ -159,17 +159,6 @@ static void get_original_env_values() {
         }
     }
     
-    // Final fallbacks if all else fails
-    if (!original_home) {
-        original_home = strdup("/tmp");
-    }
-    if (!original_xdg_config_home) {
-        original_xdg_config_home = strdup("/tmp/.config");
-    }
-    if (!original_xdg_data_home) {
-        original_xdg_data_home = strdup("/tmp/.local/share");
-    }
-    
     env_initialized = 1;
     
     DEBUG_PRINT("Original environment values: HOME=%s, XDG_CONFIG_HOME=%s, XDG_DATA_HOME=%s\n",
