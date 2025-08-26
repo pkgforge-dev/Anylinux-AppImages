@@ -115,6 +115,34 @@ static int is_portable_home_in_use() {
     return 0;
 }
 
+// Detect if any portable AppImage directories are in use
+static int is_portable_appimage_in_use() {
+    // Check HOME for .home suffix
+    if (is_portable_home_in_use()) {
+        return 1;
+    }
+    
+    // Check XDG_CONFIG_HOME for .config suffix
+    const char *xdg_config = getenv("XDG_CONFIG_HOME");
+    if (xdg_config) {
+        size_t len = strlen(xdg_config);
+        if (len > 7 && strcmp(xdg_config + len - 7, ".config") == 0) {
+            return 1;
+        }
+    }
+    
+    // Check XDG_DATA_HOME for .share suffix
+    const char *xdg_data = getenv("XDG_DATA_HOME");
+    if (xdg_data) {
+        size_t len = strlen(xdg_data);
+        if (len > 6 && strcmp(xdg_data + len - 6, ".share") == 0) {
+            return 1;
+        }
+    }
+    
+    return 0;
+}
+
 // Get original environment values using three-tiered approach
 static void get_original_env_values() {
     if (env_initialized) return;
@@ -217,8 +245,8 @@ static char* const* create_cleaned_env(char* const* original_env)
     // Track if we've seen and need to replace HOME, XDG_CONFIG_HOME, XDG_DATA_HOME
     int found_home = 0, found_xdg_config = 0, found_xdg_data = 0;
     
-    // Only restore portable home paths if we have captured original values and portable home is in use
-    int should_restore_home = (env_initialized && is_portable_home_in_use());
+    // Only restore portable home paths if we have captured original values and portable AppImage is in use
+    int should_restore_home = (env_initialized && is_portable_appimage_in_use());
 
     for (size_t i = 0; i < env_count; i++) {
         int should_copy = 1;
