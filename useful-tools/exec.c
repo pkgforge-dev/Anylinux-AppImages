@@ -132,16 +132,18 @@ static int is_external_process(const char *filename)
         return 0;
     DEBUG_PRINT("APPDIR = %s\n", appdir);
 
-    return strncmp(filename, appdir, MIN(strlen(filename), strlen(appdir)));
+    return strncmp(filename, appdir, MIN(strlen(filename), strlen(appdir))) != 0;
 }
 
 static int exec_common(execve_func_t function, const char *filename, char* const argv[], char* const envp[])
 {
     char *fullpath = canonicalize_file_name(filename);
-    DEBUG_PRINT("filename %s, fullpath %s\n", filename, fullpath);
+    DEBUG_PRINT("filename %s, fullpath %s\n", filename, fullpath ? fullpath : "(null)");
 
     char* const *env = envp;
-    if (is_external_process(fullpath)) {
+    const char* path_to_check = fullpath ? fullpath : filename;
+
+    if (is_external_process(path_to_check)) {
         DEBUG_PRINT("External process detected. Cleaning environment variables\n");
         env = create_cleaned_env(envp);
         if (!env) {
@@ -179,11 +181,11 @@ VISIBLE int execv(const char *filename, char *const argv[]) {
 VISIBLE int execvpe(const char *filename, char *const argv[], char *const envp[])
 {
     DEBUG_PRINT("execvpe call hijacked: %s\n", filename);
-    execve_func_t execve_orig = dlsym(RTLD_NEXT, "execvpe");
-    if (!execve_orig) {
+    execve_func_t execvpe_orig = dlsym(RTLD_NEXT, "execvpe");
+    if (!execvpe_orig) {
         DEBUG_PRINT("Error getting execvpe original symbol: %s\n", strerror(errno));
     }
-    return exec_common(execve_orig, filename, argv, envp);
+    return exec_common(execvpe_orig, filename, argv, envp);
 }
 
 VISIBLE int execvp(const char *filename, char *const argv[]) {
