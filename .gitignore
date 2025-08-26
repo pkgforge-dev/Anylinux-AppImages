@@ -1,0 +1,8 @@
+# Build artifacts
+*.so
+*_test
+*.o
+*.a
+
+# Temporary files
+/tmp/
