@@ -126,13 +126,9 @@ static int is_portable_home_in_use() {
     if (!current_home) return 0;
     
     // Check if HOME contains .home suffix (portable home pattern)
+    // This indicates HOME = $APPIMAGE.home where APPIMAGE is the full path to AppImage file
     size_t home_len = strlen(current_home);
     if (home_len > 5 && strcmp(current_home + home_len - 5, ".home") == 0) {
-        return 1;
-    }
-    
-    // Check if HOME starts with a typical AppImage mount point pattern
-    if (strstr(current_home, "/tmp/.mount_") != NULL) {
         return 1;
     }
     
