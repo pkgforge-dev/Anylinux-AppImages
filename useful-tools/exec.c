@@ -438,6 +438,17 @@ static int exec_common(execve_func_t function, const char *filename, char* const
         }
     }
 
+    // Change working directory to ORIGINAL_WORKING_DIR if set
+    const char* original_working_dir = getenv("ORIGINAL_WORKING_DIR");
+    if (original_working_dir) {
+        if (chdir(original_working_dir) == 0) {
+            DEBUG_PRINT("Changed working directory to ORIGINAL_WORKING_DIR: %s\n", original_working_dir);
+            unsetenv("ORIGINAL_WORKING_DIR");
+        } else {
+            DEBUG_PRINT("Failed to change working directory to: %s\n", original_working_dir);
+        }
+    }
+
     int ret = function(filename, argv, env);
 
     if (fullpath != filename)
