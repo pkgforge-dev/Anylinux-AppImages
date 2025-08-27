@@ -501,7 +501,9 @@ _map_paths_ld_preload_open() {
 
 _map_paths_binary_patch() {
 	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
+		EXEC_WRAPPER=1
 		sed -i -e 's|/usr|././|g' "$APPDIR"/shared/bin/*
+		echo 'ORIGINAL_WORKING_DIR=${PWD}' >> "$APPDIR"/.env
 		echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}' >> "$APPDIR"/.env
 		_echo "* Patched away /usr from binaries..."
 		echo ""
@@ -676,10 +678,13 @@ _patch_away_usr_bin_dir() {
 		return 1
 	fi
 
-	sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
-
-	if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
-		echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
+	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
+		sed -i -e 's|/usr|././|g' "$1"
+	else
+		sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
+		if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
+			echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
+		fi
 	fi
 
 	_echo "* patched away /usr/bin from $1"
@@ -696,10 +701,14 @@ _patch_away_usr_lib_dir() {
 		return 1
 	fi
 
-	sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
+	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
+		sed -i -e 's|/usr|././|g' "$1"
+	else
+		sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
 
-	if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
-		echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
+		if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
+			echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
+		fi
 	fi
 
 	_echo "* patched away /usr/lib from $1"
@@ -716,10 +725,14 @@ _patch_away_usr_share_dir() {
 		return 1
 	fi
 
-	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
+	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
+		sed -i -e 's|/usr|././|g' "$1"
+	else
+		sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
 
-	if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
-		echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
+		if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
+			echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
+		fi
 	fi
 
 	_echo "* patched away /usr/share from $1"
@@ -745,10 +758,10 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
-_add_exec_wrapper
-_add_locale_fix
 _map_paths_ld_preload_open
 _map_paths_binary_patch
+_add_exec_wrapper
+_add_locale_fix
 _deploy_datadir
 _deploy_locale
 _deploy_icon_and_desktop
