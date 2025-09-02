@@ -142,6 +142,7 @@ _display_with_host_term() {
 	elif _is_cmd gnome-terminal; then gnome-terminal -- sh -c "$tcmd" &
 
 	# these need extra quotes for some reason
+	elif _is_cmd ptyxis;         then ptyxis         -x "sh -c \"$tcmd\"" &
 	elif _is_cmd qterminal;      then qterminal      -e "sh -c \"$tcmd\"" &
 	elif _is_cmd mate-terminal;  then mate-terminal  -e "sh -c \"$tcmd\"" &
 	elif _is_cmd xfce4-terminal; then xfce4-terminal -e "sh -c \"$tcmd\"" &
