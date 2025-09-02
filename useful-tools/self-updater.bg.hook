@@ -48,29 +48,17 @@ _sanity_check() {
 		>&2 echo "This usually happens when the appimage is placed in /usr/bin"
 		>&2 echo "or similar locations that need elevated rights to replace"
 		return 1
-	elif ! command -v yad \
-	  && ! command -v zenity \
-	  && ! command -v kdialog; then
+	elif ! command -v notify; then
 		return 1
 	elif [ ! -d "$CONFIGDIR" ]; then
 		mkdir -p "$CONFIGDIR"
 	fi
 }
 
-_display_message() {
-	if command -v kdialog 1>/dev/null; then
-		kdialog --yesno "$*" || return 1
-	elif command -v yad 1>/dev/null; then
-		yad --text="$*" || return 1
-	elif command -v zenity 1>/dev/null; then
-		zenity --question --text "$*" || return 1
-	fi
-}
-
 _download() {
 	url="$2"
 	dest="$1"
-	if ! _display_message "Do you wish to download '$url' in '$dest'?"; then
+	if ! notify -dq "Do you wish to download '$url' in '$dest'?"; then
 		return 1
 	elif command -v wget 1>/dev/null; then
 		DOWNLOAD_CMD="wget"
@@ -79,8 +67,8 @@ _download() {
 		DOWNLOAD_CMD="curl"
 		set -- -Lso "$@"
 	else
-		>&2 echo "ERROR: we need wget or curl to download ${dest##*/}"
-		_display_message "ERROR: we need wget or curl to download ${dest##*/}"
+		>&2 echo "ERROR: We need wget or curl to download ${dest##*/}"
+		notify -ne "We need wget or curl to download ${dest##*/}"
 		exit 1
 	fi
 	"$DOWNLOAD_CMD" "$@"
@@ -114,10 +102,10 @@ _check_update() {
 _update() {
 	if appimageupdatetool -Or "$APPIMAGE"; then
 		>&2 echo "$POST_UPDATE_GOOD"
-		notify-send "$POST_UPDATE_GOOD" 2>/dev/null || true
+		notify "$POST_UPDATE_GOOD" 2>/dev/null || true
 	else
 		>&2 echo "$POST_UPDATE_BAD"
-		notify-send "$POST_UPDATE_BAD" 2>/dev/null || true
+		notify "$POST_UPDATE_BAD" 2>/dev/null || true
 	fi
 
 }
@@ -149,18 +137,18 @@ if [ "$STATUS" = 0 ]; then
 	exit 0
 elif [ "$STATUS" = 1 ]; then
 	if ! _get_appimageupdatetool; then
-		if _display_message "$DO_NOT_ASK"; then
+		if notify -dq "$DO_NOT_ASK"; then
 			_disable_update_checking
 		fi
 	elif _check_update; then
-		if _display_message "$UPDATE_MSG"; then
+		if notify -dq "$UPDATE_MSG"; then
 			_update
-		elif _display_message "$DO_NOT_ASK"; then
+		elif notify -dq "$DO_NOT_ASK"; then
 			_disable_update_checking
 		fi
 	fi
 else
-	if _display_message "$WELCOME_MSG"; then
+	if notify -dq "$WELCOME_MSG"; then
 		_enable_update_checking
 		_get_appimageupdatetool
 	else
