@@ -71,7 +71,6 @@ _notify_info() {
 	elif _is_cmd Xdialog;     then Xdialog --infobox "$*" 0 0 6000 || :
 	elif _is_cmd xmessage;    then xmessage -center "$*" || :
 	elif _is_cmd gxmessage;   then gxmessage -center "$*" || :
-	elif _is_cmd xterm;       then xterm -e "echo '$*'; read yn" || :
 	else NOTIFICATION=1 _display_with_host_term "$*"
 	fi
 }
@@ -86,7 +85,6 @@ _notify_error() {
 	elif _is_cmd Xdialog;     then Xdialog --infobox "$*" 0 0 6000 || :
 	elif _is_cmd xmessage;    then xmessage -center "$*" || :
 	elif _is_cmd gxmessage;   then gxmessage -center "$*" || :
-	elif _is_cmd xterm;       then xterm -e "echo '$*'; read yn" || :
 	else NOTIFICATION=1 _display_with_host_term "$*"
 	fi
 }
@@ -101,7 +99,6 @@ _notify_warning() {
 	elif _is_cmd Xdialog;     then Xdialog --infobox "$*" 0 0 6000 || :
 	elif _is_cmd gxmessage;   then gxmessage -center "$*" || :
 	elif _is_cmd xmessage;    then xmessage -center "$*" || :
-	elif _is_cmd xterm;       then xterm -e "echo '$*'; read yn" || :
 	else NOTIFICATION=1 _display_with_host_term "$*"
 	fi
 }
