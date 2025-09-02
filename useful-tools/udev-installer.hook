@@ -31,25 +31,13 @@ DO_NOT_ASK="Do you wish to not see this message again?"
 _sanity_check() {
 	if [ -z "$CURRENTDIR" ] || [ -z "$APPIMAGE" ]; then
 		return 1
-	elif ! command -v cp || ! command -v mkdir; then
-		return 1
-	elif ! command -v yad \
-	  && ! command -v zenity \
-	  && ! command -v kdialog; then
+	elif ! command -v cp \
+	  || ! command -v mkdir \
+	  || ! command -v notify; then
 		return 1
 	elif ! command -v pkexec \
 	  && ! command -v lxqt-sudo; then
 		return 1
-	fi
-}
-
-_display_message() {
-	if command -v kdialog 1>/dev/null; then
-		kdialog --yesno "$*" 2>/dev/null || return 1
-	elif command -v yad 1>/dev/null; then
-		yad --text="$*" 2>/dev/null || return 1
-	elif command -v zenity 1>/dev/null; then
-		zenity --question --text "$*" 2>/dev/null || return 1
 	fi
 }
 
@@ -109,6 +97,7 @@ _install_udev() {
 	  command -v udevadm && udevadm control --reload-rules
 	"
 	rm -rf "$UDEVDIR"
+	notify "udev rules successfully installed!"
 }
 
 _do_not_ask_again() {
@@ -122,8 +111,8 @@ _check_udev
 
 if [ -f "$LOCKFILEPATH" ]; then
 	exit 0
-elif _display_message "$UDEV_INSTALL_MSG"; then
+elif notify --display-question "$UDEV_INSTALL_MSG"; then
 	_install_udev
-elif _display_message "$DO_NOT_ASK"; then
+elif notify --display-question "$DO_NOT_ASK"; then
 	_do_not_ask_again
 fi
