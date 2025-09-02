@@ -1,0 +1,211 @@
+#!/bin/sh
+
+# Simple wrapper to display GUI notifications and messages
+
+_is_cmd() {
+	command -v "$1" 1>/dev/null
+}
+
+# display functions, these might return non 0 depending on user input
+_display_info() {
+	set -- "INFO: $*"
+	if   _is_cmd kdialog;   then kdialog --msgbox "$*"
+	elif _is_cmd qarma;     then qarma --info --text "$*"
+	elif _is_cmd yad;       then yad --info --text "$*"
+	elif _is_cmd zenity;    then zenity --info --text "$*"
+	elif _is_cmd Xdialog;   then Xdialog --infobox "$*" 0 0 6000
+	elif _is_cmd gxmessage; then gxmessage -center "$*"
+	elif _is_cmd xmessage;  then xmessage -center "$*"
+	else NOTIFICATION=0 _display_with_host_term "$*"
+	fi
+}
+
+_display_error() {
+	set -- "ERROR: $*"
+	if   _is_cmd kdialog;   then kdialog --error "$*"
+	elif _is_cmd qarma;     then qarma --error --text "$*"
+	elif _is_cmd yad;       then yad --error --text "$*"
+	elif _is_cmd zenity;    then zenity --error --text "$*"
+	elif _is_cmd Xdialog;   then Xdialog --msgbox "$*" 0 0
+	elif _is_cmd gxmessage; then gxmessage -center "$*"
+	elif _is_cmd xmessage;  then xmessage -center "$*"
+	else NOTIFICATION=0 _display_with_host_term "$*"
+	fi
+}
+
+_display_warning() {
+	set -- "WARNING: $*"
+	if   _is_cmd kdialog;   then kdialog --sorry "$*"
+	elif _is_cmd qarma;     then qarma --warning --text "$*"
+	elif _is_cmd yad;       then yad --warning --text "$*"
+	elif _is_cmd zenity;    then zenity --warning --text "$*"
+	elif _is_cmd Xdialog;   then Xdialog --msgbox "$*" 0 0
+	elif _is_cmd gxmessage; then gxmessage -center "$*"
+	elif _is_cmd xmessage;  then xmessage -center "$*"
+	else NOTIFICATION=0 _display_with_host_term "$*"
+	fi
+}
+
+_display_question() {
+	set -- "QUESTION: $*"
+	if   _is_cmd kdialog;   then kdialog --yesno "$*"
+	elif _is_cmd qarma;     then qarma --question --text "$*"
+	elif _is_cmd yad;       then yad --question --text "$*"
+	elif _is_cmd zenity;    then zenity --question --text "$*"
+	elif _is_cmd Xdialog;   then Xdialog --yesno "$*" 0 0
+	elif _is_cmd gxmessage; then gxmessage -center -buttons "Yes:0,No:1" "$*"
+	elif _is_cmd xmessage;  then xmessage -center -buttons "Yes:0,No:1" "$*"
+	else NOTIFICATION=0 _display_with_host_term "$*"
+	fi
+}
+
+
+# notify functions, these will always return 0 unless there are no deps
+_notify_info() {
+	set -- "INFO: $*"
+	if   _is_cmd notify-send; then notify-send "$*" || :
+	elif _is_cmd qarma;       then qarma --info --text "$*" || :
+	elif _is_cmd kdialog;     then kdialog --passivepopup "$*" || :
+	elif _is_cmd yad;         then yad --window-type=notification --text "$*" || :
+	elif _is_cmd zenity;      then zenity --info --text "$*" || :
+	elif _is_cmd Xdialog;     then Xdialog --infobox "$*" 0 0 6000 || :
+	elif _is_cmd xmessage;    then xmessage -center "$*" || :
+	elif _is_cmd gxmessage;   then gxmessage -center "$*" || :
+	elif _is_cmd xterm;       then xterm -e "echo '$*'; read yn" || :
+	else NOTIFICATION=1 _display_with_host_term "$*"
+	fi
+}
+
+_notify_error() {
+	set -- "ERROR: $*"
+	if   _is_cmd notify-send; then notify-send -u critical "$*" || :
+	elif _is_cmd kdialog;     then kdialog --error "$*" || :
+	elif _is_cmd qarma;       then qarma --error --text "$*" || :
+	elif _is_cmd yad;         then yad --window-type=notification --text "$*" || :
+	elif _is_cmd zenity;      then zenity --error --text "$*" || :
+	elif _is_cmd Xdialog;     then Xdialog --infobox "$*" 0 0 6000 || :
+	elif _is_cmd xmessage;    then xmessage -center "$*" || :
+	elif _is_cmd gxmessage;   then gxmessage -center "$*" || :
+	elif _is_cmd xterm;       then xterm -e "echo '$*'; read yn" || :
+	else NOTIFICATION=1 _display_with_host_term "$*"
+	fi
+}
+
+_notify_warning() {
+	set -- "WARNING: $*"
+	if   _is_cmd notify-send; then notify-send -u critical "$*" || :
+	elif _is_cmd kdialog;     then kdialog --sorry "$*" || :
+	elif _is_cmd qarma;       then qarma --warning --text "$*" || :
+	elif _is_cmd yad;         then yad --window-type=notification --text "$*" || :
+	elif _is_cmd zenity;      then zenity --warning --text "$*" || :
+	elif _is_cmd Xdialog;     then Xdialog --infobox "$*" 0 0 6000 || :
+	elif _is_cmd gxmessage;   then gxmessage -center "$*" || :
+	elif _is_cmd xmessage;    then xmessage -center "$*" || :
+	elif _is_cmd xterm;       then xterm -e "echo '$*'; read yn" || :
+	else NOTIFICATION=1 _display_with_host_term "$*"
+	fi
+}
+
+# extreme measure
+_display_with_host_term() {
+	message="$*"
+	tmpfile="${TMPDIR:-/tmp}"/."${0##*/}"-no-gui-fallback
+
+	cmd_notification="echo '$message'; read yn"
+	cmd_display="
+		trap 'echo 0 > \"$tmpfile\"; exit' HUP TERM
+		echo '$message'
+		printf '\n%s''   (Yes/No)?: ';
+		while :; do
+			read yn
+			case \$yn in
+				Y*|y*) echo 1 > '$tmpfile'; break;;
+				N*|n*) echo 0 > '$tmpfile'; break;;
+				*)     echo 'Please type Yes or No' ;;
+			esac
+		done
+	"
+
+	if [ "$NOTIFICATION" = 1 ]; then
+		tcmd="$cmd_notification"
+	else
+		tcmd="$cmd_display"
+	fi
+
+	# normal terminals
+	if   _is_cmd alacritty;  then alacritty  -e sh -c "$tcmd" &
+	elif _is_cmd wezterm;    then wezterm    -e sh -c "$tcmd" &
+	elif _is_cmd konsole;    then konsole    -e sh -c "$tcmd" &
+	elif _is_cmd lxterminal; then lxterminal -e sh -c "$tcmd" &
+	elif _is_cmd kitty;      then kitty      -e sh -c "$tcmd" &
+	elif _is_cmd urxvt;      then urxvt      -e sh -c "$tcmd" &
+	elif _is_cmd xterm;      then xterm      -e sh -c "$tcmd" &
+
+	# mmmm
+	elif _is_cmd gnome-terminal; then gnome-terminal -- sh -c "$tcmd" &
+
+	# these need extra quotes for some reason
+	elif _is_cmd qterminal;      then qterminal      -e "sh -c \"$tcmd\"" &
+	elif _is_cmd mate-terminal;  then mate-terminal  -e "sh -c \"$tcmd\"" &
+	elif _is_cmd xfce4-terminal; then xfce4-terminal -e "sh -c \"$tcmd\"" &
+	else
+		>&2 echo "ERROR: Cannot find suitable binary to perform operation!"
+		return 127
+	fi
+
+	if [ "$NOTIFICATION" = 1 ]; then
+		return 0
+	fi
+
+	elapsed=0
+	timeout=150  # 15 seconds
+	while :; do
+		if [ -f "$tmpfile" ] || [ "$elapsed" -ge "$timeout" ]; then
+			break
+		fi
+		sleep 0.1
+		elapsed=$(( elapsed + 1 ))
+	done
+
+	read -r RESPONSE < "$tmpfile"
+	rm -f "$tmpfile"
+
+	if [ "$RESPONSE" = "1" ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+
+case "$1" in
+	--display-info|-di)     shift; _display_info     "$@";;
+	--display-error|-de)    shift; _display_error    "$@";;
+	--display-warning|-dw)  shift; _display_warning  "$@";;
+	--display-question|-dq) shift; _display_question "$@";;
+	--notify-info|-ni)      shift; _notify_info      "$@";;
+	--notify-error|-ne)     shift; _notify_error     "$@";;
+	--notify-warning|-nw)   shift; _notify_warning   "$@";;
+	--help) cat <<-EOF
+	Notificaton helper - Show messages and notifications with various tools
+	                     like kdialog, yad, zenity, notify-send and more
+
+	Usage: '${0##*/}' --OPTION MESSAGE
+
+	OPTIONS:
+	-di, --display-info MESSAGE      Display simple message
+	-de, --display-error MESSAGE     Display error message
+	-dw. --display-warning MESSAGE   Display warning message
+	-dq, --display-question MESSAGE  Display yes/no question
+	-ni, --notify-info MESSAGE       Send simple notification
+	-ne, --notify-error MESSAGE      Send error notification
+	-nw, --notify-warning MESSAGE    Send warning notification
+
+	NOTE: If no flag is provided --notify-info behaviour is used instead.
+	EOF
+	exit 1
+	;;
+	# act as notify-send ARG wrapper when no flag is given
+	*) _notify_info "$@";;
+esac
+
