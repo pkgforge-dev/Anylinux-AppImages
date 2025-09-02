@@ -25,6 +25,7 @@ EXEC_WRAPPER=${EXEC_WRAPPER:-0}
 EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/exec.c}
 LOCALE_FIX=${LOCALE_FIX:-0}
 LOCALE_FIX_SOURCE=${LOCALE_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/localefix.c}
+NOTIFY_WRAPPER_SOURCE=${NOTIFY_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/notify}
 
 DEPLOY_QT=${DEPLOY_QT:-0}
 DEPLOY_GTK=${DEPLOY_GTK:-0}
@@ -834,6 +835,10 @@ if [ -n "$ADD_HOOKS" ]; then
 			exit 1
 		fi
 	done
+
+	# always add notify wrapper when using hooks
+	_download "$hook_dst"/notify "$NOTIFY_WRAPPER_SOURCE"
+	_echo "* Added notify wrapper"
 fi
 
 set -- "$APPDIR"/bin/*.hook
@@ -845,7 +850,7 @@ elif [ ! -f "$APPDIR"/AppRun ]; then
 	_echo "* Hardlinked $APPDIR/sharun as $APPDIR/AppRun..."
 fi
 
-chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook 2>/dev/null || true
+chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null || :
 
 # make sure the .env has all the "unset" last, due to a bug in the dotenv
 # library used by sharun all the unsets have to be declared last in the .env
