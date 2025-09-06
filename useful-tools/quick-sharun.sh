@@ -222,6 +222,9 @@ _determine_what_to_deploy() {
 					DEPLOY_QT=1
 					QT_DIR=qt6
 					;;
+				*libQt*Qml*.so)
+					DEPLOY_QML=1
+					;;
 				*libgtk-3*.so*)
 					DEPLOY_GTK=1
 					GTK_DIR=gtk-3.0
@@ -303,6 +306,13 @@ _make_deployment_array() {
 			"$LIB_DIR"/"$QT_DIR"/plugins/tls/*.so*          \
 			"$LIB_DIR"/"$QT_DIR"/plugins/wayland-*/*.so*    \
 			"$LIB_DIR"/"$QT_DIR"/plugins/xcbglintegrations/*.so*
+
+		if [ "$DEPLOY_QML" = 1 ]; then
+			_echo "* Deploying qml"
+			dst_qml="$APPDIR"/shared/lib/"$QT_DIR"
+			mkdir -p "$dst_qml"
+			cp -r "$LIB_DIR"/"$QT_DIR"/qml "$dst_qml"
+		fi
 	fi
 	if [ "$DEPLOY_GTK" = 1 ]; then
 		_echo "* Deploying $GTK_DIR"
