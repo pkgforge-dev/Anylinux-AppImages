@@ -222,7 +222,7 @@ _determine_what_to_deploy() {
 					DEPLOY_QT=1
 					QT_DIR=qt6
 					;;
-				*libQt*Qml*.so)
+				*libQt*Qml*.so*)
 					DEPLOY_QML=1
 					;;
 				*libgtk-3*.so*)
