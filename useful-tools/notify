@@ -193,7 +193,7 @@ case "$1" in
 	OPTIONS:
 	-di, --display-info MESSAGE      Display simple message
 	-de, --display-error MESSAGE     Display error message
-	-dw. --display-warning MESSAGE   Display warning message
+	-dw, --display-warning MESSAGE   Display warning message
 	-dq, --display-question MESSAGE  Display yes/no question
 	-ni, --notify-info MESSAGE       Send simple notification
 	-ne, --notify-error MESSAGE      Send error notification
