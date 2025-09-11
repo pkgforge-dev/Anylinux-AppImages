@@ -171,6 +171,43 @@ static int exec_common(execve_func_t function, const char *filename, char* const
         }
     }
 
+    // Restore portable dirs values
+    const char *real_data = getenv("REAL_XDG_DATA_HOME");
+    if (real_data && *real_data) {
+        if (setenv("XDG_DATA_HOME", real_data, 1) == 0) {
+            DEBUG_PRINT("Restored XDG_DATA_HOME: %s\n", real_data);
+        } else {
+            DEBUG_PRINT("Failed to restore XDG_DATA_HOME (wanted '%s')\n", real_data);
+        }
+    }
+
+    const char *real_config = getenv("REAL_XDG_CONFIG_HOME");
+    if (real_config && *real_config) {
+        if (setenv("XDG_CONFIG_HOME", real_config, 1) == 0) {
+            DEBUG_PRINT("Restored XDG_CONFIG_HOME: %s\n", real_config);
+        } else {
+            DEBUG_PRINT("Failed to restore XDG_CONFIG_HOME (wanted '%s')\n", real_config);
+        }
+    }
+
+    const char *real_cache = getenv("REAL_XDG_CACHE_HOME");
+    if (real_cache && *real_cache) {
+        if (setenv("XDG_CACHE_HOME", real_cache, 1) == 0) {
+            DEBUG_PRINT("Restored XDG_CACHE_HOME: %s\n", real_cache);
+        } else {
+            DEBUG_PRINT("Failed to restore XDG_CACHE_HOME (wanted '%s')\n", real_cache);
+        }
+    }
+
+    const char *real_home = getenv("REAL_HOME");
+    if (real_home && *real_home) {
+        if (setenv("HOME", real_home, 1) == 0) {
+            DEBUG_PRINT("Restored HOME: %s\n", real_home);
+        } else {
+            DEBUG_PRINT("Failed to restore HOME (wanted '%s')\n", real_home);
+        }
+    }
+
     int ret = function(filename, argv, env);
 
     if (fullpath != filename)
