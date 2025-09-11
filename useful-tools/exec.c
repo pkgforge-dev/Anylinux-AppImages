@@ -148,29 +148,6 @@ static int exec_common(execve_func_t function, const char *filename, char* const
     char *fullpath = canonicalize_file_name(filename);
     DEBUG_PRINT("filename %s, fullpath %s\n", filename, fullpath ? fullpath : "(null)");
 
-    char* const *env = envp;
-    const char* path_to_check = fullpath ? fullpath : filename;
-
-    if (is_external_process(path_to_check)) {
-        DEBUG_PRINT("External process detected. Cleaning environment variables\n");
-        env = create_cleaned_env(envp);
-        if (!env) {
-            env = envp;
-            DEBUG_PRINT("Error creating cleaned environment\n");
-        }
-    }
-
-    // Change working directory to ORIGINAL_WORKING_DIR if set
-    const char* original_working_dir = getenv("ORIGINAL_WORKING_DIR");
-    if (original_working_dir) {
-        if (chdir(original_working_dir) == 0) {
-            DEBUG_PRINT("Changed working directory to ORIGINAL_WORKING_DIR: %s\n", original_working_dir);
-            unsetenv("ORIGINAL_WORKING_DIR");
-        } else {
-            DEBUG_PRINT("Failed to change working directory to: %s\n", original_working_dir);
-        }
-    }
-
     // Restore portable dirs values
     const char *real_data = getenv("REAL_XDG_DATA_HOME");
     if (real_data && *real_data) {
@@ -205,6 +182,29 @@ static int exec_common(execve_func_t function, const char *filename, char* const
             DEBUG_PRINT("Restored HOME: %s\n", real_home);
         } else {
             DEBUG_PRINT("Failed to restore HOME (wanted '%s')\n", real_home);
+        }
+    }
+
+    // remove problematic variables
+    char* const *env = envp;
+    const char* path_to_check = fullpath ? fullpath : filename;
+    if (is_external_process(path_to_check)) {
+        DEBUG_PRINT("External process detected. Cleaning environment variables\n");
+        env = create_cleaned_env(envp);
+        if (!env) {
+            env = envp;
+            DEBUG_PRINT("Error creating cleaned environment\n");
+        }
+    }
+
+    // Change working directory to ORIGINAL_WORKING_DIR if set
+    const char* original_working_dir = getenv("ORIGINAL_WORKING_DIR");
+    if (original_working_dir) {
+        if (chdir(original_working_dir) == 0) {
+            DEBUG_PRINT("Changed working directory to ORIGINAL_WORKING_DIR: %s\n", original_working_dir);
+            unsetenv("ORIGINAL_WORKING_DIR");
+        } else {
+            DEBUG_PRINT("Failed to change working directory to: %s\n", original_working_dir);
         }
     }
 
