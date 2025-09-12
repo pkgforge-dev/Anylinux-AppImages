@@ -33,6 +33,7 @@ DEPLOY_OPENGL=${DEPLOY_OPENGL:-0}
 DEPLOY_VULKAN=${DEPLOY_VULKAN:-0}
 DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-0}
 DEPLOY_GSTREAMER=${DEPLOY_GSTREAMER:-0}
+DEPLOY_IMAGEMAGICK=${DEPLOY_IMAGEMAGICK:0}
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-0}
 
@@ -240,6 +241,9 @@ _determine_what_to_deploy() {
 				*libgstreamer*.so*)
 					DEPLOY_GSTREAMER=1
 					;;
+				*libMagick*.so*)
+					DEPLOY_IMAGEMAGICK=1
+					;;
 			esac
 		done
 	done
@@ -318,7 +322,6 @@ _make_deployment_array() {
 		_echo "* Deploying gdk-pixbuf"
 		set -- "$@" \
 			"$LIB_DIR"/gdk-pixbuf-*/*/loaders/*
-
 	fi
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
 		set -- "$@" \
@@ -354,6 +357,15 @@ _make_deployment_array() {
 		set -- "$@" \
 			"$LIB_DIR"/gstreamer*/* \
 			"$LIB_DIR"/gstreamer*/*/*
+	fi
+	if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
+		_echo "* Deploying ImageMagick"
+		set -- "$@" "$LIB_DIR"/libMagick*.so*
+		mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
+		cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
+		cp -r /etc/ImageMagick-*       "$APPDIR"/etc
+		echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPDIR"/.env
+		echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc' >> "$APPDIR"/.env
 	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
@@ -811,6 +823,10 @@ for lib do case "$lib" in
 	*libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
+	*libMagick*.so*)
+		# MAGICK_HOME only works on portable builds of imagemagick
+		# so we will have to patch it manually instead
+		_patch_away_usr_lib_dir "$lib" || continue
 	esac
 done
 
