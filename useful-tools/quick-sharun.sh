@@ -361,8 +361,8 @@ _make_deployment_array() {
 	if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 		_echo "* Deploying ImageMagick"
 		set -- "$@" \
-			/usr/bin/magick  \
-			/usr/bin/convert \
+			"$(command -v magick || true)"  \
+			"$(command -v convert || true)" \
 			"$LIB_DIR"/libMagick*.so*
 		mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
 		cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
