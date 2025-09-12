@@ -366,9 +366,9 @@ _make_deployment_array() {
 			"$LIB_DIR"/libMagick*.so*
 		mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
 		cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
-		cp -r /etc/ImageMagick-*       "$APPDIR"/etc
+		cp -r /etc/ImageMagick-*       "$APPDIR"/etc/ImageMagick
 		echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPDIR"/.env
-		echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc' >> "$APPDIR"/.env
+		echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc/ImageMagick' >> "$APPDIR"/.env
 	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
