@@ -37,30 +37,31 @@ We also try to avoid the usage of containers and other methods; so far, the only
 | 19  | [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 | 20  | [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 | 21  | [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
-| 22  | [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
-| 23  | [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
-| 24  | [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
-| 25  | [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
-| 26  | [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
-| 27  | [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
-| 28  | [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
-| 29  | [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
-| 30  | [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)                                                          |
-| 31  | [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
-| 32  | ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
-| 33  | [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
-| 34  | [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
-| 35  | [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
-| 36  | [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
-| 37  | [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
-| 38  | [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
-| 39  | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
-| 40  | [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
-| 41  | [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
-| 42  | [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
-| 43  | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
-| 44  | [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
-| 45  | [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
+| 22  | [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
+| 23  | [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
+| 24  | [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
+| 25  | [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
+| 26  | [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
+| 27  | [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
+| 28  | [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
+| 29  | [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
+| 30  | [Pixelpulse3](https://github.com/pkgforge-dev/Pixelpulse3-AppImage)                                                      |
+| 31  | [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)                                                          |
+| 32  | [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
+| 33  | ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
+| 34  | [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
+| 35  | [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
+| 36  | [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
+| 37  | [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
+| 38  | [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
+| 39  | [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
+| 40  | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
+| 41  | [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
+| 42  | [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
+| 43  | [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
+| 44  | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
+| 45  | [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
+| 46  | [Zenity](https://github.com/pkgforge-dev/Zenity-GTK4-AppImage)                                                           |
 
 ---
 
