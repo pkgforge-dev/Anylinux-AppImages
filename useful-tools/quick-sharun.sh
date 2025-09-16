@@ -19,7 +19,7 @@ APPRUN=${APPRUN:-AppRun-generic}
 APPDIR=${APPDIR:-$PWD/AppDir}
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools}
-LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/fritzw/ld-preload-open.git}
+LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
 EXEC_WRAPPER=${EXEC_WRAPPER:-0}
 EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/exec.c}
@@ -526,14 +526,7 @@ _map_paths_ld_preload_open() {
 }
 
 _map_paths_binary_patch() {
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		EXEC_WRAPPER=1
-		sed -i -e 's|/usr|././|g' "$APPDIR"/shared/bin/*
-		echo 'ORIGINAL_WORKING_DIR=${PWD}' >> "$APPDIR"/.env
-		echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}' >> "$APPDIR"/.env
-		_echo "* Patched away /usr from binaries..."
-		echo ""
-	elif [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
+	if [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
 		set -- "$APPDIR"/shared/bin/*
 		for bin do
 			_patch_away_usr_bin_dir   "$bin"
@@ -704,14 +697,11 @@ _patch_away_usr_bin_dir() {
 		return 1
 	fi
 
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		sed -i -e 's|/usr|././|g' "$1"
-	else
-		sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
-		if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
-			echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
-		fi
+	sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
+	if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
 	fi
+
 
 	_echo "* patched away /usr/bin from $1"
 	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
@@ -727,14 +717,10 @@ _patch_away_usr_lib_dir() {
 		return 1
 	fi
 
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		sed -i -e 's|/usr|././|g' "$1"
-	else
-		sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
+	sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
 
-		if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
-			echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
-		fi
+	if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/lib from $1"
@@ -751,15 +737,12 @@ _patch_away_usr_share_dir() {
 		return 1
 	fi
 
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		sed -i -e 's|/usr|././|g' "$1"
-	else
-		sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
+	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
 
-		if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
-			echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
-		fi
+	if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
 	fi
+
 
 	_echo "* patched away /usr/share from $1"
 	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
@@ -784,8 +767,6 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
-_map_paths_ld_preload_open
-_map_paths_binary_patch
 _add_exec_wrapper
 _add_locale_fix
 _deploy_datadir
@@ -806,14 +787,23 @@ set -- \
 	"$APPDIR"/lib/*/*/*/*.so*
 
 for lib do case "$lib" in
-	libgegl*)
+	*libgegl*)
 		# GEGL_PATH is problematic so we avoiud it
 		# patch the lib directly to load its plugins instead
-		_patch_away_usr_lib_dir "$lib" || continue
+		case "$PATH_MAPPING" in *gegl-*) continue;; esac
+
+		dir=$(echo "$LIB_DIR"/gegl-*)
+		[ -d "$dir" ] || continue
+
+		PATH_MAPPING="$dir:\${SHARUN_DIR}/lib/${dir##*/}
+		$PATH_MAPPING"
 		echo 'unset GEGL_PATH' >> "$APPDIR"/.env
 		;;
 	*libp11-kit.so*)
-		_patch_away_usr_lib_dir "$lib" || continue
+		case "$PATH_MAPPING" in *pkcs11*) continue;; esac
+
+		PATH_MAPPING="$LIB_DIR/pkcs11:\${SHARUN_DIR}/lib/pkcs11
+		$PATH_MAPPING"
 		;;
 	*p11-kit-trust.so*)
 		# good path that library should have
@@ -834,14 +824,30 @@ for lib do case "$lib" in
 		_echo "* fixed path to /etc/ssl/certs in $lib"
 		;;
 	*libgimpwidgets*)
+		# this shit is hardcoded to look into a zillion icons in /usr/share
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
 	*libMagick*.so*)
 		# MAGICK_HOME only works on portable builds of imagemagick
 		# so we will have to patch it manually instead
-		_patch_away_usr_lib_dir "$lib" || continue
+		case "$PATH_MAPPING" in *ImageMagick-*) continue;; esac
+
+		dir=$(echo "$LIB_DIR"/ImageMagick-*)
+		[ -d "$dir" ] || continue
+
+		PATH_MAPPING="$dir:\${SHARUN_DIR}/lib/${dir##*/}
+		$PATH_MAPPING"
+		;;
 	esac
 done
+
+if [ -n "$PATH_MAPPING" ]; then
+	PATH_MAPPING="$(echo "$PATH_MAPPING" \
+		| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//')"
+fi
+
+_map_paths_ld_preload_open
+_map_paths_binary_patch
 
 echo ""
 _echo "------------------------------------------------------------"
