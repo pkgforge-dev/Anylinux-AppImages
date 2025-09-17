@@ -20,6 +20,7 @@ if [ -f "$1" ] && [ ! -f "$2" ]; then
 	_err_msg "There is no nvidia vulkan loader at: /usr/share/vulkan/icd.d"
 	_err_msg "This usually happens when you are using a distro that splits"
 	_err_msg "the nvidia driver into several packages such as debian"
+	_err_msg "Run 'sudo apt install nvidia-vulkan-icd' to fix this issue"
 	_err_msg ""
 	_err_msg "MAKE SURE YOUR VULKAN DRIVER WORKS BEFORE REPORTING BUGS"
 	_err_msg "You can check that by testing with vkcube"
