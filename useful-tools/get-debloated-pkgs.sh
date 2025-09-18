@@ -10,6 +10,7 @@ ARCH="$(uname -m)"
 TMPFILE="$(mktemp)"
 TMPDIR="$(mktemp -d)"
 SOURCE=${SOURCE:-https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/releases/latest}
+ERRLOG="$TMPDIR"/.errlog
 
 COMMON_PACKAGES=${COMMON_PACKAGES:-0}
 PREFER_NANO=${PREFER_NANO:-0}
@@ -36,6 +37,9 @@ _echo2() {
 }
 
 _error(){
+	if [ -f "$ERRLOG" ]; then
+		>&2 cat "$ERRLOG"
+	fi
 	>&2 printf '\033[1;31m%s\033[0m\n' "ERROR: $*"
 	exit 1
 }
@@ -79,14 +83,25 @@ _help_msg() {
 	exit 1
 }
 
+_download() {
+	COUNT=0
+	while true; do
+		if $DLCMD "$@" 2>>"$ERRLOG"; then
+			break
+		fi
+		COUNT=$(( COUNT + 1 ))
+		if [ "$COUNT" -gt 5 ]; then
+			_error "Failed 5 times to download $*"
+		fi
+	done
+}
+
 if ! command -v pacman 1>/dev/null; then
 	_error "${0##*/} can only be used on Archlinux like systems!"
 elif command -v wget 1>/dev/null; then
 	DLCMD="wget --retry-connrefused --tries=30 -O"
-	DLCMDS="wget --retry-connrefused --tries=30 -qO"
 elif command -v curl 1>/dev/null; then
 	DLCMD="curl --retry-connrefused --retry 30 -Lo"
-	DLCMDS="curl --retry-connrefused --retry 30 -Lso"
 else
 	_error "We need wget or curl to download packages"
 fi
@@ -183,7 +198,8 @@ if [ -z "$1" ]; then
 	_help_msg
 fi
 
-if ! LIST_ALL=$($DLCMDS - "$SOURCE" \
+
+if ! LIST_ALL=$(_download - "$SOURCE" \
 	| sed 's/[()",{} ]/\n/g' | grep -o 'https.*pkg\.tar\.\(zst\|xz\)'); then
 	_error "Failed to download packages list!"
 fi
@@ -211,10 +227,9 @@ _echo2 "$TO_DOWNLOAD"
 _echo "------------------------------------------------------------"
 _echo ""
 
-sleep 0.5
 set -- $TO_DOWNLOAD
 for pkg do
-	$DLCMD "$TMPDIR"/"${pkg##*/}" "$pkg" &
+	_download "$TMPDIR"/"${pkg##*/}" "$pkg" &
 	pids="$pids $!"
 done
 
