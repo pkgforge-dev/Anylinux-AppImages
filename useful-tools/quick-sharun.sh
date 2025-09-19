@@ -544,9 +544,9 @@ _map_paths_ld_preload_open() {
 _map_paths_binary_patch() {
 	set -- "$APPDIR"/shared/bin/*
 	for bin do
-		_patch_away_usr_bin_dir   "$bin"
-		_patch_away_usr_lib_dir   "$bin"
-		_patch_away_usr_share_dir "$bin"
+		_patch_away_usr_bin_dir   "$bin" || :
+		_patch_away_usr_lib_dir   "$bin" || :
+		_patch_away_usr_share_dir "$bin" || :
 	done
 }
 
