@@ -490,6 +490,21 @@ _add_locale_fix() {
 }
 
 _map_paths_ld_preload_open() {
+	if grep -q '_tmp_share' "$APPDIR"/.env 2>/dev/null; then
+		PATH_MAPPING="/tmp/$_tmp_share:\${SHARUN_DIR}/share,$PATH_MAPPING"
+	fi
+
+	if grep -q '_tmp_bin' "$APPDIR"/.env 2>/dev/null; then
+		PATH_MAPPING="/tmp/$_tmp_bin:\${SHARUN_DIR}/bin,$PATH_MAPPING"
+	fi
+
+	if grep -q '_tmp_lib' "$APPDIR"/.env 2>/dev/null; then
+		PATH_MAPPING="/tmp/$_tmp_lib:\${SHARUN_DIR}/lib,$PATH_MAPPING"
+	fi
+
+	PATH_MAPPING="$(echo "$PATH_MAPPING" \
+		| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//')"
+
 	case "$PATH_MAPPING" in
 		*'${SHARUN_DIR}'*) true    ;;
 		'')                return 0;;
@@ -527,14 +542,12 @@ _map_paths_ld_preload_open() {
 }
 
 _map_paths_binary_patch() {
-	if [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
-		set -- "$APPDIR"/shared/bin/*
-		for bin do
-			_patch_away_usr_bin_dir   "$bin"
-			_patch_away_usr_lib_dir   "$bin"
-			_patch_away_usr_share_dir "$bin"
-		done
-	fi
+	set -- "$APPDIR"/shared/bin/*
+	for bin do
+		_patch_away_usr_bin_dir   "$bin"
+		_patch_away_usr_lib_dir   "$bin"
+		_patch_away_usr_share_dir "$bin"
+	done
 }
 
 _deploy_datadir() {
@@ -689,11 +702,6 @@ _check_window_class() {
 }
 
 _patch_away_usr_bin_dir() {
-	# do not patch if PATH_MAPPING already covers this
-	case "$PATH_MAPPING" in
-		*/usr/bin*) return 1;;
-	esac
-
 	if ! grep -Eaoq -m 1 "/usr/bin" "$1"; then
 		return 1
 	fi
@@ -703,16 +711,10 @@ _patch_away_usr_bin_dir() {
 		echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
 	fi
 
-
 	_echo "* patched away /usr/bin from $1"
-	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 }
 
 _patch_away_usr_lib_dir() {
-	# do not patch if PATH_MAPPING already covers this
-	case "$PATH_MAPPING" in
-		*/usr/lib*) return 1;;
-	esac
 
 	if ! grep -Eaoq -m 1 "/usr/lib" "$1"; then
 		return 1
@@ -725,15 +727,9 @@ _patch_away_usr_lib_dir() {
 	fi
 
 	_echo "* patched away /usr/lib from $1"
-	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 }
 
 _patch_away_usr_share_dir() {
-	# do not patch if PATH_MAPPING already covers this
-	case "$PATH_MAPPING" in
-		*/usr/share*) return 1;;
-	esac
-
 	if ! grep -Eaoq -m 1 "/usr/share" "$1"; then
 		return 1
 	fi
@@ -744,9 +740,7 @@ _patch_away_usr_share_dir() {
 		echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
 	fi
 
-
 	_echo "* patched away /usr/share from $1"
-	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 }
 
 _echo "------------------------------------------------------------"
@@ -788,23 +782,14 @@ set -- \
 	"$APPDIR"/lib/*/*/*/*.so*
 
 for lib do case "$lib" in
-	*libgegl*)
+	libgegl*)
 		# GEGL_PATH is problematic so we avoiud it
 		# patch the lib directly to load its plugins instead
-		case "$PATH_MAPPING" in *gegl-*) continue;; esac
-
-		dir=$(echo "$LIB_DIR"/gegl-*)
-		[ -d "$dir" ] || continue
-
-		PATH_MAPPING="$dir:\${SHARUN_DIR}/lib/${dir##*/}
-		$PATH_MAPPING"
+		_patch_away_usr_lib_dir "$lib" || continue
 		echo 'unset GEGL_PATH' >> "$APPDIR"/.env
 		;;
 	*libp11-kit.so*)
-		case "$PATH_MAPPING" in *pkcs11*) continue;; esac
-
-		PATH_MAPPING="$LIB_DIR/pkcs11:\${SHARUN_DIR}/lib/pkcs11
-		$PATH_MAPPING"
+		_patch_away_usr_lib_dir "$lib" || continue
 		;;
 	*p11-kit-trust.so*)
 		# good path that library should have
@@ -825,30 +810,21 @@ for lib do case "$lib" in
 		_echo "* fixed path to /etc/ssl/certs in $lib"
 		;;
 	*libgimpwidgets*)
-		# this shit is hardcoded to look into a zillion icons in /usr/share
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
 	*libMagick*.so*)
 		# MAGICK_HOME only works on portable builds of imagemagick
 		# so we will have to patch it manually instead
-		case "$PATH_MAPPING" in *ImageMagick-*) continue;; esac
-
-		dir=$(echo "$LIB_DIR"/ImageMagick-*)
-		[ -d "$dir" ] || continue
-
-		PATH_MAPPING="$dir:\${SHARUN_DIR}/lib/${dir##*/}
-		$PATH_MAPPING"
-		;;
+		_patch_away_usr_lib_dir "$lib" || continue
 	esac
 done
 
-if [ -n "$PATH_MAPPING" ]; then
-	PATH_MAPPING="$(echo "$PATH_MAPPING" \
-		| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//')"
+if [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
+	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
+	_map_paths_binary_patch
+else
+	_map_paths_ld_preload_open
 fi
-
-_map_paths_ld_preload_open
-_map_paths_binary_patch
 
 echo ""
 _echo "------------------------------------------------------------"
