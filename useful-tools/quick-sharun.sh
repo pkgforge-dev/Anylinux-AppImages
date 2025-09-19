@@ -531,7 +531,7 @@ _map_paths_ld_preload_open() {
 	rm -rf "$TMPDIR"/ld-preload-open
 	git clone "$LD_PRELOAD_OPEN" "$TMPDIR"/ld-preload-open && (
 		cd "$TMPDIR"/ld-preload-open
-		make all
+		make path-mapping.so
 	)
 
 	mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/lib
