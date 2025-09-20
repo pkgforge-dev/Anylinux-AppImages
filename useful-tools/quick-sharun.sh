@@ -19,7 +19,7 @@ APPRUN=${APPRUN:-AppRun-generic}
 APPDIR=${APPDIR:-$PWD/AppDir}
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools}
-LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/fritzw/ld-preload-open.git}
+LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
 EXEC_WRAPPER=${EXEC_WRAPPER:-0}
 EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/exec.c}
@@ -490,6 +490,29 @@ _add_locale_fix() {
 }
 
 _map_paths_ld_preload_open() {
+	deps="git make"
+	for d in $deps; do
+		if ! command -v "$d" 1>/dev/null; then
+			_err_msg "ERROR: Using pathmap requires $d"
+			return 1
+		fi
+	done
+
+	if grep -q '_tmp_share' "$APPDIR"/.env 2>/dev/null; then
+		PATH_MAPPING="/tmp/$_tmp_share:\${SHARUN_DIR}/share,$PATH_MAPPING"
+	fi
+
+	if grep -q '_tmp_bin' "$APPDIR"/.env 2>/dev/null; then
+		PATH_MAPPING="/tmp/$_tmp_bin:\${SHARUN_DIR}/bin,$PATH_MAPPING"
+	fi
+
+	if grep -q '_tmp_lib' "$APPDIR"/.env 2>/dev/null; then
+		PATH_MAPPING="/tmp/$_tmp_lib:\${SHARUN_DIR}/lib,$PATH_MAPPING"
+	fi
+
+	PATH_MAPPING="$(echo "$PATH_MAPPING" \
+		| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//')"
+
 	case "$PATH_MAPPING" in
 		*'${SHARUN_DIR}'*) true    ;;
 		'')                return 0;;
@@ -503,20 +526,12 @@ _map_paths_ld_preload_open() {
 			;;
 	esac
 
-	deps="git make"
-	for d in $deps; do
-		if ! command -v "$d" 1>/dev/null; then
-			_err_msg "ERROR: Using PATH_MAPPING requires $d"
-			exit 1
-		fi
-	done
-
 	_echo "* Building $LD_PRELOAD_OPEN..."
 
 	rm -rf "$TMPDIR"/ld-preload-open
 	git clone "$LD_PRELOAD_OPEN" "$TMPDIR"/ld-preload-open && (
 		cd "$TMPDIR"/ld-preload-open
-		make all
+		make path-mapping.so
 	)
 
 	mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/lib
@@ -527,21 +542,12 @@ _map_paths_ld_preload_open() {
 }
 
 _map_paths_binary_patch() {
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		EXEC_WRAPPER=1
-		sed -i -e 's|/usr|././|g' "$APPDIR"/shared/bin/*
-		echo 'ORIGINAL_WORKING_DIR=${PWD}' >> "$APPDIR"/.env
-		echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}' >> "$APPDIR"/.env
-		_echo "* Patched away /usr from binaries..."
-		echo ""
-	elif [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
-		set -- "$APPDIR"/shared/bin/*
-		for bin do
-			_patch_away_usr_bin_dir   "$bin"
-			_patch_away_usr_lib_dir   "$bin"
-			_patch_away_usr_share_dir "$bin"
-		done
-	fi
+	set -- "$APPDIR"/shared/bin/*
+	for bin do
+		_patch_away_usr_bin_dir   "$bin" || :
+		_patch_away_usr_lib_dir   "$bin" || :
+		_patch_away_usr_share_dir "$bin" || :
+	done
 }
 
 _deploy_datadir() {
@@ -660,14 +666,6 @@ _deploy_icon_and_desktop() {
 
 	find "$APPDIR"/share/icons/hicolor "$@" -type f -delete
 	_remove_empty_dirs "$APPDIR"/share/icons/hicolor
-
-	# make sure there is no hardcoded path to /usr/share/icons in bins
-	set -- "$APPDIR"/shared/bin/*
-	for bin do
-		if grep -Eaoq -m 1 "/usr/share/icons" "$bin"; then
-			_patch_away_usr_share_dir "$bin" || true
-		fi
-	done
 }
 
 _check_window_class() {
@@ -696,74 +694,44 @@ _check_window_class() {
 }
 
 _patch_away_usr_bin_dir() {
-	# do not patch if PATH_MAPPING already covers this
-	case "$PATH_MAPPING" in
-		*/usr/bin*) return 1;;
-	esac
-
 	if ! grep -Eaoq -m 1 "/usr/bin" "$1"; then
 		return 1
 	fi
 
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		sed -i -e 's|/usr|././|g' "$1"
-	else
-		sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
-		if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
-			echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
-		fi
+	sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
+	if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/bin from $1"
-	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 }
 
 _patch_away_usr_lib_dir() {
-	# do not patch if PATH_MAPPING already covers this
-	case "$PATH_MAPPING" in
-		*/usr/lib*) return 1;;
-	esac
-
 	if ! grep -Eaoq -m 1 "/usr/lib" "$1"; then
 		return 1
 	fi
 
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		sed -i -e 's|/usr|././|g' "$1"
-	else
-		sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
+	sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
 
-		if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
-			echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
-		fi
+	if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/lib from $1"
-	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 }
 
 _patch_away_usr_share_dir() {
-	# do not patch if PATH_MAPPING already covers this
-	case "$PATH_MAPPING" in
-		*/usr/share*) return 1;;
-	esac
-
 	if ! grep -Eaoq -m 1 "/usr/share" "$1"; then
 		return 1
 	fi
 
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		sed -i -e 's|/usr|././|g' "$1"
-	else
-		sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
+	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
 
-		if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
-			echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
-		fi
+	if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/share from $1"
-	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 }
 
 _echo "------------------------------------------------------------"
@@ -785,8 +753,6 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
-_map_paths_ld_preload_open
-_map_paths_binary_patch
 _add_exec_wrapper
 _add_locale_fix
 _deploy_datadir
@@ -843,6 +809,25 @@ for lib do case "$lib" in
 		_patch_away_usr_lib_dir "$lib" || continue
 	esac
 done
+
+# make sure there is no hardcoded path to /usr/share/... in bins
+set -- "$APPDIR"/shared/bin/*
+for bin do
+	if grep -aoq -m 1 '/usr/share/.*/' "$bin"; then
+		_patch_away_usr_share_dir "$bin" || true
+	fi
+	if grep -aoq -m 1 '/usr/lib/.*/' "$bin"; then
+		_patch_away_usr_lib_dir "$bin" || true
+	fi
+done
+
+if [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
+	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
+	_map_paths_binary_patch
+else
+	_map_paths_ld_preload_open \
+		|| ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
+fi
 
 echo ""
 _echo "------------------------------------------------------------"
