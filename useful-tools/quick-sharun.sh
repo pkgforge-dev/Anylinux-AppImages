@@ -490,6 +490,14 @@ _add_locale_fix() {
 }
 
 _map_paths_ld_preload_open() {
+	deps="git make"
+	for d in $deps; do
+		if ! command -v "$d" 1>/dev/null; then
+			_err_msg "ERROR: Using pathmap requires $d"
+			return 1
+		fi
+	done
+
 	if grep -q '_tmp_share' "$APPDIR"/.env 2>/dev/null; then
 		PATH_MAPPING="/tmp/$_tmp_share:\${SHARUN_DIR}/share,$PATH_MAPPING"
 	fi
@@ -517,14 +525,6 @@ _map_paths_ld_preload_open() {
 			exit 1
 			;;
 	esac
-
-	deps="git make"
-	for d in $deps; do
-		if ! command -v "$d" 1>/dev/null; then
-			_err_msg "ERROR: Using PATH_MAPPING requires $d"
-			exit 1
-		fi
-	done
 
 	_echo "* Building $LD_PRELOAD_OPEN..."
 
@@ -825,7 +825,8 @@ if [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
 	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 	_map_paths_binary_patch
 else
-	_map_paths_ld_preload_open
+	_map_paths_ld_preload_open \
+		|| ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 fi
 
 echo ""
