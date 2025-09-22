@@ -34,7 +34,7 @@ UPDATE_MSG="${UPDATE_MSG:-A new version of $APPNAME is available. Do you wish to
 POST_UPDATE_GOOD="$APPNAME updated successfully!"
 POST_UPDATE_BAD="ERROR: Something went wrong updating $APPNAME"
 DO_NOT_ASK="Do you wish to disable update checking and not see this message again?"
-APPIMAGEUPDATETOOL_LINK="${APPIMAGEUPDATETOOL_LINK:-https://github.com/AppImageCommunity/AppImageUpdate/releases/latest/download/appimageupdatetool-$ARCH.AppImage}"
+APPIMAGEUPDATETOOL_LINK="${APPIMAGEUPDATETOOL_LINK:-https://github.com/AppImageCommunity/AppImageUpdate/releases/download/continuous/appimageupdatetool-$ARCH.AppImage}"
 
 # make sure we can update the thing
 _sanity_check() {
