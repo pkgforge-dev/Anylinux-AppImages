@@ -331,6 +331,7 @@ _make_deployment_array() {
 	if [ "$DEPLOY_GDK" = 1 ]; then
 		_echo "* Deploying gdk-pixbuf"
 		set -- "$@" \
+			"$LIB_DIR"/glycin-loaders/*/* \
 			"$LIB_DIR"/gdk-pixbuf-*/*/loaders/*
 	fi
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
