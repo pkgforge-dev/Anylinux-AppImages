@@ -845,6 +845,36 @@ for lib do case "$lib" in
 	esac
 done
 
+set -- "$APPDIR"/bin/*
+
+for bin do case "$bin" in
+	*glycin-*)
+		if [ -x "$APPDIR"/bin/bwrap ]; then
+			continue
+		fi
+		cat <<-'EOF' > "$APPDIR"/bin/bwrap
+		#!/bin/sh
+
+		# AppImages crash when we bundle bwrap required by glycin loaders
+		# This terrible hack makes us able to run the glycin loaders without bwrap
+
+		while :; do case "$1" in
+		        --) shift; break;;
+		        --chdir|--seccomp|--dev|--tmpfs) shift 2;;
+		        --*bind*|--symlink|--setenv) shift 3;;
+		        -*) shift;;
+		        *) break ;;
+		        esac
+		done
+
+		exec "$@"
+		EOF
+		chmod +x "$APPDIR"/bin/bwrap
+		_echo "* added bwrap wrapper for glycin loaders"
+		;;
+	esac
+done
+
 echo ""
 _echo "------------------------------------------------------------"
 echo ""
