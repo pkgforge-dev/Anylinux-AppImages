@@ -666,14 +666,6 @@ _deploy_icon_and_desktop() {
 
 	find "$APPDIR"/share/icons/hicolor "$@" -type f -delete
 	_remove_empty_dirs "$APPDIR"/share/icons/hicolor
-
-	# make sure there is no hardcoded path to /usr/share/icons in bins
-	set -- "$APPDIR"/shared/bin/*
-	for bin do
-		if grep -Eaoq -m 1 "/usr/share/icons" "$bin"; then
-			_patch_away_usr_share_dir "$bin" || true
-		fi
-	done
 }
 
 _check_window_class() {
@@ -848,6 +840,17 @@ for lib do case "$lib" in
 		# so we will have to patch it manually instead
 		_patch_away_usr_lib_dir "$lib" || continue
 	esac
+done
+
+# make sure there is no hardcoded path to /usr/share/... in bins
+set -- "$APPDIR"/shared/bin/*
+for bin do
+	if grep -aoq -m 1 '/usr/share/.*/' "$bin"; then
+		_patch_away_usr_share_dir "$bin" || true
+	fi
+	if grep -aoq -m 1 '/usr/lib/.*/' "$bin"; then
+		_patch_away_usr_lib_dir "$bin" || true
+	fi
 done
 
 if [ "$DEPLOY_GLYCIN" = 1 ] && [ ! -x "$APPDIR"/bin/bwrap ]; then
