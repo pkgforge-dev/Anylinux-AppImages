@@ -238,6 +238,9 @@ _determine_what_to_deploy() {
 				*libgdk_pixbuf*.so*)
 					DEPLOY_GDK=1
 					;;
+				*libglycin*.so*)
+					DEPLOY_GLYCIN=1
+					;;
 				*libpipewire*.so*)
 					DEPLOY_PIPEWIRE=1
 					;;
@@ -330,9 +333,11 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_GDK" = 1 ]; then
 		_echo "* Deploying gdk-pixbuf"
-		set -- "$@" \
-			"$LIB_DIR"/glycin-loaders/*/* \
-			"$LIB_DIR"/gdk-pixbuf-*/*/loaders/*
+		set -- "$@" "$LIB_DIR"/gdk-pixbuf-*/*/loaders/*
+	fi
+	if [ "$DEPLOY_GLYCIN" = 1 ]; then
+		_echo "* Deploying glycin"
+		set -- "$@" "$LIB_DIR"/glycin-loaders/*/*
 	fi
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
 		set -- "$@" \
@@ -845,35 +850,26 @@ for lib do case "$lib" in
 	esac
 done
 
-set -- "$APPDIR"/bin/*
+if [ "$DEPLOY_GLYCIN" = 1 ] && [ ! -x "$APPDIR"/bin/bwrap ]; then
+	cat <<-'EOF' > "$APPDIR"/bin/bwrap
+	#!/bin/sh
 
-for bin do case "$bin" in
-	*glycin-*)
-		if [ -x "$APPDIR"/bin/bwrap ]; then
-			continue
-		fi
-		cat <<-'EOF' > "$APPDIR"/bin/bwrap
-		#!/bin/sh
+	# AppImages crash when we bundle bwrap required by glycin loaders
+	# This terrible hack makes us able to run the glycin loaders without bwrap
 
-		# AppImages crash when we bundle bwrap required by glycin loaders
-		# This terrible hack makes us able to run the glycin loaders without bwrap
-
-		while :; do case "$1" in
-		        --) shift; break;;
-		        --chdir|--seccomp|--dev|--tmpfs) shift 2;;
-		        --*bind*|--symlink|--setenv) shift 3;;
-		        -*) shift;;
-		        *) break ;;
-		        esac
-		done
-
-		exec "$@"
-		EOF
-		chmod +x "$APPDIR"/bin/bwrap
-		_echo "* added bwrap wrapper for glycin loaders"
-		;;
-	esac
-done
+	while :; do case "$1" in
+	        --) shift; break;;
+	        --chdir|--seccomp|--dev|--tmpfs) shift 2;;
+	        --*bind*|--symlink|--setenv) shift 3;;
+	        -*) shift;;
+	        *) break ;;
+	        esac
+	done
+	exec "$@"
+	EOF
+	chmod +x "$APPDIR"/bin/bwrap
+	_echo "* added bwrap wrapper for glycin loaders"
+fi
 
 echo ""
 _echo "------------------------------------------------------------"
