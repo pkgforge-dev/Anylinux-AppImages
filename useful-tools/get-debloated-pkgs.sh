@@ -169,6 +169,7 @@ if [ "$COMMON_PACKAGES" = 1 ]; then
 		qt6-base-mini    \
 		gtk3-mini        \
 		gtk4-mini        \
+		gdk-pixbuf2-mini \
 		llvm-libs-"$PKG_TYPE"
 fi
 
