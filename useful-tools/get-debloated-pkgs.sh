@@ -164,7 +164,6 @@ if [ "$COMMON_PACKAGES" = 1 ]; then
 	ADD_MESA=1
 	set -- "$@" \
 		opus-mini        \
-		ffmpeg-mini      \
 		libxml2-mini     \
 		qt6-base-mini    \
 		gtk3-mini        \
