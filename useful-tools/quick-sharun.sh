@@ -474,6 +474,18 @@ _add_exec_wrapper() {
 	cc -shared -fPIC "$TMPDIR"/exec.c -o "$APPDIR"/lib/exec.so
 	echo "exec.so" >> "$APPDIR"/.preload
 
+	# remove xdg-open wrapper not needed when exec.so is in use
+	if [ -f "$APPDIR"/bin/gio-launch-desktop ]; then
+		rm -f "$APPDIR"/bin/gio-launch-desktop
+		cat <<-'EOF' > "$APPDIR"/bin/gio-launch-desktop
+		#!/bin/sh
+		export GIO_LAUNCHED_DESKTOP_FILE_PID=$$
+		exec "$@"
+		EOF
+		chmod +x "$APPDIR"/bin/gio-launch-desktop
+	fi
+	rm -f "$APPDIR"/bin/xdg-open
+
 	_echo "* EXEC_WRAPPER successfully added!"
 }
 
