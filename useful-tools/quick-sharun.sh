@@ -851,6 +851,11 @@ for lib do case "$lib" in
 		# MAGICK_HOME only works on portable builds of imagemagick
 		# so we will have to patch it manually instead
 		_patch_away_usr_lib_dir "$lib" || continue
+		;;
+	*libmlt*.so*)
+		_patch_away_usr_lib_dir "$lib" || continue
+		_patch_away_usr_share_dir "$lib" || continue
+		;;
 	esac
 done
 
