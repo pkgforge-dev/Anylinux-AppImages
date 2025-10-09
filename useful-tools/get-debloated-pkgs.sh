@@ -4,7 +4,7 @@
 # https://github.com/pkgforge-dev/archlinux-pkgs-debloated
 # These packages make the resulting AppImages a lot smaller!
 
-set -e
+set -ex
 
 ARCH="$(uname -m)"
 TMPFILE="$(mktemp)"
