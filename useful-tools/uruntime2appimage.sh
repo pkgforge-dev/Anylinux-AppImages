@@ -66,6 +66,12 @@ _deploy_desktop_and_icon() {
 			_echo "* Downloading $DESKTOP to $APPDIR..."
 			_download "$APPDIR"/"${DESKTOP##*/}" "$DESKTOP"
 		fi
+
+		# make sure desktop entry ends with .desktop
+		if [ ! -f "$APPDIR"/*.desktop ] && [ -f "$APPDIR"/*.desktop.* ]; then
+			filename="${DESKTOP##*/}"
+			mv "$APPDIR"/*.desktop.* "$APPDIR"/"${filename%.desktop*}".desktop
+		fi
 	fi
 
 	if [ ! -f "$APPDIR"/.DirIcon ]; then
