@@ -37,6 +37,7 @@ We also try to avoid the usage of containers and other methods; so far, the only
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
+[kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
