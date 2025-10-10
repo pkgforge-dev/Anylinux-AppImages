@@ -8,7 +8,7 @@ Most of the AppImages are made with [sharun](https://github.com/VHSgunzo/sharun)
 
 The uruntime [automatically falls back to using extract and run](https://github.com/VHSgunzo/uruntime?tab=readme-ov-file#built-in-configuration) if FUSE is not available at all, so we **truly have 0 requirements.**
 
-We also try to avoid the usage of containers and other methods; so far, the only AppImage that depends on them is Lutris.
+We also try to avoid the usage of containers/namespaces and similar methods, so far the AppImages that depend on them are Lutris and virt-manager.
 
 **How is this possible?** See: [How to guide](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/HOW-TO-MAKE-THESE.md)
 
@@ -61,6 +61,7 @@ We also try to avoid the usage of containers and other methods; so far, the only
 [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
 [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
+[virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
 [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
 
