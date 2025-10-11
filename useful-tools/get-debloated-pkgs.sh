@@ -4,7 +4,11 @@
 # https://github.com/pkgforge-dev/archlinux-pkgs-debloated
 # These packages make the resulting AppImages a lot smaller!
 
-set -ex
+if [ "$DEBUG" = 1 ]; then
+	set -x
+fi
+
+set -e
 
 ARCH="$(uname -m)"
 TMPFILE="$(mktemp)"
@@ -108,6 +112,42 @@ elif command -v curl 1>/dev/null; then
 	DLCMD="curl --retry-connrefused --retry 30 -Lo"
 else
 	_error "We need wget or curl to download packages"
+fi
+
+# use wget-curl wrapper if GITHUB_TOKEN is set
+if [ -n "$GITHUB_TOKEN" ]; then
+	cat <<-'EOF' > "$TMPDIR"/.wget-curl-wrapper.sh
+	#!/bin/sh
+	# wrapper for wget and curl that automatically uses GITHUB_TOKEN
+	for link do
+	    case "$link" in
+	        *github.com*) GITHUB_LINK=1; break;;
+	    esac
+	done
+
+	if command -v wget 1>/dev/null; then
+	    set -- --retry-connrefused --tries=30 -O "$@"
+	    if [ "$GITHUB_LINK" = 1 ] && [ -n "$GITHUB_TOKEN" ]; then
+	        set -- \
+	            --header="Authorization: Bearer $GITHUB_TOKEN" \
+	            --header="Accept: application/vnd.github+json" \
+	            "$@"
+	    fi
+	    exec wget "$@"
+	elif command -v curl 1>/dev/null; then
+	    set -- --retry-connrefused --retry 30 -Lo "$@"
+	    if [ "$GITHUB_LINK" = 1 ] && [ -n "$GITHUB_TOKEN" ]; then
+	    set -- \
+	            --header "Authorization: Bearer $GITHUB_TOKEN" \
+	            --header "Accept: application/vnd.github+json" \
+	            "$@"
+	    fi
+	    exec curl "$@"
+	fi
+	EOF
+	chmod +x "$TMPDIR"/.wget-curl-wrapper.sh
+	DLCMD="$TMPDIR"/.wget-curl-wrapper.sh
+	_echo "GITHUB_TOKEN is set, we will use it for downloads."
 fi
 
 case "$ARCH" in
