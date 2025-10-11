@@ -333,7 +333,7 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_GDK" = 1 ]; then
 		_echo "* Deploying gdk-pixbuf"
-		set -- "$@" "$LIB_DIR"/gdk-pixbuf-*/*/loaders/*
+		set -- "$@" "$LIB_DIR"/gdk-pixbuf-*/*/loaders/*svg*.so*
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying glycin"
