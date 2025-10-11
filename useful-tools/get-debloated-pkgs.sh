@@ -131,7 +131,6 @@ if [ -n "$GITHUB_TOKEN" ]; then
 	        set -- \
 	            --header="Authorization: Bearer $GITHUB_TOKEN" \
 	            --header="Accept: application/vnd.github+json" \
-	            --header="X-GitHub-Api-Version: 2022-11-28"    \
 	            "$@"
 	    fi
 	    exec wget "$@"
@@ -141,7 +140,6 @@ if [ -n "$GITHUB_TOKEN" ]; then
 	    set -- \
 	            --header "Authorization: Bearer $GITHUB_TOKEN" \
 	            --header "Accept: application/vnd.github+json" \
-	            --header "X-GitHub-Api-Version: 2022-11-28"    \
 	            "$@"
 	    fi
 	    exec curl "$@"
