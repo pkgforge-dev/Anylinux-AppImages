@@ -415,6 +415,7 @@ _make_deployment_array() {
 			"$LIB_DIR"/pipewire-*/* \
 			"$LIB_DIR"/spa-*/*      \
 			"$LIB_DIR"/spa-*/*/*    \
+			"$LIB_DIR"/libpulse.so* \
 			"$LIB_DIR"/alsa-lib/*pipewire*.so*
 	fi
 	if [ "$DEPLOY_GSTREAMER" = 1 ]; then
