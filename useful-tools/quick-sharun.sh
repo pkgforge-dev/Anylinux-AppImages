@@ -484,6 +484,12 @@ _deploy_libs() {
 				--strace-mode  "$APPDIR"/sharun -- "$pybin"
 		done
 	fi
+
+	# lib4bin sometimes does not make the lib symlink
+	if [ ! -d "$APPDIR"/lib ]; then
+		_err_msg "lib4bin failed to symlink $APPDIR/shared/lib to $APPDIR/lib, fixing"
+		ln -s ./shared/lib "$APPDIR"/lib
+	fi
 }
 
 _handle_helper_bins() {
