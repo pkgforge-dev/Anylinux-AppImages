@@ -228,6 +228,9 @@ _determine_what_to_deploy() {
 				*libQt*Qml*.so*)
 					DEPLOY_QML=1
 					;;
+				*libQt*WebEngineCore.so*)
+					DEPLOY_QT_WEB_ENGINE=1
+					;;
 				*libgtk-3*.so*)
 					DEPLOY_GTK=1
 					GTK_DIR=gtk-3.0
@@ -307,14 +310,49 @@ _make_deployment_array() {
 			QT_DIR=qt
 		fi
 		_echo "* Deploying $QT_DIR"
-		set -- "$@" \
-			"$LIB_DIR"/"$QT_DIR"/plugins/imageformats/*.so* \
-			"$LIB_DIR"/"$QT_DIR"/plugins/iconengines/*.so*  \
-			"$LIB_DIR"/"$QT_DIR"/plugins/platform*/*.so*    \
-			"$LIB_DIR"/"$QT_DIR"/plugins/styles/*.so*       \
-			"$LIB_DIR"/"$QT_DIR"/plugins/tls/*.so*          \
-			"$LIB_DIR"/"$QT_DIR"/plugins/wayland-*/*.so*    \
-			"$LIB_DIR"/"$QT_DIR"/plugins/xcbglintegrations/*.so*
+
+		plugindir="$LIB_DIR"/"$QT_DIR"/plugins
+
+		for lib in $NEEDED_LIBS; do
+			case "$lib" in
+				*libQt*Gui.so*)
+					set -- "$@" \
+						"$plugindir"/imageformats/* \
+						"$plugindir"/iconengines/*  \
+						"$plugindir"/styles/*       \
+						"$plugindir"/platform*/*    \
+						"$plugindir"/wayland-*/*    \
+						"$plugindir"/xcbglintegrations/*
+					;;
+				*libQt*Network.so*)
+					set -- "$@" \
+						"$plugindir"/tls/* \
+						"$plugindir"/bearer/*
+					;;
+				*libQt*Sql.so*)
+					set -- "$@" "$plugindir"/sqldrivers/*
+					;;
+				*libQt*Multimedia.so*)
+					set -- "$@" "$plugindir"/multimedia/*
+					;;
+				*libQt*PrintSupport*)
+					set -- "$@" "$plugindir"/printsupport/*
+					;;
+				*libQt*Positioning.so*)
+					set -- "$@" "$plugindir"/position/*
+					;;
+			esac
+		done
+
+		if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
+			if ! qtwebenginebin=$(find "$LIB_DIR" -type f \
+				-name 'QtWebEngineProcess' -print -quit 2>/dev/null); then
+				_err_msg "Cannot find QtWebEngineProcess!"
+				exit 1
+			else
+				set -- "$@" "$qtwebenginebin"
+			fi
+		fi
 
 		if [ "$DEPLOY_QML" = 1 ]; then
 			_echo "* Deploying qml"
@@ -464,6 +502,11 @@ _handle_helper_bins() {
 				ln "$APPDIR"/sharun "$gstlibdir"/"${bin##*/}"
 			fi
 		done
+	fi
+
+	if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
+		cp -r /usr/share/qt*/resources    "$APPDIR"/lib/qt*
+		cp -r /usr/share/qt*/translations "$APPDIR"/lib/qt*
 	fi
 
 	# TODO add more instances of helper bins
