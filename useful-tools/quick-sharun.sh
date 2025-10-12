@@ -214,7 +214,8 @@ _determine_what_to_deploy() {
 		esac
 
 		# check linked libraries and enable each mode accordingly
-		for lib in $(ldd "$bin" 2>/dev/null | awk '{print $1}'); do
+		NEEDED_LIBS="$(ldd "$bin" 2>/dev/null | awk '{print $1}')"
+		for lib in $NEEDED_LIBS; do
 			case "$lib" in
 				*libQt5Core.so*)
 					DEPLOY_QT=1
@@ -333,7 +334,16 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_GDK" = 1 ]; then
 		_echo "* Deploying gdk-pixbuf"
-		set -- "$@" "$LIB_DIR"/gdk-pixbuf-*/*/loaders/*svg*.so*
+		gdkdir="$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders)"
+
+		set -- "$@" "$gdkdir"/*svg*.so*
+		for lib in $NEEDED_LIBS; do
+			case "$lib" in
+				*libjxl.so*)  set -- "$@" "$gdkdir"/*jxl*.so* ;;
+				*libavif.so*) set -- "$@" "$gdkdir"/*avif*.so*;;
+				*libheif.so*) set -- "$@" "$gdkdir"/*heif*.so*;;
+			esac
+		done
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying glycin"
