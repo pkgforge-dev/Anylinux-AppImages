@@ -214,7 +214,7 @@ _determine_what_to_deploy() {
 		esac
 
 		# check linked libraries and enable each mode accordingly
-		NEEDED_LIBS="$(ldd "$bin" 2>/dev/null | awk '{print $1}')"
+		NEEDED_LIBS="$(ldd "$bin" 2>/dev/null | awk '{print $1}') $NEEDED_LIBS"
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
 				*libQt5Core.so*)
