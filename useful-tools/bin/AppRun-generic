@@ -49,8 +49,8 @@ for hook in "$CURRENTDIR"/bin/*.hook; do
 	[ -x "$hook" ] || continue
 	case "$hook" in
 		*.bg.hook)  >&2 echo "exec bg hook: $hook"; "$hook" &;;
-		*.hook)     >&2 echo "exec hook: $hook";    "$hook"  ;;
 		*.src.hook) >&2 echo "source hook: $hook";  "$hook"  ;;
+		*.hook)     >&2 echo "exec hook: $hook";    "$hook"  ;;
 	esac
 done
 
