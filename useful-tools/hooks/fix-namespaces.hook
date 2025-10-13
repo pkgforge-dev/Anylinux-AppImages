@@ -13,7 +13,7 @@ namespaces are safe and a vital part of the security model of all web browsers, 
 
 To fix this issue I will need permission to disable the restriction, like all other linux distros do and several ubuntu forks had to undo.
 
-For more details see: https://github.com/pkgforge-dev/Anylinux-AppImage/blob/main/fix-namespaces.md#why
+For more details see: https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/fix-namespaces.md#why
 
 If you later wish to undo this change, remove: '/etc/sysctl.d/20-fix-namespaces.conf'
 and then run 'sysctl -w kernel.apparmor_restrict_unprivileged_userns=1' or reboot.

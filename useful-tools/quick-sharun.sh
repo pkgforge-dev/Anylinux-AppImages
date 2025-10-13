@@ -18,14 +18,14 @@ TMPDIR=${TMPDIR:-/tmp}
 APPRUN=${APPRUN:-AppRun-generic}
 APPDIR=${APPDIR:-$PWD/AppDir}
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio}
-HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools}
+HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/fritzw/ld-preload-open.git}
 
 EXEC_WRAPPER=${EXEC_WRAPPER:-0}
-EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/exec.c}
+EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/exec.c}
 LOCALE_FIX=${LOCALE_FIX:-0}
-LOCALE_FIX_SOURCE=${LOCALE_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/localefix.c}
-NOTIFY_WRAPPER_SOURCE=${NOTIFY_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/notify}
+LOCALE_FIX_SOURCE=${LOCALE_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/localefix.c}
+NOTIFY_WRAPPER_SOURCE=${NOTIFY_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/notify}
 
 DEPLOY_QT=${DEPLOY_QT:-0}
 DEPLOY_GTK=${DEPLOY_GTK:-0}
