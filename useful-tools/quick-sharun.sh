@@ -406,7 +406,7 @@ _make_deployment_array() {
 			set -- "$@" \
 				"$LIB_DIR"/libvulkan*.so*  \
 				"$LIB_DIR"/libVkLayer*.so*
-			ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}nvidia-check.hook"
+			ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}vulkan-check.src.hook"
 		fi
 	fi
 	if [ "$DEPLOY_PIPEWIRE" = 1 ]; then
