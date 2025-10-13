@@ -42,13 +42,15 @@ _get_main_bin_name() {
 _get_main_bin_name
 
 # additional scripts can be placed in the top level bin dir
-# those with a name that ends up .hook will be executed in teh current shell
-# while those that end with bg.hook will be executed in the background
+# those with a name that ends up .hook will be executed in the current shell
+# those that end with .bg.hook will be executed in the background
+# and those that end with .src.hook will be sourced in the AppRun
 for hook in "$CURRENTDIR"/bin/*.hook; do
 	[ -x "$hook" ] || continue
 	case "$hook" in
-		*.bg.hook) >&2 echo "exec bg hook: $hook"; "$hook" &;;
-		*.hook)    >&2 echo "exec hook: $hook";    "$hook"  ;;
+		*.bg.hook)  >&2 echo "exec bg hook: $hook"; "$hook" &;;
+		*.hook)     >&2 echo "exec hook: $hook";    "$hook"  ;;
+		*.src.hook) >&2 echo "source hook: $hook";  "$hook"  ;;
 	esac
 done
 
