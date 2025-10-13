@@ -34,7 +34,7 @@ _nvidia_check() (
 
 _nvidia_check
 
-# It is possible for a vulkan layer to have a path with '$LIB' is a token
+# It is possible for a vulkan layer to have a path with '$LIB' which is a token
 # used by the dynamic linker that expands to locations like lib and lib32
 # the problem here is that debian  has lib/x86_64-linux-gnu instead
 # so we need to check and patch '$LIB' for the real path to the lib instead
