@@ -25,7 +25,7 @@ EXEC_WRAPPER=${EXEC_WRAPPER:-0}
 EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/exec.c}
 LOCALE_FIX=${LOCALE_FIX:-0}
 LOCALE_FIX_SOURCE=${LOCALE_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/localefix.c}
-NOTIFY_WRAPPER_SOURCE=${NOTIFY_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/notify}
+SCRIPTS_SOURCE=${SCRIPTS_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin}
 
 DEPLOY_QT=${DEPLOY_QT:-0}
 DEPLOY_GTK=${DEPLOY_GTK:-0}
@@ -968,13 +968,13 @@ if [ -n "$ADD_HOOKS" ]; then
 	done
 
 	# always add notify wrapper when using hooks
-	_download "$hook_dst"/notify "$NOTIFY_WRAPPER_SOURCE"
+	_download "$hook_dst"/notify "$SCRIPTS_SOURCE"/notify
 	_echo "* Added notify wrapper"
 fi
 
 set -- "$APPDIR"/bin/*.hook
 if [ -f "$1" ] && [ ! -f "$APPDIR"/AppRun ]; then
-	_download "$APPDIR"/AppRun "$HOOKSRC"/"$APPRUN"
+	_download "$APPDIR"/AppRun "$SCRIPTS_SOURCE"/"$APPRUN"
 	_echo "* Added $APPRUN..."
 elif [ ! -f "$APPDIR"/AppRun ]; then
 	ln -v "$APPDIR"/sharun "$APPDIR"/AppRun
