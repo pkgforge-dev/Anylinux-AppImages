@@ -436,22 +436,11 @@ _make_deployment_array() {
 			"$(command -v magick || true)"  \
 			"$(command -v convert || true)" \
 			"$LIB_DIR"/libMagick*.so*
-		mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
-		cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
-		cp -r /etc/ImageMagick-*       "$APPDIR"/etc/ImageMagick
-		echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPDIR"/.env
-		echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc/ImageMagick' >> "$APPDIR"/.env
 	fi
 
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Deploying gegl"
-		gegldir=$(echo "$LIB_DIR"/gegl-*)
-		dst_gegldir="$APPDIR"/shared/lib/"${gegldir##*/}"
-		if [ -d "$gegldir" ]; then
-			set -- "$@" "$LIB_DIR"/gegl-*/*
-			mkdir -p "$dst_gegldir"
-			cp "$gegldir"/*.json "$dst_gegldir"
-		fi
+		set -- "$@" "$LIB_DIR"/gegl-*/*
 	fi
 
 	if [ "$DEPLOY_BABL" = 1 ]; then
@@ -985,6 +974,25 @@ if [ "$DEPLOY_GLYCIN" = 1 ] && [ ! -x "$APPDIR"/bin/bwrap ]; then
 	EOF
 	chmod +x "$APPDIR"/bin/bwrap
 	_echo "* added bwrap wrapper for glycin loaders"
+fi
+
+# these need to be done later because sharun may make shared/lib a symlink to lib
+# and if we make shared/lib first then it breaks sharun
+if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
+	mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
+	cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
+	cp -r /etc/ImageMagick-*       "$APPDIR"/etc/ImageMagick
+	echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPDIR"/.env
+	echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc/ImageMagick' >> "$APPDIR"/.env
+	_echo "* Copied ImageMagick directories"
+fi
+if [ "$DEPLOY_GEGL" = 1 ]; then
+	gegldir=$(echo "$LIB_DIR"/gegl-*)
+	dst_gegldir="$APPDIR"/shared/lib/"${gegldir##*/}"
+	if [ -d "$gegldir" ] && [ -d "$dst_gegldir" ]; then
+		cp "$gegldir"/*.json "$dst_gegldir"
+		_echo "* Copied gegl json files"
+	fi
 fi
 
 echo ""
