@@ -254,6 +254,12 @@ _determine_what_to_deploy() {
 				*libMagick*.so*)
 					DEPLOY_IMAGEMAGICK=1
 					;;
+				*libgegl*.so*)
+					DEPLOY_GEGL=1
+					;;
+				*libbabl*.so*)
+					DEPLOY_BABL=1
+					;;
 			esac
 		done
 	done
@@ -435,6 +441,22 @@ _make_deployment_array() {
 		cp -r /etc/ImageMagick-*       "$APPDIR"/etc/ImageMagick
 		echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPDIR"/.env
 		echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc/ImageMagick' >> "$APPDIR"/.env
+	fi
+
+	if [ "$DEPLOY_GEGL" = 1 ]; then
+		_echo "* Deploying gegl"
+		gegldir=$(echo "$LIB_DIR"/gegl-*)
+		dst_gegldir="$APPDIR"/shared/lib/"${gegldir##*/}"
+		if [ -d "$gegldir" ]; then
+			set -- "$@" "$LIB_DIR"/gegl-*/*
+			mkdir -p "$dst_gegldir"
+			cp "$gegldir"/*.json "$dst_gegldir"
+		fi
+	fi
+
+	if [ "$DEPLOY_BABL" = 1 ]; then
+		_echo "* Deploying babl"
+		set -- "$@" "$LIB_DIR"/babl-*/*
 	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
