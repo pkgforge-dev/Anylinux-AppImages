@@ -6,13 +6,13 @@ _err_msg(){
 	>&2 printf '\033[1;31m%s\033[0m\n' " $*"
 }
 
-# debian likes to split the nvidia driver into several packages
-# so there is a lot of people that only have the nvidia opengl driver installed
-# that then come complain that X vulkan app does not work because there is
-# no nvidia vulkan driver installed on their system.
 _nvidia_check() (
 	set -- /usr/share/glvnd/egl_vendor.d/10_nvidia.json /usr/share/vulkan/icd.d/*nvidia*.json
 
+	# debian likes to split the nvidia driver into several packages
+	# so there is a lot of people that only have the nvidia opengl driver installed
+	# that then come complain that X vulkan app does not work because there is
+	# no nvidia vulkan driver installed on their system.
 	if [ -f "$1" ] && [ ! -f "$2" ]; then
 		_err_msg ""
 		_err_msg "============================================================"
@@ -29,6 +29,16 @@ _nvidia_check() (
 		_err_msg ""
 		_err_msg "============================================================"
 		_err_msg ""
+	fi
+
+	# The nvidia driver will not load if /usr/lib contains 32bit libs, since we
+	# only support 64bit we can just check if there is a 64bit ld-linux.so in /usr/lib64
+	# TODO: There might be some other distro where this is not enough
+	if [ -f "$1" ] || [ -f "$2" ]; then
+		if [ ! -f /usr/lib/ld-linux-*64.so.* ] && [ -f /usr/lib64/ld-linux-*64.so.* ]; then
+			export LD_LIBRARY_PATH="/usr/lib64:$LD_LIBRARY_PATH"
+			>&2 echo "vulkan-check: Set LD_LIBRARY_PATH to /usr/lib64 for nvidia driver"
+		fi
 	fi
 )
 
