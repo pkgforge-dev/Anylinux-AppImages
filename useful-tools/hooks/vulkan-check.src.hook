@@ -50,7 +50,7 @@ _check_vulkan_json_path() (
 	done
 
 	for f in /usr/share/vulkan/explicit_layer.d/*; do
-		if layer_path=$(grep -o '"/usr.*$LIB.*"' "$f"); then
+		if [ -f "$f" ] && layer_path=$(grep -o '"/usr.*$LIB.*"' "$f"); then
 			for p in lib/"$(uname -m)"-linux-gnu lib64 lib; do
 				test_path=$(echo "$layer_path" | sed "s|\"||g; s|\$LIB|$p|")
 				if [ -e "$test_path" ]; then
@@ -66,7 +66,7 @@ _check_vulkan_json_path() (
 	done
 
 	for f in /usr/share/vulkan/implicit_layer.d/*; do
-		if layer_path=$(grep -o '"/usr.*$LIB.*"' "$f"); then
+		if [ -f "$f" ] && layer_path=$(grep -o '"/usr.*$LIB.*"' "$f"); then
 			for p in lib/"$(uname -m)"-linux-gnu lib64 lib; do
 				test_path=$(echo "$layer_path" | sed "s|\"||g; s|\$LIB|$p|")
 				if [ -e "$test_path" ]; then
