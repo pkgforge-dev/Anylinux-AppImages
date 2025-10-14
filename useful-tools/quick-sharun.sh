@@ -871,7 +871,7 @@ set -- \
 	"$APPDIR"/lib/*/*/*/*.so*
 
 for lib do case "$lib" in
-	libgegl*)
+	*libgegl*)
 		# GEGL_PATH is problematic so we avoiud it
 		# patch the lib directly to load its plugins instead
 		_patch_away_usr_lib_dir "$lib" || continue
@@ -910,6 +910,26 @@ for lib do case "$lib" in
 		_patch_away_usr_lib_dir "$lib" || continue
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
+	*libMangoHud*.so*)
+		src_mangohud_layer=$(echo /usr/share/vulkan/implicit_layer.d/MangoHud*.json)
+		dst_mangohud_layer="$APPDIR"/share/vulkan/implicit_layer.d/"${src_mangohud_layer##*/}"
+		if [ -f "$src_mangohud_layer" ] && [ ! -f "$dst_mangohud_layer" ]; then
+			mkdir -p "$APPDIR"/share/vulkan/implicit_layer.d
+			cp -v "$src_mangohud_layer" "$dst_mangohud_layer"
+			sed -i 's|/.*/mangohud/||' "$dst_mangohud_layer"
+
+			if [ ! -f "$APPDIR"/bin/mangohud ] \
+				&& command -v mangohud 1>/dev/null; then
+				cp -v "$(command -v mangohud)" "$APPDIR"/bin
+			fi
+
+			sed -i \
+				-e 's|/usr/.*/||'                         \
+				-e '1a\export SHARUN_ALLOW_LD_PRELOAD=1'  \
+				"$APPDIR"/bin/mangohud || :
+
+			_echo "Copied over mangohud layer and patched mangohud"
+		fi
 	esac
 done
 
