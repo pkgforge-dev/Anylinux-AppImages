@@ -16,7 +16,6 @@ PATH="$CURRENTDIR/bin:$PATH"
 export PATH
 BIN="${ARGV0:-$0}"
 BIN="${BIN##*/}"
-unset ARGV0
 
 # get name of main binary from the .desktop file
 _get_main_bin_name() {
@@ -59,6 +58,8 @@ for hook in "$CURRENTDIR"/bin/*.src.hook; do
 	[ -e "$hook" ] || continue
 	. "$hook"
 done
+
+unset ARGV0
 
 # If LD_DEBUG=libs is set outside the AppImage the output is not helpful
 # because it will include the libs of sh, grep, cat, etc from the hooks
