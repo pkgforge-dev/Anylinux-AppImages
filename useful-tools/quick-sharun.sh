@@ -27,13 +27,8 @@ LOCALE_FIX=${LOCALE_FIX:-0}
 LOCALE_FIX_SOURCE=${LOCALE_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/localefix.c}
 SCRIPTS_SOURCE=${SCRIPTS_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin}
 
-DEPLOY_QT=${DEPLOY_QT:-0}
-DEPLOY_GTK=${DEPLOY_GTK:-0}
 DEPLOY_OPENGL=${DEPLOY_OPENGL:-0}
 DEPLOY_VULKAN=${DEPLOY_VULKAN:-0}
-DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-0}
-DEPLOY_GSTREAMER=${DEPLOY_GSTREAMER:-0}
-DEPLOY_IMAGEMAGICK=${DEPLOY_IMAGEMAGICK:-0}
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-0}
 
@@ -226,39 +221,42 @@ _determine_what_to_deploy() {
 					QT_DIR=qt6
 					;;
 				*libQt*Qml*.so*)
-					DEPLOY_QML=1
+					DEPLOY_QML=${DEPLOY_QML:-1}
 					;;
 				*libQt*WebEngineCore.so*)
-					DEPLOY_QT_WEB_ENGINE=1
+					DEPLOY_QT_WEB_ENGINE=${DEPLOY_QT_WEB_ENGINEL:-1}
 					;;
 				*libgtk-3*.so*)
-					DEPLOY_GTK=1
+					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-3.0
 					;;
 				*libgtk-4*.so*)
-					DEPLOY_GTK=1
+					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-4.0
 					;;
 				*libgdk_pixbuf*.so*)
-					DEPLOY_GDK=1
+					DEPLOY_GTK=${DEPLOY_GDK:-1}
 					;;
 				*libglycin*.so*)
-					DEPLOY_GLYCIN=1
+					DEPLOY_GLYCIN=${DEPLOY_GLYCIN:-1}
 					;;
 				*libpipewire*.so*)
-					DEPLOY_PIPEWIRE=1
+					DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
 					;;
 				*libgstreamer*.so*)
-					DEPLOY_GSTREAMER=1
+					DEPLOY_GSTREAMER=${DEPLOY_GSTREAMER:-1}
 					;;
 				*libMagick*.so*)
-					DEPLOY_IMAGEMAGICK=1
+					DEPLOY_IMAGEMAGICK=${DEPLOY_IMAGEMAGICK:-1}
 					;;
 				*libgegl*.so*)
-					DEPLOY_GEGL=1
+					DEPLOY_GEGL=${DEPLOY_GEGL:-1}
 					;;
 				*libbabl*.so*)
-					DEPLOY_BABL=1
+					DEPLOY_BABL=${DEPLOY_BABL:-1}
+					;;
+				*libheif.so*)
+					DEPLOY_LIBHEIF=${DEPLOY_LIBHEIF:-1}
 					;;
 			esac
 		done
@@ -446,6 +444,19 @@ _make_deployment_array() {
 	if [ "$DEPLOY_BABL" = 1 ]; then
 		_echo "* Deploying babl"
 		set -- "$@" "$LIB_DIR"/babl-*/*
+	fi
+
+	if [ "$DEPLOY_LIBHEIF" = 1 ]; then
+		_echo "* Deploying heif"
+
+		# TODO remove the .env parts once sharun sets this automatically
+		if [ -d "$LIB_DIR"/libheif/plugins ]; then
+			set -- "$@" "$LIB_DIR"/libheif/plugins/*
+			echo 'LIBHEIF_PLUGIN_PATH=${SHARUN_DIR}/lib/libheif/plugins' >> "$APPDIR"/.env
+		elif [ -d "$LIB_DIR"/libheif ]; then
+			set -- "$@" "$LIB_DIR"/libheif/*
+			echo 'LIBHEIF_PLUGIN_PATH=${SHARUN_DIR}/lib/libheif' >> "$APPDIR"/.env
+		fi
 	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
