@@ -40,6 +40,17 @@ _get_main_bin_name() {
 
 _get_main_bin_name
 
+# Allow users to set env variables for specific AppImage
+# This feature only works with the uruntime
+if [ "$1" = '--appimage-add-env' ]; then
+	shift
+	for v do
+		echo "$v" >> "$APPIMAGE".env
+		>&2 echo "Added '$v' to $APPIMAGE.env"
+	done
+	exit 0
+fi
+
 # additional scripts can be placed in the top level bin dir
 # those with a name that ends up .hook will be executed in the current shell
 # those that end with .bg.hook will be executed in the background
