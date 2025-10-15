@@ -447,7 +447,7 @@ _make_deployment_array() {
 	fi
 
 	if [ "$DEPLOY_LIBHEIF" = 1 ]; then
-		_echo "* Deploying heif"
+		_echo "* Deploying libheif"
 
 		# TODO remove the .env parts once sharun sets this automatically
 		if [ -d "$LIB_DIR"/libheif/plugins ]; then
