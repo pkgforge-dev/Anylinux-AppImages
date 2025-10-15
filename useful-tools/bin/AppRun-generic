@@ -48,10 +48,16 @@ _get_main_bin_name
 for hook in "$CURRENTDIR"/bin/*.hook; do
 	[ -x "$hook" ] || continue
 	case "$hook" in
-		*.bg.hook)  >&2 echo "exec bg hook: $hook"; "$hook" &;;
-		*.src.hook) >&2 echo "source hook: $hook";  . "$hook";;
-		*.hook)     >&2 echo "exec hook: $hook";    "$hook"  ;;
+		*.src.hook) continue ;;
+		*.bg.hook)  "$hook" &;;
+		*.hook)     "$hook"  ;;
 	esac
+done
+
+# source hooks need to run last
+for hook in "$CURRENTDIR"/bin/*.src.hook; do
+	[ -e "$hook" ] || continue
+	. "$hook"
 done
 
 # If LD_DEBUG=libs is set outside the AppImage the output is not helpful
