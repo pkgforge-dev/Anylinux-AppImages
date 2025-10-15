@@ -54,6 +54,13 @@ for hook in "$CURRENTDIR"/bin/*.hook; do
 	esac
 done
 
+# If LD_DEBUG=libs is set outside the AppImage the output is not helpful
+# because it will include the libs of sh, grep, cat, etc from the hooks
+# with this var we can set LD_DEBUG=libs for the bundled application only
+if [ "$APPIMAGE_DEBUG" = 1 ]; then
+	export LD_DEBUG=libs
+fi
+
 # Check if ARGV0 matches any bundled binary, fallback to $1, then main bin
 if [ -f "$CURRENTDIR"/bin/"$BIN" ]; then
 	exec "$CURRENTDIR"/bin/"$BIN" "$@"
