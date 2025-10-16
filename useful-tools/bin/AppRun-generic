@@ -70,22 +70,30 @@ for hook in "$CURRENTDIR"/bin/*.src.hook; do
 	. "$hook"
 done
 
+# always unset ARGVO to avoid causing issues to child processes that use zsh
+# We do it after running the hooks since some hooks need it
 unset ARGV0
+
+# Check if BIN (ARGV0) matches a binary, fallback to $1, then binary in .desktop
+if [ -f "$CURRENTDIR"/bin/"$BIN" ]; then
+	TO_LAUNCH="$CURRENTDIR"/bin/"$BIN"
+elif [ -f "$CURRENTDIR"/bin/"$1" ]; then
+	TO_LAUNCH="$CURRENTDIR"/bin/"$1"
+	shift
+else
+	TO_LAUNCH="$CURRENTDIR"/bin/"$MAIN_BIN"
+fi
 
 # If LD_DEBUG=libs is set outside the AppImage the output is not helpful
 # because it will include the libs of sh, grep, cat, etc from the hooks
 # with this var we can set LD_DEBUG=libs for the bundled application only
 if [ "$APPIMAGE_DEBUG" = 1 ]; then
 	export LD_DEBUG=libs
-fi
-
-# Check if ARGV0 matches any bundled binary, fallback to $1, then main bin
-if [ -f "$CURRENTDIR"/bin/"$BIN" ]; then
-	exec "$CURRENTDIR"/bin/"$BIN" "$@"
-elif [ -f "$CURRENTDIR"/bin/"$1" ]; then
-	BIN="$1"
-	shift
-	exec "$CURRENTDIR"/bin/"$BIN" "$@"
+	export VK_LOADER_DEBUG=all
+	export LC_ALL=C
+	export SHARUN_PRINTENV=1
+	"$TO_LAUNCH" "$@" 2>"$HOME"/"${APPIMAGE##*/}"-debug.log
+	>&2 echo "Debug log at: '$HOME/${APPIMAGE##*/}-debug.log'"
 else
-	exec "$CURRENTDIR"/bin/"$MAIN_BIN" "$@"
+	exec "$TO_LAUNCH" "$@"
 fi
