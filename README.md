@@ -21,6 +21,7 @@ We also try to avoid the usage of containers/namespaces and similar methods, so 
 [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)                                        |
 [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)                                                            |
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
+[Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced)                                                           |
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
 [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
