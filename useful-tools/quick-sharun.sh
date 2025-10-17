@@ -950,6 +950,7 @@ for lib do case "$lib" in
 			sed -i \
 				-e 's|/usr/.*/||'                         \
 				-e '1a\export SHARUN_ALLOW_LD_PRELOAD=1'  \
+				-e 's|#!.*|#!/bin/sh|'                    \
 				"$APPDIR"/bin/mangohud || :
 
 			_echo "Copied over mangohud layer and patched mangohud"
