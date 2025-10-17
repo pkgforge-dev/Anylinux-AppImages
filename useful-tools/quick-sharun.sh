@@ -1042,6 +1042,8 @@ elif [ ! -f "$APPDIR"/AppRun ]; then
 	_echo "* Hardlinked $APPDIR/sharun as $APPDIR/AppRun..."
 fi
 
+sed -i -e "s|@@@@@|$ARCH|" "$APPDIR"/AppRun
+
 chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null || :
 
 # make sure the .env has all the "unset" last, due to a bug in the dotenv
