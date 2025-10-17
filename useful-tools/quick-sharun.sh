@@ -729,31 +729,33 @@ _deploy_icon_and_desktop() {
 	fi
 
 	# copy the entire hicolor icons dir and remove unneeded icons
-	mkdir -p "$APPDIR"/share/icons
-	cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
+	if [ -d /usr/share/icons/hicolor ]; then
+		mkdir -p "$APPDIR"/share/icons
+		cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
 
-	set --
-	for f in "$APPDIR"/shared/bin/*; do
-		f=${f##*/}
-		set -- ! -name "*$f*" "$@"
-	done
-
-	# also include names of top level .desktop and icon
-	if [ -n "$DESKTOP" ]; then
-		DESKTOP=${DESKTOP##*/}
-		DESKTOP=${DESKTOP%.desktop}
-		set -- ! -name "*$DESKTOP*" "$@"
+		set --
+		for f in "$APPDIR"/shared/bin/*; do
+			f=${f##*/}
+			set -- ! -name "*$f*" "$@"
+		done
+	
+		# also include names of top level .desktop and icon
+		if [ -n "$DESKTOP" ]; then
+			DESKTOP=${DESKTOP##*/}
+			DESKTOP=${DESKTOP%.desktop}
+			set -- ! -name "*$DESKTOP*" "$@"
+		fi
+	
+		if [ -n "$ICON" ]; then
+			ICON=${ICON##*/}
+			ICON=${ICON%.png}
+			ICON=${ICON%.svg}
+			set -- ! -name "*$ICON*" "$@"
+		fi
+	
+		find "$APPDIR"/share/icons/hicolor "$@" -type f -delete
+		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
-
-	if [ -n "$ICON" ]; then
-		ICON=${ICON##*/}
-		ICON=${ICON%.png}
-		ICON=${ICON%.svg}
-		set -- ! -name "*$ICON*" "$@"
-	fi
-
-	find "$APPDIR"/share/icons/hicolor "$@" -type f -delete
-	_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 }
 
 _check_window_class() {
