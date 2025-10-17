@@ -14,5 +14,3 @@ fi
 if [ -f "$APPIMAGE_QT_THEME" ]; then
 	set -- "$@" "-stylesheet" "$APPIMAGE_QT_THEME"
 fi
-
-
