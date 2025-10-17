@@ -2,6 +2,12 @@
 
 # hook that checks several potential issues vulkan related
 
+# On aarch64 device drivers are all over the place and often they ship with
+# modifications not upstreamed to mesa, so we need to allow the host vulkan
+if [ "$APPIMAGE_ARCH" = 'aarch64' ]; then
+	export SHARUN_ALLOW_SYS_VKICD=1
+fi
+
 _err_msg(){
 	>&2 printf '\033[1;31m%s\033[0m\n' " $*"
 }
@@ -53,7 +59,7 @@ _check_vulkan_json_path() (
 	implicit_dir="$_VULKAN_HOOK_DIR"/vulkan/implicit_layer.d
 	explicit_dir="$_VULKAN_HOOK_DIR"/vulkan/explicit_layer.d
 
-	for dep in grep sed mkdir uname; do
+	for dep in grep sed mkdir; do
 		if ! command -v "$dep" 1>/dev/null; then
 			return 1
 		fi
@@ -61,7 +67,7 @@ _check_vulkan_json_path() (
 
 	for f in /usr/share/vulkan/explicit_layer.d/*; do
 		if [ -f "$f" ] && layer_path=$(grep -o '"/usr.*$LIB.*"' "$f"); then
-			for p in lib/"$(uname -m)"-linux-gnu lib64 lib; do
+			for p in lib/"$APPIMAGE_ARCH"-linux-gnu lib64 lib; do
 				test_path=$(echo "$layer_path" | sed "s|\"||g; s|\$LIB|$p|")
 				if [ -e "$test_path" ]; then
 					mkdir -p "$explicit_dir"
@@ -77,7 +83,7 @@ _check_vulkan_json_path() (
 
 	for f in /usr/share/vulkan/implicit_layer.d/*; do
 		if [ -f "$f" ] && layer_path=$(grep -o '"/usr.*$LIB.*"' "$f"); then
-			for p in lib/"$(uname -m)"-linux-gnu lib64 lib; do
+			for p in lib/"$APPIMAGE_ARCH"-linux-gnu lib64 lib; do
 				test_path=$(echo "$layer_path" | sed "s|\"||g; s|\$LIB|$p|")
 				if [ -e "$test_path" ]; then
 					mkdir -p "$implicit_dir"
@@ -95,3 +101,4 @@ _check_vulkan_json_path() (
 if _check_vulkan_json_path && [ -d "$_VULKAN_HOOK_DIR" ]; then
 	export XDG_CONFIG_DIRS="$_VULKAN_HOOK_DIR:${XDG_CONFIG_DIRS:-/etc/xdg}"
 fi
+
