@@ -46,7 +46,7 @@ jobs:
           merge-multiple: true
 
       - name: Release Artifacts
-        uses: softprops/action-gh-release@v2.2.2
+        uses: softprops/action-gh-release@v2.4.1
         with:
           name: "demo: ${{ env.VERSION }}"
           tag_name: "demo"
