@@ -229,6 +229,8 @@ See the following examples where these scripts are used:
 * [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/blob/7716accbc41a848b5734e7caa8eb697e38b38bcc/azahar-appimage.sh#L69-L98)
 * [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage/blob/3d69b2be0806dac0b0c8a08d0a5711a297a68761/scrcpy-appimage.sh#L5-L43)
 
+A simple demo that [bundles glxgears and vkcube](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/vkcube-glxgears-appimage.sh) is also provided [here](https://github.com/pkgforge-dev/Anylinux-AppImages/releases/tag/demo)
+
 
 -----------------------------------
 
