@@ -1,0 +1,58 @@
+name: Build Demo
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  schedule:
+    - cron: "0 7 1/30 * *"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: "${{ matrix.name }} (${{ matrix.arch }})"
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      matrix:
+        include:
+          - runs-on: ubuntu-latest
+            name: Build AppImage
+            arch: x86_64
+          - runs-on: ubuntu-24.04-arm
+            name: Build AppImage
+            arch: aarch64
+    container: ghcr.io/pkgforge-dev/archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make AppImage
+        run: sh ./useful-tools/demo/vkcube-glxgears-appimage.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: AppImage-${{ matrix.arch }}
+          path: dist
+
+  release:
+    if: ${{ github.ref_name == 'main' }}
+    needs: [build]
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          pattern: AppImage-*
+          merge-multiple: true
+
+      - name: Release Artifacts
+        uses: softprops/action-gh-release@v2.2.2
+        with:
+          name: "demo: ${{ env.VERSION }}"
+          tag_name: "demo"
+          prerelease: true
+          draft: false
+          generate_release_notes: false
+          make_latest: true
+          files: |
+            *.AppImage*
