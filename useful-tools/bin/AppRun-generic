@@ -17,6 +17,7 @@ BIN="${BIN##*/}"
 
 export APPIMAGE_ARCH=@@@@@
 export PATH="$CURRENTDIR/bin:$PATH"
+export CURRENTDIR
 
 # get name of main binary from the .desktop file
 _get_main_bin_name() {
