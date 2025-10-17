@@ -11,11 +11,12 @@ fi
 
 set -e
 
+APPIMAGE_ARCH=@@@
 CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
-PATH="$CURRENTDIR/bin:$PATH"
-export PATH
 BIN="${ARGV0:-$0}"
 BIN="${BIN##*/}"
+
+export PATH="$CURRENTDIR/bin:$PATH"
 
 # get name of main binary from the .desktop file
 _get_main_bin_name() {
