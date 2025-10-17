@@ -11,7 +11,7 @@ fi
 
 set -e
 
-APPIMAGE_ARCH=@@@
+APPIMAGE_ARCH=@@@@@
 CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
 BIN="${ARGV0:-$0}"
 BIN="${BIN##*/}"
