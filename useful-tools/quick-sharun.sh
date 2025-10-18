@@ -738,21 +738,21 @@ _deploy_icon_and_desktop() {
 			f=${f##*/}
 			set -- ! -name "*$f*" "$@"
 		done
-	
+
 		# also include names of top level .desktop and icon
 		if [ -n "$DESKTOP" ]; then
 			DESKTOP=${DESKTOP##*/}
 			DESKTOP=${DESKTOP%.desktop}
 			set -- ! -name "*$DESKTOP*" "$@"
 		fi
-	
+
 		if [ -n "$ICON" ]; then
 			ICON=${ICON##*/}
 			ICON=${ICON%.png}
 			ICON=${ICON%.svg}
 			set -- ! -name "*$ICON*" "$@"
 		fi
-	
+
 		find "$APPDIR"/share/icons/hicolor "$@" -type f -delete
 		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
@@ -1036,16 +1036,17 @@ if [ -n "$ADD_HOOKS" ]; then
 	_echo "* Added notify wrapper"
 fi
 
-set -- "$APPDIR"/bin/*.hook
-if [ -f "$1" ] && [ ! -f "$APPDIR"/AppRun ]; then
+if [ ! -f "$APPDIR"/AppRun ]; then
 	_download "$APPDIR"/AppRun "$SCRIPTS_SOURCE"/"$APPRUN"
 	_echo "* Added $APPRUN..."
-elif [ ! -f "$APPDIR"/AppRun ]; then
-	ln -v "$APPDIR"/sharun "$APPDIR"/AppRun
-	_echo "* Hardlinked $APPDIR/sharun as $APPDIR/AppRun..."
 fi
 
-sed -i -e "s|@@@@@|$ARCH|" "$APPDIR"/AppRun
+# Set APPIMAGE_ARCH and MAIN_BIN in AppRun
+MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$APPDIR"/*.desktop)
+sed -i \
+	-e "s|@MAIN_BIN@|$MAIN_BIN|"  \
+	-e "s|@APPIMAGE_ARCH@|$ARCH|" \
+	"$APPDIR"/AppRun
 
 chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null || :
 
