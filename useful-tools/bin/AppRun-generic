@@ -12,35 +12,13 @@ fi
 set -e
 
 CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
+MAIN_BIN=@MAIN_BIN@
 BIN="${ARGV0:-$0}"
 BIN="${BIN##*/}"
 
-export APPIMAGE_ARCH=@@@@@
+export APPIMAGE_ARCH=@APPIMAGE_ARCH@
 export PATH="$CURRENTDIR/bin:$PATH"
 export CURRENTDIR
-
-# get name of main binary from the .desktop file
-_get_main_bin_name() {
-	for f in "$CURRENTDIR"/*.desktop; do
-		[ -e "$f" ] || return 1
-		while IFS= read -r line; do
-			case "$line" in
-				Exec=*)
-					# strip Exec=
-					MAIN_BIN="${line#Exec=}"
-					# only get the bin name
-					MAIN_BIN="${MAIN_BIN##*/}"
-					# remove spaces and flags
-					MAIN_BIN="${MAIN_BIN%% *}"
-					return 0
-					;;
-			esac
-		done < "$f"
-	done
-	return 1
-}
-
-_get_main_bin_name
 
 # Allow users to set env variables for specific AppImage
 # This feature only works with the uruntime
