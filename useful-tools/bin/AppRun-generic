@@ -2,8 +2,6 @@
 
 # Example AppRun for using the hooks of this repository.
 # NOTE: It is meant to be used with sharun which uses a top level bin dir
-# NOTE2: If you do not need the hooks DO NOT USE THIS SCRIPT!!
-# sharun itself can work as teh AppRun and that is much better!
 
 if [ "$APPRUN_DEBUG" = 1 ]; then
 	set -x
