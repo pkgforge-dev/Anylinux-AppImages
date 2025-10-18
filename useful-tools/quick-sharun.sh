@@ -640,6 +640,7 @@ _map_paths_binary_patch() {
 
 _deploy_datadir() {
 	if [ "$DEPLOY_DATADIR" = 1 ]; then
+		# deploy application data files
 		set -- "$APPDIR"/bin/*
 		for bin do
 			[ -x "$bin" ] || continue
@@ -653,6 +654,22 @@ _deploy_datadir() {
 				fi
 			done
 		done
+
+		# try to find and deploy a dbus service that matches .desktop
+		set -- "$APPDIR"/*.desktop
+		desktopname="${1%.desktop}"
+		desktopname="${desktopname##*/}"
+		dst_dbus_dir="$APPDIR"/share/dbus-1/services
+		for f in /usr/share/dbus-1/services/*; do
+			case "${f##*/}" in
+				*"$desktopname"*)
+					_echo "* Adding dbus service $f"
+					mkdir -p "$dst_dbus_dir"
+					cp -v "$f" "$dst_dbus_dir"
+					;;
+			esac
+		done
+		sed -i -e 's|/usr/.*/||g' "$dst_dbus_dir"/* 2>/dev/null || :
 	fi
 }
 
@@ -877,9 +894,9 @@ _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_exec_wrapper
 _add_locale_fix
+_deploy_icon_and_desktop
 _deploy_datadir
 _deploy_locale
-_deploy_icon_and_desktop
 _check_window_class
 
 echo ""
