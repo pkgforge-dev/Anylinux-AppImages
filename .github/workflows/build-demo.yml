@@ -4,6 +4,12 @@ concurrency:
   cancel-in-progress: true
 
 on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ '**/*.md' ]
+  pull_request:
+    branches: [ main ]
+    paths-ignore: [ '**/*.md' ]
   schedule:
     - cron: "0 7 1/30 * *"
   workflow_dispatch: {}
