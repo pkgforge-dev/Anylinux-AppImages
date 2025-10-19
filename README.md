@@ -61,6 +61,7 @@ We also try to avoid the usage of containers/namespaces and similar methods, so 
 [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
 [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
 [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
+[uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
