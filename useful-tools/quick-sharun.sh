@@ -258,6 +258,9 @@ _determine_what_to_deploy() {
 				*libheif.so*)
 					DEPLOY_LIBHEIF=${DEPLOY_LIBHEIF:-1}
 					;;
+				*libp11-kit.so*)
+					DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
+					;;
 			esac
 		done
 	done
@@ -457,6 +460,10 @@ _make_deployment_array() {
 			set -- "$@" "$LIB_DIR"/libheif/*
 			echo 'LIBHEIF_PLUGIN_PATH=${SHARUN_DIR}/lib/libheif' >> "$APPDIR"/.env
 		fi
+	fi
+
+	if [ "$DEPLOY_P11KIT" = 1 ]; then
+		set -- "$@" "$LIB_DIR"/pkcs11/*
 	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
