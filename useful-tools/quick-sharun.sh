@@ -425,34 +425,38 @@ _make_deployment_array() {
 			"$LIB_DIR"/libpulse.so* \
 			"$LIB_DIR"/alsa-lib/*pipewire*.so*
 	fi
+
+	GST_DIR=$(echo "$LIB_DIR"/gstreamer-*)
 	if [ "$DEPLOY_GSTREAMER_ALL" = 1 ]; then
 		_echo "* Deploying all gstreamer"
-			set -- "$@" \
-				"$LIB_DIR"/gstreamer*/* \
-				"$LIB_DIR"/gstreamer*/*/*
+			set -- "$@" "$GST_DIR"/*
 	elif [ "$DEPLOY_GSTREAMER" = 1 ]; then
 		_echo "* Deploying minimal gstreamer"
-		# gstreamer has a lot of plugins
-		# remove the following since they pull a lot of deps:
-		gstdir=$(echo "$LIB_DIR"/gstreamer*)
-		tmpgstdir="$TMPDIR"/"${gstdir##*/}"
-		cp -r "$gstdir" "$tmpgstdir"
 
-		# has a dependency to libicudata (30 MIB lib)
-		rm -rf "$tmpgstdir"/*ladspa* "$tmpgstdir"/*/*ladspa*
+		# we need to delete the plugins on the host because copying
+		# the libs to a different place and pointing to that dir
+		# does not work, all the plugins still end up being deployed
 
-		# has a dependency to libx265, massive library rarely used
-		rm -rf "$tmpgstdir"/*x265* "$tmpgstdir"/*/*x265*
+		# check we have write access to the directory
+		# and make sure we are in a container since someone could
+		# run this script in their personal PC with elevated rights...
+		if [ -w "$GST_DIR" ] && [ -n "$CI" ]; then
+			# gstreamer has a lot of plugins
+			# remove the following since they pull a lot of deps:
 
-		# svt-hevc video encoder, rarely needed
-		rm -rf "$tmpgstdir"/*svthevcenc* "$tmpgstdir"/*/*svthevcenc*
-
-		if [ "$DEPLOY_VULKAN" != 1 ]; then
-			# pulls vulkan, do not add it unless vulkan is being deployed
-			rm -rf "$tmpgstdir"/*gstladspa* "$tmpgstdir"/*/*gstladspa*
+			# gstladspa has a dependency to libicudata (30 MIB lib)
+			rm -rf "$GST_DIR"/*ladspa*
+			# gstx265 has a dependency to libx265, massive library
+			rm -rf "$GST_DIR"/*x265*
+			# gstsvt-hevc video encoder, rarely needed
+			rm -rf "$GST_DIR"/*svthevcenc*
+			# gstvulkan pulls vulkan, do not add it unless vulkan is being deployed
+			if [ "$DEPLOY_VULKAN" != 1 ]; then
+				rm -rf "$GST_DIR"/*vulkan*
+			fi
 		fi
 
-		set -- "$@" "$tmpgstdir"/* "$tmpgstdir"/*/*
+		set -- "$@" "$GST_DIR"/*
 	fi
 	if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 		_echo "* Deploying ImageMagick"
