@@ -445,14 +445,18 @@ _make_deployment_array() {
 			# remove the following since they pull a lot of deps:
 
 			# gstladspa has a dependency to libicudata (30 MIB lib)
-			rm -rf "$GST_DIR"/*ladspa*
+			rm -f "$GST_DIR"/*gstladspa*
 			# gstx265 has a dependency to libx265, massive library
-			rm -rf "$GST_DIR"/*x265*
+			rm -f "$GST_DIR"/*gstx265*
 			# gstsvt-hevc video encoder, rarely needed
-			rm -rf "$GST_DIR"/*svthevcenc*
+			rm -f "$GST_DIR"/*gstsvthevcenc*
+			# Apparently this is only useful in windows?
+			rm -f "$GST_DIR"/*gstopenmpt*
+			# Never heard of this format before lol
+			rm -f "$GST_DIR"/*gstopenexr*
 			# gstvulkan pulls vulkan, do not add it unless vulkan is being deployed
 			if [ "$DEPLOY_VULKAN" != 1 ]; then
-				rm -rf "$GST_DIR"/*vulkan*
+				rm -f "$GST_DIR"/*gstvulkan*
 			fi
 		fi
 
