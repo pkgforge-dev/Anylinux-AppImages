@@ -55,6 +55,7 @@ We also try to avoid the usage of containers/namespaces and similar methods, so 
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
+[servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
 [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
 [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
