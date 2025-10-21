@@ -425,11 +425,34 @@ _make_deployment_array() {
 			"$LIB_DIR"/libpulse.so* \
 			"$LIB_DIR"/alsa-lib/*pipewire*.so*
 	fi
-	if [ "$DEPLOY_GSTREAMER" = 1 ]; then
-		_echo "* Deploying gstreamer"
-		set -- "$@" \
-			"$LIB_DIR"/gstreamer*/* \
-			"$LIB_DIR"/gstreamer*/*/*
+	if [ "$DEPLOY_GSTREAMER_ALL" = 1 ]; then
+		_echo "* Deploying all gstreamer"
+			set -- "$@" \
+				"$LIB_DIR"/gstreamer*/* \
+				"$LIB_DIR"/gstreamer*/*/*
+	elif [ "$DEPLOY_GSTREAMER" = 1 ]; then
+		_echo "* Deploying minimal gstreamer"
+		# gstreamer has a lot of plugins
+		# remove the following since they pull a lot of deps:
+		gstdir=$(echo "$LIB_DIR"/gstreamer*)
+		tmpgstdir="$TMPDIR"/"${gstdir##*/}"
+		cp -r "$gstdir" "$tmpgstdir"
+
+		# has a dependency to libicudata (30 MIB lib)
+		rm -rf "$tmpgstdir"/*ladspa* "$tmpgstdir"/*/*ladspa*
+
+		# has a dependency to libx265, massive library rarely used
+		rm -rf "$tmpgstdir"/*x265* "$tmpgstdir"/*/*x265*
+
+		# svt-hevc video encoder, rarely needed
+		rm -rf "$tmpgstdir"/*svthevcenc* "$tmpgstdir"/*/*svthevcenc*
+
+		if [ "$DEPLOY_VULKAN" != 1 ]; then
+			# pulls vulkan, do not add it unless vulkan is being deployed
+			rm -rf "$tmpgstdir"/*gstladspa* "$tmpgstdir"/*/*gstladspa*
+		fi
+
+		set -- "$@" "$tmpgstdir"/* "$tmpgstdir"/*/*
 	fi
 	if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 		_echo "* Deploying ImageMagick"
