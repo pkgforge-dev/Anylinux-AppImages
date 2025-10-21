@@ -1067,6 +1067,7 @@ fi
 
 # Set APPIMAGE_ARCH and MAIN_BIN in AppRun
 MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$APPDIR"/*.desktop)
+MAIN_BIN=${MAIN_BIN##*/}
 sed -i \
 	-e "s|@MAIN_BIN@|$MAIN_BIN|"  \
 	-e "s|@APPIMAGE_ARCH@|$ARCH|" \
