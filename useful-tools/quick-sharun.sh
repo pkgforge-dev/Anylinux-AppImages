@@ -527,6 +527,14 @@ _make_deployment_array() {
 		set -- "$@" "$LIB_DIR"/pkcs11/*
 	fi
 
+	if [ "$DEPLOY_CARLA" = 1 ]; then
+		set -- "$@" \
+			"$(command -v carla || :)"* \
+			"$LIB_DIR"/carla/*          \
+			"$LIB_DIR"/carla/jack/*     \
+			"$LIB_DIR"/carla/styles/*
+	fi
+
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
 }
 
@@ -598,6 +606,26 @@ _handle_helper_bins() {
 	if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
 		cp -r /usr/share/qt*/resources    "$APPDIR"/lib/qt*
 		cp -r /usr/share/qt*/translations "$APPDIR"/lib/qt*
+	fi
+
+	if [ "$DEPLOY_CARLA" = 1 ]; then
+		cp -r /usr/share/carla "$APPDIR"/share
+		cp -rn "$LIB_DIR"/carla  "$APPDIR"/lib
+
+		bins_to_find="$(find "$APPDIR"/lib/carla -exec file {} \; \
+			| grep -i 'elf.*executable' | awk -F':' '{print $1}')"
+
+		for bin in $bins_to_find; do
+			if [ -x "$bin" ]; then
+				mv "$bin" "$APPDIR"/shared/bin
+				ln -f "$APPDIR"/sharun "$bin"
+			fi
+		done
+
+		sed -i \
+			-e 's|INSTALL_PREFIX="/usr"|INSTALL_PREFIX="$APPDIR"|g' \
+			-e 's|which python3|command -v python3|g'               \
+			"$APPDIR"/lib/carla/carla-*-modgui "$APPDIR"/bin/carla*
 	fi
 
 	# TODO add more instances of helper bins
