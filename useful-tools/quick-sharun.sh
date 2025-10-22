@@ -426,52 +426,64 @@ _make_deployment_array() {
 			"$LIB_DIR"/alsa-lib/*pipewire*.so*
 	fi
 
-	GST_DIR=$(echo "$LIB_DIR"/gstreamer-*)
-	if [ "$DEPLOY_GSTREAMER_ALL" = 1 ]; then
-		_echo "* Deploying all gstreamer"
-			set -- "$@" "$GST_DIR"/*
-	elif [ "$DEPLOY_GSTREAMER" = 1 ]; then
-		_echo "* Deploying minimal gstreamer"
+	if [ "$DEPLOY_GSTREAMER_ALL" = 1 ] || [ "$DEPLOY_GSTREAMER" = 1 ]; then
+		GST_DIR=$(echo "$LIB_DIR"/gstreamer-*)
+		if [ "$DEPLOY_GSTREAMER_ALL" = 1 ]; then
+			_echo "* Deploying all gstreamer"
+		elif [ "$DEPLOY_GSTREAMER" = 1 ]; then
+			_echo "* Deploying minimal gstreamer"
 
-		# we need to delete the plugins on the host because copying
-		# the libs to a different place and pointing to that dir
-		# does not work, all the plugins still end up being deployed
+			# we need to delete the plugins on the host because copying
+			# the libs to a different place and pointing to that dir
+			# does not work, all the plugins still end up being deployed
 
-		# check we have write access to the directory
-		# and make sure we are in a container since someone could
-		# run this script in their personal PC with elevated rights...
-		if [ -w "$GST_DIR" ] && [ -n "$CI" ]; then
-			# gstreamer has a lot of plugins
-			# remove the following since they pull a lot of deps:
+			# check we have write access to the directory
+			# and make sure we are in a container since someone could
+			# run this script in their personal PC with elevated rights...
+			if [ -w "$GST_DIR" ] && [ -n "$CI" ]; then
+				# gstreamer has a lot of plugins
+				# remove the following since they pull a lot of deps:
 
-			# has a dependency to libicudata (30 MIB lib)
-			rm -f "$GST_DIR"/*gstladspa*
-			# gstx265 has a dependency to libx265, massive library
-			rm -f "$GST_DIR"/*gstx265*
-			# gstsvt-hevc video encoder, rarely needed
-			rm -f "$GST_DIR"/*gstsvthevcenc*
-			# Apparently this is only useful in windows?
-			rm -f "$GST_DIR"/*gstopenmpt*
-			# Never heard of this format before lol
-			rm -f "$GST_DIR"/*gstopenexr*
-			# used to scan barcodes
-			rm -f "$GST_DIR"/*gstzxing*
-			# dvd playback
-			rm -f "$GST_DIR"/*gstdvdspu*
-			rm -f "$GST_DIR"/*gstresindvd*
-			# only needed for recording with some capture card
-			rm -f "$GST_DIR"/*gstdecklink*
-			# mpeg2 video encoder
-			rm -f "$GST_DIR"/*gstmpeg2enc*
-			# wtf is this?
-			rm -f "$GST_DIR"/*gstmplex*
-			# gstvulkan pulls vulkan, do not add it unless vulkan is being deployed
-			if [ "$DEPLOY_VULKAN" != 1 ]; then
-				rm -f "$GST_DIR"/*gstvulkan*
+				# has a dependency to libicudata (30 MIB lib)
+				rm -f "$GST_DIR"/*gstladspa*
+				# gstx265 has a dependency to libx265, massive library
+				rm -f "$GST_DIR"/*gstx265*
+				# gstsvt-hevc video encoder, rarely needed
+				rm -f "$GST_DIR"/*gstsvthevcenc*
+				# Apparently this is only useful in windows?
+				rm -f "$GST_DIR"/*gstopenmpt*
+				# Never heard of this format before lol
+				rm -f "$GST_DIR"/*gstopenexr*
+				# used to scan barcodes
+				rm -f "$GST_DIR"/*gstzxing*
+				# dvd playback
+				rm -f "$GST_DIR"/*gstdvdspu*
+				rm -f "$GST_DIR"/*gstresindvd*
+				# only needed for recording with some capture card
+				rm -f "$GST_DIR"/*gstdecklink*
+				# mpeg2 video encoder
+				rm -f "$GST_DIR"/*gstmpeg2enc*
+				# wtf is this?
+				rm -f "$GST_DIR"/*gstmplex*
+				# gstvulkan pulls vulkan, remove unless vulkan is deployed
+				if [ "$DEPLOY_VULKAN" != 1 ]; then
+					rm -f "$GST_DIR"/*gstvulkan*
+				fi
 			fi
 		fi
-
-		set -- "$@" "$GST_DIR"/*
+		set -- "$@" \
+			"$GST_DIR"/*.so*      \
+			"$GST_DIR"/gst*helper \
+			"$GST_DIR"/gst*scanner
+		# On ubuntu and alpine the gstreamer binaries are on a different dir
+		if [ ! -f "$GST_DIR"/gst-plugin-scanner ]; then
+			gst_bin_path=$(find /usr/lib* -type f \
+				-name 'gst-plugin-scanner' -print -quit)
+			gst_bin_dir=${gst_bin_path%/*}
+			set -- "$@" \
+				"$gst_bin_dir"/gst*scanner \
+				"$gst_bin_dir"/gst*helper
+		fi
 	fi
 	if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 		_echo "* Deploying ImageMagick"
