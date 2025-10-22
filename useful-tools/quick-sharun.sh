@@ -243,6 +243,9 @@ _determine_what_to_deploy() {
 				*libpipewire*.so*)
 					DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
 					;;
+				*libjack.so*)
+					DEPLOY_JACK=${DEPLOY_JACK:-1}
+					;;
 				*libgstreamer*.so*)
 					DEPLOY_GSTREAMER=${DEPLOY_GSTREAMER:-1}
 					;;
@@ -425,7 +428,11 @@ _make_deployment_array() {
 			"$LIB_DIR"/libpulse.so* \
 			"$LIB_DIR"/alsa-lib/*pipewire*.so*
 	fi
-
+	if [ "$DEPLOY_JACK" = 1 ]; then
+		_echo "* Deploying jack"
+		set -- "$@" "$LIB_DIR"/jack/*
+		echo 'JACK_DRIVER_DIR=${SHARUN_DIR}/lib/jack' >> "$APPDIR"/.env
+	fi
 	if [ "$DEPLOY_GSTREAMER_ALL" = 1 ] || [ "$DEPLOY_GSTREAMER" = 1 ]; then
 		GST_DIR=$(echo "$LIB_DIR"/gstreamer-*)
 		if [ "$DEPLOY_GSTREAMER_ALL" = 1 ]; then
