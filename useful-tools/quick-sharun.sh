@@ -444,7 +444,7 @@ _make_deployment_array() {
 			# gstreamer has a lot of plugins
 			# remove the following since they pull a lot of deps:
 
-			# gstladspa has a dependency to libicudata (30 MIB lib)
+			# has a dependency to libicudata (30 MIB lib)
 			rm -f "$GST_DIR"/*gstladspa*
 			# gstx265 has a dependency to libx265, massive library
 			rm -f "$GST_DIR"/*gstx265*
@@ -454,6 +454,17 @@ _make_deployment_array() {
 			rm -f "$GST_DIR"/*gstopenmpt*
 			# Never heard of this format before lol
 			rm -f "$GST_DIR"/*gstopenexr*
+			# used to scan barcodes
+			rm -f "$GST_DIR"/*gstzxing*
+			# dvd playback
+			rm -f "$GST_DIR"/*gstdvdspu*
+			rm -f "$GST_DIR"/*gstresindvd*
+			# only needed for recording with some capture card
+			rm -f "$GST_DIR"/*gstdecklink*
+			# mpeg2 video encoder
+			rm -f "$GST_DIR"/*gstmpeg2enc*
+			# wtf is this?
+			rm -f "$GST_DIR"/*gstmplex*
 			# gstvulkan pulls vulkan, do not add it unless vulkan is being deployed
 			if [ "$DEPLOY_VULKAN" != 1 ]; then
 				rm -f "$GST_DIR"/*gstvulkan*
