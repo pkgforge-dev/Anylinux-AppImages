@@ -762,7 +762,7 @@ _deploy_locale() {
 			! -name '*gtk*40.mo'   \
 			! -name '*gst-plugin*' \
 			! -name '*gstreamer*'
-			for f in "$APPDIR"/shared/bin/*; do
+			for f in "$APPDIR"/shared/bin/* "$APPDIR"/bin/*; do
 				f=${f##*/}
 				set -- "$@" ! -name "*$f*"
 			done
