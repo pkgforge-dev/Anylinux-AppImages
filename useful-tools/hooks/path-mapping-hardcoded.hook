@@ -16,17 +16,17 @@ if [ -f "$APPDIR"/.env ]; then
 	. "$APPDIR"/.env
 else
 	>&2 echo "path-mapping-hardcoded: WARNING There is no .env file in this AppImage!"
-	>&2 echo "This usually means I was added unnecesarly to this application"
+	>&2 echo "This usually means I was added unnecessarily to this application"
 	>&2 echo "or the person that packaged me has no idea what they are doing"
 	exit 0
 fi
 
 if [ -n "$_tmp_bin" ]; then
-	ln -sfn "$PARENTDIR"/bin /tmp/"$_tmp_bin"
+	ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin"
 fi
 if [ -n "$_tmp_lib" ]; then
-	ln -sfn "$PARENTDIR"/lib /tmp/"$_tmp_lib"
+	ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib"
 fi
 if [ -n "$_tmp_share" ];
-	ln -sfn "$PARENTDIR"/share /tmp/"$_tmp_share"
+	ln -sfn "$APPDIR"/share /tmp/"$_tmp_share"
 fi
