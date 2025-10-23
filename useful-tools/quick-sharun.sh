@@ -524,10 +524,12 @@ _make_deployment_array() {
 	fi
 
 	if [ "$DEPLOY_P11KIT" = 1 ]; then
+		_echo "* Deploying p11kit"
 		set -- "$@" "$LIB_DIR"/pkcs11/*
 	fi
 
 	if [ "$DEPLOY_CARLA" = 1 ]; then
+		_echo "* Deploying carla"
 		set -- "$@" \
 			"$(command -v carla || :)"* \
 			"$LIB_DIR"/carla/*          \
