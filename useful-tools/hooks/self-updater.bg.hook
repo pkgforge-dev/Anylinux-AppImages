@@ -109,6 +109,9 @@ _update() {
 _make_configfile() {
 	if [ ! -f "$CONFIGFILEPATH" ]; then
 		echo "2" > "$CONFIGFILEPATH"
+		# do not ask the first time we are launched
+		# because that just annoys people
+		exit 0
 	fi
 }
 
