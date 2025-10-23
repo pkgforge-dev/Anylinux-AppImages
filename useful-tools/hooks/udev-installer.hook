@@ -21,8 +21,6 @@
 
 set -e
 
-# Use relative path to make sure we pick the `.env` from the same AppDir
-PARENTDIR="$(cd "${0%/*}" && echo "${PWD%/*}")"
 CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 LOCKFILEPATH="$CACHEDIR"/."${APPIMAGE##*/}"-disable-udev-check
 UDEV_INSTALL_MSG="${UDEV_INSTALL_MSG:-${APPIMAGE##*/} needs udev rules in order to work. Do you wish to install them?}"
@@ -30,7 +28,7 @@ DO_NOT_ASK="Do you wish to not see this message again?"
 
 # make sure we have the needed deps
 _sanity_check() {
-	if [ -z "$PARENTDIR" ] || [ -z "$APPIMAGE" ]; then
+	if [ -z "$APPDIR" ] || [ -z "$APPIMAGE" ]; then
 		return 1
 	elif ! command -v cp \
 	  || ! command -v mkdir \
@@ -44,15 +42,15 @@ _sanity_check() {
 
 _check_udev() {
 	# Add any possible udev files in the array
-	if [ -d "$PARENTDIR"/etc/udev/rules.d ]; then
-		UDEVDIR="$PARENTDIR"/etc/udev/rules.d
-		set -- "$PARENTDIR"/etc/udev/rules.d/*
-	elif [ -d "$PARENTDIR"/lib/rules.d ]; then
-		UDEVDIR="$PARENTDIR"/lib/rules.d
-		set -- "$PARENTDIR"/lib/udev/rules.d/*
-	elif [ -d "$PARENTDIR"/usr/lib/rules.d ]; then
-		UDEVDIR="$PARENTDIR"/usr/lib/rules.d
-		set -- "$PARENTDIR"/usr/lib/udev/rules.d/*
+	if [ -d "$APPDIR"/etc/udev/rules.d ]; then
+		UDEVDIR="$APPDIR"/etc/udev/rules.d
+		set -- "$APPDIR"/etc/udev/rules.d/*
+	elif [ -d "$APPDIR"/lib/rules.d ]; then
+		UDEVDIR="$APPDIR"/lib/rules.d
+		set -- "$APPDIR"/lib/udev/rules.d/*
+	elif [ -d "$APPDIR"/usr/lib/rules.d ]; then
+		UDEVDIR="$APPDIR"/usr/lib/rules.d
+		set -- "$APPDIR"/usr/lib/udev/rules.d/*
 	else
 		>&2 echo "ERROR: No udev rules found, make sure to include"
 		>&2 echo "them in one of the following places in the AppDir:"
