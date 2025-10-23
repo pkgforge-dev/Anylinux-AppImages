@@ -14,14 +14,11 @@
 
 set -e
 
-APPDIR=${APPDIR:-$SHARUN_DIR}
 APPNAME=${APPIMAGE##*/}
-
 BINDIR=${XDG_BIN_HOME:-$HOME/.local/bin}
-PATH="$PATH:$BINDIR"
-
 DATADIR=${XDG_DATA_HOME:-$HOME/.local/share}/appimagekit
 CONFIGDIR=${UPDATE_POLICY_CONFIGDIR:-${XDG_CONFIG_HOME:-$HOME/.config}/auto-updates-policy}
+PATH="$PATH:$BINDIR"
 
 set -- "$APPDIR"/*.desktop
 entry=${1##*/}
@@ -112,6 +109,9 @@ _update() {
 _make_configfile() {
 	if [ ! -f "$CONFIGFILEPATH" ]; then
 		echo "2" > "$CONFIGFILEPATH"
+		# do not ask the first time we are launched
+		# because that just annoys people
+		exit 0
 	fi
 }
 
@@ -147,6 +147,8 @@ elif [ "$STATUS" = 1 ]; then
 		fi
 	fi
 else
+	# wait 20 seconds before asking for the first time
+	sleep 20
 	if notify -dq "$WELCOME_MSG"; then
 		_enable_update_checking
 		_get_appimageupdatetool
