@@ -60,7 +60,7 @@ export VERBOSE=1
 
 if [ "$DEPLOY_PYTHON" = 1 ]; then
 	export WITH_PYTHON=1
-	export PYTHON_VER="${PYTHON_VER:-3.12}"
+	export PYTHON_VER="${PYTHON_VER:-3.13}"
 fi
 
 if [ -z "$NO_STRIP" ]; then
