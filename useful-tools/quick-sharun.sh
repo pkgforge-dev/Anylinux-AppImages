@@ -1095,6 +1095,15 @@ if [ "$DEPLOY_GEGL" = 1 ]; then
 	fi
 fi
 
+# some libraries may need to look for a relative ../share directory
+# normally this is for when they are located in /usr/share
+# however with sharun this structure is not present, instead 
+# we have the libraries inside `shared/lib` and `share` is one level
+# further back, so we make a relative symlink to fix this issue
+if [ ! -d "$APPDIR"/shared/share ]; then
+	ln -s ../share "$APPDIR"/shared/share
+fi
+
 echo ""
 _echo "------------------------------------------------------------"
 echo ""
