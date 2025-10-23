@@ -27,6 +27,6 @@ fi
 if [ -n "$_tmp_lib" ]; then
 	ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib"
 fi
-if [ -n "$_tmp_share" ];
+if [ -n "$_tmp_share" ]; then
 	ln -sfn "$APPDIR"/share /tmp/"$_tmp_share"
 fi
