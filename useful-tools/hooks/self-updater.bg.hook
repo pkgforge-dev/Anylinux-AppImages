@@ -14,14 +14,11 @@
 
 set -e
 
-APPDIR=${APPDIR:-$SHARUN_DIR}
 APPNAME=${APPIMAGE##*/}
-
 BINDIR=${XDG_BIN_HOME:-$HOME/.local/bin}
-PATH="$PATH:$BINDIR"
-
 DATADIR=${XDG_DATA_HOME:-$HOME/.local/share}/appimagekit
 CONFIGDIR=${UPDATE_POLICY_CONFIGDIR:-${XDG_CONFIG_HOME:-$HOME/.config}/auto-updates-policy}
+PATH="$PATH:$BINDIR"
 
 set -- "$APPDIR"/*.desktop
 entry=${1##*/}
