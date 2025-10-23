@@ -3,7 +3,7 @@
 # this script makes symnlinks to the hardcoded random dirs that were
 # patched away when 'PATH_MAPPING_HARDCODED' is used with quick-sharun
 
-# make sure the _tmp_* vars comne directly from the APPDIR .env file
+# make sure the _tmp_* vars come directly from the APPDIR .env file
 unset _tmp_bin _tmp_lib _tmp_share
 
 if ! command -v ln 1>/dev/null; then
