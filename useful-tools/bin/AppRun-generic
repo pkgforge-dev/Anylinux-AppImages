@@ -10,13 +10,14 @@ fi
 set -e
 
 CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
+APPDIR="$CURRENTDIR"
 MAIN_BIN=@MAIN_BIN@
 BIN="${ARGV0:-$0}"
 BIN="${BIN##*/}"
 
 export APPIMAGE_ARCH=@APPIMAGE_ARCH@
 export PATH="$CURRENTDIR/bin:$PATH"
-export CURRENTDIR
+export CURRENTDIR APPDIR
 
 # Allow users to set env variables for specific AppImage
 # This feature only works with the uruntime
