@@ -1,13 +1,10 @@
-name: Build Demo
+name: Build Demos
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
 on:
   push:
-    branches: [ main ]
-    paths-ignore: [ '**/*.md' ]
-  pull_request:
     branches: [ main ]
     paths-ignore: [ '**/*.md' ]
   schedule:
@@ -21,18 +18,36 @@ jobs:
     strategy:
       matrix:
         include:
-          - runs-on: ubuntu-latest
-            name: Build AppImage
-            arch: x86_64
-          - runs-on: ubuntu-24.04-arm
-            name: Build AppImage
-            arch: aarch64
+          - arch: x86_64
+            platform: linux/amd64
+            runs-on: ubuntu-24.04
+            script: vkcube-glxgears-appimage
+          - arch: x86_64
+            platform: linux/amd64
+            runs-on: ubuntu-24.04
+            script: vkcube-glxgears-appimage
+          - arch: x86_64
+            platform: linux/amd64
+            runs-on: ubuntu-24.04
+            script: gtk3-demo-appimage
+          - arch: x86_64
+            platform: linux/amd64
+            runs-on: ubuntu-24.04
+            script: gtk3-demo-appimage
+          - arch: x86_64
+            platform: linux/amd64
+            runs-on: ubuntu-24.04
+            script: gtk4-demo-appimage
+          - arch: x86_64
+            platform: linux/amd64
+            runs-on: ubuntu-24.04
+            script: gtk4-demo-appimage
     container: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Make AppImage
-        run: sh ./useful-tools/demo/vkcube-glxgears-appimage.sh
+        run: sh ./useful-tools/demo/${{ matrix.script }}.sh
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4.6.2
