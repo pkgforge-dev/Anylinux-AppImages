@@ -71,7 +71,7 @@ if [ "$APPIMAGE_DEBUG" = 1 ]; then
 	export VK_LOADER_DEBUG=all
 	export LC_ALL=C
 	export SHARUN_PRINTENV=1
-	"$TO_LAUNCH" "$@" 2>"$HOME"/"${APPIMAGE##*/}"-debug.log
+	"$TO_LAUNCH" "$@" 2>"$HOME"/"${APPIMAGE##*/}"-debug.log || :
 	>&2 echo "Debug log at: '$HOME/${APPIMAGE##*/}-debug.log'"
 else
 	exec "$TO_LAUNCH" "$@"
