@@ -17,7 +17,7 @@ pacman -Syu --noconfirm \
 	base-devel       \
 	curl             \
 	git              \
-	gtk4-demos       \
+	gtk3-demos       \
 	libxcb           \
 	libxcursor       \
 	libxi            \
