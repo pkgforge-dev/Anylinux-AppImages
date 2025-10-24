@@ -690,14 +690,7 @@ _map_paths_ld_preload_open() {
 }
 
 _map_paths_binary_patch() {
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		EXEC_WRAPPER=1
-		sed -i -e 's|/usr|././|g' "$APPDIR"/shared/bin/*
-		echo 'ORIGINAL_WORKING_DIR=${PWD}' >> "$APPDIR"/.env
-		echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}' >> "$APPDIR"/.env
-		_echo "* Patched away /usr from binaries..."
-		echo ""
-	elif [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
+	if [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
 		set -- "$APPDIR"/shared/bin/*
 		for bin do
 			_patch_away_usr_bin_dir   "$bin"
@@ -879,13 +872,9 @@ _patch_away_usr_bin_dir() {
 		return 1
 	fi
 
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		sed -i -e 's|/usr|././|g' "$1"
-	else
-		sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
-		if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
-			echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
-		fi
+	sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
+	if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/bin from $1"
@@ -902,14 +891,9 @@ _patch_away_usr_lib_dir() {
 		return 1
 	fi
 
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		sed -i -e 's|/usr|././|g' "$1"
-	else
-		sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
-
-		if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
-			echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
-		fi
+	sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
+	if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/lib from $1"
@@ -926,14 +910,9 @@ _patch_away_usr_share_dir() {
 		return 1
 	fi
 
-	if [ "$PATH_MAPPING_RELATIVE" = 1 ]; then
-		sed -i -e 's|/usr|././|g' "$1"
-	else
-		sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
-
-		if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
-			echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
-		fi
+	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
+	if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
+		echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
 	fi
 
 	_echo "* patched away /usr/share from $1"
@@ -1096,7 +1075,7 @@ if [ "$DEPLOY_GEGL" = 1 ]; then
 fi
 
 # some libraries may need to look for a relative ../share directory
-# normally this is for when they are located in /usr/share
+# normally this is for when they are located in /usr/lib
 # however with sharun this structure is not present, instead 
 # we have the libraries inside `shared/lib` and `share` is one level
 # further back, so we make a relative symlink to fix this issue
