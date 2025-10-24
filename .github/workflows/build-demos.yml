@@ -1,4 +1,4 @@
-name: Build Demo
+name: Build Demos
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
