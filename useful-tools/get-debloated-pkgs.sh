@@ -209,6 +209,7 @@ if [ "$COMMON_PACKAGES" = 1 ]; then
 		gtk3-mini        \
 		gtk4-mini        \
 		gdk-pixbuf2-mini \
+		librsvg-mini     \
 		llvm-libs-"$PKG_TYPE"
 fi
 
