@@ -13,8 +13,8 @@ ARCH=${ARCH:-$(uname -m)}
 APPDIR=${APPDIR:-$PWD/AppDir}
 OUTPATH=${OUTPATH:-$PWD}
 DWARFS_COMP="${DWARFS_COMP:-zstd:level=22 -S26 -B6}"
-URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.4.5/uruntime-appimage-dwarfs-lite-$ARCH}
-DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.13.0/dwarfs-universal-0.13.0-Linux-$ARCH}
+URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.4.7/uruntime-appimage-dwarfs-lite-$ARCH}
+DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$ARCH}
 TMPDIR=${TMPDIR:-/tmp}
 DWARFS_CMD="${DWARFS_CMD:-$TMPDIR/mkdwarfs}"
 RUNTIME="${RUNTIME:-$TMPDIR/uruntime}"
