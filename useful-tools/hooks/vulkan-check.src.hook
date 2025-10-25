@@ -13,12 +13,20 @@ _err_msg(){
 }
 
 _nvidia_check() (
-	set -- /usr/share/glvnd/egl_vendor.d/10_nvidia.json /usr/share/vulkan/icd.d/*nvidia*.json
+	# wtf makes this file? I cannot find any info related to it!
+	nonsense=/usr/share/vulkan/icd.d/nvidia_icd.json_inactive
+	if [ -f "$nonsense" ]; then
+		_err_msg ""
+		_err_msg "WARNING: Nvidia vulkan driver disabled by '$nonsense'"
+		_err_msg ""
+		return 1
+	fi
 
 	# debian likes to split the nvidia driver into several packages
 	# so there is a lot of people that only have the nvidia opengl driver installed
 	# that then come complain that X vulkan app does not work because there is
 	# no nvidia vulkan driver installed on their system.
+	set -- /usr/share/glvnd/egl_vendor.d/10_nvidia.json /usr/share/vulkan/icd.d/*nvidia*.json
 	if [ -f "$1" ] && [ ! -f "$2" ]; then
 		_err_msg ""
 		_err_msg "============================================================"
@@ -37,9 +45,8 @@ _nvidia_check() (
 		_err_msg ""
 	elif [ -f "$1" ] || [ -f "$2" ]; then
 		return 0
-	else
-		return 1
 	fi
+	return 1
 )
 
 if _nvidia_check; then
@@ -103,4 +110,3 @@ _check_vulkan_json_path() (
 if _check_vulkan_json_path && [ -d "$_VULKAN_HOOK_DIR" ]; then
 	export XDG_CONFIG_DIRS="$_VULKAN_HOOK_DIR:${XDG_CONFIG_DIRS:-/etc/xdg}"
 fi
-
