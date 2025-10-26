@@ -5,7 +5,7 @@
 # On aarch64 device drivers are all over the place and often they ship with
 # modifications not upstreamed to mesa, so we need to allow the host vulkan
 if [ "$APPIMAGE_ARCH" = 'aarch64' ]; then
-	export SHARUN_ALLOW_SYS_VKICD=1
+	export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
 fi
 
 _err_msg(){
