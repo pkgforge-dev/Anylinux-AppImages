@@ -240,6 +240,9 @@ _determine_what_to_deploy() {
 				*libglycin*.so*)
 					DEPLOY_GLYCIN=${DEPLOY_GLYCIN:-1}
 					;;
+				*libSDL*.so*)
+					DEPLOY_SDL=${DEPLY_SDL:-1}
+					;;
 				*libpipewire*.so*)
 					DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
 					;;
@@ -392,6 +395,22 @@ _make_deployment_array() {
 				*libheif.so*) set -- "$@" "$gdkdir"/*heif*.so*;;
 			esac
 		done
+	fi
+	if [ "$DEPLOY_SDL" = 1 ]; then
+		_echo "* Deploying SDL"
+		set -- "$@" \
+			"$LIB_DIR"/libSDL*.so*           \
+			"$LIB_DIR"/libudev.so*           \
+			"$LIB_DIR"/libXcursor.so*        \
+			"$LIB_DIR"/libXext.so*           \
+			"$LIB_DIR"/libXi.so*             \
+			"$LIB_DIR"/libXfixes.so*         \
+			"$LIB_DIR"/libXrandr.so*         \
+			"$LIB_DIR"/libXss.so*            \
+			"$LIB_DIR"/libX11-xcb.so*        \
+			"$LIB_DIR"/libwayland-client.so* \
+			"$LIB_DIR"/libwayland-egl.so*    \
+			"$LIB_DIR"/libwayland-cursor.so*
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying glycin"
@@ -1076,7 +1095,7 @@ fi
 
 # some libraries may need to look for a relative ../share directory
 # normally this is for when they are located in /usr/lib
-# however with sharun this structure is not present, instead 
+# however with sharun this structure is not present, instead
 # we have the libraries inside `shared/lib` and `share` is one level
 # further back, so we make a relative symlink to fix this issue
 if [ ! -d "$APPDIR"/shared/share ]; then
