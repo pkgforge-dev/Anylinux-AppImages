@@ -241,7 +241,7 @@ _determine_what_to_deploy() {
 					DEPLOY_GLYCIN=${DEPLOY_GLYCIN:-1}
 					;;
 				*libSDL*.so*)
-					DEPLOY_SDL=${DEPLY_SDL:-1}
+					DEPLOY_SDL=${DEPLOY_SDL:-1}
 					;;
 				*libpipewire*.so*)
 					DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
