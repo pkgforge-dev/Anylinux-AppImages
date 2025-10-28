@@ -60,6 +60,7 @@ static const char* vars_to_unset[] = {
     "GTK_EXE_PREFIX",
     "GTK_IM_MODULE_FILE",
     "GTK_PATH",
+    "JACK_DRIVER_DIR",
     "LD_LIBRARY_PATH",
     "LD_PRELOAD",
     "LIBDECOR_PLUGIN_DIR",
