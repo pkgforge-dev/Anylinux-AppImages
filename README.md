@@ -56,6 +56,7 @@ We also try to avoid the usage of containers/namespaces and similar methods, so 
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
+[sound-space-plus](https://github.com/pkgforge-dev/sound-space-plus-AppImage)                                            |
 [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
 [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
