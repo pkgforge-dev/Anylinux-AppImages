@@ -208,6 +208,11 @@ _determine_what_to_deploy() {
 			-*) continue;;
 		esac
 
+		# some apps may dlopen pulseaudio instead of linking directly
+		if grep -aoq -m 1 'libpulse.so' "$bin"; then
+			DEPLOY_PULSE=${DEPLOY_PULSE:-1}
+		fi
+
 		# check linked libraries and enable each mode accordingly
 		NEEDED_LIBS="$(ldd "$bin" 2>/dev/null | awk '{print $1}') $NEEDED_LIBS"
 		for lib in $NEEDED_LIBS; do
@@ -437,12 +442,15 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_PIPEWIRE" = 1 ]; then
 		_echo "* Deploying pipewire"
+		DEPLOY_PULSE=${DEPLOY_PULSE:-1}
 		set -- "$@" \
 			"$LIB_DIR"/pipewire-*/* \
 			"$LIB_DIR"/spa-*/*      \
 			"$LIB_DIR"/spa-*/*/*    \
-			"$LIB_DIR"/libpulse.so* \
 			"$LIB_DIR"/alsa-lib/*pipewire*.so*
+	fi
+	if [ "$DEPLOY_PULSE" = 1 ]; then
+		set -- "$@" "$LIB_DIR"/libpulse.so*
 	fi
 	if [ "$DEPLOY_GSTREAMER_ALL" = 1 ] || [ "$DEPLOY_GSTREAMER" = 1 ]; then
 		GST_DIR=$(echo "$LIB_DIR"/gstreamer-*)
