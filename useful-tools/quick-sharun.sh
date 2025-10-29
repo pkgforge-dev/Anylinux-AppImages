@@ -1156,6 +1156,36 @@ if [ -f "$APPDIR"/.env ]; then
 	echo "$sorted_env" > "$APPDIR"/.env
 fi
 
+
+# check if we have libjack.so in the AppImage, jack needs matching
+# server and client library versions to work, instead we need to use
+# pipewire-jack, which gives a libjack.so that does not have this limitation
+libjackwarning="
+------------------------------------------------------------
+------------------------------------------------------------
+
+WARNING: Detected libjack.so has been bundled in this application!
+If this app is going to connect to a jack server it is not going to work!
+jack needs matching library versions between clients and server to work!
+
+The only solution is bundling libjack.so from pipewire-jack
+package instead which does not have this issue.
+
+NOTE: This is only a problem if the application has the option to connect
+to a jack server, that is for example music players and music editing software
+libjack.so can be bundled as linked dependency of another library like
+ffmpeg and in that case this is not an issue.
+
+------------------------------------------------------------
+------------------------------------------------------------
+"
+set -- "$APPDIR"/lib/libjack.so*
+if [ -f "$1" ] && command -v ldd 1>/dev/null; then
+	if ! ldd "$1" | grep -q 'libpipewire'; then
+		_err_msg "$libjackwarning"
+	fi
+fi
+
 echo ""
 _echo "------------------------------------------------------------"
 _echo "All done!"
