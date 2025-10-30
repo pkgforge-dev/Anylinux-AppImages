@@ -768,6 +768,7 @@ _deploy_datadir() {
 					icons   |\
 					info    |\
 					java    |\
+					locale  |\
 					man     |\
 					pipewire|\
 					pixmaps |\
