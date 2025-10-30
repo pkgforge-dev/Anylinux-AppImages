@@ -757,6 +757,7 @@ _deploy_datadir() {
 					awk     |\
 					bash    |\
 					dbus-1  |\
+					defaults|\
 					doc     |\
 					file    |\
 					fonts   |\
@@ -764,6 +765,7 @@ _deploy_datadir() {
 					gvfs    |\
 					help    |\
 					icons   |\
+					info    |\
 					java    |\
 					man     |\
 					pipewire|\
