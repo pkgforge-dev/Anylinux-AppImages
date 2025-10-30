@@ -1104,6 +1104,22 @@ for lib do case "$lib" in
 
 			_echo "Copied over mangohud layer and patched mangohud"
 		fi
+		;;
+	*libwebkit*gtk*.so*)
+		# sharun deploys webkit2gtk but with relative path mapping
+		# the problem is that changes the working dir to the AppDir
+		# We can instead use path-mapping-hardcoded which does not
+		# have the changing of working directory issue
+
+		# restore relative path mapping to /usr
+		sed -i -e 's|\./\.//|/usr/|g' "$lib" || :
+
+		# remove working dir change
+		sed -i -e '/SHARUN_WORKING_DIR=${SHARUN_DIR}/d' "$APPDIR"/.env || :
+
+		# now do better path map to the libs
+		_patch_away_usr_lib_dir "$lib" || continue
+		;;
 	esac
 done
 
