@@ -750,7 +750,7 @@ _deploy_datadir() {
 				| tr '/' '\n'
 			)
 
-			for datadir in "$possible_dirs"; do
+			for datadir in $possible_dirs; do
 				# skip dirs not wanted or handled by sharun
 				case "$datadir" in
 					alsa    |\
@@ -784,11 +784,15 @@ _deploy_datadir() {
 				esac
 
 				for path in /usr/local/share /usr/share; do
-					if [ -d "$path/$datadir" ]; then
-						datadir="$path/$datadir"
-						_echo "* Adding datadir $datadir..."
-						cp -vr "$datadir" "$APPDIR"/share
-					break
+
+					src_datadir="$path"/"$datadir"
+					dst_datadir="$APPDIR"/share/"$datadir"
+
+					if [ -d "$src_datadir" ] \
+						&& [ ! -d  "$dst_datadir" ]; then
+						_echo "* Adding datadir $src_datadir..."
+						cp -vr "$src_datadir" "$dst_datadir"
+						break
 					fi
 				done
 			done
