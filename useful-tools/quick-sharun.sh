@@ -722,13 +722,15 @@ _map_paths_binary_patch() {
 _deploy_datadir() {
 	if [ "$DEPLOY_DATADIR" = 1 ]; then
 		# deploy application data files
+		mkdir -p "$APPDIR"/share
+
+		# find if there is a datadir that matches bundled binary name
 		set -- "$APPDIR"/bin/*
 		for bin do
 			[ -x "$bin" ] || continue
 			bin="${bin##*/}"
 			for datadir in /usr/local/share/* /usr/share/*; do
 				if echo "${datadir##*/}" | grep -qi "$bin"; then
-					mkdir -p "$APPDIR"/share
 					_echo "* Adding datadir $datadir..."
 					cp -vr "$datadir" "$APPDIR/share"
 					break
@@ -736,8 +738,70 @@ _deploy_datadir() {
 			done
 		done
 
-		# try to find and deploy a dbus service that matches .desktop
 		set -- "$APPDIR"/*.desktop
+
+		# Some apps have a datadir that does not match the binary name
+		# in that case we need to get it by reading the binary
+		if [ -f "$1" ] && command -v strings 1>/dev/null; then
+
+			bin=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$1")
+			possible_dirs=$(
+				strings "$APPDIR"/shared/bin/"$bin" \
+				  | grep -v '[;:,.(){}?<>*]' \
+				  | tr '/' '\n'
+			)
+
+			for datadir in $possible_dirs; do
+				# skip dirs not wanted or handled by sharun
+				case "$datadir" in
+					alsa    |\
+					awk     |\
+					bash    |\
+					dbus-1  |\
+					defaults|\
+					doc     |\
+					file    |\
+					fonts   |\
+					glvnd   |\
+					gvfs    |\
+					help    |\
+					icons   |\
+					info    |\
+					java    |\
+					man     |\
+					pipewire|\
+					pixmaps |\
+					qt      |\
+					qt4     |\
+					qt5     |\
+					qt6     |\
+					qt7     |\
+					themes  |\
+					vulkan  |\
+					wayland |\
+					X11     |\
+					xcb     |\
+					zsh     )
+						continue
+						;;
+				esac
+
+				for path in /usr/local/share /usr/share; do
+
+					src_datadir="$path"/"$datadir"
+					dst_datadir="$APPDIR"/share/"$datadir"
+
+					if [ -d "$src_datadir" ] \
+						&& [ ! -d  "$dst_datadir" ]; then
+						_echo "* Adding datadir $src_datadir..."
+						cp -vr "$src_datadir" "$dst_datadir"
+						break
+					fi
+				done
+			done
+		fi
+
+		# try to find and deploy a dbus service that matches .desktop
 		desktopname="${1%.desktop}"
 		desktopname="${desktopname##*/}"
 		dst_dbus_dir="$APPDIR"/share/dbus-1/services
