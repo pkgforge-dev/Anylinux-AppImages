@@ -746,7 +746,7 @@ _deploy_datadir() {
 
 			bin=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$1")
 			possible_dirs=$(
-				strings "$APPDIR"/bin/shared/"$bin" \
+				strings "$APPDIR"/shared/bin/"$bin" \
 				  | grep -v '[;:,.(){}?<>*]' \
 				  | tr '/' '\n'
 			)
