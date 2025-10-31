@@ -18,6 +18,7 @@ We also try to avoid the usage of containers/namespaces and similar methods, so 
 | ------------------------------------------------------------------------------------------------------------------------ |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
 [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage)                                                  |
+[Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
 [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)                                        |
 [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)                                                            |
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
