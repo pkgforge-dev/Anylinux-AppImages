@@ -4,9 +4,9 @@
 
 Designed to run seamlessly on any Linux distribution, including older distributions and musl-based ones. Our AppImages bundle all the needed dependencies and do not depend on host libraries to work, unlike most other AppImages.
 
-Most of the AppImages are made with [sharun](https://github.com/VHSgunzo/sharun). We also use an alternative, better [runtime](https://github.com/VHSgunzo/uruntime).
+Most of the AppImages are made with [sharun](https://github.com/VHSgunzo/sharun). We also use an alternative better [runtime](https://github.com/VHSgunzo/uruntime).
 
-The uruntime [automatically falls back to using extract and run](https://github.com/VHSgunzo/uruntime?tab=readme-ov-file#built-in-configuration) if FUSE is not available at all, so we **truly have 0 requirements.**
+The uruntime [automatically falls back to using namespaces](https://github.com/VHSgunzo/uruntime?tab=readme-ov-file#built-in-configuration) if FUSE is not available at all, and if namespaces are not possible it falls back to extract and run, so we **truly have 0 requirements.**
 
 We also try to avoid the usage of containers/namespaces and similar methods, so far the AppImages that depend on them are Lutris and virt-manager.
 
