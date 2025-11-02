@@ -22,7 +22,8 @@ jobs:
       - name: Get stats
         run: |
           LIST="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/README.md"
-          REPOS="$(wget -q "$LIST" -O - | sed -n '0,/---/d; p' | sed 's/[()",{} ]/\n/g' | grep -i 'https.*pkgforge-dev.*AppImage.*' | awk -F'/' '{print $NF}')"
+          REPOS="$(wget -q "$LIST" -O - | sed -n '0,/---/d; p' | sed 's/[()",{} ]/\n/g' \
+            | grep -i 'https.*pkgforge-dev.*AppImage.*' | awk -F'/' '{print $NF}' | grep -v '\.md')"
           
           for REPO in $REPOS; do
           	NUM=$(wget -q "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
