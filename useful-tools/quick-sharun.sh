@@ -131,9 +131,16 @@ _help_msg() {
 if [ -z "$1" ] && [ -z "$PYTHON_PACKAGES" ]; then
 	_help_msg
 	exit 1
+elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
+	_err_msg "ERROR: DEPLOY_PYTHON and DEPLOY_SYS_PYTHON cannot be both enabled!"
+	exit 1
 elif [ "$1" = "--help" ]; then
 	_help_msg
 	exit 0
+fi
+
+if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
+	DEBLOAT_SYS_PYTHON=${DEBLOAT_SYS_PYTHON:-1}
 fi
 
 if [ -e "$1" ] && [ "$2" = "--" ]; then
@@ -518,17 +525,21 @@ _make_deployment_array() {
 			"$(command -v convert || true)" \
 			"$LIB_DIR"/libMagick*.so*
 	fi
-
+	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
+		if pythonbin=$(command -v python); then
+			set -- "$@" "$pythonbin"*
+		elif pythonbin=$(command -v python3); then
+			set -- "$@" "$pythonbin"*
+		fi
+	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Deploying gegl"
 		set -- "$@" "$LIB_DIR"/gegl-*/*
 	fi
-
 	if [ "$DEPLOY_BABL" = 1 ]; then
 		_echo "* Deploying babl"
 		set -- "$@" "$LIB_DIR"/babl-*/*
 	fi
-
 	if [ "$DEPLOY_LIBHEIF" = 1 ]; then
 		_echo "* Deploying libheif"
 
@@ -539,7 +550,6 @@ _make_deployment_array() {
 			set -- "$@" "$LIB_DIR"/libheif/*
 		fi
 	fi
-
 	if [ "$DEPLOY_P11KIT" = 1 ]; then
 		_echo "* Deploying p11kit"
 		set -- "$@" "$LIB_DIR"/pkcs11/*
@@ -1155,6 +1165,18 @@ fi
 
 # these need to be done later because sharun may make shared/lib a symlink to lib
 # and if we make shared/lib first then it breaks sharun
+if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
+	set -- "$LIB_DIR"/python*
+	if [ -d "$1" ]; then
+		cp -r "$1" "$APPDIR"/shared/lib
+	else
+		_err_msg "ERROR: Cannot find python installation in $LIB_DIR"
+		exit 1
+	fi
+	if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
+		find "$APPDIR"/shared/lib/"${1##*/}" -type f -name '*.pyc' -delete
+	fi
+fi
 if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 	mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
 	cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
