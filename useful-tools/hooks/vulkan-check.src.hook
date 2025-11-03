@@ -49,15 +49,7 @@ _nvidia_check() (
 	return 1
 )
 
-if _nvidia_check; then
-	# The proprietary nvidia driver will not load if /usr/lib contains 32bit libs, since we
-	# only support 64bit we can just check if there is a 64bit ld-linux.so in /usr/lib64
-	# TODO: There might be some other distro where this is not enough
-	if [ ! -f /usr/lib/ld-linux-*64.so.* ] && [ -f /usr/lib64/ld-linux-*64.so.* ]; then
-		export LD_LIBRARY_PATH="/usr/lib64:$LD_LIBRARY_PATH"
-		>&2 echo "vulkan-check: Set LD_LIBRARY_PATH to /usr/lib64 for nvidia driver"
-	fi
-fi
+_nvidia_check || :
 
 # It is possible for a vulkan layer to have a path with '$LIB' which is a token
 # used by the dynamic linker that expands to locations like lib and lib32
