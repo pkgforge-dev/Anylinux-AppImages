@@ -708,6 +708,13 @@ _map_paths_ld_preload_open() {
 			;;
 	esac
 
+	# format new line entries in PATH_MAPPING into comma separated
+	# entries for sharun, pathmap accepts new lines in the variable
+	# but the .env library used by sharun does not
+	PATH_MAPPING=$(echo "$PATH_MAPPING"   \
+		| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//; s/^,*//'
+	)
+
 	deps="git make"
 	for d in $deps; do
 		if ! command -v "$d" 1>/dev/null; then
