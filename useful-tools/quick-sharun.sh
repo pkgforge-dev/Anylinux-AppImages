@@ -535,10 +535,8 @@ _make_deployment_array() {
 		# TODO remove the .env parts once sharun sets this automatically
 		if [ -d "$LIB_DIR"/libheif/plugins ]; then
 			set -- "$@" "$LIB_DIR"/libheif/plugins/*
-			echo 'LIBHEIF_PLUGIN_PATH=${SHARUN_DIR}/lib/libheif/plugins' >> "$APPDIR"/.env
 		elif [ -d "$LIB_DIR"/libheif ]; then
 			set -- "$@" "$LIB_DIR"/libheif/*
-			echo 'LIBHEIF_PLUGIN_PATH=${SHARUN_DIR}/lib/libheif' >> "$APPDIR"/.env
 		fi
 	fi
 
