@@ -80,51 +80,66 @@ _err_msg(){
 
 _help_msg() {
 	cat <<-EOF
-	USAGE: ${0##*/} /path/to/binaries_and_libraries
+	  USAGE: ${0##*/} /path/to/binaries_and_libraries
 
-	DESCRIPTION:
-	POSIX shell script wrapper for sharun that simplifies the deployment
-	of AppImages to simple oneliners. It automates detection and deployment of common
-	libraries such as GTK, Qt, OpenGL, Vulkan, Pipewire, GStreamer, etc.
+	  DESCRIPTION:
+	  POSIX shell script wrapper for sharun that simplifies the deployment
+	  of AppImages to simple oneliners. It automates detection and deployment of common
+	  libraries such as GTK, Qt, OpenGL, Vulkan, Pipewire, GStreamer, etc.
 
-	Features:
-	- Automatic detection and forced deployment of libraries.
-	- Support for environment-based configuration to force deployment, e.g., DEPLOY_OPENGL=1
-	- Deployment of app-specific hooks, desktop entries, icons, locale data and more.
-	- Automatic patching of hardcoded paths in binaries and libraries.
+	  Features:
+	  - Automatic detection and forced deployment of libraries.
+	  - Support for environment-based configuration to force deployment, e.g., DEPLOY_OPENGL=1
+	  - Deployment of app-specific hooks, desktop entries, icons, locale data and more.
+	  - Automatic patching of hardcoded paths in binaries and libraries.
 
-	OPTIONS / ENVIRONMENT VARIABLES:
-	ADD_HOOKS        List of hooks (colon-separated) to deploy with the application.
-	DESKTOP          Path or URL to a .desktop file to include.
-	ICON             Path or URL to an icon file to include.
-	DEPLOY_QT        Set to 1 to force deployment of Qt.
-	DEPLOY_GTK       Set to 1 to force deployment of GTK.
-	DEPLOY_OPENGL    Set to 1 to force deployment of OpenGL.
-	DEPLOY_VULKAN    Set to 1 to force deployment of Vulkan.
-	DEPLOY_PIPEWIRE  Set to 1 to force deployment of Pipewire.
-	DEPLOY_GSTREAMER Set to 1 to force deployment of GStreamer.
-	DEPLOY_LOCALE    Set to 1 to deploy locale data.
-	DEPLOY_PYTHON    Set to 1 to deploy Python.
+	  OPTIONS / ENVIRONMENT VARIABLES:
+	  ADD_HOOKS          List of hooks (colon-separated) to deploy with the application.
+	  DESKTOP            Path or URL to a .desktop file to include.
+	  ICON               Path or URL to an icon file to include.
+	  DEPLOY_QT          Set to 1 to force deployment of Qt. Will determine to deploy
+	                 QtWebEngine and Qml as well, these can be controlled with
+	                 DEPLOY_QT_WEB_ENGINE and DEPLOY_QML. Set to 1 enable, 0 disable
+	  DEPLOY_SDL          Set to 1 to force deployment of SDL.
+	  DEPLOY_GTK          Set to 1 to force deployment of GTK.
+	  DEPLOY_GDK          Set to 1 to force deployment of gdk-pixbuf.
+	  DEPLOY_GLYCIN       Set to 1 to force deployment of Glycin.
+	  DEPLOY_OPENGL       Set to 1 to force deployment of OpenGL.
+	  DEPLOY_VULKAN       Set to 1 to force deployment of Vulkan.
+	  DEPLOY_IMAGEMAGICK  Set to 1 to force deployment of ImageMagick.
+	  DEPLOY_LIBHEIF      Set to 1 to force deployment of libheif.
+	  DEPLOY_GEGL         Set to 1 to force deployment of GEGL.
+	  DEPLOY_BABL         Set to 1 to force deployment of babl.
+	  DEPLOY_P11KIT       Set to 1 to force deployment of p11-kit.
+	  DEPLOY_PIPEWIRE     Set to 1 to force deployment of Pipewire.
+	  DEPLOY_PULSE        Set to 1 to force deployment of pulseaudio.
+	  DEPLOY_GSTREAMER    Set to 1 to force deployment of GStreamer. By default
+	                several gstreamer plugins are removed, set DEPLOY_GSTREAMER_ALL=1
+	                if you can to deploy ALL Gstreamer plugins. (Very bloated).
+	  DEPLOY_LOCALE       Set to 1 to deploy locale data.
+	  DEPLOY_SYS_PYTHON   Set to 1 to deploy system Python. Will remove all pycache
+	                 pycache files, set DEBLOAT_SYS_PYTHON to 0 to prevent this.
+	  DEPLOY_PYTHON      Set to 1 to deploy UV Python (sharun feature).
 	                 Set PYTHON_VER and PYTHON_PACKAGES for version and packages to add.
-	LIB_DIR          Set source library directory if autodetection fails.
-	NO_STRIP         Disable stripping binaries and libraries if set.
-	APPDIR           Destination AppDir (default: ./AppDir).
-	APPRUN           AppRun to use (default: AppRun-generic). Only needed for hooks.
-	EXEC_WRAPPER     Preloads a library that unsets environment variables known to cause
-	                 problems to child processes. Not needed if the app will just use
-	                 xdg-open to spawn child proceeses since in that case sharun has
-	                 a wrapper for xdg-open that handles that.
 
-	NOTE:
-	Several of these options get turned on automatically based on what is being deployed.
+	  LIB_DIR          Set source library directory if autodetection fails.
+	  NO_STRIP         Disable stripping binaries and libraries if set.
+	  APPDIR           Destination AppDir (default: ./AppDir).
+	  EXEC_WRAPPER     Preloads a library that unsets environment variables known to cause
+	                   problems to child processes. Not needed if the app will just use
+	                   xdg-open to spawn child proceeses since in that case sharun has
+	                   a wrapper for xdg-open that handles that.
 
-	EXAMPLES:
-	DEPLOY_OPENGL=1 ./quick-sharun.sh /path/to/myapp
-	DESKTOP=/path/to/app.desktop ICON=/path/to/icon.png ./quick-sharun.sh /path/to/myapp
-	ADD_HOOKS="self-updater.bg.hook:fix-namespaces.hook" ./quick-sharun.sh /path/to/myapp
+	  NOTE:
+	  Several of these options get turned on automatically based on what is being deployed.
 
-	SEE ALSO:
-	sharun (https://github.com/VHSgunzo/sharun)
+	  EXAMPLES:
+	  DEPLOY_OPENGL=1 ./quick-sharun.sh /path/to/myapp
+	  DESKTOP=/path/to/app.desktop ICON=/path/to/icon.png ./quick-sharun.sh /path/to/myapp
+	  ADD_HOOKS="self-updater.bg.hook:fix-namespaces.hook" ./quick-sharun.sh /path/to/myapp
+
+	  SEE ALSO:
+	  sharun (https://github.com/VHSgunzo/sharun)
 	EOF
 }
 
