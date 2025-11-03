@@ -19,7 +19,7 @@ APPRUN=${APPRUN:-AppRun-generic}
 APPDIR=${APPDIR:-$PWD/AppDir}
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
-LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/fritzw/ld-preload-open.git}
+LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
 EXEC_WRAPPER=${EXEC_WRAPPER:-0}
 EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/exec.c}
