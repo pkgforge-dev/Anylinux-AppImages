@@ -130,6 +130,16 @@ _help_msg() {
 	                   xdg-open to spawn child proceeses since in that case sharun has
 	                   a wrapper for xdg-open that handles that.
 
+	  PATH_MAPPING    Configures and preloads pathmap.
+	                  Set this variable if the application is hardcoded to look
+	                  into /usr and similar locations, example:
+	                    export PATH_MAPPING='
+	                      /usr/lib/myapp_libs:${SHARUN_DIR}/lib/myapp_libs
+	                      /etc/myapp.conf:${SHARUN_DIR}/etc/myapp.conf
+	                    '
+	                  ${SHARUN_DIR} here must NOT expand!
+	                  The braces in the variable are mandatory!
+
 	  NOTE:
 	  Several of these options get turned on automatically based on what is being deployed.
 
@@ -139,7 +149,8 @@ _help_msg() {
 	  ADD_HOOKS="self-updater.bg.hook:fix-namespaces.hook" ./quick-sharun.sh /path/to/myapp
 
 	  SEE ALSO:
-	  sharun (https://github.com/VHSgunzo/sharun)
+	  sharun  (https://github.com/VHSgunzo/sharun)
+	  pathmap (https://github.com/VHSgunzo/pathmap)
 	EOF
 }
 
