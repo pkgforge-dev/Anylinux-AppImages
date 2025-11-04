@@ -134,10 +134,10 @@ _help_msg() {
 	                  Set this variable if the application is hardcoded to look
 	                  into /usr and similar locations, example:
 	                    export PATH_MAPPING='
-	                      /usr/lib/myapp_libs:${SHARUN_DIR}/lib/myapp_libs
-	                      /etc/myapp.conf:${SHARUN_DIR}/etc/myapp.conf
+	                      /usr/lib/myapp_libs:\${SHARUN_DIR}/lib/myapp_libs
+	                      /etc/myapp.conf:\${SHARUN_DIR}/etc/myapp.conf
 	                    '
-	                  ${SHARUN_DIR} here must NOT expand!
+	                  \${SHARUN_DIR} here must NOT expand!
 	                  The braces in the variable are mandatory!
 
 	  NOTE:
