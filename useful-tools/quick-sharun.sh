@@ -977,11 +977,6 @@ _check_window_class() {
 }
 
 _patch_away_usr_bin_dir() {
-	# do not patch if PATH_MAPPING already covers this
-	case "$PATH_MAPPING" in
-		*/usr/bin*) return 1;;
-	esac
-
 	if ! grep -Eaoq -m 1 "/usr/bin" "$1"; then
 		return 1
 	fi
@@ -996,11 +991,6 @@ _patch_away_usr_bin_dir() {
 }
 
 _patch_away_usr_lib_dir() {
-	# do not patch if PATH_MAPPING already covers this
-	case "$PATH_MAPPING" in
-		*/usr/lib*) return 1;;
-	esac
-
 	if ! grep -Eaoq -m 1 "/usr/lib" "$1"; then
 		return 1
 	fi
@@ -1015,11 +1005,6 @@ _patch_away_usr_lib_dir() {
 }
 
 _patch_away_usr_share_dir() {
-	# do not patch if PATH_MAPPING already covers this
-	case "$PATH_MAPPING" in
-		*/usr/share*) return 1;;
-	esac
-
 	if ! grep -Eaoq -m 1 "/usr/share" "$1"; then
 		return 1
 	fi
