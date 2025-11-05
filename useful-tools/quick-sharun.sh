@@ -1143,7 +1143,6 @@ done
 
 # check for hardcoded path to any other possibly bundled library dir
 topleveldirs=$(find "$APPDIR"/lib/ -maxdepth 1  -type d | sed 's|/.*/||')
-set -- "$APPDIR"/lib/*.so* "$APPDIR"/shared/bin/*
 for dir in $topleveldirs; do
 	# skip directories we already handle here on in sharun
 	case "$dir" in
@@ -1166,11 +1165,12 @@ for dir in $topleveldirs; do
 			;;
 	esac
 
-	for bin_or_lib do
-		if [ ! -f "$bin_or_lib" ]; then
+	for f in "$APPDIR"/lib/*.so* "$APPDIR"/shared/bin/*; do
+		if [ ! -f "$f" ]; then
 			continue
-		elif grep -aoq -m 1 "$LIB_DIR"/"$dir" "$bin_or_lib"; then
-			_patch_away_usr_lib_dir "$bin_or_lib" || :
+		elif grep -aoq -m 1 "$LIB_DIR"/"$dir" "$f"; then
+			_echo "* Detected hardcoded path to $LIB_DIR/$dir in $f"
+			_patch_away_usr_lib_dir "$f" || :
 		fi
 	done
 done
@@ -1178,11 +1178,13 @@ done
 # make sure there is no hardcoded path to /usr/share/... in bins
 set -- "$APPDIR"/shared/bin/*
 for bin do
-	if grep -aoq -m 1 '/usr/share/.*/' "$bin"; then
-		_patch_away_usr_share_dir "$bin" || true
+	if p=$(grep -ao -m 1 '/usr/share/.*/' "$bin"); then
+		_echo "* Detected hardcoded path to $p in $bin"
+		_patch_away_usr_share_dir "$bin" || :
 	fi
-	if grep -aoq -m 1 '/usr/lib/.*/' "$bin"; then
-		_patch_away_usr_lib_dir "$bin" || true
+	if p=$(grep -ao -m 1 '/usr/lib/.*/' "$bin"); then
+		_echo "* Detected hardcoded path to $p in $bin"
+		_patch_away_usr_lib_dir "$bin" || :
 	fi
 done
 
