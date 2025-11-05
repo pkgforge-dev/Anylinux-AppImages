@@ -1076,6 +1076,9 @@ for lib do case "$lib" in
 		_patch_away_usr_lib_dir "$lib" || continue
 		echo 'unset GEGL_PATH' >> "$APPDIR"/.env
 		;;
+	*libp11-kit.so*)
+		_patch_away_usr_lib_dir "$lib" || continue
+		;;
 	*p11-kit-trust.so*)
 		# good path that library should have
 		ssl_path="/etc/ssl/certs/ca-certificates.crt"
@@ -1096,6 +1099,11 @@ for lib do case "$lib" in
 		;;
 	*libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
+		;;
+	*libMagick*.so*)
+		# MAGICK_HOME only works on portable builds of imagemagick
+		# so we will have to patch it manually instead
+		_patch_away_usr_lib_dir "$lib" || continue
 		;;
 	*libmlt*.so*)
 		_patch_away_usr_lib_dir "$lib" || continue
