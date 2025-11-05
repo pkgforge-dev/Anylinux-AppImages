@@ -1151,8 +1151,10 @@ for dir in $topleveldirs; do
 		dri        |\
 		gbm        |\
 		gconv      |\
+		gdk-pixbuf*|\
 		gio        |\
 		gtk*       |\
+		gstreamer* |\
 		gvfs       |\
 		libproxy   |\
 		pipewire*  |\
