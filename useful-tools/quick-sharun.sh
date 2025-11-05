@@ -1077,7 +1077,13 @@ for lib do case "$lib" in
 		echo 'unset GEGL_PATH' >> "$APPDIR"/.env
 		;;
 	*libp11-kit.so*)
-		_patch_away_usr_lib_dir "$lib" || continue
+		_patch_away_usr_lib_dir "$lib" || :
+		_patch_away_usr_share_dir "$lib" || :
+		mkdir -p "$APPDIR"/share
+		if [ -d /usr/share/p11-kit ] && [ ! -d "$APPDIR"/share/p11-kit ]; then
+			cp -r /usr/share/p11-kit "$APPDIR"/share
+		fi
+		continue
 		;;
 	*p11-kit-trust.so*)
 		# good path that library should have
@@ -1096,6 +1102,7 @@ for lib do case "$lib" in
 		fi
 
 		_echo "* fixed path to /etc/ssl/certs in $lib"
+		_patch_away_usr_share_dir "$lib" || continue
 		;;
 	*libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
@@ -1149,14 +1156,50 @@ for lib do case "$lib" in
 	esac
 done
 
+# check for hardcoded path to any other possibly bundled library dir
+topleveldirs=$(find "$APPDIR"/lib/ -maxdepth 1  -type d | sed 's|/.*/||')
+for dir in $topleveldirs; do
+	# skip directories we already handle here on in sharun
+	case "$dir" in
+		alsa-lib   |\
+		dri        |\
+		gbm        |\
+		gconv      |\
+		gdk-pixbuf*|\
+		gio        |\
+		gtk*       |\
+		gstreamer* |\
+		gvfs       |\
+		libproxy   |\
+		pipewire*  |\
+		pulseaudio |\
+		qt*        |\
+		spa*       |\
+		vdpau      )
+			continue
+			;;
+	esac
+
+	for f in "$APPDIR"/lib/*.so* "$APPDIR"/shared/bin/*; do
+		if [ ! -f "$f" ]; then
+			continue
+		elif grep -aoq -m 1 "$LIB_DIR"/"$dir" "$f"; then
+			_echo "* Detected hardcoded path to $LIB_DIR/$dir in $f"
+			_patch_away_usr_lib_dir "$f" || :
+		fi
+	done
+done
+
 # make sure there is no hardcoded path to /usr/share/... in bins
 set -- "$APPDIR"/shared/bin/*
 for bin do
-	if grep -aoq -m 1 '/usr/share/.*/' "$bin"; then
-		_patch_away_usr_share_dir "$bin" || true
+	if p=$(grep -ao -m 1 '/usr/share/.*/' "$bin"); then
+		_echo "* Detected hardcoded path to $p in $bin"
+		_patch_away_usr_share_dir "$bin" || :
 	fi
-	if grep -aoq -m 1 '/usr/lib/.*/' "$bin"; then
-		_patch_away_usr_lib_dir "$bin" || true
+	if p=$(grep -ao -m 1 '/usr/lib/.*/' "$bin"); then
+		_echo "* Detected hardcoded path to $p in $bin"
+		_patch_away_usr_lib_dir "$bin" || :
 	fi
 done
 
