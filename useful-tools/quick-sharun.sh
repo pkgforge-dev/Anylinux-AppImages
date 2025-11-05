@@ -273,7 +273,7 @@ _determine_what_to_deploy() {
 					GTK_DIR=gtk-4.0
 					;;
 				*libgdk_pixbuf*.so*)
-					DEPLOY_GTK=${DEPLOY_GDK:-1}
+					DEPLOY_GDK=${DEPLOY_GDK:-1}
 					;;
 				*libglycin*.so*)
 					DEPLOY_GLYCIN=${DEPLOY_GLYCIN:-1}
