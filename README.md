@@ -70,6 +70,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
 [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
 [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
+[TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage)                                                            |
 [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
 [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
