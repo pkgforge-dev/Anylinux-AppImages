@@ -1081,8 +1081,7 @@ for lib do case "$lib" in
 		_patch_away_usr_share_dir "$lib" || :
 		mkdir -p "$APPDIR"/share
 		if [ -d /usr/share/p11-kit ] && [ ! -d "$APPDIR"/share/p11-kit ]; then
-			cp -r /usr/share/p11-kit         "$APPDIR"/share
-			cp -r /usr/share/ca-certificates "$APPDIR"/share
+			cp -r /usr/share/p11-kit "$APPDIR"/share
 		fi
 		continue
 		;;
@@ -1103,7 +1102,7 @@ for lib do case "$lib" in
 		fi
 
 		_echo "* fixed path to /etc/ssl/certs in $lib"
-		_patch_away_usr_share_dir "$lib" || :
+		_patch_away_usr_share_dir "$lib" || continue
 		;;
 	*libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
