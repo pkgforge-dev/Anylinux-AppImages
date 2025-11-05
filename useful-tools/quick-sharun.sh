@@ -1076,9 +1076,6 @@ for lib do case "$lib" in
 		_patch_away_usr_lib_dir "$lib" || continue
 		echo 'unset GEGL_PATH' >> "$APPDIR"/.env
 		;;
-	*libp11-kit.so*)
-		_patch_away_usr_lib_dir "$lib" || continue
-		;;
 	*p11-kit-trust.so*)
 		# good path that library should have
 		ssl_path="/etc/ssl/certs/ca-certificates.crt"
@@ -1099,11 +1096,6 @@ for lib do case "$lib" in
 		;;
 	*libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
-		;;
-	*libMagick*.so*)
-		# MAGICK_HOME only works on portable builds of imagemagick
-		# so we will have to patch it manually instead
-		_patch_away_usr_lib_dir "$lib" || continue
 		;;
 	*libmlt*.so*)
 		_patch_away_usr_lib_dir "$lib" || continue
@@ -1147,6 +1139,38 @@ for lib do case "$lib" in
 		_patch_away_usr_lib_dir "$lib" || continue
 		;;
 	esac
+done
+
+# check for hardcoded path to any other possibly bundled library dir
+topleveldirs=$(find "$APPDIR"/lib/ -maxdepth 1  -type d | sed 's|/.*/||')
+set -- "$APPDIR"/lib/*.so* "$APPDIR"/shared/bin/*
+for dir in $topleveldirs; do
+	# skip directories we already handle here on in sharun
+	case "$dir" in
+		alsa-lib   |\
+		dri        |\
+		gbm        |\
+		gconv      |\
+		gio        |\
+		gtk*       |\
+		gvfs       |\
+		libproxy   |\
+		pipewire*  |\
+		pulseaudio |\
+		qt*        |\
+		spa*       |\
+		vdpau      )
+			continue
+			;;
+	esac
+
+	for bin_or_lib do
+		if [ ! -f "$bin_or_lib" ]; then
+			continue
+		elif grep -aoq -m 1 "$LIB_DIR"/"$dir" "$bin_or_lib"; then
+			_patch_away_usr_lib_dir "$bin_or_lib" || :
+		fi
+	done
 done
 
 # make sure there is no hardcoded path to /usr/share/... in bins
