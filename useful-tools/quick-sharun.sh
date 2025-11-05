@@ -795,35 +795,37 @@ _deploy_datadir() {
 			for datadir in $possible_dirs; do
 				# skip dirs not wanted or handled by sharun
 				case "$datadir" in
-					alsa    |\
-					awk     |\
-					bash    |\
-					dbus-1  |\
-					defaults|\
-					doc     |\
-					file    |\
-					fonts   |\
-					glvnd   |\
-					gvfs    |\
-					help    |\
-					icons   |\
-					info    |\
-					java    |\
-					locale  |\
-					man     |\
-					pipewire|\
-					pixmaps |\
-					qt      |\
-					qt4     |\
-					qt5     |\
-					qt6     |\
-					qt7     |\
-					themes  |\
-					vulkan  |\
-					wayland |\
-					X11     |\
-					xcb     |\
-					zsh     )
+					alsa        |\
+					applications|\
+					awk         |\
+					bash        |\
+					dbus-1      |\
+					defaults    |\
+					doc         |\
+					et          |\
+					file        |\
+					fonts       |\
+					glvnd       |\
+					gvfs        |\
+					help        |\
+					icons       |\
+					info        |\
+					java        |\
+					locale      |\
+					man         |\
+					pipewire    |\
+					pixmaps     |\
+					qt          |\
+					qt4         |\
+					qt5         |\
+					qt6         |\
+					qt7         |\
+					themes      |\
+					vulkan      |\
+					wayland     |\
+					X11         |\
+					xcb         |\
+					zsh         )
 						continue
 						;;
 				esac
