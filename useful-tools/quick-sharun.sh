@@ -1077,9 +1077,18 @@ for lib do case "$lib" in
 		echo 'unset GEGL_PATH' >> "$APPDIR"/.env
 		;;
 	*libp11-kit.so*)
-		_patch_away_usr_lib_dir "$lib" || continue
+		_patch_away_usr_lib_dir "$lib" || :
+		_patch_away_usr_share_dir "$lib" || :
+		mkdir -p "$APPDIR"/share
+		if [ -d /usr/share/p11-kit ] && [ ! -d "$APPDIR"/share/p11-kit ]; then
+			cp -r /usr/share/p11-kit         "$APPDIR"/share
+			cp -r /usr/share/ca-certificates "$APPDIR"/share
+		fi
+		continue
 		;;
 	*p11-kit-trust.so*)
+		_patch_away_usr_share_dir "$lib" || :
+
 		# good path that library should have
 		ssl_path="/etc/ssl/certs/ca-certificates.crt"
 
