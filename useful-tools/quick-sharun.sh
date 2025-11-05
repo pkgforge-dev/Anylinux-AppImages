@@ -1087,8 +1087,6 @@ for lib do case "$lib" in
 		continue
 		;;
 	*p11-kit-trust.so*)
-		_patch_away_usr_share_dir "$lib" || :
-
 		# good path that library should have
 		ssl_path="/etc/ssl/certs/ca-certificates.crt"
 
@@ -1105,6 +1103,7 @@ for lib do case "$lib" in
 		fi
 
 		_echo "* fixed path to /etc/ssl/certs in $lib"
+		_patch_away_usr_share_dir "$lib" || :
 		;;
 	*libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
