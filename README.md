@@ -29,6 +29,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
 [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced)                                                           |
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
+[Clapper](https://github.com/pkgforge-dev/Clapper-AppImage)                                                              |
 [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
