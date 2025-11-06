@@ -15,7 +15,6 @@ set -e
 
 ARCH="$(uname -m)"
 TMPDIR=${TMPDIR:-/tmp}
-APPRUN=${APPRUN:-AppRun-generic}
 APPDIR=${APPDIR:-$PWD/AppDir}
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
@@ -25,7 +24,9 @@ EXEC_WRAPPER=${EXEC_WRAPPER:-0}
 EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/exec.c}
 LOCALE_FIX=${LOCALE_FIX:-0}
 LOCALE_FIX_SOURCE=${LOCALE_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/localefix.c}
-SCRIPTS_SOURCE=${SCRIPTS_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin}
+NOTIFY_SOURCE=${NOTIFY_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/notify}
+APPRUN_SOURCE=${APPRUN_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/AppRun-generic}
+URUNTIME2APPIMAGE_SOURCE=${URUNTIME2APPIMAGE_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh}
 
 DEPLOY_OPENGL=${DEPLOY_OPENGL:-0}
 DEPLOY_VULKAN=${DEPLOY_VULKAN:-0}
@@ -97,6 +98,7 @@ _help_msg() {
 	  ADD_HOOKS          List of hooks (colon-separated) to deploy with the application.
 	  DESKTOP            Path or URL to a .desktop file to include.
 	  ICON               Path or URL to an icon file to include.
+	  OUTPUT_APPIMAGE    Set to 1 to turn the deployed AppDir into an AppImage.
 	  DEPLOY_QT          Set to 1 to force deployment of Qt. Will determine to deploy
 	                 QtWebEngine and Qml as well, these can be controlled with
 	                 DEPLOY_QT_WEB_ENGINE and DEPLOY_QML. Set to 1 enable, 0 disable
@@ -233,7 +235,7 @@ _remove_empty_dirs() {
 }
 
 _determine_what_to_deploy() {
-	mkdir -p "$APPDIR"
+	mkdir -p "$APPDIR"/share
 	for bin do
 		# ignore flags
 		case "$bin" in
@@ -762,9 +764,6 @@ _map_paths_binary_patch() {
 
 _deploy_datadir() {
 	if [ "$DEPLOY_DATADIR" = 1 ]; then
-		# deploy application data files
-		mkdir -p "$APPDIR"/share
-
 		# find if there is a datadir that matches bundled binary name
 		set -- "$APPDIR"/bin/*
 		for bin do
@@ -872,7 +871,6 @@ _deploy_locale() {
 	done
 
 	if [ "$DEPLOY_LOCALE" = 1 ]; then
-		mkdir -p "$APPDIR"/share
 		_echo "* Adding locales..."
 		cp -r "$LOCALE_DIR" "$APPDIR"/share
 		if [ "$DEBLOAT_LOCALE" = 1 ]; then
@@ -1081,7 +1079,6 @@ for lib do case "$lib" in
 	*libp11-kit.so*)
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_share_dir "$lib" || :
-		mkdir -p "$APPDIR"/share
 		if [ -d /usr/share/p11-kit ] && [ ! -d "$APPDIR"/share/p11-kit ]; then
 			cp -r /usr/share/p11-kit "$APPDIR"/share
 		fi
@@ -1289,13 +1286,13 @@ if [ -n "$ADD_HOOKS" ]; then
 	done
 
 	# always add notify wrapper when using hooks
-	_download "$hook_dst"/notify "$SCRIPTS_SOURCE"/notify
+	_download "$hook_dst"/notify "$NOTIFY_SOURCE"
 	_echo "* Added notify wrapper"
 fi
 
 if [ ! -f "$APPDIR"/AppRun ]; then
-	_download "$APPDIR"/AppRun "$SCRIPTS_SOURCE"/"$APPRUN"
-	_echo "* Added $APPRUN..."
+	_download "$APPDIR"/AppRun "$APPRUN_SOURCE"
+	_echo "* Added ${APPRUN_SOURCE##*/}"
 fi
 
 # Set APPIMAGE_ARCH and MAIN_BIN in AppRun
@@ -1359,6 +1356,15 @@ if [ -f "$1" ] && command -v ldd 1>/dev/null; then
 fi
 
 echo ""
-_echo "------------------------------------------------------------"
-_echo "All done!"
-_echo "------------------------------------------------------------"
+if [ "$OUTPUT_APPIMAGE" = 1 ]; then
+	_echo "------------------------------------------------------------"
+	_echo "Deployment finished! Now making AppImage..."
+	_echo "------------------------------------------------------------"
+	_download "$TMPDIR"/uruntime2appimage.sh "$URUNTIME2APPIMAGE_SOURCE"
+	chmod +x "$TMPDIR"/uruntime2appimage.sh
+	exec "$TMPDIR"/uruntime2appimage.sh
+else
+	_echo "------------------------------------------------------------"
+	_echo "All done!"
+	_echo "------------------------------------------------------------"
+fi
