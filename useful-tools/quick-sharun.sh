@@ -945,16 +945,16 @@ _deploy_icon_and_desktop() {
 
 		# also include names of top level .desktop and icon
 		if [ -n "$DESKTOP" ]; then
-			DESKTOP=${DESKTOP##*/}
-			DESKTOP=${DESKTOP%.desktop}
-			set -- ! -name "*$DESKTOP*" "$@"
+			DESKTOP_NAME=${DESKTOP##*/}
+			DESKTOP_NAME=${DESKTOP_NAME%.desktop}
+			set -- ! -name "*$DESKTOP_NAME*" "$@"
 		fi
 
 		if [ -n "$ICON" ]; then
-			ICON=${ICON##*/}
-			ICON=${ICON%.png}
-			ICON=${ICON%.svg}
-			set -- ! -name "*$ICON*" "$@"
+			ICON_NAME=${ICON##*/}
+			ICON_NAME=${ICON_NAME%.png}
+			ICON_NAME=${ICON_NAME%.svg}
+			set -- ! -name "*$ICON_NAME*" "$@"
 		fi
 
 		find "$APPDIR"/share/icons/hicolor "$@" -type f -delete
