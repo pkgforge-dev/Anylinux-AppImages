@@ -67,7 +67,11 @@ _download() {
 		notify -ne "We need wget or curl to download ${dest##*/}"
 		exit 1
 	fi
-	"$DOWNLOAD_CMD" "$@"
+	if ! "$DOWNLOAD_CMD" "$@"; then
+		>&2 echo "Something went wrong during download!"
+		notify -ne "Something went wrong during download!"
+		exit 1
+	fi
 }
 
 _get_appimageupdatetool() {
