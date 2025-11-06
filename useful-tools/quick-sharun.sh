@@ -98,6 +98,7 @@ _help_msg() {
 	  ADD_HOOKS          List of hooks (colon-separated) to deploy with the application.
 	  DESKTOP            Path or URL to a .desktop file to include.
 	  ICON               Path or URL to an icon file to include.
+	  OUTPUT_APPIMAGE    Set to 1 to turn the deployed AppDir into an AppImage.
 	  DEPLOY_QT          Set to 1 to force deployment of Qt. Will determine to deploy
 	                 QtWebEngine and Qml as well, these can be controlled with
 	                 DEPLOY_QT_WEB_ENGINE and DEPLOY_QML. Set to 1 enable, 0 disable
