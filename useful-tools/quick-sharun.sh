@@ -79,6 +79,20 @@ _err_msg(){
 	>&2 printf '\033[1;31m%s\033[0m\n' " $*"
 }
 
+_download() {
+	if command -v wget 1>/dev/null; then
+		DOWNLOAD_CMD="wget"
+		set -- -qO "$@"
+	elif command -v curl 1>/dev/null; then
+		DOWNLOAD_CMD="curl"
+		set -- -Lso "$@"
+	else
+		_err_msg "ERROR: we need wget or curl to download $1"
+		exit 1
+	fi
+	"$DOWNLOAD_CMD" "$@"
+}
+
 _help_msg() {
 	cat <<-EOF
 	  USAGE: ${0##*/} /path/to/binaries_and_libraries
@@ -156,15 +170,26 @@ _help_msg() {
 	EOF
 }
 
+_make_appimage() {
+	_echo "------------------------------------------------------------"
+	_echo "Making AppImage..."
+	_echo "------------------------------------------------------------"
+	_download "$TMPDIR"/uruntime2appimage.sh "$URUNTIME2APPIMAGE_SOURCE"
+	chmod +x "$TMPDIR"/uruntime2appimage.sh
+	exec "$TMPDIR"/uruntime2appimage.sh
+}
+
+case "$1" in
+	--help)           _help_msg; exit 0;;
+	--make-appimage)  _make_appimage; exit 0;;
+esac
+
 if [ -z "$1" ] && [ -z "$PYTHON_PACKAGES" ]; then
 	_help_msg
 	exit 1
 elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 	_err_msg "ERROR: DEPLOY_PYTHON and DEPLOY_SYS_PYTHON cannot be both enabled!"
 	exit 1
-elif [ "$1" = "--help" ]; then
-	_help_msg
-	exit 0
 fi
 
 if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
@@ -213,20 +238,6 @@ _save_array() {
 		}
 		print ""
 	}' "$@"
-}
-
-_download() {
-	if command -v wget 1>/dev/null; then
-		DOWNLOAD_CMD="wget"
-		set -- -qO "$@"
-	elif command -v curl 1>/dev/null; then
-		DOWNLOAD_CMD="curl"
-		set -- -Lso "$@"
-	else
-		_err_msg "ERROR: we need wget or curl to download $1"
-		exit 1
-	fi
-	"$DOWNLOAD_CMD" "$@"
 }
 
 _remove_empty_dirs() {
@@ -1418,12 +1429,7 @@ fi
 
 echo ""
 if [ "$OUTPUT_APPIMAGE" = 1 ]; then
-	_echo "------------------------------------------------------------"
-	_echo "Deployment finished! Now making AppImage..."
-	_echo "------------------------------------------------------------"
-	_download "$TMPDIR"/uruntime2appimage.sh "$URUNTIME2APPIMAGE_SOURCE"
-	chmod +x "$TMPDIR"/uruntime2appimage.sh
-	exec "$TMPDIR"/uruntime2appimage.sh
+	_make_appimage
 else
 	_echo "------------------------------------------------------------"
 	_echo "All done!"
