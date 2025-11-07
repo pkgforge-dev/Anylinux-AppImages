@@ -617,6 +617,7 @@ _make_deployment_array() {
 		set -- "$@" \
 			"$(command -v dotnet)"  \
 			$(find "$DOTNET_DIR"/shared -type f -name '*.so*' -print)
+		mkdir -p "$APPDIR"/bin
 		cp -vr "$DOTNET_DIR"/shared "$APPDIR"/bin
 		cp -vr "$DOTNET_DIR"/host   "$APPDIR"/bin
 	fi
