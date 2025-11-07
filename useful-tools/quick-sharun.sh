@@ -589,6 +589,28 @@ _make_deployment_array() {
 		_echo "* Deploying p11kit"
 		set -- "$@" "$LIB_DIR"/pkcs11/*
 	fi
+	if [ "$DEPLOY_DOTNET" = 1 ]; then
+		if [ -z "$DOTNET_DIR" ]; then
+			if [ -d /usr/lib/dotnet ]; then
+				DOTNET_DIR=/usr/lib/dotnet
+			elif [ -d /usr/share/dotnet ]; then
+				DOTNET_DIR=/usr/share/dotnet
+			fi
+		fi
+		if [ ! -d "$DOTNET_DIR" ]; then
+			_error "Cannot find dotnet installation, searched for"
+			_error "/usr/lib/dotnet and /usr/share/dotnet"
+			_error "Set DOTNET_DIR variable if it is somewhere else"
+			exit 1
+		fi
+		set -- "$@" \
+			"$(command -v dotnet)"  \
+			"$DOTNET_DIR"/*/*.so*   \
+			"$DOTNET_DIR"/*/*/*.so* \
+			"$DOTNET_DIR"/*/*/*/*.so*
+		mkdir -p "$APPDIR"/bin
+		cp -vr "$DOTNET_DIR"/* "$APPDIR"/bin
+	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
 }
