@@ -839,6 +839,7 @@ _deploy_datadir() {
 					dbus-1      |\
 					defaults    |\
 					doc         |\
+					dotnet      |\
 					et          |\
 					file        |\
 					fonts       |\
