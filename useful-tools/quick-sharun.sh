@@ -618,8 +618,8 @@ _make_deployment_array() {
 			"$(command -v dotnet)"  \
 			$(find "$DOTNET_DIR"/shared -type f -name '*.so*' -print)
 		mkdir -p "$APPDIR"/bin
-		cp -vr "$DOTNET_DIR"/shared "$APPDIR"/bin
-		cp -vr "$DOTNET_DIR"/host   "$APPDIR"/bin
+		cp -r "$DOTNET_DIR"/shared "$APPDIR"/bin
+		cp -r "$DOTNET_DIR"/host   "$APPDIR"/bin
 	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
@@ -808,10 +808,16 @@ _deploy_datadir() {
 		for bin do
 			[ -x "$bin" ] || continue
 			bin="${bin##*/}"
+
+			# skip already handled cases
+			case "$bin" in
+				dotnet) continue;;
+			esac
+
 			for datadir in /usr/local/share/* /usr/share/*; do
 				if echo "${datadir##*/}" | grep -qi "$bin"; then
 					_echo "* Adding datadir $datadir..."
-					cp -vr "$datadir" "$APPDIR/share"
+					cp -r "$datadir" "$APPDIR/share"
 					break
 				fi
 			done
