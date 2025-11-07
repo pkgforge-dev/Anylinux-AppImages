@@ -55,6 +55,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
 [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
+[Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
 [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)                                                          |
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
