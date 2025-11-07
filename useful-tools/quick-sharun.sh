@@ -915,17 +915,13 @@ _deploy_locale() {
 			_patch_away_usr_share_dir "$bin" || true
 		fi
 	done
+	set --
 
 	if [ "$DEPLOY_LOCALE" = 1 ]; then
 		_echo "* Adding locales..."
 		cp -r "$LOCALE_DIR" "$APPDIR"/share
 		if [ "$DEBLOAT_LOCALE" = 1 ]; then
 			_echo "* Removing unneeded locales..."
-			set -- \
-			! -name '*gtk*30.mo'   \
-			! -name '*gtk*40.mo'   \
-			! -name '*gst-plugin*' \
-			! -name '*gstreamer*'
 			for f in "$APPDIR"/shared/bin/* "$APPDIR"/bin/*; do
 				f=${f##*/}
 				set -- "$@" ! -name "*$f*"
