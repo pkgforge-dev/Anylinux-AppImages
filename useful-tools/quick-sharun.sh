@@ -616,11 +616,9 @@ _make_deployment_array() {
 		fi
 		set -- "$@" \
 			"$(command -v dotnet)"  \
-			"$DOTNET_DIR"/*/*.so*   \
-			"$DOTNET_DIR"/*/*/*.so* \
-			"$DOTNET_DIR"/*/*/*/*.so*
-		mkdir -p "$APPDIR"/bin
-		cp -vr "$DOTNET_DIR"/* "$APPDIR"/bin
+			$(find "$DOTNET_DIR"/shared -type f -name '*.so*' -print)
+		cp -vr "$DOTNET_DIR"/shared "$APPDIR"/bin
+		cp -vr "$DOTNET_DIR"/host   "$APPDIR"/bin
 	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
