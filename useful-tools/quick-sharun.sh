@@ -243,8 +243,15 @@ _determine_what_to_deploy() {
 			-*) continue;;
 		esac
 
+		# if the argument is a directory save it to later it copy it
+		if [ -d "$bin" ]; then
+			ADD_DIR="
+				$ADD_DIR
+				$bin
+			"
+		fi
 		# some apps may dlopen pulseaudio instead of linking directly
-		if grep -aoq -m 1 'libpulse.so' "$bin"; then
+		if [ -f "$bin" ] && grep -aoq -m 1 'libpulse.so' "$bin"; then
 			DEPLOY_PULSE=${DEPLOY_PULSE:-1}
 		fi
 
@@ -1304,6 +1311,38 @@ sed -i \
 	"$APPDIR"/AppRun
 
 chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null || :
+
+# deploy directories
+while read -r d; do
+	if [ -d "$d" ]; then
+		case "$d" in
+			"$LIB_DIR"/*) dst_path="$APPDIR"/lib;;
+			/usr/share/*) dst_path="$APPDIR"/share;;
+			/etc/*)       dst_path="$APPDIR"/etc;;
+			*)
+				_err_msg "Skipping deployment of $d"
+				_err_msg "We can only handle directories from:"
+				_err_msg "$LIB_DIR"
+				_err_msg "/usr/share"
+				_err_msg "/etc"
+				continue
+				;;
+		esac
+		mkdir -p "$dst_path"
+		if cp -rn "$d" "$dst_path"; then
+			_echo "* Added $d to $dst_path/${d##*/}"
+		else
+			# do not stop the script if the copy fails, because
+			# since lib4bin skips directories automatically we do
+			# not want CIs to fail because suddenly now we are
+			# trying to copy some directory that we did not have
+			# read access to that lib4bin was previously skipping
+			_err_msg "Failed to add $d to $dst_path/${d##*/}"
+		fi
+	fi
+done <<-EOF
+$ADD_DIR
+EOF
 
 # make sure the .env has all the "unset" last, due to a bug in the dotenv
 # library used by sharun all the unsets have to be declared last in the .env
