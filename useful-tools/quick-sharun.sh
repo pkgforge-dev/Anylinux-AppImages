@@ -598,9 +598,9 @@ _make_deployment_array() {
 			fi
 		fi
 		if [ ! -d "$DOTNET_DIR" ]; then
-			_error "Cannot find dotnet installation, searched for"
-			_error "/usr/lib/dotnet and /usr/share/dotnet"
-			_error "Set DOTNET_DIR variable if it is somewhere else"
+			_err_msg "Cannot find dotnet installation, searched for"
+			_err_msg "/usr/lib/dotnet and /usr/share/dotnet"
+			_err_msg "Set DOTNET_DIR variable if it is somewhere else"
 			exit 1
 		fi
 		set -- "$@" \
