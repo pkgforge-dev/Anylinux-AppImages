@@ -1379,6 +1379,13 @@ done <<-EOF
 $ADD_DIR
 EOF
 
+# temp fix for:
+# https://github.com/pkgforge-dev/ghostty-appimage/issues/93
+# https://github.com/VHSgunzo/sharun/issues/66
+if [ -d "$APPDIR"/share/glvnd/egl_vendor.d ]; then
+	ln -sf /usr/share/glvnd/egl_vendor.d/10_nvidia.json "$APPDIR"/share/glvnd/egl_vendor.d/10_nvidia.json
+fi
+
 # make sure the .env has all the "unset" last, due to a bug in the dotenv
 # library used by sharun all the unsets have to be declared last in the .env
 if [ -f "$APPDIR"/.env ]; then
