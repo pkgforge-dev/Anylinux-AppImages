@@ -1203,7 +1203,8 @@ for lib do case "$lib" in
 		sed -i -e '/SHARUN_WORKING_DIR=${SHARUN_DIR}/d' "$APPDIR"/.env || :
 
 		# now do better path map to the libs
-		_patch_away_usr_lib_dir "$lib" || continue
+		_patch_away_usr_lib_dir "$lib" || :
+		_patch_away_usr_bin_dir "$lib" || :
 		;;
 	esac
 done
