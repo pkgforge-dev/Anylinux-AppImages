@@ -52,6 +52,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
+[NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
 [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
