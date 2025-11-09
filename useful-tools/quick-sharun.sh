@@ -808,7 +808,9 @@ _deploy_datadir() {
 		# find if there is a datadir that matches bundled binary name
 		set -- "$APPDIR"/bin/*
 		for bin do
-			[ -x "$bin" ] || continue
+			if [ ! -f "$bin" ] || [ ! -x "$bin" ]; then
+				continue
+			fi
 			bin="${bin##*/}"
 
 			# skip already handled cases
