@@ -470,6 +470,7 @@ _make_deployment_array() {
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying glycin"
 		set -- "$@" "$LIB_DIR"/glycin-loaders/*/*
+		_add_bwrap_wrapper
 	fi
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
 		set -- "$@" \
@@ -1040,6 +1041,32 @@ _check_window_class() {
 	sed -i -e "/\[Desktop Entry\]/a\StartupWMClass=$class" "$1"
 }
 
+_add_bwrap_wrapper() {
+	mkdir -p "$APPDIR"/bin
+	cat <<-'EOF' > "$APPDIR"/bin/bwrap
+	#!/bin/sh
+
+	# AppImages crash when we bundle bwrap required by glycin loaders
+	# This terrible hack makes us able to run the glycin loaders without bwrap
+	# This is because glycin does not canonicalize the path to the glycin binaries
+
+	# With webkit2gtk we get weird cannot find xdg-dbus-proxy errors only
+	# in fedora besides other weird things that happen in other distros
+	# https://github.com/VHSgunzo/sharun/issues/77
+
+	while :; do case "$1" in
+	        --) shift; break;;
+	        --chdir|--seccomp|--dev|--tmpfs|--args) shift 2;;
+	        --*bind*|--symlink|--setenv) shift 3;;
+	        -*) shift;;
+	        *) break ;;
+	        esac
+	done
+	exec "$@"
+	EOF
+	chmod +x "$APPDIR"/bin/bwrap
+}
+
 _patch_away_usr_bin_dir() {
 	if ! grep -Eaoq -m 1 "/usr/bin" "$1"; then
 		return 1
@@ -1205,6 +1232,7 @@ for lib do case "$lib" in
 		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_bin_dir "$lib" || :
+		_add_bwrap_wrapper
 		;;
 	esac
 done
@@ -1255,27 +1283,6 @@ for bin do
 		_patch_away_usr_lib_dir "$bin" || :
 	fi
 done
-
-if [ "$DEPLOY_GLYCIN" = 1 ] && [ ! -x "$APPDIR"/bin/bwrap ]; then
-	cat <<-'EOF' > "$APPDIR"/bin/bwrap
-	#!/bin/sh
-
-	# AppImages crash when we bundle bwrap required by glycin loaders
-	# This terrible hack makes us able to run the glycin loaders without bwrap
-
-	while :; do case "$1" in
-	        --) shift; break;;
-	        --chdir|--seccomp|--dev|--tmpfs) shift 2;;
-	        --*bind*|--symlink|--setenv) shift 3;;
-	        -*) shift;;
-	        *) break ;;
-	        esac
-	done
-	exec "$@"
-	EOF
-	chmod +x "$APPDIR"/bin/bwrap
-	_echo "* added bwrap wrapper for glycin loaders"
-fi
 
 # these need to be done later because sharun may make shared/lib a symlink to lib
 # and if we make shared/lib first then it breaks sharun
