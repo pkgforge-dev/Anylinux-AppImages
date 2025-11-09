@@ -957,6 +957,11 @@ _deploy_icon_and_desktop() {
 		_echo "* Downloading $DESKTOP to $APPDIR..."
 		_download "$APPDIR"/"${DESKTOP##*/}" "$DESKTOP"
 	fi
+	# make sure desktop entry ends with .desktop
+	if [ ! -f "$APPDIR"/*.desktop ] && [ -f "$APPDIR"/*.desktop.* ]; then
+		filename="${DESKTOP##*/}"
+		mv "$APPDIR"/*.desktop.* "$APPDIR"/"${filename%.desktop*}".desktop
+	fi
 
 	if [ "$ICON" = "DUMMY" ]; then
 		# use the first binary name in shared/bin as filename
