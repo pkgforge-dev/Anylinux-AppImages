@@ -38,6 +38,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage)                                                              |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
+[Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
 [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)                                        |
 [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage)                                            |
