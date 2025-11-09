@@ -927,8 +927,10 @@ _deploy_locale() {
 		if [ "$DEBLOAT_LOCALE" = 1 ]; then
 			_echo "* Removing unneeded locales..."
 			for f in "$APPDIR"/shared/bin/* "$APPDIR"/bin/*; do
-				f=${f##*/}
-				set -- "$@" ! -name "*$f*"
+				if [ -f "$f" ]; then
+					f=${f##*/}
+					set -- "$@" ! -name "*$f*"
+				fi
 			done
 			find "$APPDIR"/share/locale "$@" -type f -delete
 			_remove_empty_dirs "$APPDIR"/share/locale
