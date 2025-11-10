@@ -39,6 +39,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
+[Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
 [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)                                        |
 [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage)                                            |
@@ -46,6 +47,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Gnome Text Editor](https://github.com/pkgforge-dev/Gnome-Text-Editor-AppImage)                                          |
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
+[Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
