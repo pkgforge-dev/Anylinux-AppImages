@@ -282,7 +282,7 @@ _determine_what_to_deploy() {
 					DEPLOY_QML=${DEPLOY_QML:-1}
 					;;
 				*libQt*WebEngineCore.so*)
-					DEPLOY_QT_WEB_ENGINE=${DEPLOY_QT_WEB_ENGINEL:-1}
+					DEPLOY_QT_WEB_ENGINE=${DEPLOY_QT_WEB_ENGINE:-1}
 					;;
 				*libgtk-3*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
