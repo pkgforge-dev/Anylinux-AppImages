@@ -11,13 +11,27 @@ ARCH=$(uname -m)
 
 # makepkg does not run when root
 sed -i -e 's|EUID == 0|EUID == 69|g' /usr/bin/makepkg
-
 sed -i \
 	-e 's|-O2|-O3|'                              \
 	-e 's|MAKEFLAGS=.*|MAKEFLAGS="-j$(nproc)"|'  \
 	-e 's|#MAKEFLAGS|MAKEFLAGS|'                 \
 	/etc/makepkg.conf
 cat /etc/makepkg.conf
+
+if [ "$1" = '--chaotic-aur' ]; then
+	shift
+	pacman-key --init
+	pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+	pacman-key --lsign-key 3056513887B78AEB
+	pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
+	pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+	echo '[chaotic-aur]' >> /etc/pacman.conf
+	echo 'Include = /etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf
+	echo "Adding Chaotic AUR packages: $*"
+	echo "----------------------------------------------------------------------"
+	pacman -Syu --noconfirm "$@"
+	exit 0
+fi
 
 git clone --depth 1 https://aur.archlinux.org/"$1" ./"$1"
 cd ./"$1"
@@ -36,6 +50,7 @@ if [ -n "$PRE_BUILD_CMDS" ]; then
 	done <<-EOF
 	$PRE_BUILD_CMDS
 	EOF
+	echo "----------------------------------------------------------------------"
 fi
 
 echo "To build:"
