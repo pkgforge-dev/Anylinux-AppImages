@@ -44,7 +44,7 @@ jobs:
             script: gtk4-demo-appimage
     container: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Make AppImage
         run: sh ./useful-tools/demo/${{ matrix.script }}.sh
