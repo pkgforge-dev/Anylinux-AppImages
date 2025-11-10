@@ -26,6 +26,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
 [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)                                        |
 [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)                                                            |
+[Authenticator](https://github.com/pkgforge-dev/Authenticator-AppImage)                                                  |
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
 [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced)                                                           |
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
@@ -80,6 +81,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
+[Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
 [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
 
