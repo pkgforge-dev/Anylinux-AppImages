@@ -26,7 +26,8 @@ jobs:
             | grep -i 'https.*pkgforge-dev.*AppImage.*' | awk -F'/' '{print $NF}' | grep -v '\.md')"
           
           for REPO in $REPOS; do
-          	NUM=$(wget -q "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
+          	NUM=$(wget -q --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
           		| ./gron.awk | awk -F'=' '/download_count/ {total += $2} END {print total}')
           	[ -n "$NUM" ] || exit 1
           	echo "${REPO}: $NUM "
