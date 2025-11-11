@@ -144,7 +144,7 @@ https://github.com/VHSgunzo/sharun
 
 * sharun is also just not for AppImages, you can use it anywhere you need to make any sort of application portable, you can even make pseudo static binaries from existing dynamic binaries which sharun does with the help of wrappe.
 
-* sharun even has hooks to fix applications that aren’t relocatable, like webkit2gtk which is hardcoded to for some binaries in `/urs/lib`, it fixes this with patching all automatically for you.
+* sharun even has hooks to fix applications that aren’t relocatable, like webkit2gtk which is hardcoded to for some binaries in `/usr/lib`, it fixes this with patching all automatically for you.
 
 
 Any application made with sharun ends up being able to work **on any linux distro**, be it ubuntu 14.04, musl distros and even directly in NixOS without any wrapper (non FHS environment). 
