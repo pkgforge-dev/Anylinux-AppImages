@@ -9,12 +9,12 @@ set -e
 
 ARCH=$(uname -m)
 
-_info_msg() (
+_info_msg() {
 	g='\033[0;32m'
 	r='\033[0m'
 	l="----------------------------------------------------------------------"
-	printf "$g\n%s\n%s\n%s\n$r\n" "$l" "${*:-$l}" "$l"
-)
+	printf "$g\n%s\n%s\n%s\n\n$r" "$l" "${*:-$l}" "$l"
+}
 
 # check for basic build dependencies
 for d in base-devel git; do
