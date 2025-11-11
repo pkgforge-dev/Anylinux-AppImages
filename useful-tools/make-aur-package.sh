@@ -9,6 +9,21 @@ set -e
 
 ARCH=$(uname -m)
 
+_info_msg() (
+	g='\033[0;32m'
+	r='\033[0m'
+	l="----------------------------------------------------------------------"
+	printf "$g\n%s\n%s\n%s\n$r\n" "$l" "${*:-$l}" "$l"
+)
+
+# check for basic build dependencies
+for d in base-devel git; do
+	if ! pacman -Q "$d" 2>/dev/null; then
+		_info_msg "Adding build dependency: $d"
+		pacman -Syu --noconfirm "$d"
+	fi
+done
+
 # makepkg does not run when root
 sed -i -e 's|EUID == 0|EUID == 69|g' /usr/bin/makepkg
 sed -i \
@@ -27,8 +42,7 @@ if [ "$1" = '--chaotic-aur' ]; then
 	pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 	echo '[chaotic-aur]' >> /etc/pacman.conf
 	echo 'Include = /etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf
-	echo "Adding Chaotic AUR packages: $*"
-	echo "----------------------------------------------------------------------"
+	_info_msg "Adding Chaotic AUR packages: $*"
 	pacman -Syu --noconfirm "$@"
 	exit 0
 fi
@@ -40,34 +54,26 @@ sed -i -e "s|x86_64|$ARCH|" ./PKGBUILD
 
 # Run extra commands from env var
 if [ -n "$PRE_BUILD_CMDS" ]; then
-	echo "Running additional pre-build commands..."
-	echo "----------------------------------------------------------------------"
+	_info_msg "Running additional pre-build commands..."
 	while IFS= read -r CMD; do
 		if [ -n "$CMD" ]; then
-			echo "Running $CMD"
+			_info_msg "Running: $CMD"
 			eval "$CMD"
 		fi
 	done <<-EOF
 	$PRE_BUILD_CMDS
 	EOF
-	echo "----------------------------------------------------------------------"
 fi
 
-echo "To build:"
-echo "----------------------------------------------------------------------"
+_info_msg "To build:"
 cat ./PKGBUILD
-echo "----------------------------------------------------------------------"
+_info_msg ""
 
-echo "Building package..."
-echo "----------------------------------------------------------------------"
+_info_msg "Building package..."
 makepkg -fs --noconfirm
 ls -la ./
 
-echo "Installing package..."
-echo "----------------------------------------------------------------------"
+_info_msg "Installing package..."
 pacman --noconfirm -U ./*.pkg.tar.*
 
-echo "All done!"
-echo "----------------------------------------------------------------------"
-echo "----------------------------------------------------------------------"
-
+_info_msg "All done!"
