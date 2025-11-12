@@ -193,7 +193,7 @@ _help_msg() {
 
 _sanity_check() {
 	for d in $DEPENDENCIES; do
-		if ! command -v "$d"; then
+		if ! command -v "$d" 1>/dev/null; then
 			_err_msg "ERROR: Missing dependency '$d'!"
 		fi
 	done
