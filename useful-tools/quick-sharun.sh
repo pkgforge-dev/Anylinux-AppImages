@@ -210,15 +210,14 @@ _sanity_check() {
 	elif [ -z "$DESKTOP" ] && [ ! -f "$APPDIR"/*.desktop ]; then
 		_err_msg "ERROR: No desktop entry in $APPDIR and DESKTOP is not set!"
 		exit 1
-	elif [ -z "$ICON" ] && [ ! -f "$APPDIR"/.DirIcon ]; then
-		_err_msg "ERROR: No .DirIcon in $APPDIR and ICON is not set!"
-		exit 1
 	elif  [ -n "$PATH_MAPPING" ] && ! echo "$PATH_MAPPING" | grep -q 'SHARUN_DIR'; then
 		_err_msg 'ERROR: PATH_MAPPING must contain unexpanded ${SHARUN_DIR} variable'
 		_err_msg 'Example:'
 		_err_msg "'PATH_MAPPING=/etc:\${SHARUN_DIR}/etc'"
 		_err_msg 'NOTE: The braces in the variable are needed!'
 		exit 1
+	elif [ -z "$ICON" ] && [ ! -f "$APPDIR"/.DirIcon ]; then
+		_err_msg "WARNING: No .DirIcon in $APPDIR and ICON is not set!"
 	fi
 
 	if [ "$STRACE_MODE" = 1 ]; then
