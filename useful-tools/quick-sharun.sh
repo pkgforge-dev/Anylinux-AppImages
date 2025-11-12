@@ -36,6 +36,18 @@ DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
 LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
 
+DEPENDENCIES="
+	awk
+	cp
+	find
+	grep
+	ldd
+	mv
+	rm
+	strings
+	tr
+"
+
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
 if [ -f "$APPDIR"/.env ]; then
@@ -51,6 +63,14 @@ _tmp_bin="${_tmp_bin:-$(tr -dc "$regex" < /dev/urandom | head -c 3)}"
 _tmp_lib="${_tmp_lib:-$(tr -dc "$regex" < /dev/urandom | head -c 3)}"
 _tmp_share="${_tmp_share:-$(tr -dc "$regex" < /dev/urandom | head -c 5)}"
 
+if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
+	DEBLOAT_SYS_PYTHON=${DEBLOAT_SYS_PYTHON:-1}
+fi
+
+if [ -e "$1" ] && [ "$2" = "--" ]; then
+	STRACE_ARGS_PROVIDED=1
+fi
+
 # for sharun
 export DST_DIR="$APPDIR"
 export GEN_LIB_PATH=1
@@ -59,13 +79,13 @@ export WITH_HOOKS=1
 export STRACE_MODE="${STRACE_MODE:-1}"
 export VERBOSE=1
 
+if [ -z "$NO_STRIP" ]; then
+	export STRIP=1
+fi
+
 if [ "$DEPLOY_PYTHON" = 1 ]; then
 	export WITH_PYTHON=1
 	export PYTHON_VER="${PYTHON_VER:-3.13}"
-fi
-
-if [ -z "$NO_STRIP" ]; then
-	export STRIP=1
 fi
 
 # github actions doesn't set USER
@@ -168,6 +188,65 @@ _help_msg() {
 	  sharun  (https://github.com/VHSgunzo/sharun)
 	  pathmap (https://github.com/VHSgunzo/pathmap)
 	EOF
+	exit 1
+}
+
+_sanity_check() {
+	for d in $DEPENDENCIES; do
+		if ! command -v "$d"; then
+			_err_msg "ERROR: Missing dependency '$d'!"
+		fi
+	done
+
+	if [ "$EXEC_WRAPPER" = 1 ] && ! command -v cc 1>/dev/null; then
+		_err_msg "ERROR: Using EXEC_WRAPPER requires cc"
+		exit 1
+	elif [ "$LOCALE_FIX" = 1 ] && ! command -v cc 1>/dev/null; then
+		_err_msg "ERROR: Using LOCALE_FIX requires cc"
+		exit 1
+	elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
+		_err_msg "ERROR: DEPLOY_PYTHON and DEPLOY_SYS_PYTHON cannot be both enabled!"
+		exit 1
+	elif [ -z "$DESKTOP" ] && [ ! -f "$APPDIR"/*.desktop ]; then
+		_err_msg "ERROR: No desktop entry in $APPDIR and DESKTOP is not set!"
+		exit 1
+	elif [ -z "$ICON" ] && [ ! -f "$APPDIR"/.DirIcon ]; then
+		_err_msg "ERROR: No .DirIcon in $APPDIR and ICON is not set!"
+		exit 1
+	elif  [ -n "$PATH_MAPPING" ] && ! echo "$PATH_MAPPING" | grep -q 'SHARUN_DIR'; then
+		_err_msg 'ERROR: PATH_MAPPING must contain unexpanded ${SHARUN_DIR} variable'
+		_err_msg 'Example:'
+		_err_msg "'PATH_MAPPING=/etc:\${SHARUN_DIR}/etc'"
+		_err_msg 'NOTE: The braces in the variable are needed!'
+		exit 1
+	fi
+
+	if [ "$STRACE_MODE" = 1 ]; then
+		if command -v xvfb-run 1>/dev/null; then
+			XVFB_CMD="xvfb-run -a --"
+		else
+			_err_msg "WARNING: xvfb-run was not detected on the system"
+			_err_msg "xvfb-run is used with sharun for strace mode, this is needed"
+			_err_msg "to find dlopened libraries as normally this script is going"
+			_err_msg "to be run in a headless enviromment where the application"
+			_err_msg "will fail to start and result strace mode will not be able"
+			_err_msg "to find the libraries dlopened by the application"
+			XVFB_CMD=""
+			sleep 5
+		fi
+	fi
+
+	if [ -z "$LIB_DIR" ]; then
+		if [ -d "/usr/lib/$ARCH-linux-gnu" ]; then
+			LIB_DIR="/usr/lib/$ARCH-linux-gnu"
+		elif [ -d "/usr/lib" ]; then
+			LIB_DIR="/usr/lib"
+		else
+			_err_msg "ERROR: there is no /usr/lib directory in this system"
+			_err_msg "set the LIB_DIR variable to where you have libraries"
+			exit 1
+		fi
+	fi
 }
 
 _make_appimage() {
@@ -180,51 +259,20 @@ _make_appimage() {
 }
 
 case "$1" in
-	--help)           _help_msg; exit 0;;
-	--make-appimage)  _make_appimage; exit 0;;
+	--help)
+		_help_msg
+		;;
+	--make-appimage)
+		_make_appimage
+		;;
+	'')
+		if [ -z "$PYTHON_PACKAGES" ]; then
+			_help_msg
+		fi
+		;;
 esac
 
-if [ -z "$1" ] && [ -z "$PYTHON_PACKAGES" ]; then
-	_help_msg
-	exit 1
-elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-	_err_msg "ERROR: DEPLOY_PYTHON and DEPLOY_SYS_PYTHON cannot be both enabled!"
-	exit 1
-fi
-
-if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-	DEBLOAT_SYS_PYTHON=${DEBLOAT_SYS_PYTHON:-1}
-fi
-
-if [ -e "$1" ] && [ "$2" = "--" ]; then
-	STRACE_ARGS_PROVIDED=1
-fi
-
-if [ -z "$LIB_DIR" ]; then
-	if [ -d "/usr/lib/$ARCH-linux-gnu" ]; then
-		LIB_DIR="/usr/lib/$ARCH-linux-gnu"
-	elif [ -d "/usr/lib" ]; then
-		LIB_DIR="/usr/lib"
-	else
-		_err_msg "ERROR: there is no /usr/lib directory in this system"
-		_err_msg "set the LIB_DIR variable to where you have libraries"
-		exit 1
-	fi
-fi
-
-if command -v xvfb-run 1>/dev/null; then
-	XVFB_CMD="xvfb-run -a --"
-else
-	_err_msg "WARNING: xvfb-run was not detected on the system"
-	_err_msg "xvfb-run is used with sharun for strace mode, this is needed"
-	_err_msg "to find dlopened libraries as normally this script is going"
-	_err_msg "to be run in a headless enviromment where the application"
-	_err_msg "will fail to start and result strace mode will not be able"
-	_err_msg "to find the libraries dlopened by the application"
-	XVFB_CMD=""
-	sleep 3
-fi
-
+_sanity_check
 
 # POSIX shell doesn't support arrays we use awk to save it into a variable
 # then with 'eval set -- $var' we add it to the positional array
@@ -706,11 +754,6 @@ _add_exec_wrapper() {
 		return 0
 	fi
 
-	if ! command -v cc 1>/dev/null; then
-		_err_msg "ERROR: Using EXEC_WRAPPER requires cc"
-		exit 1
-	fi
-
 	_echo "* Building exec.so..."
 	_download "$TMPDIR"/exec.c "$EXEC_WRAPPER_SOURCE"
 	cc -shared -fPIC "$TMPDIR"/exec.c -o "$APPDIR"/lib/exec.so
@@ -727,70 +770,48 @@ _add_exec_wrapper() {
 		chmod +x "$APPDIR"/bin/gio-launch-desktop
 	fi
 	rm -f "$APPDIR"/bin/xdg-open
-
 	_echo "* EXEC_WRAPPER successfully added!"
 }
 
 _add_locale_fix() {
-	if [ "$LOCALE_FIX" != 1 ]; then
-		return 0
-	fi
-
-	if ! command -v cc 1>/dev/null; then
-		_err_msg "ERROR: Using LOCALE_FIX requires cc"
-		exit 1
-	fi
-
 	_echo "* Building localefix.so..."
 	_download "$TMPDIR"/localefix.c "$LOCALE_FIX_SOURCE"
 	cc -shared -fPIC "$TMPDIR"/localefix.c -o "$APPDIR"/lib/localefix.so
 	echo "localefix.so" >> "$APPDIR"/.preload
-
 	_echo "* LOCALE_FIX successfully added!"
 }
 
 _map_paths_ld_preload_open() {
-	case "$PATH_MAPPING" in
-		*'${SHARUN_DIR}'*) true    ;;
-		'')                return 0;;
-		*)
-			_err_msg 'ERROR: PATH_MAPPING must contain unexpanded'
-			_err_msg '${SHARUN_DIR} variable for this to work'
-			_err_msg 'Example:'
-			_err_msg "'PATH_MAPPING=/etc:\${SHARUN_DIR}/etc'"
-			_err_msg 'NOTE: The braces in the variable are needed'
-			exit 1
-			;;
-	esac
-
 	# format new line entries in PATH_MAPPING into comma separated
 	# entries for sharun, pathmap accepts new lines in the variable
 	# but the .env library used by sharun does not
-	PATH_MAPPING=$(echo "$PATH_MAPPING"   \
-		| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//; s/^,*//'
-	)
+	if [ -n "$PATH_MAPPING" ]; then
+		PATH_MAPPING=$(echo "$PATH_MAPPING"   \
+			| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//; s/^,*//'
+		)
 
-	deps="git make"
-	for d in $deps; do
-		if ! command -v "$d" 1>/dev/null; then
-			_err_msg "ERROR: Using PATH_MAPPING requires $d"
-			exit 1
-		fi
-	done
+		deps="git make"
+		for d in $deps; do
+			if ! command -v "$d" 1>/dev/null; then
+				_err_msg "ERROR: Using PATH_MAPPING requires $d"
+				exit 1
+			fi
+		done
 
-	_echo "* Building $LD_PRELOAD_OPEN..."
+		_echo "* Building $LD_PRELOAD_OPEN..."
 
-	rm -rf "$TMPDIR"/ld-preload-open
-	git clone "$LD_PRELOAD_OPEN" "$TMPDIR"/ld-preload-open && (
-		cd "$TMPDIR"/ld-preload-open
-		make all
-	)
+		rm -rf "$TMPDIR"/ld-preload-open
+		git clone "$LD_PRELOAD_OPEN" "$TMPDIR"/ld-preload-open && (
+			cd "$TMPDIR"/ld-preload-open
+			make all
+		)
 
-	mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/lib
-	echo "path-mapping.so" >> "$APPDIR"/.preload
-	echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPDIR"/.env
-	_echo "* PATH_MAPPING successfully added!"
-	echo ""
+		mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/lib
+		echo "path-mapping.so" >> "$APPDIR"/.preload
+		echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPDIR"/.env
+		_echo "* PATH_MAPPING successfully added!"
+		echo ""
+	fi
 }
 
 _map_paths_binary_patch() {
@@ -832,7 +853,7 @@ _deploy_datadir() {
 
 		# Some apps have a datadir that does not match the binary name
 		# in that case we need to get it by reading the binary
-		if [ -f "$1" ] && command -v strings 1>/dev/null; then
+		if [ -f "$1" ]; then
 
 			bin=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$1")
 			possible_dirs=$(
@@ -1128,11 +1149,11 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
+_deploy_icon_and_desktop
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_exec_wrapper
 _add_locale_fix
-_deploy_icon_and_desktop
 _deploy_datadir
 _deploy_locale
 _check_window_class
@@ -1449,7 +1470,7 @@ ffmpeg and in that case this is not an issue.
 ------------------------------------------------------------
 "
 set -- "$APPDIR"/lib/libjack.so*
-if [ -f "$1" ] && command -v ldd 1>/dev/null; then
+if [ -f "$1" ]; then
 	if ! ldd "$1" | grep -q 'libpipewire'; then
 		_err_msg "$libjackwarning"
 	fi
