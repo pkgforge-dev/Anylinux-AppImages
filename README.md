@@ -50,6 +50,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Gnome Text Editor](https://github.com/pkgforge-dev/Gnome-Text-Editor-AppImage)                                          |
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
+[Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
