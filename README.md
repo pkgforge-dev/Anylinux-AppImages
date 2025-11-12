@@ -32,6 +32,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
 [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage)                                                              |
 [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
+[Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
