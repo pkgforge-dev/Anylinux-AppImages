@@ -56,6 +56,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
+[Mousai](https://github.com/pkgforge-dev/Mousai-AppImage)                                                                |
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
