@@ -26,12 +26,14 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
 [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)                                        |
 [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)                                                            |
+[Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage)                                                  |
 [Authenticator](https://github.com/pkgforge-dev/Authenticator-AppImage)                                                  |
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
 [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced)                                                           |
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
 [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage)                                                              |
 [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
+[Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
@@ -49,6 +51,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Gnome Text Editor](https://github.com/pkgforge-dev/Gnome-Text-Editor-AppImage)                                          |
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
+[Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
@@ -56,6 +59,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
+[Mousai](https://github.com/pkgforge-dev/Mousai-AppImage)                                                                |
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
