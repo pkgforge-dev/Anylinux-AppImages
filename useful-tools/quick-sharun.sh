@@ -774,18 +774,20 @@ _add_exec_wrapper() {
 }
 
 _add_locale_fix() {
-	_echo "* Building localefix.so..."
-	_download "$TMPDIR"/localefix.c "$LOCALE_FIX_SOURCE"
-	cc -shared -fPIC "$TMPDIR"/localefix.c -o "$APPDIR"/lib/localefix.so
-	echo "localefix.so" >> "$APPDIR"/.preload
-	_echo "* LOCALE_FIX successfully added!"
+	if [ "$LOCALE_FIX"  = 1 ] && [ ! -f "$APPDIR"/lib/localefix.so ]; then
+		_echo "* Building localefix.so..."
+		_download "$TMPDIR"/localefix.c "$LOCALE_FIX_SOURCE"
+		cc -shared -fPIC "$TMPDIR"/localefix.c -o "$APPDIR"/lib/localefix.so
+		echo "localefix.so" >> "$APPDIR"/.preload
+		_echo "* LOCALE_FIX successfully added!"
+	fi
 }
 
 _map_paths_ld_preload_open() {
 	# format new line entries in PATH_MAPPING into comma separated
 	# entries for sharun, pathmap accepts new lines in the variable
 	# but the .env library used by sharun does not
-	if [ -n "$PATH_MAPPING" ]; then
+	if [ -n "$PATH_MAPPING" ] && [ ! -f "$APPDIR"/lib/path-mapping.so ]; then
 		PATH_MAPPING=$(echo "$PATH_MAPPING"   \
 			| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//; s/^,*//'
 		)
