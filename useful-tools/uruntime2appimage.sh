@@ -179,7 +179,7 @@ if [ -z "$OUTNAME" ]; then
 	if [ -n "$VERSION" ]; then
 		OUTNAME="$APPNAME"-"$VERSION"-anylinux-"$ARCH".AppImage
 	else
-		OUTNAME="$APPNAME"-"$ARCH".AppImage
+		OUTNAME="$APPNAME"-anylinux-"$ARCH".AppImage
 		>&2 echo "WARNING: VERSION is not set"
 		>&2 echo "WARNING: set it to include it in $OUTNAME"
 	fi
@@ -258,6 +258,8 @@ _echo "------------------------------------------------------------"
 _echo "Making AppImage..."
 _echo "------------------------------------------------------------"
 
+mkdir -p "$OUTPATH"
+
 set -- \
 	--force               \
 	--set-owner 0         \
@@ -310,6 +312,16 @@ if [ -n "$UPINFO" ]; then
 fi
 
 chmod +x "$OUTPATH"/"$OUTNAME"
+
+# output the APPNAME and VERSION vars when we assembled the artifact
+# name using information from the desktop entry and VERSION env var
+# only do it when APPNAME is set
+if [ -n "$APPNAME" ]; then
+	echo "$APPNAME" > "$OUTPATH"/appname
+	if [ -n "$VERSION" ]; then
+		echo "$VERSION" > "$OUTPATH"/version
+	fi
+fi
 
 _echo "------------------------------------------------------------"
 _echo "All done! AppImage at: $OUTPATH/$OUTNAME"
