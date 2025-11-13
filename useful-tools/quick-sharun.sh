@@ -823,6 +823,25 @@ _map_paths_binary_patch() {
 			_patch_away_usr_lib_dir   "$bin"
 			_patch_away_usr_share_dir "$bin"
 		done
+	elif [ -n "$PATH_MAPPING_HARDCODED" ]; then
+		set -- $PATH_MAPPING_HARDCODED
+		_echo "* Patching files listed in PATH_MAPPING_HARDCODED..."
+		# only search for files to patch in the lib and bin dirs
+		path1="$APPDIR"/shared/bin
+		path2="$APPDIR"/lib
+		for f do
+			file=$(find -L "$path1" "$path2" -type f -name "$f")
+			if [ -n "$file" ]; then
+				for found in $file; do
+					_patch_away_usr_bin_dir   "$found" || :
+					_patch_away_usr_lib_dir   "$found" || :
+					_patch_away_usr_share_dir "$found" || :
+				done
+			else
+				_err_msg "ERROR: Could not find $f in $APPDIR"
+				exit 1
+			fi
+		done
 	fi
 }
 
