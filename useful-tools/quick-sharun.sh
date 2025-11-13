@@ -824,7 +824,9 @@ _map_paths_binary_patch() {
 			_patch_away_usr_share_dir "$bin"
 		done
 	elif [ -n "$PATH_MAPPING_HARDCODED" ]; then
+		set -f
 		set -- $PATH_MAPPING_HARDCODED
+		set +f
 		_echo "* Patching files listed in PATH_MAPPING_HARDCODED..."
 		# only search for files to patch in the lib and bin dirs
 		path1="$APPDIR"/shared/bin
