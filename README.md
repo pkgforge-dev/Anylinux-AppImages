@@ -55,6 +55,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
+[KiCad](https://github.com/pkgforge-dev/KiCad-AppImage)                                                                  |
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
