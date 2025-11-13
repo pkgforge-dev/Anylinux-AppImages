@@ -16,6 +16,7 @@ set -e
 ARCH="$(uname -m)"
 TMPDIR=${TMPDIR:-/tmp}
 APPDIR=${APPDIR:-$PWD/AppDir}
+APPENV=$APPDIR/.env
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
@@ -50,12 +51,12 @@ DEPENDENCIES="
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
-if [ -f "$APPDIR"/.env ]; then
+if [ -f "$APPENV" ]; then
 	while IFS= read -r line; do
 		case "$line" in
 			_tmp_*) eval "$line";;
 		esac
-	done < "$APPDIR"/.env
+	done < "$APPENV"
 fi
 
 regex='A-Za-z0-9_=-'
@@ -334,12 +335,12 @@ _determine_what_to_deploy() {
 				*libgtk-3*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-3.0
-					echo 'GSETTINGS_BACKEND=keyfile' >> "$APPDIR"/.env
+					echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
 					;;
 				*libgtk-4*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-4.0
-					echo 'GSETTINGS_BACKEND=keyfile' >> "$APPDIR"/.env
+					echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
 					;;
 				*libgdk_pixbuf*.so*)
 					DEPLOY_GDK=${DEPLOY_GDK:-1}
@@ -641,7 +642,6 @@ _make_deployment_array() {
 	if [ "$DEPLOY_LIBHEIF" = 1 ]; then
 		_echo "* Deploying libheif"
 
-		# TODO remove the .env parts once sharun sets this automatically
 		if [ -d "$LIB_DIR"/libheif/plugins ]; then
 			set -- "$@" "$LIB_DIR"/libheif/plugins/*
 		elif [ -d "$LIB_DIR"/libheif ]; then
@@ -811,7 +811,7 @@ _map_paths_ld_preload_open() {
 
 		mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/lib
 		echo "path-mapping.so" >> "$APPDIR"/.preload
-		echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPDIR"/.env
+		echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPENV"
 		_echo "* PATH_MAPPING successfully added!"
 		echo ""
 	fi
@@ -1118,8 +1118,8 @@ _patch_away_usr_bin_dir() {
 	fi
 
 	sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
-	if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPDIR"/.env 2>/dev/null; then
-		echo "_tmp_bin='$_tmp_bin'" >> "$APPDIR"/.env
+	if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPENV" 2>/dev/null; then
+		echo "_tmp_bin='$_tmp_bin'" >> "$APPENV"
 	fi
 
 	_echo "* patched away /usr/bin from $1"
@@ -1132,8 +1132,8 @@ _patch_away_usr_lib_dir() {
 	fi
 
 	sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
-	if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPDIR"/.env 2>/dev/null; then
-		echo "_tmp_lib='$_tmp_lib'" >> "$APPDIR"/.env
+	if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPENV" 2>/dev/null; then
+		echo "_tmp_lib='$_tmp_lib'" >> "$APPENV"
 	fi
 
 	_echo "* patched away /usr/lib from $1"
@@ -1146,8 +1146,8 @@ _patch_away_usr_share_dir() {
 	fi
 
 	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
-	if ! grep -q "_tmp_share='$_tmp_share'" "$APPDIR"/.env 2>/dev/null; then
-		echo "_tmp_share='$_tmp_share'" >> "$APPDIR"/.env
+	if ! grep -q "_tmp_share='$_tmp_share'" "$APPENV" 2>/dev/null; then
+		echo "_tmp_share='$_tmp_share'" >> "$APPENV"
 	fi
 
 	_echo "* patched away /usr/share from $1"
@@ -1199,7 +1199,7 @@ for lib do case "$lib" in
 		# GEGL_PATH is problematic so we avoiud it
 		# patch the lib directly to load its plugins instead
 		_patch_away_usr_lib_dir "$lib" || continue
-		echo 'unset GEGL_PATH' >> "$APPDIR"/.env
+		echo 'unset GEGL_PATH' >> "$APPENV"
 		;;
 	*libp11-kit.so*)
 		_patch_away_usr_lib_dir "$lib" || :
@@ -1272,7 +1272,7 @@ for lib do case "$lib" in
 		sed -i -e 's|\./\.//|/usr/|g' "$lib" || :
 
 		# remove working dir change
-		sed -i -e '/SHARUN_WORKING_DIR=${SHARUN_DIR}/d' "$APPDIR"/.env || :
+		sed -i -e '/SHARUN_WORKING_DIR=${SHARUN_DIR}/d' "$APPENV" || :
 
 		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
@@ -1347,8 +1347,8 @@ if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 	mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
 	cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
 	cp -r /etc/ImageMagick-*       "$APPDIR"/etc/ImageMagick
-	echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPDIR"/.env
-	echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc/ImageMagick' >> "$APPDIR"/.env
+	echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
+	echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc/ImageMagick' >> "$APPENV"
 	_echo "* Copied ImageMagick directories"
 fi
 if [ "$DEPLOY_GEGL" = 1 ]; then
@@ -1452,7 +1452,7 @@ fi
 
 # make sure the .env has all the "unset" last, due to a bug in the dotenv
 # library used by sharun all the unsets have to be declared last in the .env
-if [ -f "$APPDIR"/.env ]; then
+if [ -f "$APPENV" ]; then
 	sorted_env="$(LC_ALL=C awk '
 		{
 			if ($0 ~ /^unset/) {
@@ -1465,9 +1465,9 @@ if [ -f "$APPDIR"/.env ]; then
 			for (i = 1; i <= u; i++) {
 				print unset_array[i]
 			}
-		}' "$APPDIR"/.env
+		}' "$APPENV"
 	)"
-	echo "$sorted_env" > "$APPDIR"/.env
+	echo "$sorted_env" > "$APPENV"
 fi
 
 
