@@ -338,6 +338,7 @@ _determine_what_to_deploy() {
 				*libgtk-4*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-4.0
+					echo 'GSETTINGS_BACKEND=keyfile' >> "$APPDIR"/.env
 					;;
 				*libgdk_pixbuf*.so*)
 					DEPLOY_GDK=${DEPLOY_GDK:-1}
