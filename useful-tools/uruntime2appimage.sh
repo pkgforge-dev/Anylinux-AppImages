@@ -177,7 +177,7 @@ if [ -z "$OUTNAME" ]; then
 	fi
 
 	if [ -n "$VERSION" ]; then
-		OUTNAME="$APPNAME"-"$VERSION"-"$ARCH".AppImage
+		OUTNAME="$APPNAME"-"$VERSION"-anylinux-"$ARCH".AppImage
 	else
 		OUTNAME="$APPNAME"-"$ARCH".AppImage
 		>&2 echo "WARNING: VERSION is not set"
