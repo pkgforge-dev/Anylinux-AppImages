@@ -151,7 +151,23 @@ fi
 
 _deploy_desktop_and_icon
 
-if [ ! -f "$APPDIR"/*.desktop ]; then
+DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
+APPNAME=$(awk -F'=' '/^Name=/ {gsub(/ /,"_",$2); print $2; exit}' "$DESKTOP_ENTRY")
+
+# add appimage info to desktop entry, first make sure to remove existing info
+sed -i \
+	-e '/X-AppImage-Name/d'    \
+	-e '/X-AppImage-Version/d' \
+	-e '/X-AppImage-Arch/d'    \
+	"$DESKTOP_ENTRY"
+
+echo "
+X-AppImage-Name=$APPNAME
+X-AppImage-Version=${VERSION:-UNKNOWN}
+X-AppImage-Arch=$ARCH
+" >> "$DESKTOP_ENTRY"
+
+if [ ! -f "$DESKTOP_ENTRY" ]; then
 	>&2 echo "ERROR: No top level .desktop file found in $APPDIR"
 	>&2 echo "Note it cannot be more than .desktop file in that location"
 	exit 1
@@ -169,13 +185,6 @@ fi
 _check_window_class
 
 if [ -z "$OUTNAME" ]; then
-	if [ -z "$APPNAME" ]; then
-		APPNAME=$(
-		  awk -F'=' '/^Name=/ {gsub(/ /,"_",$2); print $2; exit}' \
-		  "$APPDIR"/*.desktop
-		)
-	fi
-
 	if [ -n "$VERSION" ]; then
 		OUTNAME="$APPNAME"-"$VERSION"-anylinux-"$ARCH".AppImage
 	else
@@ -279,7 +288,7 @@ if [ "$OPTIMIZE_LAUNCH" = 1 ]; then
 		fi
 	done
 
-	_echo "* Making dwarfs profile optimization at "$DWARFSPROF"..."
+	_echo "* Making dwarfs profile optimization at $DWARFSPROF..."
 	"$DWARFS_CMD" "$@" -C zstd:level=5 -S19 --output "$tmpappimage"
 	chmod +x "$tmpappimage"
 
@@ -313,15 +322,13 @@ fi
 
 chmod +x "$OUTPATH"/"$OUTNAME"
 
-# output the APPNAME and VERSION vars when we assembled the artifact
-# name using information from the desktop entry and VERSION env var
-# only do it when APPNAME is set
-if [ -n "$APPNAME" ]; then
-	echo "$APPNAME" > "$OUTPATH"/appname
-	if [ -n "$VERSION" ]; then
-		echo "$VERSION" > "$OUTPATH"/version
-	fi
-fi
+# make a appinfo file next to the artifact, this can be used for
+# later getting info when making a github release
+echo "
+X-AppImage-Name=$APPNAME
+X-AppImage-Version=${VERSION:-UNKNOWN}
+X-AppImage-Arch=$ARCH
+" > "$OUTPATH"/appinfo
 
 _echo "------------------------------------------------------------"
 _echo "All done! AppImage at: $OUTPATH/$OUTNAME"
