@@ -88,6 +88,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
 [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
+[VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage)                                                          |
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
 [Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
