@@ -301,6 +301,7 @@ if [ "$OPTIMIZE_LAUNCH" = 1 ]; then
 
 	sleep 10
 	pkill -P "$pid" || true
+	wait "$pid" || true
 	rm -f "$tmpappimage"
 fi
 
