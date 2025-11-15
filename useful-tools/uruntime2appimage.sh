@@ -306,7 +306,16 @@ if [ -f "$DWARFSPROF" ]; then
 	set -- --categorize=hotness --hotness-list="$DWARFSPROF" "$@"
 fi
 
-"$DWARFS_CMD" "$@" -C $DWARFS_COMP --output "$OUTPATH"/"$OUTNAME"
+if ! "$DWARFS_CMD" "$@" -C $DWARFS_COMP --output "$OUTPATH"/"$OUTNAME"; then
+	>&2 echo "ERROR: Something went wrong making dwarfs image!"
+	if [ -f "$DWARFSPROF" ]; then
+		>&2 echo "Found '$DWARFSPROF' file in '$APPDIR', may be causing issues:"
+		>&2 echo "------------------------------------------------------------"
+		>&2 cat "$DWARFSPROF" || :
+		>&2 echo "------------------------------------------------------------"
+	fi
+	exit 1
+fi
 
 if [ -n "$UPINFO" ]; then
 	_echo "------------------------------------------------------------"
