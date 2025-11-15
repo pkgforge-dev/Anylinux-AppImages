@@ -21,6 +21,10 @@ RUNTIME="${RUNTIME:-$TMPDIR/uruntime}"
 DWARFSPROF="${DWARFSPROF:-$APPDIR/.dwarfsprofile}"
 OPTIMIZE_LAUNCH="${OPTIMIZE_LAUNCH:-0}"
 
+# github actions doesn't set user causing some apps
+# crash when making the dwarfs image profile
+export USER="${LOGNAME:-${USER:-${USERNAME:-yomama}}}"
+
 _echo() {
 	printf '\033[1;92m%s\033[0m\n' "$*"
 }
