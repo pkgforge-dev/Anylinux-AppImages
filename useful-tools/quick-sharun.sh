@@ -1421,11 +1421,11 @@ while read -r d; do
 			*/share/*)
 				dst_path="$APPDIR"/share/"${d##*/share/}"
 				;;
-			/etc/*)
+			*/etc/*)
 				dst_path="$APPDIR"/etc/"${d##*/etc/}"
 				;;
 			*/lib/*)
-				dst_path=dst_path="$APPDIR"/lib/"${d##*/lib/}"
+				dst_path="$APPDIR"/lib/"${d##*/lib/}"
 				;;
 			*)
 				_err_msg "Skipping deployment of $d"
@@ -1433,7 +1433,7 @@ while read -r d; do
 				_err_msg "Any dir from: $LIB_DIR"
 				_err_msg "Any dir with /lib/ in its path"
 				_err_msg "Any dir with /share/ in its path"
-				_err_msg "Any dir from /etc"
+				_err_msg "Any dir with /etc/ in its path"
 				continue
 				;;
 		esac
