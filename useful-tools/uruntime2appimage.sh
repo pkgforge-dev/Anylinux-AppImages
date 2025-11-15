@@ -301,6 +301,7 @@ if [ "$OPTIMIZE_LAUNCH" = 1 ]; then
 
 	sleep 10
 	pkill -P "$pid" || true
+	umount "$TMPDIR"/.mount_* || true
 	wait "$pid" || true
 	rm -f "$tmpappimage"
 fi
