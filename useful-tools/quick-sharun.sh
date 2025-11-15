@@ -867,7 +867,7 @@ _deploy_datadir() {
 			for datadir in /usr/local/share/* /usr/share/*; do
 				if echo "${datadir##*/}" | grep -qi "$bin"; then
 					_echo "* Adding datadir $datadir..."
-					cp -r "$datadir" "$APPDIR/share"
+					cp -Lr "$datadir" "$APPDIR/share"
 					break
 				fi
 			done
@@ -933,7 +933,7 @@ _deploy_datadir() {
 					if [ -d "$src_datadir" ] \
 						&& [ ! -d  "$dst_datadir" ]; then
 						_echo "* Adding datadir $src_datadir..."
-						cp -vr "$src_datadir" "$dst_datadir"
+						cp -Lr "$src_datadir" "$dst_datadir"
 						break
 					fi
 				done
@@ -949,7 +949,7 @@ _deploy_datadir() {
 				*"$desktopname"*)
 					_echo "* Adding dbus service $f"
 					mkdir -p "$dst_dbus_dir"
-					cp -v "$f" "$dst_dbus_dir"
+					cp -L "$f" "$dst_dbus_dir"
 					;;
 			esac
 		done
