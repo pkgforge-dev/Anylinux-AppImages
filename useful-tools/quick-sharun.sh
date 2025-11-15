@@ -1415,21 +1415,31 @@ chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null 
 while read -r d; do
 	if [ -d "$d" ]; then
 		case "$d" in
-			"$LIB_DIR"/*) dst_path="$APPDIR"/lib;;
-			/usr/share/*) dst_path="$APPDIR"/share;;
-			/etc/*)       dst_path="$APPDIR"/etc;;
+			"$LIB_DIR"/*)
+				dst_path="$APPDIR"/lib/"${d##*$LIB_DIR/}"
+				;;
+			*/share/*)
+				dst_path="$APPDIR"/share/"${d##*/share/}"
+				;;
+			/etc/*)
+				dst_path="$APPDIR"/etc/"${d##*/etc/}"
+				;;
+			*/lib/*)
+				dst_path=dst_path="$APPDIR"/lib/"${d##*/lib/}"
+				;;
 			*)
 				_err_msg "Skipping deployment of $d"
-				_err_msg "We can only handle directories from:"
-				_err_msg "$LIB_DIR"
-				_err_msg "/usr/share"
-				_err_msg "/etc"
+				_err_msg "Valid directories to deploy are:"
+				_err_msg "Any dir from: $LIB_DIR"
+				_err_msg "Any dir with /lib/ in its path"
+				_err_msg "Any dir with /share/ in its path"
+				_err_msg "Any dir from /etc"
 				continue
 				;;
 		esac
-		mkdir -p "$dst_path"
-		if cp -rn "$d" "$dst_path"; then
-			_echo "* Added $d to $dst_path/${d##*/}"
+		mkdir -p "${dst_path%/*}"
+		if cp -Lrn "$d" "$dst_path"; then
+			_echo "* Added $d to $dst_path"
 		else
 			# do not stop the script if the copy fails, because
 			# since lib4bin skips directories automatically we do
