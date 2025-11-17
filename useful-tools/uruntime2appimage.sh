@@ -238,6 +238,9 @@ if [ "$URUNTIME_PRELOAD" = 1 ]; then
 	_echo "Setting runtime to always keep the mount point..."
 	_echo "------------------------------------------------------------"
 	sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=0|' "$RUNTIME"
+else
+	# workaround in the meantime https://github.com/VHSgunzo/uruntime/issues/22
+	sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=1|' "$RUNTIME"
 fi
 
 if [ -n "$UPINFO" ]; then
