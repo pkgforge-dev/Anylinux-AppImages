@@ -1438,7 +1438,7 @@ while read -r d; do
 				;;
 		esac
 		mkdir -p "${dst_path%/*}"
-		if cp -Lrn "$d" "$dst_path"; then
+		if cp -Lrn "$d"/. "$dst_path"; then
 			_echo "* Added $d to $dst_path"
 		else
 			# do not stop the script if the copy fails, because
