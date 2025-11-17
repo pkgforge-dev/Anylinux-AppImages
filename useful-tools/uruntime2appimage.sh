@@ -13,13 +13,15 @@ ARCH=${ARCH:-$(uname -m)}
 APPDIR=${APPDIR:-$PWD/AppDir}
 OUTPATH=${OUTPATH:-$PWD}
 DWARFS_COMP="${DWARFS_COMP:-zstd:level=22 -S26 -B6}"
-URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.3/uruntime-appimage-dwarfs-lite-$ARCH}
-DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$ARCH}
 TMPDIR=${TMPDIR:-/tmp}
-DWARFS_CMD="${DWARFS_CMD:-$TMPDIR/mkdwarfs}"
-RUNTIME="${RUNTIME:-$TMPDIR/uruntime}"
-DWARFSPROF="${DWARFSPROF:-$APPDIR/.dwarfsprofile}"
-OPTIMIZE_LAUNCH="${OPTIMIZE_LAUNCH:-0}"
+DWARFS_CMD=${DWARFS_CMD:-$TMPDIR/mkdwarfs}
+RUNTIME=${RUNTIME:-$TMPDIR/uruntime}
+DWARFSPROF=${DWARFSPROF:-$APPDIR/.dwarfsprofile}
+OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
+
+APPIMAGE_ARCH=$(uname -m)
+URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.3/uruntime-appimage-dwarfs-lite-$APPIMAGE_ARCH}
+DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$APPIMAGE_ARCH}
 
 # github actions doesn't set user causing some apps
 # crash when making the dwarfs image profile
@@ -168,7 +170,7 @@ sed -i \
 echo "
 X-AppImage-Name=$APPNAME
 X-AppImage-Version=${VERSION:-UNKNOWN}
-X-AppImage-Arch=$ARCH
+X-AppImage-Arch=$APPIMAGE_ARCH
 " >> "$DESKTOP_ENTRY"
 
 if [ ! -f "$DESKTOP_ENTRY" ]; then
@@ -342,7 +344,7 @@ chmod +x "$OUTPATH"/"$OUTNAME"
 echo "
 X-AppImage-Name=$APPNAME
 X-AppImage-Version=${VERSION:-UNKNOWN}
-X-AppImage-Arch=$ARCH
+X-AppImage-Arch=$APPIMAGE_ARCH
 " > "$OUTPATH"/appinfo
 
 _echo "------------------------------------------------------------"
