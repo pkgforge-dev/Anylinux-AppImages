@@ -32,6 +32,23 @@ POST_UPDATE_BAD="ERROR: Something went wrong updating $APPNAME"
 DO_NOT_ASK="Do you wish to disable update checking and not see this message again?"
 APPIMAGEUPDATETOOL_LINK="${APPIMAGEUPDATETOOL_LINK:-https://github.com/AppImageCommunity/AppImageUpdate/releases/download/continuous/appimageupdatetool-$APPIMAGE_ARCH.AppImage}"
 
+# check for other appimage managers
+# skip appimaged/appimagelauncher because they cannot integrate DWARFS appimages
+# we also do not check for gearlever because with gearlever the user
+# has to be manually giving urls to update appimages which is terrible
+# it is also not able to do delta updates at the time of writting this
+_is_another_updater_here() {
+	if [ "$DO_NOT_CHECK_FOR_OTHER_APPIMAGE_MANAGERS" != 1 ]; then
+		if command -v am       \
+		  || command -v appman \
+		  || command -v dbin   \
+		  || command -v soar; then
+			return 0
+		fi
+	fi
+	return 1
+}
+
 # make sure we can update the thing
 _sanity_check() {
 	if [ -f "$CONFIGDIR"/no_updatecheck ] \
@@ -45,6 +62,8 @@ _sanity_check() {
 		>&2 echo "or similar locations that need elevated rights to replace"
 		return 1
 	elif ! command -v notify; then
+		return 1
+	elif _is_another_updater_here; then
 		return 1
 	elif [ ! -d "$CONFIGDIR" ]; then
 		mkdir -p "$CONFIGDIR"
@@ -151,8 +170,8 @@ elif [ "$STATUS" = 1 ]; then
 		fi
 	fi
 else
-	# wait 20 seconds before asking for the first time
-	sleep 20
+	# wait 5 seconds before asking for the first time
+	sleep 5
 	if notify -dq "$WELCOME_MSG"; then
 		_enable_update_checking
 		_get_appimageupdatetool
