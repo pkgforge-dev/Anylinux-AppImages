@@ -156,7 +156,7 @@ fi
 _deploy_desktop_and_icon
 
 DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
-APPNAME=$(awk -F'=' '/^Name=/ {gsub(/ /,"_",$2); print $2; exit}' "$DESKTOP_ENTRY")
+APPNAME=${APPNAME:-$(awk -F'=' '/^Name=/{gsub(/ /,"_",$2); print $2; exit}' "$DESKTOP_ENTRY")}
 
 # add appimage info to desktop entry, first make sure to remove existing info
 sed -i \
