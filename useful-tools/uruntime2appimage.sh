@@ -13,7 +13,7 @@ ARCH=${ARCH:-$(uname -m)}
 APPDIR=${APPDIR:-$PWD/AppDir}
 OUTPATH=${OUTPATH:-$PWD}
 DWARFS_COMP="${DWARFS_COMP:-zstd:level=22 -S26 -B6}"
-URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.1/uruntime-appimage-dwarfs-lite-$ARCH}
+URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.3/uruntime-appimage-dwarfs-lite-$ARCH}
 DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$ARCH}
 TMPDIR=${TMPDIR:-/tmp}
 DWARFS_CMD="${DWARFS_CMD:-$TMPDIR/mkdwarfs}"
@@ -238,9 +238,6 @@ if [ "$URUNTIME_PRELOAD" = 1 ]; then
 	_echo "Setting runtime to always keep the mount point..."
 	_echo "------------------------------------------------------------"
 	sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=0|' "$RUNTIME"
-else
-	# workaround in the meantime https://github.com/VHSgunzo/uruntime/issues/22
-	sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=1|' "$RUNTIME"
 fi
 
 if [ -n "$UPINFO" ]; then
