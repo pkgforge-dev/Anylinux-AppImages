@@ -1396,7 +1396,10 @@ if [ -n "$ADD_HOOKS" ]; then
 	for hook do
 		if [ -f "$hook_dst"/"$hook" ]; then
 			continue
-		elif _download "$hook_dst"/"$hook" "$HOOKSRC"/"$hook"; then
+		elif [ "$ARCH" != 'x86_64' ] \
+		  && echo "$hook" | grep -q 'x86*64'; then
+			continue # do not add x86-64 hooks in other arches
+		if _download "$hook_dst"/"$hook" "$HOOKSRC"/"$hook"; then
 			_echo "* Added $hook"
 		else
 			_err_msg "ERROR: Failed to download $hook, valid link?"
