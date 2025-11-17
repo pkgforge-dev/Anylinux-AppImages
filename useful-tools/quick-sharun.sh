@@ -724,7 +724,7 @@ _deploy_libs() {
 	fi
 }
 
-_handle_helper_bins() {
+_handle_bins_scripts() {
 	# check for gstreamer binaries these need to be in the gstreamer libdir
 	# since sharun will set the following vars to that location:
 	# GST_PLUGIN_PATH
@@ -747,7 +747,21 @@ _handle_helper_bins() {
 		cp -r /usr/share/qt*/translations "$APPDIR"/lib/qt*
 	fi
 
-	# TODO add more instances of helper bins
+	# handle shell scripts
+	set -- "$APPDIR"/bin/*
+	for s do
+		if ! head -c 20 "$s" | grep -q '#!.*sh'; then
+			continue
+		fi
+		# patch away hardcoded paths from dotnet scripts
+		if grep -q 'dotnet' "$s"; then
+			sed -i -e 's|/usr|"$APPDIR"|g' "$s"
+		fi
+		# some very very old distros do not have /usr/bin/env
+		# so it is better to always use #!/bin/sh shebang instead
+		sed -i -e 's|/usr/bin/env sh|/bin/sh|' "$s"
+	done
+
 }
 
 _add_exec_wrapper() {
@@ -1167,7 +1181,7 @@ _echo "------------------------------------------------------------"
 
 _get_sharun
 _deploy_libs "$@"
-_handle_helper_bins
+_handle_bins_scripts
 
 echo ""
 _echo "------------------------------------------------------------"
