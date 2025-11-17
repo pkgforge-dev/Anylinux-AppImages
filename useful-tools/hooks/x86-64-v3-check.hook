@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# add this hook if your application was compiled for x86-64-v3
+# see https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels
+# this way the user is aware and we don't waste time debugging nonsense
+
+_err_msg(){
+	>&2 printf '\033[0;33m%s\033[0m\n' " $*"
+}
+
+if [ -r /proc/cpuinfo ]; then
+	v3cpu=0
+	while IFS= read -r line; do
+		case "$line" in
+			*fma*|*FMA*) v3cpu=1; break;;
+		esac
+	done </proc/cpuinfo
+
+	if [ "$v3cpu" != 1 ]; then
+		_err_msg ""
+		_err_msg "============================================================"
+		_err_msg ""
+		_err_msg "UNSUPPORTED CPU! You need a cpu that supports x86-64-v3!"
+		_err_msg ""
+		_err_msg "============================================================"
+		_err_msg ""
+	fi
+fi
+
