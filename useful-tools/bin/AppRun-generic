@@ -16,6 +16,7 @@ BIN="${ARGV0:-$0}"
 BIN="${BIN##*/}"
 
 export APPIMAGE_ARCH=@APPIMAGE_ARCH@
+export HOSTPATH="$PATH"
 export PATH="$CURRENTDIR/bin:$PATH"
 export CURRENTDIR APPDIR
 
