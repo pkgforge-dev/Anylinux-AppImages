@@ -48,6 +48,7 @@ if [ "$1" = '--chaotic-aur' ]; then
 	pacman -Syu --noconfirm "$@"
 	exit 0
 elif [ "$1" = '--archlinux-pkg' ]; then
+	shift
 	git clone --depth 1 https://gitlab.archlinux.org/archlinux/packaging/packages/"$1" ./"$1"
 else
 	git clone --depth 1 https://aur.archlinux.org/"$1" ./"$1"
