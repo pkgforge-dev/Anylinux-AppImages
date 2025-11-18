@@ -753,13 +753,14 @@ _handle_bins_scripts() {
 		if ! head -c 20 "$s" | grep -q '#!.*sh'; then
 			continue
 		fi
-		# patch away hardcoded paths from dotnet scripts
-		if grep -q 'dotnet' "$s"; then
-			sed -i -e 's|/usr|"$APPDIR"|g' "$s"
-		fi
 		# some very very old distros do not have /usr/bin/env
 		# so it is better to always use #!/bin/sh shebang instead
 		sed -i -e 's|/usr/bin/env sh|/bin/sh|' "$s"
+		
+		# patch away hardcoded paths from dotnet scripts
+		if grep -q 'dotnet' "$s"; then
+			sed -i -e '/^#/!s|/usr|"$APPDIR"|g' "$s"
+		fi
 	done
 
 }
