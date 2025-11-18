@@ -2,6 +2,8 @@
 
 # Simple wrapper to display GUI notifications and messages
 
+PATH="${HOSTPATH:-/usr/local/bin:/usr/bin:/bin}"
+
 _is_cmd() {
 	command -v "$1" 1>/dev/null
 }
