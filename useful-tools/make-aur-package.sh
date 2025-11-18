@@ -47,9 +47,11 @@ if [ "$1" = '--chaotic-aur' ]; then
 	_info_msg "Adding Chaotic AUR packages: $*"
 	pacman -Syu --noconfirm "$@"
 	exit 0
+elif [ "$1" = '--archlinux-pkg' ]; then
+	git clone --depth 1 https://gitlab.archlinux.org/archlinux/packaging/packages/"$1" ./"$1"
+else
+	git clone --depth 1 https://aur.archlinux.org/"$1" ./"$1"
 fi
-
-git clone --depth 1 https://aur.archlinux.org/"$1" ./"$1"
 cd ./"$1"
 
 sed -i -e "s|x86_64|$ARCH|" ./PKGBUILD
