@@ -90,6 +90,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
 [VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage)                                                          |
+[Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage)                                                  |
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
 [Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
