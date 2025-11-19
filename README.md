@@ -74,6 +74,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
+[RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
