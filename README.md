@@ -83,6 +83,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
 [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
+[sView](https://github.com/pkgforge-dev/sView-AppImage)                                                                  | 
 [Tagger](https://github.com/pkgforge-dev/Tagger-AppImage)                                                                |
 [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
 [TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage)                                                            |
