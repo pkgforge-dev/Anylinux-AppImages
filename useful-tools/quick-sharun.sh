@@ -633,7 +633,10 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Deploying gegl"
-		set -- "$@" "$LIB_DIR"/gegl-*/*
+		set -- "$@" \
+			"$LIB_DIR"/gegl-*/*       \
+			"$(command -v gegl || :)" \
+			"$(command -v gegl-imgcmp || :)"
 	fi
 	if [ "$DEPLOY_BABL" = 1 ]; then
 		_echo "* Deploying babl"
