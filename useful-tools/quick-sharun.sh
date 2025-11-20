@@ -681,8 +681,17 @@ _make_deployment_array() {
 		while read -r d; do
 			if [ -d "$d" ]; then
 				_echo " - $d"
-				for f in "$d"/* "$d"/*/* "$d"/*/*/*; do
-					[ -f "$f" ] || continue
+				for f in \
+					"$d"/*        \
+					"$d"/*/*      \
+					"$d"/*/*/*    \
+					"$d"/*/*/*/*  \
+					"$d"/*/*/*/*/*; do
+
+					if [ ! -f "$f" ]; then
+						continue
+					fi
+
 					case "$f" in
 						*.so*)
 							set -- "$@" "$f"
