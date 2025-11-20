@@ -719,7 +719,13 @@ _get_sharun() {
 	if [ ! -x "$TMPDIR"/sharun-aio ]; then
 		_echo "Downloading sharun..."
 		_download "$TMPDIR"/sharun-aio "$SHARUN_LINK"
-		chmod +x "$TMPDIR"/sharun-aio
+		if head -c 4 "$TMPDIR"/sharun-aio | grep -qa 'ELF'; then
+			chmod +x "$TMPDIR"/sharun-aio
+		else
+			_err_msg "ERROR: What was downloaded is not sharun!"
+			_err_msg "This is usually caused by network issues"
+			exit 1
+		fi
 	fi
 }
 
