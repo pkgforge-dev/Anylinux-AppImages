@@ -681,11 +681,18 @@ _make_deployment_array() {
 		while read -r d; do
 			if [ -d "$d" ]; then
 				_echo " - $d"
-				set -- "$@" "$d"/*
-				for dd in "$d"/*; do
-					if [ -d "$dd" ]; then
-						set -- "$@" "$dd"/*
-					fi
+				for f in "$d"/* "$d"/*/* "$d"/*/*/*; do
+					[ -f "$f" ] || continue
+					case "$f" in
+						*.so*)
+							set -- "$@" "$f"
+							;;
+						*)
+							if [ -x "$f" ]; then
+								set -- "$@" "$f"
+							fi
+							;;
+					esac
 				done
 			fi
 		done <<-EOF
