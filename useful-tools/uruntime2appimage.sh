@@ -20,7 +20,7 @@ DWARFSPROF=${DWARFSPROF:-$APPDIR/.dwarfsprofile}
 OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
 
 APPIMAGE_ARCH=$(uname -m)
-URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.3/uruntime-appimage-dwarfs-lite-$APPIMAGE_ARCH}
+URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.5/uruntime-appimage-dwarfs-lite-$APPIMAGE_ARCH}
 DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$APPIMAGE_ARCH}
 
 # github actions doesn't set user causing some apps
