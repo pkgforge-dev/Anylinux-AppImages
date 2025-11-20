@@ -756,7 +756,7 @@ _handle_bins_scripts() {
 		# some very very old distros do not have /usr/bin/env
 		# so it is better to always use #!/bin/sh shebang instead
 		sed -i -e 's|/usr/bin/env sh|/bin/sh|' "$s"
-		
+
 		# patch away hardcoded paths from dotnet scripts
 		if grep -q 'dotnet' "$s"; then
 			sed -i -e '/^#/!s|/usr|"$APPDIR"|g' "$s"
@@ -1471,11 +1471,21 @@ done <<-EOF
 $ADD_DIR
 EOF
 
+# wrap any executable in lib with sharun
+for b in $(find "$APPDIR"/lib/ -type f ! -name '*.so*'); do
+	if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
+		ln -f "$APPDIR"/sharun "$b"
+		_echo "* Wrapped lib executable '$b' with sharun"
+	fi
+done
+
 # temp fix for:
 # https://github.com/pkgforge-dev/ghostty-appimage/issues/93
 # https://github.com/VHSgunzo/sharun/issues/66
 if [ -d "$APPDIR"/share/glvnd/egl_vendor.d ]; then
-	ln -sf /usr/share/glvnd/egl_vendor.d/10_nvidia.json "$APPDIR"/share/glvnd/egl_vendor.d/10_nvidia.json
+	ln -sf \
+		/usr/share/glvnd/egl_vendor.d/10_nvidia.json \
+		"$APPDIR"/share/glvnd/egl_vendor.d/10_nvidia.json
 fi
 
 # make sure the .env has all the "unset" last, due to a bug in the dotenv
