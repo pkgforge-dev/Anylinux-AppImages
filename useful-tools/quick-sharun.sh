@@ -673,6 +673,23 @@ _make_deployment_array() {
 		cp -r "$DOTNET_DIR"/shared "$APPDIR"/bin
 		cp -r "$DOTNET_DIR"/host   "$APPDIR"/bin
 	fi
+	# also pass all the files in the directories to add to lib4bin
+	# so we deploy any possible library and binary in the directories
+	# later on the binaries in lib will be wrapped with sharun
+	if [ -n "$ADD_DIR" ]; then
+		while read -r d; do
+			if [ -d "$d" ]; then
+				set -- "$@" "$d"/*
+				for dd in "$d"/*; do
+					if [ -d "$dd" ]; then
+						set -- "$@" "$dd"/*
+					fi
+				done
+			fi
+		done <<-EOF
+		$ADD_DIR
+		EOF
+	fi
 
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
 }
