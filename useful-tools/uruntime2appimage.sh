@@ -180,8 +180,8 @@ if [ ! -f "$DESKTOP_ENTRY" ]; then
 elif [ ! -f "$APPDIR"/.DirIcon ] && ! _try_to_find_icon; then
 	>&2 echo "ERROR: No top level .DirIcon file found in $APPDIR"
 	exit 1
-elif [ ! -w "$OUTPATH" ]; then
-	>&2 echo "ERROR: No write access to $OUTPATH"
+elif ! mkdir -p "$OUTPATH"; then
+	>&2 echo "ERROR: Cannot create output directory: '$OUTPATH'"
 	exit 1
 elif [ ! -x "$APPDIR"/AppRun ]; then
 	>&2 echo "WARNING: Fixing exec perms of $APPDIR/AppRun"
@@ -272,8 +272,6 @@ fi
 _echo "------------------------------------------------------------"
 _echo "Making AppImage..."
 _echo "------------------------------------------------------------"
-
-mkdir -p "$OUTPATH"
 
 set -- \
 	--force               \
