@@ -160,6 +160,14 @@ _deploy_desktop_and_icon
 DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
 APPNAME=${APPNAME:-$(awk -F'=' '/^Name=/{gsub(/ /,"_",$2); print $2; exit}' "$DESKTOP_ENTRY")}
 
+# sanitize VERSION and APPNAME
+if [ -n "$VERSION" ]; then
+	VERSION=$(printf '%s' "$VERSION" | tr '":><*|\?\r\n' '_')
+fi
+if [ -n "$APPNAME" ]; then
+	APPNAME=$(printf '%s' "$APPNAME" | tr '":><*|\?\r\n' '_')
+fi
+
 # add appimage info to desktop entry, first make sure to remove existing info
 sed -i \
 	-e '/X-AppImage-Name/d'    \
