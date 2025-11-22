@@ -1090,32 +1090,12 @@ _deploy_icon_and_desktop() {
 		_download "$APPDIR"/"${ICON##*/}" "$ICON"
 	fi
 
-	# copy the entire hicolor icons dir and remove unneeded icons
+	# copy the entire hicolor icons dir
+	# by default the hicolor icon theme ships no icons, this
+	# means any present icon is likely needed by the application
 	if [ -d /usr/share/icons/hicolor ]; then
 		mkdir -p "$APPDIR"/share/icons
 		cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
-
-		set --
-		for f in "$APPDIR"/shared/bin/*; do
-			f=${f##*/}
-			set -- ! -name "*$f*" "$@"
-		done
-
-		# also include names of top level .desktop and icon
-		if [ -n "$DESKTOP" ]; then
-			DESKTOP_NAME=${DESKTOP##*/}
-			DESKTOP_NAME=${DESKTOP_NAME%.desktop}
-			set -- ! -name "*$DESKTOP_NAME*" "$@"
-		fi
-
-		if [ -n "$ICON" ]; then
-			ICON_NAME=${ICON##*/}
-			ICON_NAME=${ICON_NAME%.png}
-			ICON_NAME=${ICON_NAME%.svg}
-			set -- ! -name "*$ICON_NAME*" "$@"
-		fi
-
-		find "$APPDIR"/share/icons/hicolor "$@" -type f -delete
 		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
 }
