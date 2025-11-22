@@ -77,7 +77,8 @@ export DST_DIR="$APPDIR"
 export GEN_LIB_PATH=1
 export HARD_LINKS=1
 export WITH_HOOKS=1
-export STRACE_MODE="${STRACE_MODE:-1}"
+export STRACE_MODE=${STRACE_MODE:-1}
+export WRAPPE_CLVL=${WRAPPE_CLVL:-15}
 export VERBOSE=1
 
 if [ -z "$NO_STRIP" ]; then
@@ -257,22 +258,6 @@ _make_appimage() {
 	chmod +x "$TMPDIR"/uruntime2appimage.sh
 	exec "$TMPDIR"/uruntime2appimage.sh
 }
-
-case "$1" in
-	--help)
-		_help_msg
-		;;
-	--make-appimage)
-		_make_appimage
-		;;
-	'')
-		if [ -z "$PYTHON_PACKAGES" ]; then
-			_help_msg
-		fi
-		;;
-esac
-
-_sanity_check
 
 # POSIX shell doesn't support arrays we use awk to save it into a variable
 # then with 'eval set -- $var' we add it to the positional array
@@ -1192,6 +1177,64 @@ _patch_away_usr_share_dir() {
 	_echo "* patched away /usr/share from $1"
 	ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}path-mapping-hardcoded.hook"
 }
+
+_make_static_bin() (
+	while :; do case "$1" in
+		--dst-dir)
+			export DST_DIR="$2"
+			shift
+			;;
+		-*)
+			_err_msg "ERROR: Unknown option: '$1'"
+			exit 1
+			;;
+		'')
+			break
+			;;
+		*)
+			BIN_TO_DEPLOY="${BIN_TO_DEPLOY:+$BIN_TO_DEPLOY:}$1"
+			shift
+			;;
+		esac
+	done
+	_IFS=$IFS
+	IFS=:
+	set -- $BIN_TO_DEPLOY
+	IFS=$_IFS
+	_echo "------------------------------------------------------------"
+	mkdir -p "$DST_DIR"
+	for b do
+		_echo "Packing $b as a static binary..."
+		$XVFB_CMD "$TMPDIR"/sharun-aio l \
+			--with-wrappe            \
+			--wrappe-exec "${b##*/}" \
+			"$b" || :
+	done
+	_echo "------------------------------------------------------------"
+)
+
+
+case "$1" in
+	--help)
+		_help_msg
+		;;
+	--make-appimage)
+		_make_appimage
+		;;
+	--make-static-bin)
+		shift
+		_get_sharun
+		_make_static_bin "$@"
+		exit 0
+		;;
+	'')
+		if [ -z "$PYTHON_PACKAGES" ]; then
+			_help_msg
+		fi
+		;;
+esac
+
+_sanity_check
 
 _echo "------------------------------------------------------------"
 _echo "Starting deployment, checking if extra libraries need to be added..."
