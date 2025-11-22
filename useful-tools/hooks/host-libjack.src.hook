@@ -43,15 +43,15 @@ _find_host_libjack() (
 )
 
 if [ "$USE_HOST_LIBJACK" = 1 ]; then
-	>&2 echo "Using host 'libjack.so', stability is not guaranteed!"
+	>&2 echo "host-libjack: Using host 'libjack.so', stability is not guaranteed!"
 	HOST_LIBJACK_DIR=${HOST_LIBJACK_DIR:-${TMPDIR:-/tmp}/.hostlibjack}
 
 	if _find_host_libjack; then
 		export SHARUN_EXTRA_LIBRARY_PATH="${HOST_LIBJACK_DIR}${SHARUN_EXTRA_LIBRARY_PATH:+:$SHARUN_EXTRA_LIBRARY_PATH}"
 	else
 		>&2 echo ""
-		>&2 echo "ERROR: libjack.so not found on this system or it is"
-		>&2 echo "pipewire-jack, which is not useful here. Aborting..."
+		>&2 echo "host-libjack: ERROR: libjack.so not found on this system"
+		>&2 echo "or it is pipewire-jack, which is not useful here. Aborting..."
 		>&2 echo ""
 	fi
 fi
