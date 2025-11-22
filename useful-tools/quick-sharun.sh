@@ -1179,9 +1179,10 @@ _patch_away_usr_share_dir() {
 }
 
 _make_static_bin() (
+	DST_DIR="$APPDIR"/bin
 	while :; do case "$1" in
 		--dst-dir)
-			export DST_DIR="$2"
+			DST_DIR="$2"
 			shift
 			;;
 		-*)
@@ -1203,6 +1204,7 @@ _make_static_bin() (
 	IFS=$_IFS
 	_echo "------------------------------------------------------------"
 	mkdir -p "$DST_DIR"
+	export DST_DIR
 	for b do
 		_echo "Packing $b as a static binary..."
 		$XVFB_CMD "$TMPDIR"/sharun-aio l \
