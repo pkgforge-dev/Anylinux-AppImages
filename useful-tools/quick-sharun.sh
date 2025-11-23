@@ -51,12 +51,14 @@ DEPENDENCIES="
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
-if [ -f "$APPENV" ]; then
+PATH_MAPPING_SCRIPT="$APPDIR"/bin/path-mapping-hardcoded.src.hook
+
+if [ -f "$PATH_MAPPING_SCRIPT" ]; then
 	while IFS= read -r line; do
 		case "$line" in
 			_tmp_*) eval "$line";;
 		esac
-	done < "$APPENV"
+	done < "$PATH_MAPPING_SCRIPT"
 fi
 
 regex='A-Za-z0-9_=-'
@@ -1137,40 +1139,39 @@ _add_bwrap_wrapper() {
 }
 
 _add_path_mapping_hardcoded() {
-	f="$APPDIR"/bin/path-mapping-hardcoded.hook
-	if [ ! -x "$f" ]; then
-		mkdir -p "${f%/*}"
-		cat <<-'EOF' > "$f"
-		#!/bin/sh
-
-		# this script makes symnlinks to hardcoded random dirs that
-		# were patched away by quick-sharun when hardcoded paths are
-		# detected or when 'PATH_MAPPING_HARDCODED' is used
-
-		# make sure the _tmp_* vars come directly from the APPDIR .env file
-		unset _tmp_bin _tmp_lib _tmp_share
-
-		if ! command -v ln 1>/dev/null; then
-		    >&2 echo "path-mapping-hardcoded: ERROR we cannot make symlinks"
-		    >&2 echo "because command 'ln' is missing from the system! Aborting..."
-		    exit 1
-		fi
-
-		if [ -f "$APPDIR"/.env ]; then
-		    . "$APPDIR"/.env
-		    if [ -n "$_tmp_bin" ]; then
-		        ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin"
-		    fi
-		    if [ -n "$_tmp_lib" ]; then
-		        ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib"
-		    fi
-		    if [ -n "$_tmp_share" ]; then
-		        ln -sfn "$APPDIR"/share /tmp/"$_tmp_share"
-		    fi
-		fi
-		EOF
-		chmod +x "$f"
+	if [ -x "$PATH_MAPPING_SCRIPT" ]; then
+		return 0
 	fi
+	mkdir -p "${PATH_MAPPING_SCRIPT%/*}"
+	cat <<-'EOF' > "$PATH_MAPPING_SCRIPT"
+	#!/bin/sh
+
+	# this script makes symnlinks to hardcoded random dirs that
+	# were patched away by quick-sharun when hardcoded paths are
+	# detected or when 'PATH_MAPPING_HARDCODED' is used
+
+	_tmp_bin=""
+	_tmp_lib=""
+	_tmp_share=""
+
+	if ! command -v ln 1>/dev/null; then
+	    >&2 echo "path-mapping-hardcoded: ERROR we cannot make symlinks"
+	    >&2 echo "because command 'ln' is missing from the system! Aborting..."
+	    exit 1
+	fi
+
+	if [ -n "$_tmp_bin" ]; then
+	    ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin"
+	fi
+	if [ -n "$_tmp_lib" ]; then
+	    ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib"
+	fi
+	if [ -n "$_tmp_share" ]; then
+	    ln -sfn "$APPDIR"/share /tmp/"$_tmp_share"
+	fi
+	EOF
+	chmod +x "$f"
+	_echo "* Added $PATH_MAPPING_SCRIPT"
 }
 
 _patch_away_usr_bin_dir() {
@@ -1179,12 +1180,11 @@ _patch_away_usr_bin_dir() {
 	fi
 
 	sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
-	if ! grep -q "_tmp_bin='$_tmp_bin'" "$APPENV" 2>/dev/null; then
-		echo "_tmp_bin='$_tmp_bin'" >> "$APPENV"
-	fi
 
 	_echo "* patched away /usr/bin from $1"
 	_add_path_mapping_hardcoded
+
+	sed -i -e "s|_tmp_bin=.*|_tmp_bin=$_tmp_bin|g" "$PATH_MAPPING_SCRIPT"
 }
 
 _patch_away_usr_lib_dir() {
@@ -1193,12 +1193,11 @@ _patch_away_usr_lib_dir() {
 	fi
 
 	sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
-	if ! grep -q "_tmp_lib='$_tmp_lib'" "$APPENV" 2>/dev/null; then
-		echo "_tmp_lib='$_tmp_lib'" >> "$APPENV"
-	fi
 
 	_echo "* patched away /usr/lib from $1"
 	_add_path_mapping_hardcoded
+
+	sed -i -e "s|_tmp_lib=.*|_tmp_lib=$_tmp_lib|g" "$PATH_MAPPING_SCRIPT"
 }
 
 _patch_away_usr_share_dir() {
@@ -1207,12 +1206,11 @@ _patch_away_usr_share_dir() {
 	fi
 
 	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
-	if ! grep -q "_tmp_share='$_tmp_share'" "$APPENV" 2>/dev/null; then
-		echo "_tmp_share='$_tmp_share'" >> "$APPENV"
-	fi
 
 	_echo "* patched away /usr/share from $1"
 	_add_path_mapping_hardcoded
+
+	sed -i -e "s|_tmp_share=.*|_tmp_share=$_tmp_share|g" "$PATH_MAPPING_SCRIPT"
 }
 
 _make_static_bin() (
