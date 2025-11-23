@@ -21,10 +21,8 @@ SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/do
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
-EXEC_WRAPPER=${EXEC_WRAPPER:-0}
-EXEC_WRAPPER_SOURCE=${EXEC_WRAPPER_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/exec.c}
-LOCALE_FIX=${LOCALE_FIX:-0}
-LOCALE_FIX_SOURCE=${LOCALE_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/localefix.c}
+ANYLINUX_LIB=${ANYLINUX_LIB:-0}
+ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
 NOTIFY_SOURCE=${NOTIFY_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/notify}
 APPRUN_SOURCE=${APPRUN_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/AppRun-generic}
 URUNTIME2APPIMAGE_SOURCE=${URUNTIME2APPIMAGE_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh}
@@ -48,6 +46,11 @@ DEPENDENCIES="
 	strings
 	tr
 "
+
+# keep this for backwards compat until all existing scripts have been updated
+if [ "$EXEC_WRAPPER" = 1 ] || [ "$LOCALE_FIX" = 1 ]; then
+	ANYLINUX_LIB=1
+fi
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
@@ -165,10 +168,8 @@ _help_msg() {
 	  LIB_DIR          Set source library directory if autodetection fails.
 	  NO_STRIP         Disable stripping binaries and libraries if set.
 	  APPDIR           Destination AppDir (default: ./AppDir).
-	  EXEC_WRAPPER     Preloads a library that unsets environment variables known to cause
-	                   problems to child processes. Not needed if the app will just use
-	                   xdg-open to spawn child proceeses since in that case sharun has
-	                   a wrapper for xdg-open that handles that.
+	  ANYLINUX_LIB     Preloads a library that unsets environment variables known to cause
+	                   problems to child processes. Set to 0 to disable.
 
 	  PATH_MAPPING    Configures and preloads pathmap.
 	                  Set this variable if the application is hardcoded to look
@@ -202,11 +203,8 @@ _sanity_check() {
 		fi
 	done
 
-	if [ "$EXEC_WRAPPER" = 1 ] && ! command -v cc 1>/dev/null; then
-		_err_msg "ERROR: Using EXEC_WRAPPER requires cc"
-		exit 1
-	elif [ "$LOCALE_FIX" = 1 ] && ! command -v cc 1>/dev/null; then
-		_err_msg "ERROR: Using LOCALE_FIX requires cc"
+	if [ "$ANYLINUX_LIB" = 1 ] && ! command -v cc 1>/dev/null; then
+		_err_msg "ERROR: Using ANYLINUX_LIB requires cc"
 		exit 1
 	elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		_err_msg "ERROR: DEPLOY_PYTHON and DEPLOY_SYS_PYTHON cannot be both enabled!"
@@ -796,17 +794,18 @@ _handle_bins_scripts() {
 
 }
 
-_add_exec_wrapper() {
-	if [ "$EXEC_WRAPPER" != 1 ]; then
+_add_anylinux_lib() {
+	if [ "$ANYLINUX_LIB" != 1 ]; then
 		return 0
 	fi
 
-	_echo "* Building exec.so..."
-	_download "$TMPDIR"/exec.c "$EXEC_WRAPPER_SOURCE"
-	cc -shared -fPIC "$TMPDIR"/exec.c -o "$APPDIR"/lib/exec.so
-	echo "exec.so" >> "$APPDIR"/.preload
+	_echo "* Building anylinux.so..."
+	_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
+	cc -shared -fPIC "$APPDIR"/.anylinux.c -o "$APPDIR"/lib/anylinux.so
+	echo "anylinux.so" >> "$APPDIR"/.preload
 
-	# remove xdg-open wrapper not needed when exec.so is in use
+	# remove xdg-open wrapper not needed when the lib is in use
+	# we still need to have a wrapper for gio-launch-desktop though
 	if [ -f "$APPDIR"/bin/gio-launch-desktop ]; then
 		rm -f "$APPDIR"/bin/gio-launch-desktop
 		cat <<-'EOF' > "$APPDIR"/bin/gio-launch-desktop
@@ -817,17 +816,7 @@ _add_exec_wrapper() {
 		chmod +x "$APPDIR"/bin/gio-launch-desktop
 	fi
 	rm -f "$APPDIR"/bin/xdg-open
-	_echo "* EXEC_WRAPPER successfully added!"
-}
-
-_add_locale_fix() {
-	if [ "$LOCALE_FIX"  = 1 ] && [ ! -f "$APPDIR"/lib/localefix.so ]; then
-		_echo "* Building localefix.so..."
-		_download "$TMPDIR"/localefix.c "$LOCALE_FIX_SOURCE"
-		cc -shared -fPIC "$TMPDIR"/localefix.c -o "$APPDIR"/lib/localefix.so
-		echo "localefix.so" >> "$APPDIR"/.preload
-		_echo "* LOCALE_FIX successfully added!"
-	fi
+	_echo "* anylinux.so successfully added!"
 }
 
 _map_paths_ld_preload_open() {
@@ -1295,8 +1284,7 @@ echo ""
 _deploy_icon_and_desktop
 _map_paths_ld_preload_open
 _map_paths_binary_patch
-_add_exec_wrapper
-_add_locale_fix
+_add_anylinux_lib
 _deploy_datadir
 _deploy_locale
 _check_window_class

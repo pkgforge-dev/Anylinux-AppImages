@@ -8,6 +8,13 @@
  * mode is used, where for example the HOME var from the portable .home dir would
  * be inherited by other processes launched by the appimage in portable mode
  * causing them to start using the fake .home dir instead of the real home
+ *
+ * It also sets LC_ALL=C if it detects the application will fail to switch locale
+ * While we normally bundle locales with quick-sharun and apps have working
+ * language interface, we do not bundle the libc locale because glibc
+ * has issues when LOCPATH is used This means some applications like dolphin-emu
+ * crash when glibc cannot switch locale even though the application itself can
+ * This library checks that and forces the C locale instead to prevent crashes
 */
 
 #ifndef _GNU_SOURCE
@@ -22,20 +29,36 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <locale.h>
 
 typedef int (*execve_func_t)(const char *filename, char *const argv[], char *const envp[]);
+
+#define LOG(fmt, ...) fprintf(stderr, " [anylinux.so] LOCALEFIX >> " fmt "\n", ##__VA_ARGS__)
+
+__attribute__((constructor))
+static void locale_fix_init(void) {
+	if (!setlocale(LC_ALL, "")) {
+		LOG("Failed to set locale, falling back to C locale.");
+		if (!setlocale(LC_ALL, "C")) {
+			LOG("Failed to setlocale(LC_ALL, \"C\"): %s", strerror(errno));
+		}
+		if (setenv("LC_ALL", "C", 1) != 0) {
+			LOG("Failed to setenv(LC_ALL, \"C\"): %s", strerror(errno));
+		}
+	}
+}
 
 #define VISIBLE __attribute__ ((visibility ("default")))
 
 // print to stderr when APPIMAGE_EXEC_DEBUG=1
 static int appimage_exec_debug_enabled(void) {
-	const char *v = getenv("APPIMAGE_EXEC_DEBUG");
+	const char *v = getenv("ANYLINUX_LIB_DEBUG");
 	return v && strcmp(v, "1") == 0;
 }
 
 #define DEBUG_PRINT(...) do \
 	if (appimage_exec_debug_enabled()) \
-		fprintf(stderr, "APPIMAGE_EXEC>> " __VA_ARGS__); \
+		fprintf(stderr, " [anylinux.so] >> " __VA_ARGS__); \
 	while (0)
 
 // problematic vars to check
@@ -185,8 +208,19 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 			DEBUG_PRINT("Error creating cleaned environment; using original env\n");
 			env = envp;
 		}
-	} else
-		DEBUG_PRINT("Internal process; leaving environment unchanged\n");
+	} else {
+		const char *basename = strrchr(filename, '/');
+		basename = basename ? basename + 1 : filename;
+		if (strcmp(basename, "xdg-open") == 0 || strcmp(basename, "gio-launch-desktop") == 0) {
+			DEBUG_PRINT("Internal process detected (%s); cleaning environment anyway since this is needed\n", basename);
+			env = create_cleaned_env(envp);
+			if (!env) {
+				DEBUG_PRINT("Error creating cleaned environment; using original env\n");
+				env = envp;
+			}
+		} else
+			DEBUG_PRINT("Internal process; leaving environment unchanged\n");
+	}
 
 	DEBUG_PRINT("Calling exec for %s\n", filename);
 	int ret = function(filename, argv, env);
