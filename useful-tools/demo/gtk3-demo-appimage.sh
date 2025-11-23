@@ -8,9 +8,9 @@ ARCH="$(uname -m)"
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 EXTRA_PACKAGES="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 
-export ICON=DUMMY
 export ANYLINUX_LIB=1
-export DESKTOP=DUMMY
+export ICON=/usr/share/icons/hicolor/256x256/apps/gtk3-demo.png
+export DESKTOP=/usr/share/applications/gtk3-demo.desktop
 export OUTPATH=./dist
 export OUTNAME=gtk3-demo-"$ARCH".AppImage
 
@@ -42,7 +42,7 @@ echo "Bundling AppImage..."
 echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
-./quick-sharun /usr/bin/gtk3-demo
+./quick-sharun /usr/bin/gtk3-demo*
 
 ./quick-sharun --make-appimage
 

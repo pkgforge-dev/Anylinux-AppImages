@@ -10,8 +10,8 @@ EXTRA_PACKAGES="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImage
 
 export DEPLOY_OPENGL=1
 export ANYLINUX_LIB=1
-export ICON=DUMMY
-export DESKTOP=DUMMY
+export ICON=/usr/share/icons/hicolor/scalable/apps/org.gtk.Demo4.svg
+export DESKTOP=/usr/share/applications/org.gtk.Demo4.desktop
 export OUTPATH=./dist
 export OUTNAME=gtk4-demo-"$ARCH".AppImage
 
@@ -43,7 +43,7 @@ echo "Bundling AppImage..."
 echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
-./quick-sharun /usr/bin/gtk4-demo
+./quick-sharun /usr/bin/gtk4-demo*
 
 ./quick-sharun --make-appimage
 
