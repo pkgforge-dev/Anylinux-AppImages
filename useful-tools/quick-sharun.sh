@@ -1151,22 +1151,22 @@ _add_path_mapping_hardcoded() {
 		unset _tmp_bin _tmp_lib _tmp_share
 
 		if ! command -v ln 1>/dev/null; then
-			>&2 echo "path-mapping-hardcoded: ERROR we cannot make symlinks"
-			>&2 echo "because command 'ln' is missing from the system! Aborting..."
-			exit 1
+		    >&2 echo "path-mapping-hardcoded: ERROR we cannot make symlinks"
+		    >&2 echo "because command 'ln' is missing from the system! Aborting..."
+		    exit 1
 		fi
 
 		if [ -f "$APPDIR"/.env ]; then
-			. "$APPDIR"/.env
-			if [ -n "$_tmp_bin" ]; then
-				ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin"
-			fi
-			if [ -n "$_tmp_lib" ]; then
-				ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib"
-			fi
-			if [ -n "$_tmp_share" ]; then
-				ln -sfn "$APPDIR"/share /tmp/"$_tmp_share"
-			fi
+		    . "$APPDIR"/.env
+		    if [ -n "$_tmp_bin" ]; then
+		        ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin"
+		    fi
+		    if [ -n "$_tmp_lib" ]; then
+		        ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib"
+		    fi
+		    if [ -n "$_tmp_share" ]; then
+		        ln -sfn "$APPDIR"/share /tmp/"$_tmp_share"
+		    fi
 		fi
 		EOF
 		chmod +x "$f"
