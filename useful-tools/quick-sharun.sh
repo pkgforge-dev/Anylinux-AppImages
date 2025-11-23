@@ -801,7 +801,7 @@ _add_anylinux_lib() {
 
 	_echo "* Building anylinux.so..."
 	_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
-	cc -shared -fPIC "$APPDIR"/.anylinux.c -o "$APPDIR"/lib/anylinux.so
+	cc -shared -fPIC "$APPDIR"/.anylinux.c -o "$APPDIR"/shared/lib/anylinux.so
 	echo "anylinux.so" >> "$APPDIR"/.preload
 
 	# remove xdg-open wrapper not needed when the lib is in use
