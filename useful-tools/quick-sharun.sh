@@ -823,7 +823,7 @@ _map_paths_ld_preload_open() {
 	# format new line entries in PATH_MAPPING into comma separated
 	# entries for sharun, pathmap accepts new lines in the variable
 	# but the .env library used by sharun does not
-	if [ -n "$PATH_MAPPING" ] && [ ! -f "$APPDIR"/lib/path-mapping.so ]; then
+	if [ -n "$PATH_MAPPING" ] && [ ! -f "$APPDIR"/shared/lib/path-mapping.so ]; then
 		PATH_MAPPING=$(echo "$PATH_MAPPING"   \
 			| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//; s/^,*//'
 		)
@@ -844,7 +844,7 @@ _map_paths_ld_preload_open() {
 			make all
 		)
 
-		mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/lib
+		mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/shared/lib
 		echo "path-mapping.so" >> "$APPDIR"/.preload
 		echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPENV"
 		_echo "* PATH_MAPPING successfully added!"
@@ -1296,10 +1296,10 @@ _echo "------------------------------------------------------------"
 echo ""
 
 set -- \
-	"$APPDIR"/lib/*.so*       \
-	"$APPDIR"/lib/*/*.so*     \
-	"$APPDIR"/lib/*/*/*.so*   \
-	"$APPDIR"/lib/*/*/*/*.so*
+	"$APPDIR"/shared/lib/*.so*       \
+	"$APPDIR"/shared/lib/*/*.so*     \
+	"$APPDIR"/shared/lib/*/*/*.so*   \
+	"$APPDIR"/shared/lib/*/*/*/*.so*
 
 for lib do case "$lib" in
 	*libgegl*)
@@ -1390,7 +1390,7 @@ for lib do case "$lib" in
 done
 
 # check for hardcoded path to any other possibly bundled library dir
-topleveldirs=$(find "$APPDIR"/lib/ -maxdepth 1  -type d | sed 's|/.*/||')
+topleveldirs=$(find "$APPDIR"/shared/lib/ -maxdepth 1  -type d | sed 's|/.*/||')
 for dir in $topleveldirs; do
 	# skip directories we already handle here on in sharun
 	case "$dir" in
@@ -1413,7 +1413,7 @@ for dir in $topleveldirs; do
 			;;
 	esac
 
-	for f in "$APPDIR"/lib/*.so* "$APPDIR"/shared/bin/*; do
+	for f in "$APPDIR"/shared/lib/*.so* "$APPDIR"/shared/bin/*; do
 		if [ ! -f "$f" ]; then
 			continue
 		elif grep -aoq -m 1 "$LIB_DIR"/"$dir" "$f"; then
@@ -1564,7 +1564,7 @@ $ADD_DIR
 EOF
 
 # wrap any executable in lib with sharun
-for b in $(find "$APPDIR"/lib/ -type f ! -name '*.so*'); do
+for b in $(find "$APPDIR"/shared/lib/ -type f ! -name '*.so*'); do
 	if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
 		ln -f "$APPDIR"/sharun "$b"
 		_echo "* Wrapped lib executable '$b' with sharun"
@@ -1614,7 +1614,7 @@ ffmpeg and in that case this is not an issue.
 ------------------------------------------------------------
 ------------------------------------------------------------
 "
-set -- "$APPDIR"/lib/libjack.so*
+set -- "$APPDIR"/shared/lib/libjack.so*
 if [ -f "$1" ]; then
 	if ! ldd "$1" | grep -q 'libpipewire'; then
 		_err_msg "$libjackwarning"
