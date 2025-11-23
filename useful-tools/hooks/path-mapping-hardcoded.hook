@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# NOTICE: This script is no longer being downloaded
+# instead quick-sharun makes it on the spot to avoid downloading it
+# this script here will likely be deleted in the future
+
 # this script makes symnlinks to the hardcoded random dirs that were
 # patched away when 'PATH_MAPPING_HARDCODED' is used with quick-sharun
 
