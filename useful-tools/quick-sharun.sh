@@ -1171,7 +1171,7 @@ _patch_away_usr_bin_dir() {
 	sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
 
 	_echo "* patched away /usr/bin from $1"
-	_add_path_mapping_hardcoded
+	_add_path_mapping_hardcoded || exit 1
 
 	sed -i -e "s|_tmp_bin=.*|_tmp_bin=$_tmp_bin|g" "$PATH_MAPPING_SCRIPT"
 }
@@ -1184,7 +1184,7 @@ _patch_away_usr_lib_dir() {
 	sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
 
 	_echo "* patched away /usr/lib from $1"
-	_add_path_mapping_hardcoded
+	_add_path_mapping_hardcoded || exit 1
 
 	sed -i -e "s|_tmp_lib=.*|_tmp_lib=$_tmp_lib|g" "$PATH_MAPPING_SCRIPT"
 }
@@ -1197,7 +1197,7 @@ _patch_away_usr_share_dir() {
 	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
 
 	_echo "* patched away /usr/share from $1"
-	_add_path_mapping_hardcoded
+	_add_path_mapping_hardcoded || exit 1
 
 	sed -i -e "s|_tmp_share=.*|_tmp_share=$_tmp_share|g" "$PATH_MAPPING_SCRIPT"
 }
