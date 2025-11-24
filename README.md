@@ -43,6 +43,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
 [Elastic](https://github.com/pkgforge-dev/Elastic-AppImage)                                                              |
 [Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage)                                                        |
+[Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
