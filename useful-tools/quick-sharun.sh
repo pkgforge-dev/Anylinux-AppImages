@@ -1159,7 +1159,7 @@ _add_path_mapping_hardcoded() {
 	    ln -sfn "$APPDIR"/share /tmp/"$_tmp_share"
 	fi
 	EOF
-	chmod +x "$f"
+	chmod +x "$PATH_MAPPING_SCRIPT"
 	_echo "* Added $PATH_MAPPING_SCRIPT"
 }
 
