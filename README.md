@@ -41,12 +41,13 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage)                                                              |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
-[Elastic](https://github.com/pkgforge-dev/Elastic-AppImage) 
-[Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage)
+[Elastic](https://github.com/pkgforge-dev/Elastic-AppImage)                                                              |
+[Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage)                                          |
 [Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage)                                                        |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
+[Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
 [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)                                        |
 [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage)                                            |
