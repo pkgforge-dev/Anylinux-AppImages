@@ -1141,9 +1141,19 @@ _add_cc_wrapper() {
 	# python apps may need to run cc at runtime and use some bundled
 	# libraries to compile stuff, so we need to use LD_LIBRARY_PATH
 	# to expose our bundled libraries to the compiler
+	
 	l=/lib64:/usr/lib64:/lib:/usr/lib
 	LD_LIBRARY_PATH="$l:${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$APPDIR/lib"
 	export LD_LIBRARY_PATH
+
+	_PATH=""
+	_IFS="$IFS"
+	IFS=:; for p in $PATH; do
+		[ "$p" != "$APPDIR"/bin ] && _PATH="${_PATH:+$_PATH:}$p"
+	done
+	PATH="$_PATH"
+	IFS="$_IFS"
+	export PATH
 
 	if ! command -v cc 1>/dev/null; then
 		>&2 echo "================================================="
@@ -1151,14 +1161,6 @@ _add_cc_wrapper() {
 		>&2 echo "================================================="
 		exit 1
 	else
-		_PATH=""
-		_IFS="$IFS"
-		IFS=:; for p in $PATH; do
-			[ "$p" != "$APPDIR"/bin ] && _PATH="${_PATH:+$_PATH:}$p"
-		done
-		PATH="$_PATH"
-		IFS="$_IFS"
-		export PATH
 		exec cc "$@"
 	fi
 	EOF
