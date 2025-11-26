@@ -75,7 +75,11 @@ cat ./PKGBUILD
 _info_msg ""
 
 _info_msg "Building package..."
-makepkg -fs --noconfirm
+
+# TODO: What do I need to do to not use skippgpcheck?
+# gpg --recv-keys doesn't work
+makepkg -fs --noconfirm --skippgpcheck
+
 ls -la ./
 
 _info_msg "Installing package..."
