@@ -914,6 +914,7 @@ _deploy_datadir() {
 		if [ -f "$1" ]; then
 
 			bin=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$1")
+			bin=${bin##*/}
 			possible_dirs=$(
 				strings "$APPDIR"/shared/bin/"$bin" \
 				  | grep -v '[;:,.(){}?<>*]' \
