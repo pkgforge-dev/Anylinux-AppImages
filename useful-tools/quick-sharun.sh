@@ -1479,7 +1479,7 @@ done
 # these need to be done later because sharun may make shared/lib a symlink to lib
 # and if we make shared/lib first then it breaks sharun
 if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-	_add_cc_wrapper
+	#_add_cc_wrapper
 	set -- "$LIB_DIR"/python*
 	if [ -d "$1" ]; then
 		cp -r "$1" "$APPDIR"/shared/lib
