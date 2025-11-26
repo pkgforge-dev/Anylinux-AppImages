@@ -320,12 +320,10 @@ _determine_what_to_deploy() {
 				*libgtk-3*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-3.0
-					echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
 					;;
 				*libgtk-4*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-4.0
-					echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
 					;;
 				*libgdk_pixbuf*.so*)
 					DEPLOY_GDK=${DEPLOY_GDK:-1}
@@ -472,6 +470,7 @@ _make_deployment_array() {
 			"$LIB_DIR"/gvfs/libgvfscommon.so      \
 			"$LIB_DIR"/gio/modules/libgvfsdbus.so \
 			"$LIB_DIR"/gio/modules/libdconfsettings.so
+		echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
 	fi
 	if [ "$DEPLOY_GDK" = 1 ]; then
 		_echo "* Deploying gdk-pixbuf"
