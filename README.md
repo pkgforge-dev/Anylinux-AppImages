@@ -83,6 +83,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
+[Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
 [sound-space-plus](https://github.com/pkgforge-dev/sound-space-plus-AppImage)                                            |
 [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
