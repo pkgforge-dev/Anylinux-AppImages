@@ -1102,11 +1102,8 @@ _check_window_class() {
 }
 
 _add_bwrap_wrapper() {
-	BWRAP_WRAPPER="$APPDIR"/bin/bwrap
-	if [ -x "$BWRAP_WRAPPER" ]; then
-		return 0
-	fi
-	cat <<-'EOF' > "$BWRAP_WRAPPER"
+	mkdir -p "$APPDIR"/bin
+	cat <<-'EOF' > "$APPDIR"/bin/bwrap
 	#!/bin/sh
 
 	# AppImages crash when we bundle bwrap required by glycin loaders
@@ -1127,44 +1124,7 @@ _add_bwrap_wrapper() {
 	done
 	exec "$@"
 	EOF
-	chmod +x "$BWRAP_WRAPPER"
-}
-
-_add_cc_wrapper() {
-	CC_WRAPPER="$APPDIR"/bin/cc
-	if [ -x "$CC_WRAPPER" ]; then
-		return 0
-	fi
-	cat <<-'EOF' > "$CC_WRAPPER"
-	#!/bin/sh
-
-	# python apps may need to run cc at runtime and use some bundled
-	# libraries to compile stuff, so we need to use LD_LIBRARY_PATH
-	# to expose our bundled libraries to the compiler
-	
-	l=/lib64:/usr/lib64:/lib:/usr/lib
-	LD_LIBRARY_PATH="$l:${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$APPDIR/lib"
-	export LD_LIBRARY_PATH
-
-	_PATH=""
-	_IFS="$IFS"
-	IFS=:; for p in $PATH; do
-		[ "$p" != "$APPDIR"/bin ] && _PATH="${_PATH:+$_PATH:}$p"
-	done
-	PATH="$_PATH"
-	IFS="$_IFS"
-	export PATH
-
-	if ! command -v cc 1>/dev/null; then
-		>&2 echo "================================================="
-		>&2 echo "ERROR: No C compiler is available in this system!"
-		>&2 echo "================================================="
-		exit 1
-	else
-		exec cc "$@"
-	fi
-	EOF
-	chmod +x "$CC_WRAPPER"
+	chmod +x "$APPDIR"/bin/bwrap
 }
 
 _add_path_mapping_hardcoded() {
@@ -1479,7 +1439,6 @@ done
 # these need to be done later because sharun may make shared/lib a symlink to lib
 # and if we make shared/lib first then it breaks sharun
 if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-	#_add_cc_wrapper
 	set -- "$LIB_DIR"/python*
 	if [ -d "$1" ]; then
 		cp -r "$1" "$APPDIR"/shared/lib
