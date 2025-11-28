@@ -993,6 +993,11 @@ _deploy_datadir() {
 }
 
 _deploy_locale() {
+	if [ ! -d /usr/share/locale ]; then
+		_err_msg "This system does not have /usr/share/locale"
+		return 0
+	fi
+
 	set -- "$APPDIR"/shared/bin/*
 	for bin do
 		if grep -Eaoq -m 1 "/usr/share/locale" "$bin"; then
