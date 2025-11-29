@@ -97,6 +97,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
 [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
+[Varia](https://github.com/pkgforge-dev/Varia-AppImage)                                                                  |
 [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage)                                                                    |
 [VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage)                                                          |
 [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage)                                                  |
