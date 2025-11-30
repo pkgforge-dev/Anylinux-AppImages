@@ -45,7 +45,7 @@ if [ "$1" = '--chaotic-aur' ]; then
 	echo '[chaotic-aur]' >> /etc/pacman.conf
 	echo 'Include = /etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf
 	_info_msg "Adding Chaotic AUR packages: $*"
-	pacman -Syu --noconfirm "$@"
+	pacman -Sy --noconfirm "$@"
 	exit 0
 elif [ "$1" = '--archlinux-pkg' ]; then
 	shift
