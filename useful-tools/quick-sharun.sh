@@ -1173,7 +1173,7 @@ _add_ldconfig_wrapper() {
 	            exit 1
 	        fi
 	        ;;
-	    esac
+	esac
 	EOF
 	chmod +x "$ldconfig"
 }
