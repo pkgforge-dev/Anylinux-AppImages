@@ -83,6 +83,10 @@ makepkg -fs --noconfirm --skippgpcheck
 ls -la ./
 
 _info_msg "Installing package..."
-pacman --noconfirm -U ./*.pkg.tar.*
+if [ "$OVERWRITE_CONFLICTS" = 1 ]; then
+	pacman --noconfirm -U ./*.pkg.tar.*
+else
+	pacman --noconfirm -U ./*.pkg.tar.* --overwrite '*'
+fi
 
 _info_msg "All done!"
