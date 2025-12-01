@@ -84,9 +84,9 @@ ls -la ./
 
 _info_msg "Installing package..."
 if [ "$OVERWRITE_CONFLICTS" = 1 ]; then
-	pacman --noconfirm -U ./*.pkg.tar.*
-else
 	pacman --noconfirm -U ./*.pkg.tar.* --overwrite '*'
+else
+	pacman --noconfirm -U ./*.pkg.tar.*
 fi
 
 _info_msg "All done!"
