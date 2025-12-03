@@ -1048,7 +1048,7 @@ _deploy_icon_and_desktop() {
 	elif echo "$DESKTOP" | grep -q 'http'; then
 		_echo "* Downloading $DESKTOP to $APPDIR..."
 		_download "$APPDIR"/"${DESKTOP##*/}" "$DESKTOP"
-	elif [ -n "$DESKTOP"]; then
+	elif [ -n "$DESKTOP" ]; then
 		_err_msg "$DESKTOP is NOT a valid path!"
 		exit 1
 	fi
