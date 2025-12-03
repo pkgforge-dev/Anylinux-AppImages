@@ -68,9 +68,12 @@ _deploy_desktop_and_icon() {
 		elif [ -f "$DESKTOP" ]; then
 			_echo "* Adding $DESKTOP to $APPDIR..."
 			cp -v "$DESKTOP" "$APPDIR"
-		elif [ -n "$DESKTOP" ]; then
+		elif echo "$DESKTOP" | grep -q 'http'; then
 			_echo "* Downloading $DESKTOP to $APPDIR..."
 			_download "$APPDIR"/"${DESKTOP##*/}" "$DESKTOP"
+		elif [ -n "$DESKTOP"]; then
+			_err_msg "$DESKTOP is NOT a valid path!"
+			exit 1
 		fi
 
 		# make sure desktop entry ends with .desktop
@@ -93,10 +96,13 @@ _deploy_desktop_and_icon() {
 			_echo "* Adding $ICON to $APPDIR..."
 			cp -v "$ICON" "$APPDIR"
 			cp -v "$ICON" "$APPDIR"/.DirIcon
-		elif [ -n "$ICON" ]; then
+		elif echo "$ICON" | grep -q 'http'; then
 			_echo "* Downloading $ICON to $APPDIR..."
 			_download "$APPDIR"/"${ICON##*/}" "$ICON"
 			cp -v "$APPDIR"/"${ICON##*/}" "$APPDIR"/.DirIcon
+		elif [ -n "$ICON" ]; then
+			_err_msg "$ICON is NOT a valid path!"
+			exit 1
 		fi
 	fi
 }

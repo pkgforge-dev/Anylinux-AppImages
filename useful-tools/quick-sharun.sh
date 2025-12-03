@@ -1045,10 +1045,14 @@ _deploy_icon_and_desktop() {
 	elif [ -f "$DESKTOP" ]; then
 		_echo "* Adding $DESKTOP to $APPDIR..."
 		cp -v "$DESKTOP" "$APPDIR"
-	elif [ -n "$DESKTOP" ]; then
+	elif echo "$DESKTOP" | grep -q 'http'; then
 		_echo "* Downloading $DESKTOP to $APPDIR..."
 		_download "$APPDIR"/"${DESKTOP##*/}" "$DESKTOP"
+	elif [ -n "$DESKTOP"]; then
+		_err_msg "$DESKTOP is NOT a valid path!"
+		exit 1
 	fi
+
 	# make sure desktop entry ends with .desktop
 	if [ ! -f "$APPDIR"/*.desktop ] && [ -f "$APPDIR"/*.desktop* ]; then
 		filename="${DESKTOP##*/}"
@@ -1066,9 +1070,12 @@ _deploy_icon_and_desktop() {
 	elif [ -f "$ICON" ]; then
 		_echo "* Adding $ICON to $APPDIR..."
 		cp -v "$ICON" "$APPDIR"
-	elif [ -n "$ICON" ]; then
+	elif echo "$ICON" | grep -q 'http'; then
 		_echo "* Downloading $ICON to $APPDIR..."
 		_download "$APPDIR"/"${ICON##*/}" "$ICON"
+	elif [ -n "$ICON" ]; then
+		_err_msg "$ICON is NOT a valid path!"
+		exit 1
 	fi
 
 	# copy the entire hicolor icons dir
