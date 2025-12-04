@@ -323,6 +323,7 @@ fi
 
 if [ -f "$DWARFSPROF" ]; then
 	_echo "* Using $DWARFSPROF..."
+	sleep 3
 	set -- --categorize=hotness --hotness-list="$DWARFSPROF" "$@"
 fi
 
