@@ -43,7 +43,6 @@ _find_host_libjack() (
 )
 
 if [ "$USE_HOST_LIBJACK" = 1 ]; then
-	>&2 echo "host-libjack: Using host 'libjack.so', stability is not guaranteed!"
 	HOST_LIBJACK_DIR=${HOST_LIBJACK_DIR:-${TMPDIR:-/tmp}/.hostlibjack}
 
 	if _find_host_libjack; then
