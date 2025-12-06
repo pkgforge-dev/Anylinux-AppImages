@@ -4,7 +4,7 @@
 
 # depends on appimageupdatetool which will be downloaded if not available
 
-# simple make sure you have your AppRun call this script before starting the
+# simply make sure you have your AppRun call this script before starting the
 # main application, that is all that's needed.
 
 # you can set the var UPDATE_MSG to change the displayed update message
