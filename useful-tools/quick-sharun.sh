@@ -1027,10 +1027,14 @@ _deploy_locale() {
 
 _deploy_icon_and_desktop() {
 	if [ "$DESKTOP" = "DUMMY" ]; then
-		# use the first binary name in shared/bin as filename
-		set -- "$APPDIR"/shared/bin/*
-		[ -f "$1" ] || exit 1
-		f=${1##*/}
+		if [ -n "$MAIN_BIN" ]; then
+			f=${MAIN_BIN##*/}
+		else
+			# use the first binary name in shared/bin as filename
+			set -- "$APPDIR"/shared/bin/*
+			[ -f "$1" ] || exit 1
+			f=${1##*/}
+		fi
 		_echo "* Adding dummy $f desktop entry to $APPDIR..."
 		cat <<-EOF > "$APPDIR"/"$f".desktop
 		[Desktop Entry]
@@ -1060,10 +1064,14 @@ _deploy_icon_and_desktop() {
 	fi
 
 	if [ "$ICON" = "DUMMY" ]; then
-		# use the first binary name in shared/bin as filename
-		set -- "$APPDIR"/shared/bin/*
-		[ -f "$1" ] || exit 1
-		f=${1##*/}
+		if [ -n "$MAIN_BIN" ]; then
+			f=${MAIN_BIN##*/}
+		else
+			# use the first binary name in shared/bin as filename
+			set -- "$APPDIR"/shared/bin/*
+			[ -f "$1" ] || exit 1
+			f=${1##*/}
+		fi
 		_echo "* Adding dummy $f icon to $APPDIR..."
 		:> "$APPDIR"/"$f".png
 		:> "$APPDIR"/.DirIcon
@@ -1570,9 +1578,23 @@ if [ ! -f "$APPDIR"/AppRun ]; then
 	_echo "* Added ${APPRUN_SOURCE##*/}"
 fi
 
-# Set APPIMAGE_ARCH and MAIN_BIN in AppRun
-MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$APPDIR"/*.desktop)
+if [ -z "$MAIN_BIN" ]; then
+	MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$APPDIR"/*.desktop)
+fi
+
 MAIN_BIN=${MAIN_BIN##*/}
+if [ ! -f "$APPDIR"/bin/"$MAIN_BIN" ]; then
+	_err_msg "MAIN_BIN is set to '$MAIN_BIN', but this file is NOT present"
+	_err_msg "This is the default binary to be launched in this application"
+	_err_msg "Please make sure to bundle $MAIN_BIN"
+	_err_msg "By default the main binary is taken from the top level"
+	_err_msg "desktop entry in '$APPDIR', make sure to add the correct"
+	_err_msg "desktop entry, if you are using DESKTOP=DUMMY, make sure to"
+	_err_msg "specify the correct binary name in the MAIN_BIN env variable"
+	exit 1
+fi
+
+# Set APPIMAGE_ARCH and MAIN_BIN in AppRun
 sed -i \
 	-e "s|@MAIN_BIN@|$MAIN_BIN|"  \
 	-e "s|@APPIMAGE_ARCH@|$ARCH|" \

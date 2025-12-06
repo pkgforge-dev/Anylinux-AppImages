@@ -50,10 +50,14 @@ _download() {
 _deploy_desktop_and_icon() {
 	if [ ! -f "$APPDIR"/*.desktop ]; then
 		if [ "$DESKTOP" = "DUMMY" ]; then
-			# use the first binary name in shared/bin as filename
-			set -- "$APPDIR"/shared/bin/*
-			[ -f "$1" ] || exit 1
-			f=${1##*/}
+			if [ -n "$MAIN_BIN" ]; then
+				f=${MAIN_BIN##*/}
+			else
+				# use the first binary name in shared/bin as filename
+				set -- "$APPDIR"/shared/bin/*
+				[ -f "$1" ] || exit 1
+				f=${1##*/}
+			fi
 			_echo "* Adding dummy $f desktop entry to $APPDIR..."
 			cat <<-EOF > "$APPDIR"/"$f".desktop
 			[Desktop Entry]
@@ -85,10 +89,14 @@ _deploy_desktop_and_icon() {
 
 	if [ ! -f "$APPDIR"/.DirIcon ]; then
 		if [ "$ICON" = "DUMMY" ]; then
-			# use the first binary name in shared/bin as filename
-			set -- "$APPDIR"/shared/bin/*
-			[ -f "$1" ] || exit 1
-			f=${1##*/}
+			if [ -n "$MAIN_BIN" ]; then
+				f=${MAIN_BIN##*/}
+			else
+				# use the first binary name in shared/bin as filename
+				set -- "$APPDIR"/shared/bin/*
+				[ -f "$1" ] || exit 1
+				f=${1##*/}
+			fi
 			_echo "* Adding dummy $f icon to $APPDIR..."
 			:> "$APPDIR"/"$f".png
 			:> "$APPDIR"/.DirIcon
