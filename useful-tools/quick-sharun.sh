@@ -1645,12 +1645,6 @@ done <<-EOF
 $ADD_DIR
 EOF
 
-# some apps may crash when they fallback to C locale because they need an utf8 locale
-if [ -d /usr/lib/locale/C.utf8 ] && [ ! -d "$APPDIR"/shared/lib/locale/C.utf8 ]; then
-	mkdir -p "$APPDIR"/shared/lib/locale
-	cp -r /usr/lib/locale/C.utf8 "$APPDIR"/shared/lib/locale
-fi
-
 # wrap any executable in lib with sharun
 for b in $(find "$APPDIR"/shared/lib/ -type f ! -name '*.so*'); do
 	if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
