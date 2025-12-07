@@ -418,17 +418,22 @@ _make_deployment_array() {
 			case "$lib" in
 				*libQt*Gui.so*)
 					set -- "$@" \
-						"$plugindir"/imageformats/* \
-						"$plugindir"/iconengines/*  \
-						"$plugindir"/styles/*       \
-						"$plugindir"/platform*/*    \
-						"$plugindir"/wayland-*/*    \
+						"$plugindir"/imageformats/*          \
+						"$plugindir"/iconengines/*           \
+						"$plugindir"/styles/*                \
+						"$plugindir"/platforminputcontexts/* \
+						"$plugindir"/platforms/*xcb*         \
+						"$plugindir"/platforms/*wayland*     \
+						"$plugindir"/platforms/*offscreen*   \
+						"$plugindir"/platformthemes/*        \
+						"$plugindir"/wayland-*/*             \
 						"$plugindir"/xcbglintegrations/*
 					;;
 				*libQt*Network.so*)
 					set -- "$@" \
-						"$plugindir"/tls/* \
-						"$plugindir"/bearer/*
+						"$plugindir"/tls/*    \
+						"$plugindir"/bearer/* \
+						"$plugindir"/platforms/*vnc*
 					;;
 				*libQt*Sql.so*)
 					set -- "$@" "$plugindir"/sqldrivers/*
