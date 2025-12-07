@@ -955,6 +955,7 @@ _deploy_datadir() {
 					wayland     |\
 					X11         |\
 					xcb         |\
+					zoneinfo    |\
 					zsh         )
 						continue
 						;;
