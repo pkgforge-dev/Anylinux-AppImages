@@ -10,7 +10,7 @@ EXTRA_PACKAGES="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImage
 
 export DEPLOY_OPENGL=1
 export ANYLINUX_LIB=1
-export ICON=/usr/share/doc/qt/global/template/images/Qt-logo.png
+export ICON=/usr/share/doc/qt6/global/template/images/Qt-logo.png
 export DESKTOP=DUMMY
 export MAIN_BIN=qdbusviewer6
 export OUTPATH=./dist
