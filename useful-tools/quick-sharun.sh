@@ -1472,6 +1472,7 @@ for dir in $topleveldirs; do
 		gstreamer* |\
 		gvfs       |\
 		libproxy   |\
+		locale     |\
 		pipewire*  |\
 		pulseaudio |\
 		qt*        |\
