@@ -271,6 +271,16 @@ if [ -n "$UPINFO" ]; then
 	"$RUNTIME" --appimage-addupdinfo "$UPINFO"
 fi
 
+if [ -n "$ADD_PERMA_ENV_VARS" ]; then
+	while IFS= read -r VAR; do
+		case "$VAR" in
+			*=*) "$RUNTIME" --appimage-addenvs "$VAR";;
+		esac
+	done <<-EOF
+	$ADD_PERMA_ENV_VARS
+	EOF
+fi
+
 # make sure the .env has all the "unset" last, due to a bug in the dotenv
 # library used by sharun all the unsets have to be declared last in the .env
 if [ -f "$APPDIR"/.env ]; then
