@@ -417,6 +417,13 @@ _make_deployment_array() {
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
 				*libQt*Gui.so*)
+					# terrible hack to prevent partial gtk deployment
+					# see: https://github.com/VHSgunzo/sharun/issues/91
+					p="$plugindir"/platformthemes/libqgtk3.so
+					if [ "$DEPLOY_GTK" != 1 ] \
+					  && [ -n "$CI" ] && [ -w "$p" ]; then
+						mv "$p" "$TMPDIR"
+					fi
 					set -- "$@" \
 						"$plugindir"/imageformats/* \
 						"$plugindir"/iconengines/*  \
@@ -1535,6 +1542,13 @@ if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Copied gegl json files"
 	fi
 fi
+if [ "$DEPLOY_QT" = 1 ] && [ -f "$TMPDIR"/libqgtk3.so ]; then
+	d="$APPDIR"/lib/"$QT_DIR"/plugins/platformthemes
+	mkdir -p "$d"
+	mv "$TMPDIR"/libqgtk3.so "$d"
+	"$APPDIR"/sharun -g 2>/dev/null || :
+fi
+
 
 # some libraries may need to look for a relative ../share directory
 # normally this is for when they are located in /usr/lib
