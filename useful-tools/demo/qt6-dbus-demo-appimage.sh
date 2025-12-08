@@ -40,10 +40,6 @@ wget --retry-connrefused --tries=30 "$EXTRA_PACKAGES" -O ./get-debloated-pkgs.sh
 chmod +x ./get-debloated-pkgs.sh
 ./get-debloated-pkgs.sh --add-common --prefer-nano
 
-# remove gtk3 since we do not want to bundle this for this demo
-# the libqgtk3.so style plugin links to gtk3
-pacman -Rdd --noconfirm gtk3
-
 echo "Bundling AppImage..."
 echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
