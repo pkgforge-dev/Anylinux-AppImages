@@ -31,6 +31,16 @@ if [ "$1" = '--appimage-add-env' ]; then
 	exit 0
 fi
 
+# check host locale works, else fallback to bundled C.UTF-8
+if command -v locale-check 1>/dev/null && ! locale-check; then
+	__lcdir="$APPDIR"/shared/lib/locale
+	if [ -d "$__lcdir" ]; then
+		export LOCPATH="$__lcdir" LC_ALL=C.UTF-8
+	fi
+	# fallback to bare C locale if this still fails somehow
+	locale-check || export LC_ALL=C
+fi
+
 # additional scripts can be placed in the top level bin dir
 # those with a name that ends up .hook will be executed in the current shell
 # those that end with .bg.hook will be executed in the background
