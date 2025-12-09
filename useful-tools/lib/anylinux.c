@@ -8,13 +8,6 @@
  * mode is used, where for example the HOME var from the portable .home dir would
  * be inherited by other processes launched by the appimage in portable mode
  * causing them to start using the fake .home dir instead of the real home
- *
- * It also sets LC_ALL=C if it detects the application will fail to switch locale
- * While we normally bundle locales with quick-sharun and apps have working
- * language interface, we do not bundle the libc locale because glibc
- * has issues when LOCPATH is used This means some applications like dolphin-emu
- * crash when glibc cannot switch locale even though the application itself can
- * This library checks that and forces the C locale instead to prevent crashes
 */
 
 #ifndef _GNU_SOURCE
@@ -29,74 +22,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <locale.h>
 
 typedef int (*execve_func_t)(const char *filename, char *const argv[], char *const envp[]);
-
-#define LOG(fmt, ...) fprintf(stderr, " [anylinux.so] LOCALEFIX >> " fmt "\n", ##__VA_ARGS__)
-
-__attribute__((constructor))
-static void locale_fix_init(void) {
-	if (! setlocale(LC_ALL, "")) {
-		LOG("Failed to set locale, falling back to bundled C.UTF-8 locale");
-		// Check if bundled C.UTF-8 locale is available
-		const char *appdir = getenv("APPDIR");
-		if (appdir) {
-			char locale_path[PATH_MAX];
-			snprintf(locale_path, sizeof(locale_path), "%s/lib/locale/C.utf8", appdir);
-
-			if (access(locale_path, F_OK) == 0) {
-				LOG("Found bundled C.UTF-8 locale: %s", locale_path);
-				// Set LOCPATH to the bundled locales directory
-				char locpath[PATH_MAX];
-				snprintf(locpath, sizeof(locpath), "%s/lib/locale", appdir);
-				if (setenv("LOCPATH", locpath, 1) == 0) {
-					LOG("Set LOCPATH to %s", locpath);
-				} else {
-					LOG("Failed to setenv(LOCPATH, \"%s\"): %s", locpath, strerror(errno));
-				}
-
-				// Set LC_ALL to C.UTF-8
-				LOG("Setting LC_ALL to C.UTF-8");
-				if (setenv("LC_ALL", "C.UTF-8", 1) == 0) {
-					if (! setlocale(LC_ALL, "")) {
-						LOG("Failed to set locale with C.UTF-8, falling back to bare C locale.");
-						if (! setlocale(LC_ALL, "C")) {
-							LOG("Failed to setlocale(LC_ALL, \"C\"): %s", strerror(errno));
-						}
-						if (setenv("LC_ALL", "C", 1) != 0) {
-							LOG("Failed to setenv(LC_ALL, \"C\"): %s", strerror(errno));
-						}
-					}
-				} else {
-					LOG("Failed to setenv(LC_ALL, \"C.UTF-8\"): %s", strerror(errno));
-					if (!setlocale(LC_ALL, "C")) {
-						LOG("Failed to setlocale(LC_ALL, \"C\"): %s", strerror(errno));
-					}
-					if (setenv("LC_ALL", "C", 1) != 0) {
-						LOG("Failed to setenv(LC_ALL, \"C\"): %s", strerror(errno));
-					}
-				}
-			} else {
-				LOG("Bundled C.UTF-8 locale not found at %s, falling back to C locale.", locale_path);
-				if (!setlocale(LC_ALL, "C")) {
-					LOG("Failed to setlocale(LC_ALL, \"C\"): %s", strerror(errno));
-				}
-				if (setenv("LC_ALL", "C", 1) != 0) {
-					LOG("Failed to setenv(LC_ALL, \"C\"): %s", strerror(errno));
-				}
-			}
-		} else {
-			LOG("APPDIR not set, cannot check for bundled locales.  Falling back to C locale.");
-			if (!setlocale(LC_ALL, "C")) {
-				LOG("Failed to setlocale(LC_ALL, \"C\"): %s", strerror(errno));
-			}
-			if (setenv("LC_ALL", "C", 1) != 0) {
-				LOG("Failed to setenv(LC_ALL, \"C\"): %s", strerror(errno));
-			}
-		}
-	}
-}
 
 #define VISIBLE __attribute__ ((visibility ("default")))
 
