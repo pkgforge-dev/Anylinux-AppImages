@@ -29,6 +29,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage)                                                  |
 [Authenticator](https://github.com/pkgforge-dev/Authenticator-AppImage)                                                  |
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
+[Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
 [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage)                                                        |
 [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced)                                                           |
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
