@@ -31,12 +31,13 @@ if [ "$1" = '--appimage-add-env' ]; then
 	exit 0
 fi
 
-# check host locale works, else fallback to bundled C.UTF-8
+# check host locale works
 if command -v locale-check 1>/dev/null && ! locale-check; then
+	# use our locales
 	__lcdir="$APPDIR"/shared/lib/locale
-	if [ -d "$__lcdir" ]; then
-		export LOCPATH="$__lcdir" LC_ALL=C.UTF-8
-	fi
+	[ ! -d "$__lcdir" ] || export LOCPATH="$__lcdir"
+	# fallback to bundled C.UTF-8
+	locale-check || export LC_ALL=C.UTF-8
 	# fallback to bare C locale if this still fails somehow
 	locale-check || export LC_ALL=C
 fi
