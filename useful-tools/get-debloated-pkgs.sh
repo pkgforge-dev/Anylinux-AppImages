@@ -203,6 +203,7 @@ fi
 if [ "$COMMON_PACKAGES" = 1 ]; then
 	ADD_MESA=1
 	set -- "$@" \
+		icu-mini         \
 		opus-mini        \
 		libxml2-mini     \
 		qt6-base-mini    \
