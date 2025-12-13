@@ -36,6 +36,8 @@ if command -v locale-check 1>/dev/null && ! locale-check; then
 	# use our locales
 	__lcdir="$APPDIR"/shared/lib/locale
 	[ ! -d "$__lcdir" ] || export LOCPATH="$__lcdir"
+	# fallback to bundled en_US.UTF-8
+	locale-check || export LC_ALL=en_US.UTF-8
 	# fallback to bundled C.UTF-8
 	locale-check || export LC_ALL=C.UTF-8
 	# fallback to bare C locale if this still fails somehow
