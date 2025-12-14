@@ -15,6 +15,9 @@
 # https://github.com/flatpak/flatpak/issues/1509#issuecomment-3315750411
 # https://discourse.ardour.org/t/ardour-pipewire-sound-stuttering-crackling-popping-when-adjusting-system-volume/109054/3
 
+# hook is enabled by default
+USE_HOST_LIBJACK=${USE_HOST_LIBJACK:-1}
+
 _find_host_libjack() (
 	if [ ! -d "$HOST_LIBJACK_DIR" ]; then
 		# attempt to find where the host libjack is located
