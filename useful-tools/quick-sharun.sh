@@ -960,6 +960,7 @@ _deploy_datadir() {
 					doc         |\
 					dotnet      |\
 					et          |\
+					factory     |\
 					file        |\
 					fish        |\
 					fonts       |\
