@@ -961,7 +961,10 @@ _deploy_datadir() {
 					dotnet      |\
 					et          |\
 					file        |\
+					fish        |\
 					fonts       |\
+					fontconfig  |\
+					git         |\
 					glvnd       |\
 					gvfs        |\
 					help        |\
@@ -970,6 +973,7 @@ _deploy_datadir() {
 					java        |\
 					locale      |\
 					man         |\
+					misc        |\
 					pipewire    |\
 					pixmaps     |\
 					qt          |\
@@ -977,9 +981,11 @@ _deploy_datadir() {
 					qt5         |\
 					qt6         |\
 					qt7         |\
+					ss          |\
 					themes      |\
 					vulkan      |\
 					wayland     |\
+					WebP        |\
 					X11         |\
 					xcb         |\
 					zoneinfo    |\
