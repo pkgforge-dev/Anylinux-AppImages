@@ -294,10 +294,15 @@ _determine_what_to_deploy() {
 				$ADD_DIR
 				$bin
 			"
-		fi
-		# some apps may dlopen pulseaudio instead of linking directly
-		if [ -f "$bin" ] && grep -aoq -m 1 'libpulse.so' "$bin"; then
-			DEPLOY_PULSE=${DEPLOY_PULSE:-1}
+		elif [ -x "$bin" ]; then
+			# some apps may dlopen pulseaudio instead of linking directly
+			if grep -aoq -m 1 'libpulse.so' "$bin"; then
+				DEPLOY_PULSE=${DEPLOY_PULSE:-1}
+			fi
+			if grep -aoq -m 1 'disable-gpu-sandbox' "$bin" \
+			  && grep -aoq -m 1 'no-zygote-sandbox' "$bin"; then
+				DEPLOY_ELECTRON=${DEPLOY_ELECTRON:-1}
+			fi
 		fi
 
 		# check linked libraries and enable each mode accordingly
@@ -642,6 +647,17 @@ _make_deployment_array() {
 		elif [ -d "$LIB_DIR"/libheif ]; then
 			set -- "$@" "$LIB_DIR"/libheif/*
 		fi
+	fi
+	if [ "$DEPLOY_ELECTRON" = 1 ] || [ "$DEPLOY_CHROMIUM" = 1 ]; then
+		_echo "* Deploying electron/chromium"
+		DEPLOY_P11KIT=1
+		set -- "$@" \
+			"$LIB_DIR"/libva.so*        \
+			"$LIB_DIR"/libva-drm.so*    \
+			"$LIB_DIR"/libpci.so*       \
+			"$LIB_DIR"/libnss*.so*      \
+			"$LIB_DIR"/libsoftokn3.so*  \
+			"$LIB_DIR"/libfreeblpriv3.so*
 	fi
 	if [ "$DEPLOY_P11KIT" = 1 ]; then
 		_echo "* Deploying p11kit"
