@@ -52,7 +52,7 @@ jobs:
             script: qt6-dbus-demo-appimage
     container: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Make AppImage
         run: sh ./useful-tools/demo/${{ matrix.script }}.sh
