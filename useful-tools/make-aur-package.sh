@@ -55,7 +55,9 @@ else
 fi
 cd ./"$1"
 
-sed -i -e "s|x86_64|$ARCH|" ./PKGBUILD
+if ! grep =q "arch=.*$ARCH" ./PKGBUILD; then
+	sed -i -e "s|x86_64|$ARCH|" ./PKGBUILD
+fi
 
 # Run extra commands from env var
 if [ -n "$PRE_BUILD_CMDS" ]; then
