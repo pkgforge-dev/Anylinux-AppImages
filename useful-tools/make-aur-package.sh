@@ -55,7 +55,7 @@ else
 fi
 cd ./"$1"
 
-if ! grep =q "arch=.*$ARCH" ./PKGBUILD; then
+if ! grep -q "arch=.*$ARCH" ./PKGBUILD; then
 	sed -i -e "s|x86_64|$ARCH|" ./PKGBUILD
 fi
 
