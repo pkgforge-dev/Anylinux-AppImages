@@ -860,7 +860,7 @@ _add_gtk_class_fix() {
 	fi
 
 	_echo "* Building gtk-class-fix.so"
-	_download "$APPDIR"/.gtk-class-fix.c "$GTK_CLASS_LIB_SOURCE"
+	_download "$APPDIR"/.gtk-class-fix.c "$GTK_CLASS_FIX_SOURCE"
 	gcc -shared -fPIC "$APPDIR"/.gtk-class-fix.c \
 		-o "$APPDIR"/shared/lib/gtk-class-fix.so \
 		$(pkg-config --cflags --libs glib-2.0 gio-2.0 gobject-2.0) -ldl
