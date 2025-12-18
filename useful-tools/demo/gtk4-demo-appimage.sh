@@ -15,6 +15,7 @@ export DESKTOP=/usr/share/applications/org.gtk.Demo4.desktop
 export OUTPATH=./dist
 export OUTNAME=gtk4-demo-"$ARCH".AppImage
 export STARTUPWMCLASS=fuck.gnome
+export GTK_CLASS_FIX=1
 
 pacman -Syu --noconfirm \
 	base-devel       \
