@@ -14,6 +14,7 @@ export ICON=/usr/share/icons/hicolor/scalable/apps/org.gtk.Demo4.svg
 export DESKTOP=/usr/share/applications/org.gtk.Demo4.desktop
 export OUTPATH=./dist
 export OUTNAME=gtk4-demo-"$ARCH".AppImage
+export STARTUPWMCLASS=fuck.gnome
 
 pacman -Syu --noconfirm \
 	base-devel       \
