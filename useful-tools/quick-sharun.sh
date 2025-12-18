@@ -23,6 +23,8 @@ LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
 ANYLINUX_LIB=${ANYLINUX_LIB:-0}
 ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
+GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
+GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
 NOTIFY_SOURCE=${NOTIFY_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/notify}
 APPRUN_SOURCE=${APPRUN_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/AppRun-generic}
 URUNTIME2APPIMAGE_SOURCE=${URUNTIME2APPIMAGE_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh}
@@ -107,11 +109,18 @@ _err_msg(){
 	>&2 printf '\033[1;31m%s\033[0m\n' " $*"
 }
 
+_is_cmd() {
+	for cmd do
+		command -v "$cmd" 1>/dev/null || return 1
+	done
+	return 0
+}
+
 _download() {
-	if command -v wget 1>/dev/null; then
+	if _is_cmd wget; then
 		DOWNLOAD_CMD="wget"
 		set -- -qO "$@"
-	elif command -v curl 1>/dev/null; then
+	elif _is_cmd curl; then
 		DOWNLOAD_CMD="curl"
 		set -- -Lso "$@"
 	else
@@ -199,13 +208,14 @@ _help_msg() {
 
 _sanity_check() {
 	for d in $DEPENDENCIES; do
-		if ! command -v "$d" 1>/dev/null; then
-			_err_msg "ERROR: Missing dependency '$d'!"
-		fi
+		_is_cmd "$d" || _err_msg "ERROR: Missing dependency '$d'!"
 	done
 
-	if [ "$ANYLINUX_LIB" = 1 ] && ! command -v cc 1>/dev/null; then
+	if [ "$ANYLINUX_LIB" = 1 ] && ! _is_cmd cc; then
 		_err_msg "ERROR: Using ANYLINUX_LIB requires cc"
+		exit 1
+	elif [ "$GTK_CLASS_FIX" = 1 ] && ! _is_cmd gcc pkg-config; then
+		_err_msg "ERROR: Using GTK_CLASS_FIX requires gcc and pkg-config"
 		exit 1
 	elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		_err_msg "ERROR: DEPLOY_PYTHON and DEPLOY_SYS_PYTHON cannot be both enabled!"
@@ -224,7 +234,7 @@ _sanity_check() {
 	fi
 
 	if [ "$STRACE_MODE" = 1 ]; then
-		if command -v xvfb-run 1>/dev/null; then
+		if _is_cmd xvfb-run; then
 			XVFB_CMD="xvfb-run -a --"
 		else
 			_err_msg "WARNING: xvfb-run was not detected on the system"
@@ -842,6 +852,26 @@ _add_anylinux_lib() {
 	_echo "* anylinux.so successfully added!"
 }
 
+_add_gtk_class_fix() {
+	if [ "$GTK_CLASS_FIX" != 1 ]; then
+		return 0
+	elif [ ! -f "$APPDIR"/*.desktop ]; then
+		_err_msg "ERROR: Using GTK_CLASS_FIX requires a desktop entry in $APPDIR"
+	fi
+
+	_echo "* Building gtk-class-fix.so"
+	_download "$APPDIR"/.gtk-class-fix.c "$GTK_CLASS_LIB_SOURCE"
+	gcc -shared -fPIC "$APPDIR"/.gtk-class-fix.c \
+		-o "$APPDIR"/shared/lib/gtk-class-fix.so \
+		$(pkg-config --cflags --libs glib-2.0 gio-2.0 gobject-2.0) -ldl
+
+	# _check_window_class will make sure StartupWMClass is added to desktop entry
+	class=$(awk -F'=| ' '/^StartupWMClass=/{print $2; exit}' "$APPDIR"/*.desktop)
+	echo "GTK_WINDOW_CLASS=$class"  >> "$APPDIR"/.env
+	echo "gtk-class-fix.so"         >> "$APPDIR"/.preload
+	_echo "* gtk-class-fix.so successfully added!"
+}
+
 _add_locale_check() {
 	loc_check_bin="$APPDIR"/bin/locale-check
 	if [ "$LOCALE_CHECK" != 1 ] || [ -x "$loc_check_bin" ]; then
@@ -871,12 +901,10 @@ _map_paths_ld_preload_open() {
 		)
 
 		deps="git make"
-		for d in $deps; do
-			if ! command -v "$d" 1>/dev/null; then
-				_err_msg "ERROR: Using PATH_MAPPING requires $d"
-				exit 1
-			fi
-		done
+		if ! _is_cmd $deps; then
+			_err_msg "ERROR: Using PATH_MAPPING requires $deps"
+			exit 1
+		fi
 
 		_echo "* Building $LD_PRELOAD_OPEN..."
 
@@ -1407,6 +1435,7 @@ _add_ldconfig_wrapper
 _deploy_datadir
 _deploy_locale
 _check_window_class
+_add_gtk_class_fix
 
 echo ""
 _echo "------------------------------------------------------------"
