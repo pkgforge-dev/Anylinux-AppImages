@@ -156,41 +156,48 @@ case "$ARCH" in
 	''|*)    _error "Unsupported Arch: '$ARCH'";;
 esac
 
-while true;
-	do case "$1" in
-		--help)
-			_help_msg
-			;;
-		--add-common)
-			COMMON_PACKAGES=1
-			shift
-			;;
-		--prefer-nano)
-			PREFER_NANO=1
-			shift
-			;;
-		--add-opengl)
-			ADD_OPENGL=1
-			shift
-			;;
-		--add-vulkan)
-			ADD_VULKAN=1
-			shift
-			;;
-		--add-mesa)
-			ADD_MESA=1
-			shift
-			;;
-		'')
-			break
-			;;
-		-*)
-			_error "Unknown option: $1"
-			;;
-		*)
-			ADD_PACKAGES="$ADD_PACKAGES $1"
-			shift
-			;;
+while :; do case "$1" in
+	--help)
+		_help_msg
+		;;
+	--add-common)
+		COMMON_PACKAGES=1
+		shift
+		;;
+	--prefer-nano)
+		PREFER_NANO=1
+		shift
+		;;
+	--add-opengl)
+		ADD_OPENGL=1
+		shift
+		;;
+	--add-vulkan)
+		ADD_VULKAN=1
+		shift
+		;;
+	--add-mesa)
+		ADD_MESA=1
+		shift
+		;;
+	'')
+		break
+		;;
+	-*)
+		_error "Unknown option: $1"
+		;;
+	!)
+		shift
+		case "$1" in
+			''|*-) _error "'!' requires a package to remove";;
+		esac
+		REMOVE_PACKAGES="$REMOVE_PACKAGES $1"
+		shift
+		;;
+	*)
+		ADD_PACKAGES="$ADD_PACKAGES $1"
+		shift
+		;;
 	esac
 done
 
@@ -242,8 +249,21 @@ set -- "$@" $ADD_PACKAGES
 
 if [ -z "$1" ]; then
 	_help_msg
+elif [ -n "$REMOVE_PACKAGES" ]; then
+	FILTERED=""
+	for pkg do
+		for del in $REMOVE_PACKAGES; do
+			case "$pkg" in
+				"$del"*)
+					_echo2 "Not adding $pkg"
+					continue 2
+					;;
+			esac
+		done
+		FILTERED="$FILTERED $pkg"
+	done
+	set -- $FILTERED
 fi
-
 
 if ! LIST_ALL=$(_download - "$SOURCE" \
 	| sed 's/[()",{} ]/\n/g' | grep -o 'https.*pkg\.tar\.\(zst\|xz\)'); then
