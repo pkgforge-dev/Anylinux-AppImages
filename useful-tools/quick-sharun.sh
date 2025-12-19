@@ -1347,6 +1347,49 @@ _patch_away_usr_share_dir() {
 	sed -i -e "s|_tmp_share=.*|_tmp_share=$_tmp_share|g" "$PATH_MAPPING_SCRIPT"
 }
 
+# sometimes developers add stuff like /bin/sh or env as the Exec= key of the
+# desktop entry, 99.99% of the time this is not wanted, so we have to error that
+_check_main_bin_name() {
+	MAIN_BIN=${MAIN_BIN##*/}
+	case "$MAIN_BIN" in
+		env|sh|bash)
+			_err_msg "ERROR: determined $MAIN_BIN as the main binary"
+			_err_msg "by reading the Exec= key in the desktop entry"
+			_err_msg "it is unlikely you are actually going to package"
+			_err_msg "a shell or env into an appimage, bailing out..."
+			_err_msg "Set the MAIN_BIN variable to $MAIN_BIN if you"
+			_err_msg "intend to actually make an appimage of such binary"
+			exit 1
+			;;
+		*)
+			return 0
+			;;
+	esac
+}
+
+_determine_main_bin() {
+	if [ -z "$MAIN_BIN" ]; then
+		MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$APPDIR"/*.desktop)
+		_check_main_bin_name
+	fi
+
+	# get basename of binary only
+	MAIN_BIN=${MAIN_BIN##*/}
+
+	if [ -f "$APPDIR"/bin/"$MAIN_BIN" ]; then
+		return 0
+	fi
+
+	_err_msg "MAIN_BIN is set to '$MAIN_BIN', but this file is NOT present"
+	_err_msg "This is the default binary to be launched in this application"
+	_err_msg "Please make sure to bundle $MAIN_BIN"
+	_err_msg "By default the main binary is taken from the top level"
+	_err_msg "desktop entry in '$APPDIR', make sure to add the correct"
+	_err_msg "desktop entry, if you are using DESKTOP=DUMMY, make sure to"
+	_err_msg "specify the correct binary name in the MAIN_BIN env variable"
+	exit 1
+}
+
 _make_static_bin() (
 	DST_DIR="$APPDIR"/bin
 	while :; do case "$1" in
@@ -1427,6 +1470,7 @@ _echo "------------------------------------------------------------"
 echo ""
 
 _deploy_icon_and_desktop
+_determine_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
@@ -1665,22 +1709,6 @@ fi
 if [ ! -f "$APPDIR"/AppRun ]; then
 	_download "$APPDIR"/AppRun "$APPRUN_SOURCE"
 	_echo "* Added ${APPRUN_SOURCE##*/}"
-fi
-
-if [ -z "$MAIN_BIN" ]; then
-	MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$APPDIR"/*.desktop)
-fi
-
-MAIN_BIN=${MAIN_BIN##*/}
-if [ ! -f "$APPDIR"/bin/"$MAIN_BIN" ]; then
-	_err_msg "MAIN_BIN is set to '$MAIN_BIN', but this file is NOT present"
-	_err_msg "This is the default binary to be launched in this application"
-	_err_msg "Please make sure to bundle $MAIN_BIN"
-	_err_msg "By default the main binary is taken from the top level"
-	_err_msg "desktop entry in '$APPDIR', make sure to add the correct"
-	_err_msg "desktop entry, if you are using DESKTOP=DUMMY, make sure to"
-	_err_msg "specify the correct binary name in the MAIN_BIN env variable"
-	exit 1
 fi
 
 # Set APPIMAGE_ARCH and MAIN_BIN in AppRun
