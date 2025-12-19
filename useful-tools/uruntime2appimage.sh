@@ -175,7 +175,7 @@ DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
 APPNAME=${APPNAME:-$(awk -F'=' '/^Name=/{gsub(/ /,"_",$2); print $2; exit}' "$DESKTOP_ENTRY")}
 
 # check for a ~/version file if VERSION is not set
-if [ -z "$VERSION" ] && [ -f "$HOME"/version]; then
+if [ -z "$VERSION" ] && [ -f "$HOME"/version ]; then
 	read -r VERSION < "$HOME"/version
 fi
 
