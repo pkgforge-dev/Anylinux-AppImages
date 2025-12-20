@@ -1071,7 +1071,11 @@ _deploy_datadir() {
 					if [ -d "$src_datadir" ] \
 						&& [ ! -d  "$dst_datadir" ]; then
 						_echo "* Adding datadir $src_datadir..."
-						cp -Lr "$src_datadir" "$dst_datadir"
+						# cp can fail here if src_datadir contains broken links
+						if ! cp -Lr "$src_datadir" "$dst_datadir"; then
+							rm -rf "$dst_datadir"
+							cp -r "$src_datadir" "$dst_datadir"
+						fi
 						break
 					fi
 				done
