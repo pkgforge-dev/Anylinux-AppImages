@@ -316,7 +316,7 @@ _determine_what_to_deploy() {
 		fi
 
 		# check linked libraries and enable each mode accordingly
-		NEEDED_LIBS="$(ldd "$bin" 2>/dev/null | awk '{print $1}') $NEEDED_LIBS"
+		NEEDED_LIBS="$(ldd "$bin" 2>/dev/null | awk '{print $3}') $NEEDED_LIBS"
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
 				*libQt5Core.so*)
@@ -352,7 +352,7 @@ _determine_what_to_deploy() {
 					;;
 				*libflutter*linux*.so*)
 					DEPLOY_FLUTTER=${DEPLOY_FLUTTER:-1}
-					FLUTTER_LIB=$(ldd "$bin" | grep -o -m 1 "/.*/$lib")
+					FLUTTER_LIB=$lib
 					;;
 				*libpipewire*.so*)
 					DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
