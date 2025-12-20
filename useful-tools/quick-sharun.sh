@@ -1670,7 +1670,18 @@ if [ "$DEPLOY_FLUTTER" = 1 ]; then
 	fi
 
 	# flutter apps need to have a relative lib and data directory
-	[ -d "$APPDIR"/bin/lib ] || ln -s ../lib "$APPDIR"/bin/lib
+	# we need to find the directory that contains libapp.so
+	if libapp=$(cd "$APPDIR"/bin \
+	  && find ../shared/lib/ -type f -name 'libapp.so' -print -quit); then
+		d=${libapp%/*}
+		if [ ! -d "$APPDIR"/bin/"${d##*/}" ]; then
+			ln -s "$d" "$APPDIR"/bin/"${d##*/}"
+		fi
+	else
+		_err_msg "Cannot find libapp.so in $APPDIR"
+		_err_msg "include it for flutter deployment to work"
+	fi
+
 	dst_flutter_dir="$APPDIR"/bin/data
 	if [ ! -d "$dst_flutter_dir" ]; then
 		if [ -z "$FLUTTER_DATA_DIR" ]; then
