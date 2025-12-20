@@ -29,8 +29,6 @@ NOTIFY_SOURCE=${NOTIFY_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/An
 APPRUN_SOURCE=${APPRUN_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/AppRun-generic}
 URUNTIME2APPIMAGE_SOURCE=${URUNTIME2APPIMAGE_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh}
 
-DEPLOY_OPENGL=${DEPLOY_OPENGL:-0}
-DEPLOY_VULKAN=${DEPLOY_VULKAN:-0}
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
 
@@ -426,6 +424,8 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/UNICODE*.so*
 	fi
 	if [ "$DEPLOY_QT" = 1 ]; then
+		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
+
 		# some distros have a qt dir rather than qt6 or qt5 dir
 		if [ ! -d "$LIB_DIR"/"$QT_DIR" ]; then
 			QT_DIR=qt
@@ -498,6 +498,10 @@ _make_deployment_array() {
 			"$LIB_DIR"/gio/modules/libgvfsdbus.so \
 			"$LIB_DIR"/gio/modules/libdconfsettings.so
 		echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
+
+		case "$GTK_DIR" in
+			*4*) DEPLOY_OPENGL=${DEPLOY_OPENGL:-1};;
+		esac
 	fi
 	if [ "$DEPLOY_GDK" = 1 ]; then
 		_echo "* Deploying gdk-pixbuf"
@@ -532,6 +536,9 @@ _make_deployment_array() {
 		_echo "* Deploying glycin"
 		set -- "$@" "$LIB_DIR"/glycin-loaders/*/*
 		_add_bwrap_wrapper
+	fi
+	if [ "$DEPLOY_FLUTTER" = 1 ]; then
+		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 	fi
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
 		set -- "$@" \
