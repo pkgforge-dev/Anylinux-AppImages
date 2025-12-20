@@ -313,8 +313,14 @@ _determine_what_to_deploy() {
 			fi
 		fi
 
-		# check linked libraries and enable each mode accordingly
 		NEEDED_LIBS="$(ldd "$bin" 2>/dev/null | awk '{print $3}') $NEEDED_LIBS"
+
+		# bin may be a shared library, in that case add it as well
+		case "$bin" in
+			*.so*) NEEDED_LIBS="$bin $NEEDED_LIBS";;
+		esac
+		
+		# check linked libraries and enable each mode accordingly
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
 				*libQt5Core.so*)
