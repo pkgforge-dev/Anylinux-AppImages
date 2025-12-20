@@ -68,6 +68,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage)                                                                  |
 [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage)                                                                |
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
+[LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage)                                                            |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
