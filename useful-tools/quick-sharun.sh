@@ -866,7 +866,14 @@ _add_gtk_class_fix() {
 		$(pkg-config --cflags --libs glib-2.0 gio-2.0 gobject-2.0) -ldl
 
 	# _check_window_class will make sure StartupWMClass is added to desktop entry
+
+	# for this to work in wayland, the class needs to have one dot in its name
+	if ! grep -q 'StartupWMClass=.*\..*' "$APPDIR"/*.desktop; then
+		sed -i -e 's/\(StartupWMClass=.*\)/\1.anylinux/' "$APPDIR"/*.desktop
+	fi
+	
 	class=$(awk -F'=| ' '/^StartupWMClass=/{print $2; exit}' "$APPDIR"/*.desktop)
+	
 	echo "GTK_WINDOW_CLASS=$class"  >> "$APPDIR"/.env
 	echo "gtk-class-fix.so"         >> "$APPDIR"/.preload
 	_echo "* gtk-class-fix.so successfully added!"
