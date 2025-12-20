@@ -21,6 +21,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 
 | Applications                                                                                                             |
 | ------------------------------------------------------------------------------------------------------------------------ |
+[anki](https://github.com/pkgforge-dev/anki-AppImage)                                                                    |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
 [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage)                                                  |
 [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
