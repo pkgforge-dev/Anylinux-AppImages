@@ -350,6 +350,10 @@ _determine_what_to_deploy() {
 				*libSDL*.so*)
 					DEPLOY_SDL=${DEPLOY_SDL:-1}
 					;;
+				*libflutter*linux*.so*)
+					DEPLOY_FLUTTER=${DEPLOY_FLUTTER:-1}
+					FLUTTER_LIB="$lib"
+					;;
 				*libpipewire*.so*)
 					DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
 					;;
@@ -871,9 +875,9 @@ _add_gtk_class_fix() {
 	if ! grep -q 'StartupWMClass=.*\..*' "$APPDIR"/*.desktop; then
 		sed -i -e 's/\(StartupWMClass=.*\)/\1.anylinux/' "$APPDIR"/*.desktop
 	fi
-	
+
 	class=$(awk -F'=| ' '/^StartupWMClass=/{print $2; exit}' "$APPDIR"/*.desktop)
-	
+
 	echo "GTK_WINDOW_CLASS=$class"  >> "$APPDIR"/.env
 	echo "gtk-class-fix.so"         >> "$APPDIR"/.preload
 	_echo "* gtk-class-fix.so successfully added!"
@@ -1650,6 +1654,36 @@ if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		find "$APPDIR"/shared/lib/"${1##*/}" -type f -name '*.pyc' -delete
 	fi
 fi
+if [ "$DEPLOY_FLUTTER" = 1 ]; then
+	if [ -z "$FLUTTER_LIB" ]; then
+		_err_msg "Flutter deployment was forced but looks like the"
+		_err_msg "the application does not link to libflutter at all"
+		_err_msg "If you see this message please open a bug report!"
+		exit 1
+	fi
+
+	# flutter apps need to have a relative lib and data directory
+	[ -d "$APPDIR"/bin/lib ] || ln -s ../lib "$APPDIR"/bin/lib
+	dst_flutter_dir="$APPDIR"/bin/data
+	if [ ! -d "$dst_flutter_dir" ]; then
+		if [ -z "$FLUTTER_DATA_DIR" ]; then
+			d=${FLUTTER_LIB%/*.so*}
+			# find data dir, we assume it is relative to
+			# where libflutter*.so came from
+			if [ -d "$d"/../data ]; then
+				FLUTTER_DATA_DIR="$d"/../data
+			elif [ -d "$d"/../../data ]; then
+				FLUTTER_DATA_DIR="$d"/../../data
+			else
+				_err_msg "Cannot find data directory of $FLUTTER_LIB"
+				_err_msg "Please set FLUTTER_DATA_DIR to its location"
+				exit 1
+			fi
+		fi
+		cp -rv "$FLUTTER_DATA_DIR" "$dst_flutter_dir"
+		_echo "* Copied flutter data directory"
+	fi
+fi
 if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 	mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
 	cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
@@ -1672,7 +1706,6 @@ if [ "$DEPLOY_QT" = 1 ] && [ -f "$TMPDIR"/libqgtk3.so ]; then
 	mv "$TMPDIR"/libqgtk3.so "$d"
 	"$APPDIR"/sharun -g 2>/dev/null || :
 fi
-
 
 # some libraries may need to look for a relative ../share directory
 # normally this is for when they are located in /usr/lib
