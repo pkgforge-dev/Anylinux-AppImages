@@ -319,7 +319,7 @@ _determine_what_to_deploy() {
 		case "$bin" in
 			*.so*) NEEDED_LIBS="$bin $NEEDED_LIBS";;
 		esac
-		
+
 		# check linked libraries and enable each mode accordingly
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
@@ -996,7 +996,10 @@ _deploy_datadir() {
 			for datadir in /usr/local/share/* /usr/share/*; do
 				if echo "${datadir##*/}" | grep -qi "$bin"; then
 					_echo "* Adding datadir $datadir..."
-					cp -Lr "$datadir" "$APPDIR/share"
+					# fallback to cp -r if cp -Lr fails
+					# due to broken symlinks in datadir
+					cp -Lr "$datadir" "$APPDIR"/share \
+					  || cp -r "$datadir" "$APPDIR"/share
 					break
 				fi
 			done
