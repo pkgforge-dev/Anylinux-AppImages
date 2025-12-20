@@ -352,7 +352,7 @@ _determine_what_to_deploy() {
 					;;
 				*libflutter*linux*.so*)
 					DEPLOY_FLUTTER=${DEPLOY_FLUTTER:-1}
-					FLUTTER_LIB="$lib"
+					FLUTTER_LIB=$(ldd "$bin" | grep -o -m 1 "/.*/$lib")
 					;;
 				*libpipewire*.so*)
 					DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
