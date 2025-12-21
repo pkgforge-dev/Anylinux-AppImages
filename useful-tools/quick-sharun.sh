@@ -336,6 +336,7 @@ _determine_what_to_deploy() {
 					;;
 				*libQt*WebEngineCore.so*)
 					DEPLOY_QT_WEB_ENGINE=${DEPLOY_QT_WEB_ENGINE:-1}
+					DEPLOY_ELECTRON=${DEPLOY_ELECTRON:-1}
 					;;
 				*libgtk-3*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
