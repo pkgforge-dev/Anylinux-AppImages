@@ -823,8 +823,12 @@ _handle_bins_scripts() {
 	fi
 
 	if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
-		cp -r /usr/share/qt*/resources    "$APPDIR"/lib/qt*
-		cp -r /usr/share/qt*/translations "$APPDIR"/lib/qt*
+		src_res=/usr/share/"$QT_DIR"/resources
+		dst_res="$APPDIR"/shared/lib/"$QT_DIR"/resources
+		if [ -d "$src_res" ] && [ ! -d "$dst_res" ]; then
+			mkdir -p "${dst_res%/*}"
+			cp -r "$src_res" "$dst_res"
+		fi
 	fi
 
 	# handle shell scripts
@@ -1732,11 +1736,19 @@ if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Copied gegl json files"
 	fi
 fi
-if [ "$DEPLOY_QT" = 1 ] && [ -f "$TMPDIR"/libqgtk3.so ]; then
-	d="$APPDIR"/lib/"$QT_DIR"/plugins/platformthemes
-	mkdir -p "$d"
-	mv "$TMPDIR"/libqgtk3.so "$d"
-	"$APPDIR"/sharun -g 2>/dev/null || :
+if [ "$DEPLOY_QT" = 1 ]; then
+	src_trans=/usr/share/"$QT_DIR"/translations
+	dst_trans="$APPDIR"/shared/lib/"$QT_DIR"/translations
+	if [ -d "$src_trans" ] && [ ! -d "$dst_trans" ]; then
+		mkdir -p "${dst_trans%/*}"
+		cp -r "$src_trans" "$dst_trans"
+	fi
+	if [ -f "$TMPDIR"/libqgtk3.so ]; then
+		d="$APPDIR"/lib/"$QT_DIR"/plugins/platformthemes
+		mkdir -p "$d"
+		mv "$TMPDIR"/libqgtk3.so "$d"
+		"$APPDIR"/sharun -g 2>/dev/null || :
+	fi
 fi
 
 # some libraries may need to look for a relative ../share directory
