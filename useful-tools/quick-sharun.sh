@@ -1742,6 +1742,8 @@ if [ "$DEPLOY_QT" = 1 ]; then
 	if [ -d "$src_trans" ] && [ ! -d "$dst_trans" ]; then
 		mkdir -p "${dst_trans%/*}"
 		cp -r "$src_trans" "$dst_trans"
+		rm -f "$dst_trans"/assistant*.qm
+		rm -f "$dst_trans"/designer*.qm
 	fi
 	if [ -f "$TMPDIR"/libqgtk3.so ]; then
 		d="$APPDIR"/lib/"$QT_DIR"/plugins/platformthemes
