@@ -109,7 +109,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
 [TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage)                                                            |
 [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
-[Tutanota Desktop](https://github.com/pkgforge-dev/Tutanota-Desktop-Enhanced-AppImage)                                   |
+[Tutanota Desktop](https://github.com/pkgforge-dev/Tutanota-Desktop-AppImage-Enhanced)                                   |
 [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
 [Varia](https://github.com/pkgforge-dev/Varia-AppImage)                                                                  |
