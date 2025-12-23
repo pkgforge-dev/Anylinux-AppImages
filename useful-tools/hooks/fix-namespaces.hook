@@ -41,17 +41,14 @@ DO_NOT_ASK="Do you wish to not see this message again about unprivileged user-na
 
 # do not bother if unshare or /bin/true are missing
 _sanity_check() {
-	if command -v unshare && command -v /bin/true; then
+	if command -v /bin/true && unshare --help | grep -q -- '--user'; then
 		return 0
 	fi
 	return 1
 }
 
 _check_usernamespaces_work() {
-	if unshare --help | grep -q -- '--user'; then
-		unshare --user -p /bin/true && return 0
-	fi
-	return 1
+	unshare --user -p /bin/true
 }
 
 _is_apparmor() {
