@@ -66,7 +66,8 @@ _fix_usernamespaces() {
         && command -v pkexec 1>/dev/null \
         && [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
           apparmor_based=true
-        elif command -v ujust 1>/dev/null && ujust | grep -q toggle-unconfined-domain-userns-creation; then
+        elif command -v ujust 1>/dev/null \
+        && ujust | grep -q toggle-unconfined-domain-userns-creation; then
           secureblue_based=true
         fi
         
