@@ -81,6 +81,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
 [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
 [okteta](https://github.com/pkgforge-dev/okteta-AppImage)                                                                |
+[opencode](https://github.com/pkgforge-dev/okteta-AppImage-Enhanced)                                                     |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
 [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
