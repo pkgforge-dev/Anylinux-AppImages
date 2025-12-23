@@ -644,10 +644,9 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 		_echo "* Deploying ImageMagick"
-		set -- "$@" \
-			"$(command -v magick || true)"  \
-			"$(command -v convert || true)" \
-			"$LIB_DIR"/libMagick*.so*
+		set -- "$@" "$LIB_DIR"/libMagick*.so*
+		if b=$(command -v magick);  then set -- "$@" "$b"; fi
+		if b=$(command -v convert); then set -- "$@" "$b"; fi
 	fi
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		if pythonbin=$(command -v python); then
@@ -658,10 +657,9 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Deploying gegl"
-		set -- "$@" \
-			"$LIB_DIR"/gegl-*/*       \
-			"$(command -v gegl || :)" \
-			"$(command -v gegl-imgcmp || :)"
+		set -- "$@" "$LIB_DIR"/gegl-*/*
+		if b=$(command -v gegl);        then set -- "$@" "$b"; fi
+		if b=$(command -v gegl-imgcmp); then set -- "$@" "$b"; fi
 	fi
 	if [ "$DEPLOY_BABL" = 1 ]; then
 		_echo "* Deploying babl"
