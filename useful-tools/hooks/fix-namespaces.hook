@@ -40,6 +40,8 @@ _is_false_positive() {
 	elif [ ! -d /etc/sysctl.d ] \
 	  || [ ! -d /etc/apparmor.d ]; then
 		FALSE_POSITIVE=1
+	elif ! unshare --help | grep -q -- '--user'; then
+		FALSE_POSITIVE=1
 	fi
 
 	if [ "$FALSE_POSITIVE" = 1 ]; then
