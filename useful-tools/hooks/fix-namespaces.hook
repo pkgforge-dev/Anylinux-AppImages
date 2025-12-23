@@ -41,53 +41,40 @@ DO_NOT_ASK="Do you wish to not see this message again about unprivileged user-na
 
 # if this fails, namespaces are disabled
 _check_usernamespaces_work() {
-    if command -v unshare 1>/dev/null; then
-      if unshare --help | grep -q -- '--user'; then
-        unshare_user_flag_available=1
-      else
-        return 0 # distros with older unshare all have unprivileged user-namespaces enabled
-      fi
-    else
-      return 1
-    fi
-
-    if [ "$unshare_user_flag_available" = 1 ]; then
-      if command -v /bin/true 1>/dev/null; then
-	    unshare --user -p /bin/true >/dev/null 2>&1
-      else
-        return 0 # non-FHS distros like NixOS don't ship /bin/true here, so we want to avoid warning on these distros
-      fi
-    fi
+	if command -v /bin/true && unshare --help | grep -q -- '--user'; then
+		unshare --user -p /bin/true && return 0
+	fi
+	return 1
 }
 
 _fix_usernamespaces() {
-        if command -v sysctl 1>/dev/null && [ -d /etc/sysctl.d ] \
-        && command -v pkexec 1>/dev/null \
-        && [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
-          apparmor_based=1
-        elif command -v ujust 1>/dev/null \
-        && ujust | grep -q toggle-unconfined-domain-userns-creation; then
-          secureblue_based=1
-        fi
+		if command -v sysctl 1>/dev/null && [ -d /etc/sysctl.d ] \
+		&& command -v pkexec 1>/dev/null \
+		&& [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+			apparmor_based=1
+		elif command -v ujust 1>/dev/null \
+		&& ujust | grep -q toggle-unconfined-domain-userns-creation; then
+			secureblue_based=1
+		fi
         
 	if [ "$apparmor_based" = 1 ]; then
-	  if notify --display-question "$INFO_MESSAGE_FIX_APPARMOR"; then
-		pkexec /bin/sh -c "
-		  echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
-		    | tee /etc/sysctl.d/20-fix-namespaces.conf
-		  sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-		"
-	  else
-		return 1
-	  fi
+		if notify --display-question "$INFO_MESSAGE_FIX_APPARMOR"; then
+			pkexec /bin/sh -c "
+			echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
+			| tee /etc/sysctl.d/20-fix-namespaces.conf
+			sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+			"
+		else
+			return 1
+		fi
 	elif [ "$secureblue_based" = 1 ]; then
-	  if notify --display-question "$INFO_MESSAGE_FIX_SECUREBLUE"; then
-	    ujust toggle-unconfined-domain-userns-creation
-	  else
-	    return 1
-	  fi
+		if notify --display-question "$INFO_MESSAGE_FIX_SECUREBLUE"; then
+			ujust toggle-unconfined-domain-userns-creation
+		else
+			return 1
+		fi
 	else
-	  notify --display-info "$INFO_MESSAGE_WITHOUT_FIX"
+		notify --display-info "$INFO_MESSAGE_WITHOUT_FIX"
 	fi
 }
 
@@ -98,7 +85,7 @@ _do_not_ask_again() {
 
 if [ -f "$LOCKFILEPATH" ]; then
 	exit 0
-elif _check_usernamespaces_work; then
+elif _check_usernamespaces_work >/dev/null 2>&1; then
 	exit 0
 elif _fix_usernamespaces; then
 	exit 0
