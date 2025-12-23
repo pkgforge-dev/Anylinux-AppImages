@@ -64,13 +64,13 @@ _fix_usernamespaces() {
         if command -v sysctl 1>/dev/null && [ -d /etc/sysctl.d ] \
         && command -v pkexec 1>/dev/null \
         && [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
-          apparmor_based=true
+          apparmor_based=1
         elif command -v ujust 1>/dev/null \
         && ujust | grep -q toggle-unconfined-domain-userns-creation; then
-          secureblue_based=true
+          secureblue_based=1
         fi
         
-	if $apparmor_based; then
+	if [ "$apparmor_based" = 1 ]; then
 	  if notify --display-question "$INFO_MESSAGE_FIX_APPARMOR"; then
 		pkexec /bin/sh -c "
 		  echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
@@ -80,7 +80,7 @@ _fix_usernamespaces() {
 	  else
 		return 1
 	  fi
-	elif $secureblue_based; then
+	elif [ "$secureblue_based" = 1 ]; then
 	  if notify --display-question "$INFO_MESSAGE_FIX_SECUREBLUE"; then
 	    ujust toggle-unconfined-domain-userns-creation
 	  else
