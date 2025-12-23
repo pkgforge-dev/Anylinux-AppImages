@@ -43,7 +43,7 @@ DO_NOT_ASK="Do you wish to not see this message again about unprivileged user-na
 _check_usernamespaces_work() {
     if command -v unshare 1>/dev/null; then
       if unshare --help | grep -q -- '--user'; then
-        unshare_user_flag_available=true
+        unshare_user_flag_available=1
       else
         return 0 # distros with older unshare all have unprivileged user-namespaces enabled
       fi
@@ -51,7 +51,7 @@ _check_usernamespaces_work() {
       return 1
     fi
 
-    if $unshare_user_flag_available; then
+    if [ "$unshare_user_flag_available" = 1 ]; then
       if command -v /bin/true 1>/dev/null; then
 	    unshare --user -p /bin/true >/dev/null 2>&1
       else
