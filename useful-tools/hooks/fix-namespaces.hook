@@ -61,8 +61,7 @@ _check_usernamespaces_work() {
 }
 
 _fix_usernamespaces() {
-        if command -v sysctl 1>/dev/null \ 
-        && [ -d /etc/sysctl.d ] \
+        if command -v sysctl 1>/dev/null && [ -d /etc/sysctl.d ] \
         && command -v pkexec 1>/dev/null \
         && [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
           apparmor_based=true
