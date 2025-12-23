@@ -918,6 +918,36 @@ _add_locale_check() {
 	fi
 }
 
+_add_certs_check() {
+	cert_check="$APPDIR"/bin/check-ca-certs.src.hook
+	if [ -f "$cert_check" ]; then
+		return 0
+	fi
+
+	cat <<-'EOF' > "$cert_check"
+	#!/bin/sh
+	if [ ! -f /etc/ssl/certs/ca-certificates.crt ]; then
+	    _possible_certs='
+	      /etc/pki/tls/certs/ca-bundle.trust.crt
+	      /etc/pki/tls/certs/ca-bundle.crt
+	      /etc/pki/tls/cacert.pem
+	      /etc/ssl/cert.pem
+	    '
+	    for c in $_possible_certs; do
+	        if [ -f "$c" ]; then
+	            REQUESTS_CA_BUNDLE=$c
+	            CURL_CA_BUNDLE=$c
+	            SSL_CERT_FILE=$c
+	            export REQUESTS_CA_BUNDLE CURL_CA_BUNDLE SSL_CERT_FILE
+	            break
+	        fi
+	    done
+	    [ -f "$c" ] || >&2 echo "WARNING: Cannot find CA Certificates in '/etc'!"
+	fi
+	EOF
+	chmod +x "$cert_check"
+}
+
 _map_paths_ld_preload_open() {
 	# format new line entries in PATH_MAPPING into comma separated
 	# entries for sharun, pathmap accepts new lines in the variable
@@ -1611,6 +1641,9 @@ for lib do case "$lib" in
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_bin_dir "$lib" || :
 		_add_bwrap_wrapper
+		;;
+	*libssl*.so*)
+		_add_certs_check
 		;;
 	esac
 done
