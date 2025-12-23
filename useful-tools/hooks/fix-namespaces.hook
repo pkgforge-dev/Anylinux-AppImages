@@ -39,35 +39,51 @@ Changes are immediate, there is no need to reboot.
 
 DO_NOT_ASK="Do you wish to not see this message again about unprivileged user-namespaces?"
 
-# if this fails, namespaces are disabled
+# do not bother if unshare or /bin/true are missing
+_sanity_check() {
+	if command -v unshare && command -v /bin/true; then
+		return 0
+	fi
+	return 1
+}
+
 _check_usernamespaces_work() {
-	if command -v /bin/true && unshare --help | grep -q -- '--user'; then
+	if unshare --help | grep -q -- '--user'; then
 		unshare --user -p /bin/true && return 0
 	fi
 	return 1
 }
 
-_fix_usernamespaces() {
-		if command -v sysctl 1>/dev/null && [ -d /etc/sysctl.d ] \
-		&& command -v pkexec 1>/dev/null \
-		&& [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
-			apparmor_based=1
-		elif command -v ujust 1>/dev/null \
-		&& ujust | grep -q toggle-unconfined-domain-userns-creation; then
-			secureblue_based=1
+_is_apparmor() {
+	if [ -d /etc/sysctl.d ] && command -v sysctl && command -v pkexec; then
+		if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+			return 0
 		fi
-        
-	if [ "$apparmor_based" = 1 ]; then
+	fi
+	return 1
+}
+
+_is_secureblue() {
+	if command -v ujust; then
+		if ujust | grep -q toggle-unconfined-domain-userns-creation; then
+			return 0
+		fi
+	fi
+	return 1
+}
+
+_fix_usernamespaces() {
+	if _is_apparmor 1>/dev/null; then
 		if notify --display-question "$INFO_MESSAGE_FIX_APPARMOR"; then
 			pkexec /bin/sh -c "
-			echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
-			| tee /etc/sysctl.d/20-fix-namespaces.conf
-			sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+			  echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
+			  | tee /etc/sysctl.d/20-fix-namespaces.conf
+			  sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 			"
 		else
 			return 1
 		fi
-	elif [ "$secureblue_based" = 1 ]; then
+	elif _is_secureblue 1>/dev/null; then
 		if notify --display-question "$INFO_MESSAGE_FIX_SECUREBLUE"; then
 			ujust toggle-unconfined-domain-userns-creation
 		else
@@ -85,7 +101,9 @@ _do_not_ask_again() {
 
 if [ -f "$LOCKFILEPATH" ]; then
 	exit 0
-elif _check_usernamespaces_work >/dev/null 2>&1; then
+elif ! _sanity_check 1>/dev/null; then
+	exit 0
+elif _check_usernamespaces_work 1>/dev/null; then
 	exit 0
 elif _fix_usernamespaces; then
 	exit 0
