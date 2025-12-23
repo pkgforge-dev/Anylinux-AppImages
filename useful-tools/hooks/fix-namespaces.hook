@@ -7,59 +7,74 @@
 CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 LOCKFILEPATH="$CACHEDIR"/.disable-namespaces-check
 
-INFO_MESSAGE="
-Starting Ubuntu24.04 Canonical decided that namespaces are not safe and is preventing us from using it to sandbox applications.
-namespaces are safe and a vital part of the security model of all web browsers, flatpak, electron apps, etc
+INFO_MESSAGE_BASE="
+Disabled unprivileged user-namespaces detected
 
-To fix this issue I will need permission to disable the restriction, like all other linux distros do and several ubuntu forks had to undo.
+Unprivileged user-namespaces are required to use this application.
 
-For more details see: https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/fix-namespaces.md#why
+Certain Linux distributions like Ubuntu since v24.04 and secureblue disable unprivileged user-namespaces by default due to safety concerns.
+This is what prevents the applications to utilize sandboxing.
+Unprivileged user-namespaces are safe and a vital part of the security model of all web browsers, flatpak, electron apps, etc.
 
+For more details, see: https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/fix-namespaces.md#why
+"
+
+INFO_MESSAGE_WITHOUT_FIX="$INFO_MESSAGE_BASE
+We do not have an automated way to enable unprivileged user-namespaces for your Linux distribution at the moment, so you will have to enable those manually.
+"
+
+INFO_MESSAGE_FIX="$INFO_MESSAGE_BASE
+To fix this issue, I will need a permission to disable this restriction, like all the other Linux distributions do and several Ubuntu forks had to undo.
+"
+
+INFO_MESSAGE_FIX_APPARMOR="$INFO_MESSAGE_FIX
 If you later wish to undo this change, remove: '/etc/sysctl.d/20-fix-namespaces.conf'
 and then run 'sysctl -w kernel.apparmor_restrict_unprivileged_userns=1' or reboot.
 "
-WARNING="
-WARNING: I'm not able to create a namespace and not sure what is preventing it.
-We will continue without prompting but if something breaks you know why.
+
+INFO_MESSAGE_FIX_SECUREBLUE="$INFO_MESSAGE_FIX
+If you later wish to undo this change, run this command: 'ujust toggle-unconfined-domain-userns-creation'.
+Changes are immediate, there is no need to reboot.
 "
-DO_NOT_ASK="Do you wish to not see this message again?"
 
-# if this fails namespaces are disabled
-_check_namespaces_work() {
-	unshare --user -p /bin/true >/dev/null 2>&1
-}
+DO_NOT_ASK="Do you wish to not see this message again about unprivileged user-namespaces?"
 
-# Make sure we have all the needed deps
-# Unlikely to be ubuntu or its spins if any of these conditions are true
-_is_false_positive() {
-	if ! command -v /bin/true \
-	  || ! command -v sysctl  \
-	  || ! command -v unshare \
-	  || ! command -v notify; then
-		FALSE_POSITIVE=1
-	elif [ ! -d /etc/sysctl.d ] \
-	  || [ ! -d /etc/apparmor.d ]; then
-		FALSE_POSITIVE=1
-	elif ! unshare --help | grep -q -- '--user'; then
-		FALSE_POSITIVE=1
-	fi
-
-	if [ "$FALSE_POSITIVE" = 1 ]; then
-		>&2 echo "$WARNING"
-		return 0
+# if this fails, namespaces are disabled
+_check_usernamespaces_work() {
+	if command -v /bin/true && unshare --help | grep -q -- '--user'; then
+		unshare --user -p /bin/true && return 0
 	fi
 	return 1
 }
 
-_fix_ubuntu_mess() {
-	if notify --display-question "$INFO_MESSAGE"; then
-		pkexec /bin/sh -c "
-		  echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
-		    | tee /etc/sysctl.d/20-fix-namespaces.conf
-		  sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-		"
+_fix_usernamespaces() {
+		if command -v sysctl 1>/dev/null && [ -d /etc/sysctl.d ] \
+		&& command -v pkexec 1>/dev/null \
+		&& [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+			apparmor_based=1
+		elif command -v ujust 1>/dev/null \
+		&& ujust | grep -q toggle-unconfined-domain-userns-creation; then
+			secureblue_based=1
+		fi
+        
+	if [ "$apparmor_based" = 1 ]; then
+		if notify --display-question "$INFO_MESSAGE_FIX_APPARMOR"; then
+			pkexec /bin/sh -c "
+			echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
+			| tee /etc/sysctl.d/20-fix-namespaces.conf
+			sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+			"
+		else
+			return 1
+		fi
+	elif [ "$secureblue_based" = 1 ]; then
+		if notify --display-question "$INFO_MESSAGE_FIX_SECUREBLUE"; then
+			ujust toggle-unconfined-domain-userns-creation
+		else
+			return 1
+		fi
 	else
-		return 1
+		notify --display-info "$INFO_MESSAGE_WITHOUT_FIX"
 	fi
 }
 
@@ -68,13 +83,11 @@ _do_not_ask_again() {
 	echo "delete me to enable again" > "$LOCKFILEPATH"
 }
 
-if [ -f /etc/sysctl.d/20-fix-namespaces.conf ] || [ -f "$LOCKFILEPATH" ]; then
+if [ -f "$LOCKFILEPATH" ]; then
 	exit 0
-elif _check_namespaces_work; then
+elif _check_usernamespaces_work >/dev/null 2>&1; then
 	exit 0
-elif _is_false_positive 1>/dev/null; then
-	exit 0
-elif _fix_ubuntu_mess; then
+elif _fix_usernamespaces; then
 	exit 0
 elif notify --display-question "$DO_NOT_ASK"; then
 	_do_not_ask_again
