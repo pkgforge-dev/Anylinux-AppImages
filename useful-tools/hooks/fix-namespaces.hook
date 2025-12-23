@@ -41,7 +41,7 @@ DO_NOT_ASK="Do you wish to not see this message again about unprivileged user-na
 
 # if this fails, namespaces are disabled
 _check_usernamespaces_work() {
-    if command -v unshare >/dev/null 2>&1; then
+    if command -v unshare 1>/dev/null; then
       if unshare --help | grep -q -- '--user'; then
         unshare_user_flag_available=true
       else
@@ -52,14 +52,21 @@ _check_usernamespaces_work() {
     fi
 
     if $unshare_user_flag_available; then
-	  unshare --user -p /bin/true >/dev/null 2>&1
+      if command -v /bin/true 1>/dev/null; then
+	    unshare --user -p /bin/true >/dev/null 2>&1
+      else
+        return 0 # non-FHS distros like NixOS don't ship /bin/true here, so we want to avoid warning on these distros
+      fi
     fi
 }
 
 _fix_usernamespaces() {
-        if command -v sysctl >/dev/null 2>&1 && [ -d /etc/sysctl.d ] && command -v pkexec >/dev/null 2>&1 && [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+        if command -v sysctl 1>/dev/null \ 
+        && [ -d /etc/sysctl.d ] \
+        && command -v pkexec 1>/dev/null \
+        && [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
           apparmor_based=true
-        elif command -v ujust >/dev/null 2>&1 && ujust | grep -q toggle-unconfined-domain-userns-creation; then
+        elif command -v ujust 1>/dev/null && ujust | grep -q toggle-unconfined-domain-userns-creation; then
           secureblue_based=true
         fi
         
