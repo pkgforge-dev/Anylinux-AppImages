@@ -61,6 +61,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Gnome System Monitor](https://github.com/pkgforge-dev/Gnome-System-Monitor-AppImage)                                    |
 [Gnome Text Editor](https://github.com/pkgforge-dev/Gnome-Text-Editor-AppImage)                                          |
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
+[Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
