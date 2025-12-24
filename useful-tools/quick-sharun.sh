@@ -1707,7 +1707,15 @@ if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		exit 1
 	fi
 	if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
-		find "$APPDIR"/shared/lib/"${1##*/}" -type f -name '*.pyc' -delete
+		(
+			cd "$APPDIR"/shared/lib/"${1##*/}"
+			for f in $(find ./ -type f -name '*.pyc' -print); do
+				case "$f" in
+					*/"$MAIN_BIN"*) :;;
+					*) [ ! -f "$f" ] || rm -f "$f";;
+				esac
+			done
+		)
 	fi
 fi
 if [ "$DEPLOY_FLUTTER" = 1 ]; then
