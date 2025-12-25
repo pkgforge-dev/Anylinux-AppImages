@@ -938,8 +938,7 @@ _add_certs_check() {
 	#!/bin/sh
 	if [ ! -f /etc/ssl/certs/ca-certificates.crt ]; then
 	    _possible_certs='
-	      /etc/pki/tls/certs/ca-bundle.trust.crt
-	      /etc/pki/tls/certs/ca-bundle.crt
+	      /etc/pki/tls/cert.pem
 	      /etc/pki/tls/cacert.pem
 	      /etc/ssl/cert.pem
 	    '
