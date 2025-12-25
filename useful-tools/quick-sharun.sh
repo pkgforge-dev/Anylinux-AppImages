@@ -688,7 +688,11 @@ _make_deployment_array() {
 		# electron has a resources directory that may have binaries
 		d="${ELECTRON_BIN%/*}"/resources
 		if [ -d "$d" ]; then
-			set -- $(find "$d" -type f ! -name '*.so*')
+			for f in $(find "$d" -type f ! -name '*.so*'); do
+				if [ -x "$f" ]; then
+					set -- "$@" "$f"
+				fi
+			done
 		fi
 	fi
 	if [ "$DEPLOY_P11KIT" = 1 ]; then
