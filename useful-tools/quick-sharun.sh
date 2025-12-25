@@ -944,9 +944,9 @@ _add_certs_check() {
 	    '
 	    for c in $_possible_certs; do
 	        if [ -f "$c" ]; then
-	            REQUESTS_CA_BUNDLE=$c
-	            CURL_CA_BUNDLE=$c
-	            SSL_CERT_FILE=$c
+	            REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-$c}
+	            CURL_CA_BUNDLE=${CURL_CA_BUNDLE:-$c}
+	            SSL_CERT_FILE=${SSL_CERT_FILE:-$c}
 	            export REQUESTS_CA_BUNDLE CURL_CA_BUNDLE SSL_CERT_FILE
 	            break
 	        fi
