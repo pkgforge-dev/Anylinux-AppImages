@@ -686,7 +686,7 @@ _make_deployment_array() {
 			"$LIB_DIR"/libsoftokn3.so*  \
 			"$LIB_DIR"/libfreeblpriv3.so*
 		# electron has a resources directory that may have binaries
-		d="$ELECTRON_BIN"/resources
+		d="${ELECTRON_BIN%/*}"/resources
 		if [ -d "$d" ]; then
 			set -- $(find "$d" -type f ! -name '*.so*')
 		fi
