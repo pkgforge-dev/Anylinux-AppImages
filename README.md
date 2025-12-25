@@ -104,6 +104,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
 [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage)                                                    |
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
+[Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
 [sView](https://github.com/pkgforge-dev/sView-AppImage)                                                                  |
 [system-monitoring-center](https://github.com/pkgforge-dev/system-monitoring-center-AppImage)                            |
