@@ -310,6 +310,7 @@ _determine_what_to_deploy() {
 			if grep -aoq -m 1 'disable-gpu-sandbox' "$bin" \
 			  && grep -aoq -m 1 'no-zygote-sandbox' "$bin"; then
 				DEPLOY_ELECTRON=${DEPLOY_ELECTRON:-1}
+				ELECTRON_BIN=$(readlink -f "$bin")
 			fi
 		fi
 
@@ -684,6 +685,11 @@ _make_deployment_array() {
 			"$LIB_DIR"/libnss*.so*      \
 			"$LIB_DIR"/libsoftokn3.so*  \
 			"$LIB_DIR"/libfreeblpriv3.so*
+		# electron has a resources directory that may have binaries
+		d="$ELECTRON_BIN"/resources
+		if [ -d "$d" ]; then
+			set -- $(find "$d" -type f ! -name '*.so*')
+		fi
 	fi
 	if [ "$DEPLOY_P11KIT" = 1 ]; then
 		_echo "* Deploying p11kit"
@@ -1889,8 +1895,18 @@ EOF
 # wrap any executable in lib with sharun
 for b in $(find "$APPDIR"/shared/lib/ -type f ! -name '*.so*'); do
 	if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
-		ln -f "$APPDIR"/sharun "$b"
+		rm -f "$b"
+		ln "$APPDIR"/sharun "$b"
 		_echo "* Wrapped lib executable '$b' with sharun"
+	fi
+done
+
+# do the same for possible nested binaries in bin
+for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*')
+	if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
+		rm -f "$b"
+		ln "$APPDIR"/sharun "$b"
+		_echo "* Wrapped nested bin executable '$b' with sharun"
 	fi
 done
 
