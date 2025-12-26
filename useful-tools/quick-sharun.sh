@@ -548,6 +548,27 @@ _make_deployment_array() {
 	if [ "$DEPLOY_FLUTTER" = 1 ]; then
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 	fi
+	if [ "$DEPLOY_ELECTRON" = 1 ] || [ "$DEPLOY_CHROMIUM" = 1 ]; then
+		_echo "* Deploying electron/chromium"
+		DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
+		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
+		set -- "$@" \
+			"$LIB_DIR"/libva.so*        \
+			"$LIB_DIR"/libva-drm.so*    \
+			"$LIB_DIR"/libpci.so*       \
+			"$LIB_DIR"/libnss*.so*      \
+			"$LIB_DIR"/libsoftokn3.so*  \
+			"$LIB_DIR"/libfreeblpriv3.so*
+		# electron has a resources directory that may have binaries
+		d="${ELECTRON_BIN%/*}"/resources
+		if [ -d "$d" ]; then
+			for f in $(find "$d" -type f ! -name '*.so*'); do
+				if [ -x "$f" ]; then
+					set -- "$@" "$f"
+				fi
+			done
+		fi
+	fi
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
 		set -- "$@" \
 			"$LIB_DIR"/dri/*   \
@@ -673,26 +694,6 @@ _make_deployment_array() {
 			set -- "$@" "$LIB_DIR"/libheif/plugins/*
 		elif [ -d "$LIB_DIR"/libheif ]; then
 			set -- "$@" "$LIB_DIR"/libheif/*
-		fi
-	fi
-	if [ "$DEPLOY_ELECTRON" = 1 ] || [ "$DEPLOY_CHROMIUM" = 1 ]; then
-		_echo "* Deploying electron/chromium"
-		DEPLOY_P11KIT=1
-		set -- "$@" \
-			"$LIB_DIR"/libva.so*        \
-			"$LIB_DIR"/libva-drm.so*    \
-			"$LIB_DIR"/libpci.so*       \
-			"$LIB_DIR"/libnss*.so*      \
-			"$LIB_DIR"/libsoftokn3.so*  \
-			"$LIB_DIR"/libfreeblpriv3.so*
-		# electron has a resources directory that may have binaries
-		d="${ELECTRON_BIN%/*}"/resources
-		if [ -d "$d" ]; then
-			for f in $(find "$d" -type f ! -name '*.so*'); do
-				if [ -x "$f" ]; then
-					set -- "$@" "$f"
-				fi
-			done
 		fi
 	fi
 	if [ "$DEPLOY_P11KIT" = 1 ]; then
