@@ -552,6 +552,7 @@ _make_deployment_array() {
 		_echo "* Deploying electron/chromium"
 		DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
+		DEPLOY_VULKAN=${DEPLOY_VULKAN:-1}
 		set -- "$@" \
 			"$LIB_DIR"/libva.so*        \
 			"$LIB_DIR"/libva-drm.so*    \
