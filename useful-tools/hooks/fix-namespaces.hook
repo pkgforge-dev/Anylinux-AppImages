@@ -41,7 +41,7 @@ DO_NOT_ASK="Do you wish to not see this message again about unprivileged user-na
 
 # do not bother if unshare or /bin/true are missing
 _sanity_check() {
-	if command -v /bin/true && unshare --help | grep -q -- '--user'; then
+	if command -v /bin/true && unshare --help 2>&1 | grep -q -- '--user'; then
 		return 0
 	fi
 	return 1
