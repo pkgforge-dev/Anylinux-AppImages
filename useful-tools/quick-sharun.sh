@@ -353,6 +353,9 @@ _determine_what_to_deploy() {
 				*libglycin*.so*)
 					DEPLOY_GLYCIN=${DEPLOY_GLYCIN:-1}
 					;;
+				*libwebkit*gtk*.so*)
+					DEPLOY_WEBKIT2GTK=${DEPLOY_WEBKIT2GTK:-1}
+					;;
 				*libSDL*.so*)
 					DEPLOY_SDL=${DEPLOY_SDL:-1}
 					;;
@@ -510,6 +513,12 @@ _make_deployment_array() {
 		case "$GTK_DIR" in
 			*4*) DEPLOY_OPENGL=${DEPLOY_OPENGL:-1};;
 		esac
+
+		if [ "$DEPLOY_WEBKIT2GTK" = 1 ]; then
+			_echo "* Deploying webkit2gtk"
+			DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
+			DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
+		fi
 	fi
 	if [ "$DEPLOY_GDK" = 1 ]; then
 		_echo "* Deploying gdk-pixbuf"
