@@ -65,6 +65,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
+[kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
 [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage)                                                                  |
