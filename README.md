@@ -85,6 +85,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced)                                                   |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
+[phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage)                                            |
 [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
 [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)                                                          |
