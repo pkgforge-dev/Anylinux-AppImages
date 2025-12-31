@@ -102,6 +102,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
 [sound-space-plus](https://github.com/pkgforge-dev/sound-space-plus-AppImage)                                            |
+[spacecadetpinball](https://github.com/pkgforge-dev/spacecadetpinball-AppImage)                                          |
 [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
 [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
 [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage)                                                    |
