@@ -1974,6 +1974,12 @@ if [ -f "$1" ]; then
 	fi
 fi
 
+# workaround nvidia gbm issues until sharun does a proper fix
+gbmdir="$APPDIR"/shared/lib/gbm
+if [ -d "$gbmdir" ] && [ ! -f "$gbmdir"/nvidia-drm_gbm.so ]; then
+	ln -s /usr/lib64/gbm/nvidia-drm_gbm.so "$gbmdir"
+fi
+
 echo ""
 if [ "$OUTPUT_APPIMAGE" = 1 ]; then
 	_make_appimage
