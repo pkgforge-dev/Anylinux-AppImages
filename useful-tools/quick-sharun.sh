@@ -1976,7 +1976,7 @@ fi
 
 # workaround nvidia gbm issues until sharun does a proper fix
 gbmdir="$APPDIR"/shared/lib/gbm
-if [ -d "$gbmdir" ] && [ ! -f "$gbmdir"/nvidia-drm_gbm.so ]; then
+if [ -d "$gbmdir" ] && [ ! -L "$gbmdir"/nvidia-drm_gbm.so ]; then
 	ln -s /usr/lib64/gbm/nvidia-drm_gbm.so "$gbmdir"
 fi
 
