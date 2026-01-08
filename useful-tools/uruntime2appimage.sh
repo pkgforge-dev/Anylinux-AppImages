@@ -182,6 +182,7 @@ fi
 
 # sanitize VERSION and APPNAME
 if [ -n "$VERSION" ]; then
+	VERSION=${VERSION#*:} # remove epoch from VERSION
 	VERSION=$(printf '%s' "$VERSION" | tr '":><*|\?\r\n' '_')
 fi
 if [ -n "$APPNAME" ]; then
