@@ -52,6 +52,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage)                                          |
 [Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage)                                                        |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
+[foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
