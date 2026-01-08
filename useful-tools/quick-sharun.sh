@@ -1559,7 +1559,6 @@ _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
 _add_locale_check
-_add_ldconfig_wrapper
 _deploy_datadir
 _deploy_locale
 _check_window_class
@@ -1810,6 +1809,9 @@ if [ "$DEPLOY_QT" = 1 ]; then
 		mv "$TMPDIR"/libqgtk3.so "$d"
 		"$APPDIR"/sharun -g 2>/dev/null || :
 	fi
+fi
+if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
+	_add_ldconfig_wrapper
 fi
 
 # some libraries may need to look for a relative ../share directory
