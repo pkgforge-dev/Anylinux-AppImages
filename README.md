@@ -50,6 +50,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Elastic](https://github.com/pkgforge-dev/Elastic-AppImage)                                                              |
 [ePSXe](https://github.com/pkgforge-dev/ePSXe-AppImage)                                                                  |
 [Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage)                                          |
+[ExtremeTuxRacer](https://github.com/pkgforge-dev/ExtremeTuxRacer-AppImage)                                              |
 [Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage)                                                        |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
