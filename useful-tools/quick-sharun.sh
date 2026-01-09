@@ -436,6 +436,7 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_QT" = 1 ]; then
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
+		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 
 		# some distros have a qt dir rather than qt6 or qt5 dir
 		if [ ! -d "$LIB_DIR"/"$QT_DIR" ]; then
@@ -448,9 +449,6 @@ _make_deployment_array() {
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
 				*libQt*Gui.so*)
-					set -- "$@" \
-						"$LIB_DIR"/libXi.so* \
-						"$LIB_DIR"/libXcursor.so*
 					# terrible hack to prevent partial gtk deployment
 					# see: https://github.com/VHSgunzo/sharun/issues/91
 					p="$plugindir"/platformthemes/libqgtk3.so
@@ -505,11 +503,10 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_GTK" = 1 ]; then
 		_echo "* Deploying $GTK_DIR"
-		DEPLOY_GDK=1
+		DEPLOY_GDK=${DEPLOY_GDK:-1}
+		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		set -- "$@" \
 			"$LIB_DIR"/"$GTK_DIR"/*/immodules/*   \
-			"$LIB_DIR"/libXi.so*                  \
-			"$LIB_DIR"/libXcursor.so*             \
 			"$LIB_DIR"/gvfs/libgvfscommon.so      \
 			"$LIB_DIR"/gio/modules/libgvfsdbus.so \
 			"$LIB_DIR"/gio/modules/libdconfsettings.so
@@ -540,19 +537,10 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_SDL" = 1 ]; then
 		_echo "* Deploying SDL"
+		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		set -- "$@" \
-			"$LIB_DIR"/libSDL*.so*           \
-			"$LIB_DIR"/libudev.so*           \
-			"$LIB_DIR"/libXcursor.so*        \
-			"$LIB_DIR"/libXext.so*           \
-			"$LIB_DIR"/libXi.so*             \
-			"$LIB_DIR"/libXfixes.so*         \
-			"$LIB_DIR"/libXrandr.so*         \
-			"$LIB_DIR"/libXss.so*            \
-			"$LIB_DIR"/libX11-xcb.so*        \
-			"$LIB_DIR"/libwayland-client.so* \
-			"$LIB_DIR"/libwayland-egl.so*    \
-			"$LIB_DIR"/libwayland-cursor.so*
+			"$LIB_DIR"/libSDL*.so* \
+			"$LIB_DIR"/libudev.so*
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying glycin"
@@ -560,10 +548,12 @@ _make_deployment_array() {
 		_add_bwrap_wrapper
 	fi
 	if [ "$DEPLOY_FLUTTER" = 1 ]; then
+		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 	fi
 	if [ "$DEPLOY_ELECTRON" = 1 ] || [ "$DEPLOY_CHROMIUM" = 1 ]; then
 		_echo "* Deploying electron/chromium"
+		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 		DEPLOY_VULKAN=${DEPLOY_VULKAN:-1}
@@ -585,6 +575,7 @@ _make_deployment_array() {
 		fi
 	fi
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
+		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		set -- "$@" \
 			"$LIB_DIR"/dri/*   \
 			"$LIB_DIR"/vdpau/* \
@@ -716,6 +707,8 @@ _make_deployment_array() {
 		set -- "$@" "$LIB_DIR"/pkcs11/*
 	fi
 	if [ "$DEPLOY_DOTNET" = 1 ]; then
+		_echo "* Deploying dotnet"
+		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		if [ -z "$DOTNET_DIR" ]; then
 			if [ -d /usr/lib/dotnet ]; then
 				DOTNET_DIR=/usr/lib/dotnet
@@ -736,6 +729,23 @@ _make_deployment_array() {
 		cp -r "$DOTNET_DIR"/shared "$APPDIR"/bin
 		cp -r "$DOTNET_DIR"/host   "$APPDIR"/bin
 	fi
+	# these are needed by several toolkits
+	if [ "$DEPLOY_COMMON_LIBS" = 1 ]; then
+		set -- "$@" \
+			"$LIB_DIR"/libXi.so*             \
+			"$LIB_DIR"/libXcursor.so*        \
+			"$LIB_DIR"/libxkbcommon.so*      \
+			"$LIB_DIR"/libxkbcommon-x11.so*  \
+			"$LIB_DIR"/libXext.so*           \
+			"$LIB_DIR"/libXfixes.so*         \
+			"$LIB_DIR"/libXrandr.so*         \
+			"$LIB_DIR"/libXss.so*            \
+			"$LIB_DIR"/libX11-xcb.so*        \
+			"$LIB_DIR"/libwayland-egl.so*    \
+			"$LIB_DIR"/libwayland-cursor.so* \
+			"$LIB_DIR"/libwayland-client.so*
+	fi
+
 	# also pass all the files in the directories to add to lib4bin
 	# so we deploy any possible library and binary in the directories
 	# later on the binaries in lib will be wrapped with sharun
