@@ -448,6 +448,9 @@ _make_deployment_array() {
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
 				*libQt*Gui.so*)
+					set -- "$@" \
+						"$LIB_DIR"/libXi.so* \
+						"$LIB_DIR"/libXcursor.so*
 					# terrible hack to prevent partial gtk deployment
 					# see: https://github.com/VHSgunzo/sharun/issues/91
 					p="$plugindir"/platformthemes/libqgtk3.so
@@ -505,6 +508,8 @@ _make_deployment_array() {
 		DEPLOY_GDK=1
 		set -- "$@" \
 			"$LIB_DIR"/"$GTK_DIR"/*/immodules/*   \
+			"$LIB_DIR"/libXi.so*                  \
+			"$LIB_DIR"/libXcursor.so*             \
 			"$LIB_DIR"/gvfs/libgvfscommon.so      \
 			"$LIB_DIR"/gio/modules/libgvfsdbus.so \
 			"$LIB_DIR"/gio/modules/libdconfsettings.so
