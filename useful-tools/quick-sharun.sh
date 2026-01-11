@@ -1328,7 +1328,7 @@ _add_bwrap_wrapper() {
 }
 
 _fix_cpython_ldconfig_mess() {
-	# cpython runs ldconfig -p to determined library names, this is
+	# cpython runs ldconfig -p to determine library names, this is
 	# super flawed because ldconfig -p is going to print host libraries
 	# and not our bundled libraries, it also only works in glibc systems
 	#
