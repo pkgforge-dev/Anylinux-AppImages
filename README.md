@@ -101,6 +101,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
+[RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced)                                                   |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
 [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
