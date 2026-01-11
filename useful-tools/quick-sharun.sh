@@ -1327,18 +1327,43 @@ _add_bwrap_wrapper() {
 	chmod +x "$APPDIR"/bin/bwrap
 }
 
-_add_ldconfig_wrapper() {
-	ldconfig="$APPDIR"/bin/ldconfig
+_fix_cpython_ldconfig_mess() {
+	# cpython runs ldconfig -p to determined library names, this is
+	# super flawed because ldconfig -p is going to print host libraries
+	# and not our bundled libraries, it also only works in glibc systems
+	#
+	# it also hardcodes /sbin/ldconfig and resets PATH variable
+	# so we have to do a lot of patches here to fix this mess
+	#
+	# we will patch /sbin/ldconfig for _ldconfig to avoid conflicts, see:
+	# https://github.com/pkgforge-dev/ghostty-appimage/issues/122
+
+	set -- "$APPDIR"/shared/lib/python*/ctypes/util.py
+	ldconfig="$APPDIR"/bin/_ldconfig
 	if [ -x "$ldconfig" ]; then
 		return 0
+	elif [ ! -f "$1" ]; then
+		return 0 # exit without error if ctypes is not present
 	fi
+	pythonlib=$1
+
+	# patch ctypes lib
+	sed -i \
+		-e 's|/sbin/ldconfig|_ldconfig|g' \
+		-e 's|env={.*}||'                 \
+		"$pythonlib"
+
 	cat <<-'EOF' > "$ldconfig"
 	#!/bin/sh
 
 	# wrapper that makes ldconfig -p print our bundled libraries
+	export LC_ALL=C
+	export LANG=C
+	# some distros don't include /sbin in PATH
+	export PATH="$PATH:/usr/sbin:/sbin"
 
-	if [ -z "$SHARUN_DIR" ]; then
-	    SHARUN_DIR=$(cd "${0%/*}"/../ && echo "$PWD")
+	if [ -z "$APPDIR" ]; then
+	    APPDIR=$(cd "${0%/*}"/../ && echo "$PWD")
 	fi
 
 	_list_libs() {
@@ -1349,7 +1374,7 @@ _add_ldconfig_wrapper() {
 	        *)       arch=x86-64;;
 	    esac
 
-	    for f in "$SHARUN_DIR"/lib/*.so* "$SHARUN_DIR"/lib/*/*.so*; do
+	    for f in "$APPDIR"/shared/lib/*.so* "$APPDIR"/shared/lib/*/*.so*; do
 	        echo "	${f##*/} (libc6,$arch) => $f"
 	    done
 
@@ -1362,15 +1387,13 @@ _add_ldconfig_wrapper() {
 	        _list_libs
 	        ;;
 	    *)
-	        if [ -x /sbin/ldconfig ]; then
-	            exec /sbin/ldconfig "$@"
-	        else
-	            exit 1
-	        fi
+	        exec ldconfig "$@"
 	        ;;
 	esac
 	EOF
 	chmod +x "$ldconfig"
+
+	_echo "* patched cpython /sbin/ldconfig for _ldconfig wrapper"
 }
 
 _add_path_mapping_hardcoded() {
@@ -1828,7 +1851,7 @@ if [ "$DEPLOY_QT" = 1 ]; then
 	fi
 fi
 if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
-	_add_ldconfig_wrapper
+	_fix_cpython_ldconfig_mess
 fi
 
 # some libraries may need to look for a relative ../share directory
