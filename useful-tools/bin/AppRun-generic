@@ -19,6 +19,12 @@ export HOSTPATH="$PATH"
 export PATH="$APPDIR/bin:$PATH"
 export APPDIR
 
+export HOST_HOME="${REAL_HOME:-$HOME}"
+export HOST_XDG_CONFIG_HOME="${REAL_XDG_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOST_HOME/.config}}"
+export HOST_XDG_DATA_HOME="${REAL_XDG_DATA_HOME:-${XDG_DATA_HOME:-$HOST_HOME/.local/share}}"
+export HOST_XDG_CACHE_HOME="${REAL_XDG_CACHE_HOME:-${XDG_CACHE_HOME:-$HOST_HOME/.cache}}"
+export HOST_XDG_STATE_HOME="${REAL_XDG_STATE_HOME:-${XDG_STATE_HOME:-$HOST_HOME/.local/state}}"
+
 # Allow users to set env variables for specific AppImage
 # This feature only works with the uruntime
 if [ "$1" = '--appimage-add-env' ]; then
