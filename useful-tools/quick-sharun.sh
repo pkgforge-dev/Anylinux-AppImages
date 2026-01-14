@@ -609,7 +609,7 @@ _make_deployment_array() {
 	if [ "$DEPLOY_PULSE" = 1 ]; then
 		set -- "$@" \
 			"$LIB_DIR"/libpulse.so* \
-			"$LIB_DIR"/alsa-lib/*pcm*pulse*.so*
+			"$LIB_DIR"/alsa-lib/libasound*pulse*.so*
 	fi
 	if [ "$DEPLOY_GSTREAMER_ALL" = 1 ] || [ "$DEPLOY_GSTREAMER" = 1 ]; then
 		GST_DIR=$(echo "$LIB_DIR"/gstreamer-*)
