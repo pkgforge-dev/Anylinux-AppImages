@@ -23,9 +23,10 @@ APPIMAGE_ARCH=$(uname -m)
 URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.6/uruntime-appimage-dwarfs-lite-$APPIMAGE_ARCH}
 DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$APPIMAGE_ARCH}
 
-# github actions doesn't set user causing some apps
-# crash when making the dwarfs image profile
+# github actions doesn't set USER and XDG_RUNTIME_DIR
+# causing some apps crash when running xvfb-run
 export USER="${LOGNAME:-${USER:-${USERNAME:-yomama}}}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 
 _echo() {
 	printf '\033[1;92m%s\033[0m\n' "$*"

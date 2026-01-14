@@ -96,8 +96,10 @@ if [ "$DEPLOY_PYTHON" = 1 ]; then
 	export PYTHON_VER="${PYTHON_VER:-3.13}"
 fi
 
-# github actions doesn't set USER
-export USER="${USER:-USER}"
+# github actions doesn't set USER and XDG_RUNTIME_DIR
+# causing some apps crash when running xvfb-run
+export USER="${LOGNAME:-${USER:-${USERNAME:-yomama}}}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 
 _echo() {
 	printf '\033[1;92m%s\033[0m\n' " $*"
