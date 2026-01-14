@@ -68,6 +68,11 @@ _get_aur_pkgbuild() {
 	cd ./"$1"
 }
 
+_external_pkgbuild() {
+	git clone --depth 1 "$1" ./"${1##*/}"
+	cd ./"${1##*/}"
+}
+
 _local_pkgbuild() {
 	if [ ! -f "$PWD"/PKGBUILD ]; then
 		>&2 echo "ERROR: No PKGBUILD found in $PWD"
@@ -100,7 +105,8 @@ _prepare
 case "$1" in
 	--chaotic-aur)   shift; _install_chaotic_aur_pkg "$@";;
 	--archlinux-pkg) shift; _get_archlinux_pkgbuild "$@";;
-	'')              _local_pkgbuild ;;
+	http*/*)         _external_pkgbuild "$@";;
+	'')              _local_pkgbuild;;
 	*)               _get_aur_pkgbuild "$@";;
 esac
 
