@@ -21,8 +21,8 @@ UPDATE_POLICY_DIR=${UPDATE_POLICY_CONFIGDIR:-$HOST_XDG_CONFIG_HOME/auto-updates-
 UPDATE_POLICY_FILE=$UPDATE_POLICY_DIR/$entry-update-setting
 APPNAME=${APPIMAGE##*/}
 
-PATH="$PATH:$BINDIR"
 BINDIR=${XDG_BIN_HOME:-$HOME/.local/bin}
+PATH="$PATH:$BINDIR"
 
 WELCOME_MSG=${WELCOME_MSG:-Allow $APPNAME to check for updates? NOTE: We will download appimageupdatetool in $BINDIR if not available}
 UPDATE_MSG="${UPDATE_MSG:-A new version of $APPNAME is available. Do you wish to update?}"
