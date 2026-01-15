@@ -14,16 +14,15 @@
 
 set -e
 
-APPNAME=${APPIMAGE##*/}
-BINDIR=${XDG_BIN_HOME:-$HOME/.local/bin}
-DATADIR=${XDG_DATA_HOME:-$HOME/.local/share}/appimagekit
-CONFIGDIR=${UPDATE_POLICY_CONFIGDIR:-${XDG_CONFIG_HOME:-$HOME/.config}/auto-updates-policy}
-PATH="$PATH:$BINDIR"
-
 set -- "$APPDIR"/*.desktop
 entry=${1##*/}
 entry=${entry%.desktop}
-CONFIGFILEPATH="$CONFIGDIR"/"$entry"-update-setting
+UPDATE_POLICY_DIR=${UPDATE_POLICY_CONFIGDIR:-$HOST_XDG_CONFIG_HOME/auto-updates-policy}
+UPDATE_POLICY_FILE=$UPDATE_POLICY_DIR/$entry-update-setting
+APPNAME=${APPIMAGE##*/}
+
+PATH="$PATH:$BINDIR"
+BINDIR=${XDG_BIN_HOME:-$HOME/.local/bin}
 
 WELCOME_MSG=${WELCOME_MSG:-Allow $APPNAME to check for updates? NOTE: We will download appimageupdatetool in $BINDIR if not available}
 UPDATE_MSG="${UPDATE_MSG:-A new version of $APPNAME is available. Do you wish to update?}"
@@ -51,8 +50,10 @@ _is_another_updater_here() {
 
 # make sure we can update the thing
 _sanity_check() {
-	if [ -f "$CONFIGDIR"/no_updatecheck ] \
-	  || [ -f "$DATADIR"/no_updatecheck ]; then
+	if [ -f "$UPDATE_POLICY_DIR"/no_updatecheck ] \
+	  || [ -f "$HOST_XDG_DATA_HOME"/appimagekit/no_updatecheck ]; then
+		return 1
+	elif [ "$DISABLE_AUTO_UPDATES" = 1 ]; then
 		return 1
 	elif [ -z "$APPIMAGE" ] || [ -z "$APPDIR" ]; then
 		return 1
@@ -65,8 +66,8 @@ _sanity_check() {
 		return 1
 	elif _is_another_updater_here; then
 		return 1
-	elif [ ! -d "$CONFIGDIR" ]; then
-		mkdir -p "$CONFIGDIR"
+	elif [ ! -d "$UPDATE_POLICY_DIR" ]; then
+		mkdir -p "$UPDATE_POLICY_DIR"
 	fi
 }
 
@@ -130,8 +131,8 @@ _update() {
 }
 
 _make_configfile() {
-	if [ ! -f "$CONFIGFILEPATH" ]; then
-		echo "2" > "$CONFIGFILEPATH"
+	if [ ! -f "$UPDATE_POLICY_FILE" ]; then
+		echo "2" > "$UPDATE_POLICY_FILE"
 		# do not ask the first time we are launched
 		# because that just annoys people
 		exit 0
@@ -139,11 +140,11 @@ _make_configfile() {
 }
 
 _enable_update_checking() {
-	echo "1" > "$CONFIGFILEPATH"
+	echo "1" > "$UPDATE_POLICY_FILE"
 }
 
 _disable_update_checking() {
-	echo "0" > "$CONFIGFILEPATH"
+	echo "0" > "$UPDATE_POLICY_FILE"
 }
 
 # if check fails exit without error so that the app can still launch
@@ -153,9 +154,9 @@ _sanity_check 1>/dev/null || exit 0
 _make_configfile
 
 # Now read the file and determine what to do
-read -r STATUS < "$CONFIGFILEPATH"
+read -r STATUS < "$UPDATE_POLICY_FILE"
 if [ "$STATUS" = 0 ]; then
-	>&2 echo "self updates disabled by $CONFIGFILEPATH"
+	>&2 echo "self updates disabled by $UPDATE_POLICY_FILE"
 	exit 0
 elif [ "$STATUS" = 1 ]; then
 	if ! _get_appimageupdatetool; then
