@@ -68,6 +68,8 @@ done
 
 # always unset ARGVO to avoid causing issues to child processes that use zsh
 # We do it after running the hooks since some hooks need it
+# we also save the original value of the var to ARG0 which does not conflict
+export ARG0="$ARGV0"
 unset ARGV0
 
 # Check if BIN (ARGV0) matches a binary, fallback to $1, then binary in .desktop
