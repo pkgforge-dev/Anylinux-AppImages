@@ -8,6 +8,8 @@
  * mode is used, where for example the HOME var from the portable .home dir would
  * be inherited by other processes launched by the appimage in portable mode
  * causing them to start using the fake .home dir instead of the real home
+ *
+ * It also offers the option to change argv0 of the running binary
 */
 
 #ifndef _GNU_SOURCE
@@ -37,6 +39,17 @@ static int appimage_exec_debug_enabled(void) {
 	if (appimage_exec_debug_enabled()) \
 		fprintf(stderr, " [anylinux.so] >> " __VA_ARGS__); \
 	while (0)
+
+// Override the name of the running program
+__attribute__((constructor))
+static void spoof_argv0(int argc, char **argv) {
+	const char *new_argv0 = getenv("OVERRIDE_ARGV0");
+	if (new_argv0 && *new_argv0) {
+		DEBUG_PRINT("Overriding argv[0] from '%s' to '%s'\n", argv[0], new_argv0);
+		argv[0] = (char *)new_argv0;
+		unsetenv("ANYLINUX_ARGV0");
+	}
+}
 
 // problematic vars to check
 static const char* vars_to_unset[] = {
