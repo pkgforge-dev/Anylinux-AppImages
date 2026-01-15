@@ -116,6 +116,13 @@ _is_cmd() {
 	return 0
 }
 
+_is_elf() {
+	if [ -f "$1" ] && head -c 4 "$1" | grep -qa 'ELF'; then
+		return 0
+	fi
+	return 1
+}
+
 _download() {
 	if _is_cmd wget; then
 		DOWNLOAD_CMD="wget"
@@ -314,6 +321,12 @@ _determine_what_to_deploy() {
 				DEPLOY_ELECTRON=${DEPLOY_ELECTRON:-1}
 				ELECTRON_BIN=$(readlink -f "$bin")
 			fi
+		fi
+
+		# check if what we are doing to deploy is not fucking broken
+		if _is_elf "$bin" && ldd "$bin" | grep "not found"; then
+			_err_msg "$bin is missing libraries! Aborting..."
+			exit 1
 		fi
 
 		NEEDED_LIBS="$(ldd "$bin" 2>/dev/null | awk '{print $3}') $NEEDED_LIBS"
