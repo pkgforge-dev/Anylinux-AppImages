@@ -33,7 +33,7 @@ and then run 'sysctl -w kernel.apparmor_restrict_unprivileged_userns=1' or reboo
 "
 
 INFO_MESSAGE_FIX_SECUREBLUE="$INFO_MESSAGE_FIX
-If you later wish to undo this change, run this command: 'ujust toggle-unconfined-domain-userns-creation'.
+If you later wish to undo this change, run this command: 'ujust set-unconfined-userns off'.
 Changes are immediate, there is no need to reboot.
 "
 
