@@ -38,6 +38,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage)                                                              |
 [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
+[ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
