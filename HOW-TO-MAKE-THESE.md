@@ -273,7 +273,7 @@ This is the solution, truly portable application bundles that have everything th
 
 1. First issue to overcome: 
 
-Since we are going to bundle our own libc, it means we cannot use the host dynamic linker even, which means we have to bundle our own `ld-linux/musl.so` and this has a problem, we cannot simply patch out binaries to use the bundled interpreter like `patchelf --set-interpreter '$ORIGIN/ld-linux.so` because that `$ORIGIN` resolution is done by the interpreter itself. 
+Since we are going to bundle our own libc, it means we cannot use the host dynamic linker even, which means we have to bundle our own `ld-linux/musl.so` and this has a problem, we cannot simply patch out binaries to use the bundled interpreter like `patchelf --set-interpreter '$ORIGIN/ld-linux.so'` because that `$ORIGIN` resolution is done by the interpreter itself. 
 
 **We can** have a relative interpreter like `./ld-linux.so`, the problem with this though is that we need to change the current working directory to that location for this to work, in other words for appimages the current working dir will change to the random mountpoint of the appimage, this is a problem if your application is a terminal emulator that opens at the current working directory for example. 
 
@@ -361,7 +361,7 @@ https://github.com/VHSgunzo/sharun
 
 * sharun is also just not for AppImages, you can use it anywhere you need to make any sort of application portable, you can even make pseudo static binaries from existing dynamic binaries which sharun does with the help of wrappe.
 
-* sharun even has hooks to fix applications that aren't relocatable, like webkit2gtk which is hardcoded to for some binaries in `/usr/lib`, it fixes this with patching all automatically for you.
+* sharun even has hooks to fix applications that aren't relocatable, like webkit2gtk which is hardcoded to look for some binaries in `/usr/lib`, it fixes this with patching all automatically for you.
 
 
 Any application made with sharun ends up being able to work **on any linux distro**, be it ubuntu 14.04, musl distros and even directly in NixOS without any wrapper (non FHS environment). 
@@ -423,7 +423,7 @@ Such package and other debloated packages we have are used by [Goverlay](https:/
 
 Nvidia releases its proprietary driver as a binary blob that is already widely compatible on its own, it's only requirement is a new enough version of glibc, which the appimages made here will do as long as you build them on a glibc distro. Then you just need to add the nvidia icds to `VK_DRIVER_FILES` to be able to use it without problem. 
 
-If you don't have the proprietary nvidia driver, mesa already includes nouveau support for the few GPUs where this driver actually works (anything 16 series or newer). 
+If you don't have the proprietary nvidia driver, mesa already includes nouveau support for the few GPUs where this driver actually works (NVIDIA GTX 16 series or newer). 
 
 Goes without saying that sharun handles all of this already on its own.
 
