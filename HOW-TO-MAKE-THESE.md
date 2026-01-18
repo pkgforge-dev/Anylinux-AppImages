@@ -257,7 +257,7 @@ Now that we have our own dynamic linker, how do we tell it that we can to use al
 
 * Lets set our rpath to be `$ORIGIN/path/to/libs`, totally valid! ☑️ However, a lot of the times, this is not done at compile time and instead it is done with `patchelf` in runtime. While doing it is fine 99% of the time, that 1% when it breaks something, it is very hard to catch what went wrong.
 
-* Tell the dynamic linker to use our bundled libraries directly ✅ This is not well known, but the dynamic linker supports the `--library-path` flag, which behaves very similar to `LD_LIBRARY_PATH` without being a variable that gets inherited by other processes, it is the perfect solution we just needed, so our `AppRun` example will now look like this:
+* Tell the dynamic linker to use our bundled libraries directly ✅ This is not well known, but the dynamic linker supports the `--library-path` flag, which behaves very similar to `LD_LIBRARY_PATH` without being a variable that gets inherited by other processes. It is the perfect solution we just needed, so our `AppRun` example will now look like this:
 
  ```
 #!/bin/sh
