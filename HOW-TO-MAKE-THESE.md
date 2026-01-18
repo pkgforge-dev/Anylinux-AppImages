@@ -236,7 +236,7 @@ Since we are going to bundle our own libc, it means we cannot use the host dynam
 
 **We can** have a relative interpreter like `./ld-linux.so`, the problem with this though is that we need to change the current working directory to that location for this to work. In other words, for AppImages, the current working directory will change to the random mountpoint of the AppImage and this is a problem if your application is a terminal emulator, that opens at the current working directory for example.
 
-Instead we have to run the dynamic linker first, and then give it the binary we want to launch , which is possible, so our `AppRun` will look like this instead:
+Instead we have to run the dynamic linker first, and then give it the binary we want to launch, which is possible, so our `AppRun` will look like this instead:
 
 
 ```
