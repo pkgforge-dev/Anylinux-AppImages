@@ -5,8 +5,8 @@
 set -eux
 
 ARCH="$(uname -m)"
-SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
-EXTRA_PACKAGES="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
+SHARUN="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/quick-sharun.sh"
+EXTRA_PACKAGES="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 
 export DEPLOY_OPENGL=1
 export DEPLOY_VULKAN=1
@@ -15,6 +15,7 @@ export ICON=DUMMY
 export DESKTOP=DUMMY
 export OUTPATH=./dist
 export OUTNAME=vkcube+glxgears-demo-"$ARCH".AppImage
+export MAIN_BIN=vkcube
 
 pacman -Syu --noconfirm \
 	base-devel       \
@@ -43,7 +44,7 @@ echo "Bundling AppImage..."
 echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
-./quick-sharun /usr/bin/vkcube /usr/bin/glxgears
+./quick-sharun /usr/bin/vkcube /usr/bin/glxgears /usr/bin/eglgears*
 
 ./quick-sharun --make-appimage
 

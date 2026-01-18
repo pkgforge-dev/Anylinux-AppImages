@@ -29,6 +29,14 @@ jobs:
           - arch: x86_64
             platform: linux/amd64
             runs-on: ubuntu-24.04
+            script: zink-vkcube-glxgears-appimage
+          - arch: aarch64
+            platform: linux/amd64
+            runs-on: ubuntu-24.04-arm
+            script: zink-vkcube-glxgears-appimage
+          - arch: x86_64
+            platform: linux/amd64
+            runs-on: ubuntu-24.04
             script: gtk3-demo-appimage
           - arch: aarch64
             platform: linux/amd64
