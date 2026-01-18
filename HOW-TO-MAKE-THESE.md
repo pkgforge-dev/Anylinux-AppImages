@@ -366,7 +366,7 @@ XCore
 
 When for most applications you only need llvm to support AMDGPU and X86/AArch64.
 
-We already make such version of llvm here: https://github.com/pkgforge-dev/llvm-libs-debloated which reduces the size of libLLVM.so down to 66 MiB.
+We already make such version of llvm here: https://github.com/pkgforge-dev/archlinux-pkgs-debloated which reduces the size of libLLVM.so down to 66 MiB.
 
 
 Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results a **60 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things.
