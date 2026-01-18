@@ -210,7 +210,7 @@ And the future stability isn't that great either, because glibc still sometimes 
 
 ### *The solution*
 
-* ~~Lets use a container~~ ❌ nope that has a bunch of limitations and weird quirks, [very bloated](https://i.imgur.com/25AOq00.png) and depends on namespaces [which you cannot even rely on...](https://github.com/linuxmint/mint22-beta/issues/82) Worth adding there are some cases where containers are really the only viable option, specially with applications that depend on both 32 and 64 bit libs in which doing this without a container is going to be a lot of pain, but yeah, always leave this as a last resort method.
+* ~~Lets use a container~~ ❌ nope that has a bunch of limitations and weird quirks, [very bloated](https://imgur.com/a/appimage-vs-flatpak-size-comparison-QH1dPyb) and depends on unprivileged user-namespaces [which you cannot even rely on...](https://github.com/linuxmint/mint22-beta/issues/82). It's worth adding that there are some cases where containers are really the only viable option, especially with applications that depend on both 32 and 64 bit libs, in which doing this without a container is going to be a lot of pain, but yeah, always leave this as a last resort method.
 
 * Compile statically! Sure, that works, go and compile all of kdenlive statically and get back to me once you get it done.
 
