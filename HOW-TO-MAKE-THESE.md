@@ -412,6 +412,7 @@ Browse through our production AppImage repositories for more complex examples:
 * [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/blob/d2e97d16ebce1f421187b9887767e6660ac57dcb/azahar-appimage.sh#L73-L97) - Nintendo 3DS emulator
 * [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage/blob/97fb70cc3b2885753116f43d3f64106cae2227d1/scrcpy-appimage.sh#L11-L43) - Android screen mirroring
 * [See all AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/README.md#applications)
+* **[And our template that greatly simplifies this!](https://github.com/pkgforge-dev/TEMPLATE-AppImage)**
 
 -----------------------------------
 
