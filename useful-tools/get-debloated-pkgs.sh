@@ -239,7 +239,8 @@ if [ "$ADD_VULKAN" = 1 ]; then
 			vulkan-freedreno-"$PKG_TYPE" \
 			vulkan-broadcom-"$PKG_TYPE"  \
 			vulkan-asahi-"$PKG_TYPE"     \
-			vulkan-powervr-"$PKG_TYPE"
+			vulkan-powervr-"$PKG_TYPE"   \
+			vulkan-virtio-"$PKG_TYPE"
 	fi
 	set -- "$@" \
 		vulkan-radeon-"$PKG_TYPE" \
