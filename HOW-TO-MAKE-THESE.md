@@ -318,7 +318,7 @@ https://github.com/VHSgunzo/sharun
 
 * sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it, **this means we no longer depend on the host shell to get our application to launch.**
 
-* sharun is not just for the AppImages, you can also use it anywhere you need to make any sort of the application portable. You can even make pseudo-static binaries from existing dynamic binaries, which sharun does with the help of wrappe.
+* sharun is not just for the AppImages, you can also use it anywhere you need to make any sort of application portable. You can even make pseudo-static binaries from existing dynamic binaries, which sharun does with the help of wrappe.
 
 * sharun even has hooks to fix applications that aren't relocatable, like webkit2gtk which is hardcoded to look for some binaries in `/usr/lib`, it fixes this with patching all automatically for you.
 
