@@ -255,7 +255,7 @@ Now that we have our own dynamic linker, how do we tell it that we can to use al
 
 * `LD_LIBRARY_PATH` ❌ Nope, terrible idea. **NEVER USE THIS VARIABLE**, it causes a lot of headaches because it is inherited by child processes, which means everything being launched by our application will try to use our libraries, and this causes insanely broken behaviours that are hard to catch. [For example](https://github.com/zen-browser/desktop/issues/2748), this issue lasted several months and no one had an idea what was going on until I [removed](https://github.com/zen-browser/desktop/pull/6156/files) the usage of `LD_LIBRARY_PATH`, which the application didn't even need to have it set in this case. Also see: [LD_LIBRARY_PATH – or: How to get yourself into trouble!](https://www.hpc.dtu.dk/?page_id=1180)
 
-* Lets see our rpath to be `$ORIGIN/path/to/libs`, totally valid! ☑️ however a lot of times this is not done at compile time and instead it is done with `patchelf`, and while 99% of the time it is fine, that 1% when it breaks something it is also very hard to catch what went wrong.
+* Lets set our rpath to be `$ORIGIN/path/to/libs`, totally valid! ☑️ However, a lot of the times, this is not done at compile time and instead it is done with `patchelf` in runtime. While doing it is fine 99% of the time, that 1% when it breaks something, it is very hard to catch what went wrong.
 
 * Tell the dynamic linker to use our bundled libraries directly ✅ This is not well known, but the dynamic linker supports the `--library-path` flag, which behaves very similar to `LD_LIBRARY_PATH` without being a variable that gets inherited by other processes, it is the perfect solution we just needed, so our `AppRun` example will now look like this:
 
