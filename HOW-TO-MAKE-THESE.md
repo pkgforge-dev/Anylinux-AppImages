@@ -110,7 +110,7 @@ chmod +x ./get-debloated-pkgs.sh
 # Installs a debloated MESA, vulkan, Qt, GTK, libicudata, and more
 ./get-debloated-pkgs.sh --add-mesa --prefer-nano
 
-# Some appsm might requiere these as well
+# Some appsm might require these as well
 ./get-debloated-pkgs.sh --add-common --prefer-nano ffmpeg-mini intel-media-driver-mini
 ```
 
