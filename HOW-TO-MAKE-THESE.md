@@ -295,7 +295,7 @@ And many many more!
 But isn't this a lot of work to find and set all the env variables that my application needs? **Yes it is**
 
 
-4. Forth issue to overcome, I don't want to do any of this that's a lot of work.
+4. Fourth issue to overcome, I don't want to do any of this that's a lot of work.
 
 -----------------------------------
 
