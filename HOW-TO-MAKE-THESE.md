@@ -135,7 +135,7 @@ export ADD_HOOKS="self-updater.bg.hook:fix-namespaces.hook"
 - **`self-updater.bg.hook`** - Makes the AppImage self-updatable using appimageupdatetool
 - **`fix-namespaces.hook`** - Fixes namespace restrictions for apps that need them (web browsers and electron apps mostly)
 - **`udev-installer.hook`** - Prompts to user to install bundled udev rules when needed
-- **`vulkan-check.src.hook`** - Checks and fixes several commons issues that might affect vulkan and hardware accel in general
+- **`vulkan-check.src.hook`** - Checks and fixes several commons issues that might affect vulkan and hardware acceleration in general
 - **`x86-64-v3-check.hook`** - Checks for x86-64-v3 CPU support for applications that need it.
 - **`host-libjack.src.hook`** - Uses host's JACK library when possible for performance gains, see the comments in the script for more details why this is needed.
 
