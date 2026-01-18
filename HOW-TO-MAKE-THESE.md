@@ -314,7 +314,7 @@ https://github.com/VHSgunzo/sharun
 
 * sharun also detects and sets a ton of [env variables](https://github.com/VHSgunzo/sharun?tab=readme-ov-file#environment-variables-that-are-set-if-sharun-finds-a-directory-or-file.) that the application needs to work.
 
-* it also fixes the issue of  `/proc/self/exe` being `ld-linux-x86-64.so.2` 👀 For this what it does is placed all the shared libraries and binaries in `shared/{lib,bin}` and then hardlinks itself to the `bin` directory of our `AppDir`, then when you `bin/app` it automatically calls the bundled dynamic linker and runs the binary with the name of the hardlink while giving the path to our bundled libraries with `--library-path`
+* it also fixes the issue of  `/proc/self/exe` being `ld-linux-x86-64.so.2` 👀 For this issue, what it does is it places all the shared libraries and binaries in `shared/{lib,bin}` and then hardlinks itself to the `bin` directory of our `AppDir`; then when you call `bin/app`, it automatically calls the bundled dynamic linker and runs the binary with the name of the hardlink, while giving the path to our bundled libraries with `--library-path`
 
 * sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it, **this means we no longer depend on the host shell to get our application to launch.**
 
