@@ -234,7 +234,7 @@ This is the solution, truly portable application bundles that have everything th
 
 Since we are going to bundle our own libc, it means we cannot use the host dynamic linker even, which means we have to bundle our own `ld-linux/musl.so` and this has a problem, we cannot simply patch out binaries to use the bundled interpreter like `patchelf --set-interpreter '$ORIGIN/ld-linux.so'` because that `$ORIGIN` resolution is done by the interpreter itself.
 
-**We can** have a relative interpreter like `./ld-linux.so`, the problem with this though is that we need to change the current working directory to that location for this to work, in other words for appimages the current working dir will change to the random mountpoint of the appimage, this is a problem if your application is a terminal emulator that opens at the current working directory for example.
+**We can** have a relative interpreter like `./ld-linux.so`, the problem with this though is that we need to change the current working directory to that location for this to work. In other words, for AppImages, the current working directory will change to the random mountpoint of the AppImage and this is a problem if your application is a terminal emulator, that opens at the current working directory for example.
 
 Instead we have to run the dynamic linker first, and then give it the binary we want to launch , which is possible, so our `AppRun` will look like this instead:
 
