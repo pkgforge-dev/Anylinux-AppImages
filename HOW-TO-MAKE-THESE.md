@@ -268,7 +268,7 @@ exec "$CURRENTDIR"/ld-linux-x86-64.so.2 \
 	"$CURRENTDIR"/bin/app "$@"
 ```
 
-Now we are ready to start making our truly portable AppImage, now just need to bundle the libraries and dynamic linker and we are good to go! Kinda now we need to fix the following issue… **And also bundling all the libraries needed isn't as easy as just running `ldd` + `cp`** Sharun handles this automatically (see below).
+We need to bundle the libraries and dynamic linker and we are **almost** good to go! However, to be fully ready, we need to fix the following issues below… **Bundling all the needed libraries isn't as easy as just running `ldd` + `cp`**, so we need some more robust solution. Sharun handles this automatically (see below).
 
 3. Third issue to overcome:
 
