@@ -1892,7 +1892,7 @@ if [ -n "$ADD_HOOKS" ]; then
 		if [ -f "$hook_dst"/"$hook" ]; then
 			continue
 		elif [ "$ARCH" != 'x86_64' ] \
-		  && echo "$hook" | grep -q 'x86*64'; then
+		  && echo "$hook" | grep -q 'x86.*64'; then
 			continue # do not add x86-64 hooks in other arches
 		elif _download "$hook_dst"/"$hook" "$HOOKSRC"/"$hook"; then
 			_echo "* Added $hook"
