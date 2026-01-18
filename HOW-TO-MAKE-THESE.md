@@ -310,7 +310,7 @@ There is a solution for this, made by @VHSGunzo called sharun:
 
 https://github.com/VHSgunzo/sharun
 
-* sharun is able to find all the libraries your application needs, **including those that are dlopened**, it turns out a lot of applications depend on dlopened libraries, those are libraries you cannot easily find with just `ldd`. Sharun uses a deployment script called `lib4bin` that has the strace mode, **that mode makes `lib4bin` open the application with strace to check all the dlopened libraries and then bundle them.**
+* sharun is able to find all the libraries that your application needs, **including those that are dlopened**. It turns out that a lot of applications depend on dlopened libraries; those are the libraries that you cannot easily find with just `ldd`. Sharun uses a deployment script called `lib4bin` that has the strace mode; **that mode makes `lib4bin` open the application with strace to check all the dlopened libraries and then bundle them.**
 
 * sharun also detects and sets a ton of [env variables](https://github.com/VHSgunzo/sharun?tab=readme-ov-file#environment-variables-that-are-set-if-sharun-finds-a-directory-or-file.) that the application needs to work.
 
