@@ -246,7 +246,7 @@ CURRENTDIR="$(readlink -f "$(dirname "$0")")"
 exec "$CURRENTDIR"/ld-linux-x86-64.so.2 "$CURRENTDIR"/bin/app "$@"
 ```
 
-However this has a small issue that `/proc/self/exe` will be `ld-linux-x86-64.so.2` instead of the name of the binary we launched, for most applications this isn't an issue, but when it is an issue it is quite a big issue. **Sharun fixes this problem** (see below), we will continue with this approach to explain the rest.
+However this has a small issue that `/proc/self/exe` will be `ld-linux-x86-64.so.2` instead of the name of the binary we launched. For most applications, this isn't an issue, but when it is an issue, it is quite a big one. **Sharun fixes this problem** (see below), so we will continue with this approach to explain the rest.
 
 
 2. Second issue to overcome:
