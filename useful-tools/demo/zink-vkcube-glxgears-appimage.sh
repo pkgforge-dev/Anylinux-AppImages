@@ -18,6 +18,7 @@ export ICON=DUMMY
 export DESKTOP=DUMMY
 export OUTPATH=./dist
 export OUTNAME=zink-vkcube+glxgears-demo-"$ARCH".AppImage
+export MAIN_BIN=vkcube
 
 pacman -Syu --noconfirm \
 	base-devel       \
