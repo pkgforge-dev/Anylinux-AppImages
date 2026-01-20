@@ -27,7 +27,6 @@ _find_host_libdecor_plugins_dir() {
 			break
 		fi
 	done
-
 }
 
 # we may have bundled libdecor plugins, only do this if that is not the case
