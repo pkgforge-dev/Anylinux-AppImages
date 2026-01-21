@@ -119,6 +119,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
 [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
+[SuperTux](https://github.com/pkgforge-dev/SuperTux-AppImage)                                                            |
 [sView](https://github.com/pkgforge-dev/sView-AppImage)                                                                  |
 [system-monitoring-center](https://github.com/pkgforge-dev/system-monitoring-center-AppImage)                            |
 [Tagger](https://github.com/pkgforge-dev/Tagger-AppImage)                                                                |
