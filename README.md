@@ -128,6 +128,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
 [Tutanota Desktop](https://github.com/pkgforge-dev/Tutanota-Desktop-AppImage-Enhanced)                                   |
 [Tux Football](https://github.com/pkgforge-dev/Tux-Football-AppImage)                                                    |
+[Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage)                                                              |
 [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
 [Varia](https://github.com/pkgforge-dev/Varia-AppImage)                                                                  |
