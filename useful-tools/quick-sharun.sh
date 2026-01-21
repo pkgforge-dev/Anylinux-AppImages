@@ -1719,6 +1719,11 @@ for lib do case "$lib" in
 	*libssl*.so*)
 		_add_certs_check
 		;;
+	*libdecor*.so*)
+		if [ ! -d "$APPDIR"/shared/lib/libdecor ]; then
+			ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
+		fi
+		;;
 	esac
 done
 
