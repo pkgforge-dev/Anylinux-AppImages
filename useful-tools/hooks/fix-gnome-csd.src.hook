@@ -18,9 +18,19 @@
 #
 
 _find_host_libdecor_plugins_dir() {
+	# We only want to do this in GNOME Wayland, so check first
+	case "$XDG_CURRENT_DESKTOP" in
+		*GNOME*|*gnome*|*Gnome*) :;;
+		*) return 0;;
+	esac
+	case "$XDG_SESSION_TYPE" in
+		*Wayland*|*wayland*|*WAYLAND*) :;;
+		*) return 0;;
+	esac
 	set -- \
 	  /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libdecor/plugins-* \
-	  /usr/lib64/libdecor/plugins-* /usr/lib/libdecor/plugins-*
+	  /usr/lib64/libdecor/plugins-* \
+	  /usr/lib/libdecor/plugins-*
 	for d do
 		if [ -d "$d" ]; then
 			export LIBDECOR_PLUGIN_DIR="$d"
@@ -29,8 +39,10 @@ _find_host_libdecor_plugins_dir() {
 	done
 }
 
-# we may have bundled libdecor plugins, only do this if that is not the case
-if [ ! -d "$APPDIR"/lib/libdecor ]; then
+if [ "$DO_NOT_USE_HOST_LIBDECOR_PLUGINS" != 1 ]; then
 	_find_host_libdecor_plugins_dir
+else
+	# set the var to a non existing location when not wanted
+	# since libdecor will still try to load at its original prefix
+	export LIBDECOR_PLUGIN_DIR=/XXX/YYY/ZZZ
 fi
-
