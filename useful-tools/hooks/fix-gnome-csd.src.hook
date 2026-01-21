@@ -4,7 +4,7 @@
 # own window decorations on wayland, as result we would need to bundle
 # 7 MiB of garbage in the AppImage just to "fix" this nonsense
 #
-# And those 7 MiB are best a case scenario when using the Cairo libdecor cairo
+# And those 7 MiB are best a case scenario when using the libdecor cairo
 # plugin which looks horrible in GNOME anyway, way more with the gtk plugin...
 #
 # This is not a problem on Windows, macOS and the rest of linux including
