@@ -36,6 +36,11 @@ _prepare() {
 			/etc/makepkg.conf
 		cat /etc/makepkg.conf
 	fi
+
+	# always disable this nonsense that was recently added to makepkg
+	sed -i \
+		-e 's/(( ${#arch\[@\]} != $(printf "%s\\n" ${arch\[@\]} | sort -u | wc -l) ))/false/' \
+		/usr/share/makepkg/lint_pkgbuild/arch.sh 2>/dev/null || :
 }
 
 _setup_chaotic_aur() {
