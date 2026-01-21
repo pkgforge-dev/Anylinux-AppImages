@@ -103,6 +103,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
 [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
+[Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
