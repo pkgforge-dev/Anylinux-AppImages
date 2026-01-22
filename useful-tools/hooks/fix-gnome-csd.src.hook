@@ -39,7 +39,7 @@ _find_host_libdecor_plugins_dir() {
 	done
 }
 
-if [ "$DO_NOT_USE_LIBDECOR_FFS" != 1 ]; then
+if [ "$DO_NOT_USE_LIBDECOR_FFS" != 1 ] || [ ! -f "$APPDIR"/.disable-libdecor ]; then
 	_find_host_libdecor_plugins_dir
 else
 	# set the var to a non existing location when not wanted
