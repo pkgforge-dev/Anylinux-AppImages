@@ -1722,15 +1722,15 @@ for lib do case "$lib" in
 		;;
 	*libdecor*.so*)
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
-		libdecor=1
 		;;
 	*libSDL*.so*)
 		# SDL may be bundled without libdecor since it maybe missing from the CI runner
 		# or the application makes of GTK/Qt + SDL, in which case we do not need libdecor
 		# at all, make sure SDL does not attempt to load libdecor in these cases
-		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
-		if [ "$DEPLOY_GTK" = 1 ] || [ "$DEPLOY_QT" = 1 ] || [ "$libdecor" != 1 ]; then
-			:> "$APPDIR"/.disable-libdecor
+		if [ -f "$APPDIR"/shared/lib/libdecor-0.so.0 ]; then
+			continue
+		elif grep -aoq -m 1 'libdecor-0.so.0' "$lib"; then
+			sed -i -e 's|libdecor-0.so.0|fuck-gnome.so.X|g' "$lib"
 		fi
 		;;
 	esac
