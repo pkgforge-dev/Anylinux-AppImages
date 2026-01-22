@@ -39,11 +39,11 @@ _find_host_libdecor_plugins_dir() {
 	done
 }
 
-if [ "$DO_NOT_USE_LIBDECOR_FFS" != 1 ] || [ ! -f "$APPDIR"/.disable-libdecor ]; then
-	_find_host_libdecor_plugins_dir
-else
+if [ "$DO_NOT_USE_LIBDECOR_FFS" = 1 ] || [ -f "$APPDIR"/.disable-libdecor ]; then
 	# set the var to a non existing location when not wanted
 	# since libdecor may still try to load at its original prefix
 	export LIBDECOR_PLUGIN_DIR=/XXX/YYY/ZZZ
-	export SDL_VIDEO_WAYLAND_ALLOW_LIBDECOR=0
+	export SDL_VIDEO_WAYLAND_ALLOW_LIBDECOR=0	
+else
+        _find_host_libdecor_plugins_dir
 fi
