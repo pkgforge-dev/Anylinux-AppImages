@@ -555,7 +555,8 @@ _make_deployment_array() {
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		set -- "$@" \
 			"$LIB_DIR"/libSDL*.so* \
-			"$LIB_DIR"/libudev.so*
+			"$LIB_DIR"/libudev.so* \
+			"$LIB_DIR"/libdecor*.so*
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying glycin"
