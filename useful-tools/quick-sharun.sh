@@ -1729,7 +1729,7 @@ for lib do case "$lib" in
 		# or the application makes use of GTK/Qt + SDL, in which case we do not need 
 		# libdecor at all, make sure SDL does not attempt to load libdecor in these cases
 		if [ "$libdecor" != 1 ]; then
-			sed -i -e 's|libdecor-0.so.0|fuck-gnome.so.0|g' "$lib"
+			sed -i -e 's|libdecor-0.so.0|fuck-gnome.so.X|g' "$lib"
 		fi
 		;;
 	esac
