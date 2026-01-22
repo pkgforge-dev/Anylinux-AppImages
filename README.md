@@ -45,6 +45,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
 [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
 [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage)                                                            |
+[Defold](https://github.com/pkgforge-dev/Defold-AppImage)                                                                |
 [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage)                                                              |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
