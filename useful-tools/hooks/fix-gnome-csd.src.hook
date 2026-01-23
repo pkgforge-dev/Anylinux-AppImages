@@ -45,5 +45,5 @@ if [ "$DO_NOT_USE_LIBDECOR_FFS" = 1 ] || [ -f "$APPDIR"/.disable-libdecor ]; the
 	export LIBDECOR_PLUGIN_DIR=/XXX/YYY/ZZZ
 	export SDL_VIDEO_WAYLAND_ALLOW_LIBDECOR=0	
 else
-        _find_host_libdecor_plugins_dir
+	_find_host_libdecor_plugins_dir
 fi
