@@ -47,6 +47,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage)                                                            |
 [Defold](https://github.com/pkgforge-dev/Defold-AppImage)                                                                |
 [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage)                                                              |
+[Drum Machine](https://github.com/pkgforge-dev/Drum-Machine-AppImage)                                                    |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
 [Elastic](https://github.com/pkgforge-dev/Elastic-AppImage)                                                              |
