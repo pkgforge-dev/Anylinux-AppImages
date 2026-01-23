@@ -1724,6 +1724,12 @@ for lib do case "$lib" in
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
 		;;
 	*libSDL*.so*)
+		# make sure SDL does not attempt to use pipewire when not deployed
+		if [ "$DEPLOY_PIPEWIRE" != 1 ] \
+		  && ! grep -q 'SDL_AUDIODRIVER=' "$APPENV" 2>/dev/null; then
+			echo 'SDL_AUDIODRIVER=pulseaudio' >> "$APPENV"
+		fi
+
 		# SDL may be bundled without libdecor since it maybe missing from the CI runner
 		# or the application makes of GTK/Qt + SDL, in which case we do not need libdecor
 		# at all, make sure SDL does not attempt to load libdecor in these cases
