@@ -552,6 +552,7 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_SDL" = 1 ]; then
 		_echo "* Deploying SDL"
+		DEPLOY_PULSE=${DEPLOY_PULSE:-1}
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		set -- "$@" \
 			"$LIB_DIR"/libSDL*.so* \
