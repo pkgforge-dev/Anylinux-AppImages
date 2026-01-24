@@ -555,8 +555,9 @@ _make_deployment_array() {
 		DEPLOY_PULSE=${DEPLOY_PULSE:-1}
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		set -- "$@" \
-			"$LIB_DIR"/libSDL*.so* \
-			"$LIB_DIR"/libudev.so* \
+			"$LIB_DIR"/libSDL*.so*   \
+			"$LIB_DIR"/libudev.so*   \
+			"$LIB_DIR"/libusb-1*.so* \
 			"$LIB_DIR"/libdecor*.so*
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
