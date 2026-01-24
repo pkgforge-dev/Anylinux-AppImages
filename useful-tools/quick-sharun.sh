@@ -342,11 +342,11 @@ _determine_what_to_deploy() {
 			case "$lib" in
 				*libQt5Core.so*)
 					DEPLOY_QT=${DEPLOY_QT:-1}
-					: "${QT_DIR:=qt5}"
+					QT_DIR=${QT_DIR:-qt5}
 					;;
 				*libQt6Core.so*)
 					DEPLOY_QT=${DEPLOY_QT:-1}
-					: "${QT_DIR:=qt6}"
+					QT_DIR=${QT_DIR:-qt6}
 					;;
 				*libQt*Qml*.so*)
 					DEPLOY_QML=${DEPLOY_QML:-1}
