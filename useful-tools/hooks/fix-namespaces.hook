@@ -48,7 +48,7 @@ _sanity_check() {
 }
 
 _check_usernamespaces_work() {
-	unshare --user -p /bin/true
+	unshare -Urm /bin/true
 }
 
 _is_apparmor() {
