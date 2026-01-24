@@ -83,6 +83,7 @@ static const char* vars_to_unset[] = {
 	"QT_PLUGIN_PATH",
 	"SPA_PLUGIN_DIR",
 	"TCL_LIBRARY",
+	"TEXTDOMAINDIR",
 	"TK_LIBRARY",
 	"XKB_CONFIG_ROOT",
 	"XTABLES_LIBDIR",
