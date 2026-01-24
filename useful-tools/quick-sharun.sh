@@ -160,6 +160,7 @@ _help_msg() {
 	  DEPLOY_QT          Set to 1 to force deployment of Qt. Will determine to deploy
 	                 QtWebEngine and Qml as well, these can be controlled with
 	                 DEPLOY_QT_WEB_ENGINE and DEPLOY_QML. Set to 1 enable, 0 disable
+					 You may also set QT_DIR if your installation of Qt has different library paths.
 	  DEPLOY_SDL          Set to 1 to force deployment of SDL.
 	  DEPLOY_GTK          Set to 1 to force deployment of GTK.
 	  DEPLOY_GDK          Set to 1 to force deployment of gdk-pixbuf.
@@ -341,11 +342,11 @@ _determine_what_to_deploy() {
 			case "$lib" in
 				*libQt5Core.so*)
 					DEPLOY_QT=${DEPLOY_QT:-1}
-					QT_DIR=qt5
+					: "${QT_DIR:=qt5}"
 					;;
 				*libQt6Core.so*)
 					DEPLOY_QT=${DEPLOY_QT:-1}
-					QT_DIR=qt6
+					: "${QT_DIR:=qt6}"
 					;;
 				*libQt*Qml*.so*)
 					DEPLOY_QML=${DEPLOY_QML:-1}
