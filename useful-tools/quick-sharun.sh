@@ -160,7 +160,7 @@ _help_msg() {
 	  DEPLOY_QT          Set to 1 to force deployment of Qt. Will determine to deploy
 	                 QtWebEngine and Qml as well, these can be controlled with
 	                 DEPLOY_QT_WEB_ENGINE and DEPLOY_QML. Set to 1 enable, 0 disable
-					 You may also set QT_DIR if your installation of Qt has different library paths.
+					 Set QT_DIR if the system Qt directory in LIB_DIR has a different name.
 	  DEPLOY_SDL          Set to 1 to force deployment of SDL.
 	  DEPLOY_GTK          Set to 1 to force deployment of GTK.
 	  DEPLOY_GDK          Set to 1 to force deployment of gdk-pixbuf.
