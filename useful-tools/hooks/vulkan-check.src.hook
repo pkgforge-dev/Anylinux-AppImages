@@ -156,3 +156,48 @@ if [ "$FORCE_HOST_MESA_DRIVERS_THIS_IS_EXPERIMENTAL_KEK" = 1 ] && _use_host_mesa
 	export SHARUN_EXTRA_LIBRARY_PATH="$HOST_MESA_DIR:$SHARUN_EXTRA_LIBRARY_PATH"
 	export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
 fi
+
+_start_virtualization() {
+	set -- /dev/dri/render*
+	gpu=$1
+
+	set -- "$APPDIR"/share/vulkan/icd.d/virtio_icd*.json
+	virtio_icd=$1
+
+	set -- "$APPDIR"/share/glvnd/egl_vendor.d/*_mesa.json
+	mesa_icd=$1
+
+	if ! command -v virgl_test_server 1>/dev/null; then
+		_err_msg "ERROR: No virgl_test_server binary found!"
+		return 1
+	elif [ ! -e "$gpu" ]; then
+		_err_msg "ERROR: There is no gpu in this system!"
+		return 1
+	elif [ ! -e "$virtio_icd" ]; then
+		_err_msg "ERROR: Vulkan virtio was not bundled! Cannot continue."
+		return 1
+	elif [ ! -e "$mesa_icd" ]; then
+		_err_msg "ERROR: Mesa gallium was not bundled! Cannot continue."
+		return 1
+	fi
+
+	socket="$TMPDIR"/virgl.socket
+	virgl_test_server --venus --use-gles --socket-path "$socket" --rendernode "$gpu" &
+
+	export VTEST_SOCKET_NAME="$socket"
+	export VK_DRIVER_FILES="$virtio_icd"
+	export __GLX_VENDOR_LIBRARY_NAME=mesa
+	export __EGL_VENDOR_LIBRARY_FILENAMES="$mesa_icd"
+	export MESA_LOADER_DRIVER_OVERRIDE=zink
+	export SHARUN_ALLOW_SYS_VKICD=0
+
+	# TODO: Improve this check, this is only a problem that affects the amdgpu ddx
+	case "$XDG_SESSION_TYPE" in
+		x11|X11) export LIBGL_KOPPER_DRI2=1;;
+	esac
+}
+
+if [ "$ENABLE_VIRTUALIZATION_THIS_IS_EXPERIMENTAL_KEK" = 1 ]; then
+	>&2 echo "Starting virtualization"
+	_start_virtualization || :
+fi
