@@ -536,6 +536,7 @@ _make_deployment_array() {
 			_echo "* Deploying webkit2gtk"
 			DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 			DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
+			set -- "$@" "$LIB_DIR"/libnss_mdns*minimal.so*
 		fi
 	fi
 	if [ "$DEPLOY_GDK" = 1 ]; then
@@ -577,12 +578,13 @@ _make_deployment_array() {
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 		DEPLOY_VULKAN=${DEPLOY_VULKAN:-1}
 		set -- "$@" \
-			"$LIB_DIR"/libva.so*        \
-			"$LIB_DIR"/libva-drm.so*    \
-			"$LIB_DIR"/libpci.so*       \
-			"$LIB_DIR"/libnss*.so*      \
-			"$LIB_DIR"/libsoftokn3.so*  \
-			"$LIB_DIR"/libfreeblpriv3.so*
+			"$LIB_DIR"/libva.so*          \
+			"$LIB_DIR"/libva-drm.so*      \
+			"$LIB_DIR"/libpci.so*         \
+			"$LIB_DIR"/libnss*.so*        \
+			"$LIB_DIR"/libsoftokn3.so*    \
+			"$LIB_DIR"/libfreeblpriv3.so* \
+			"$LIB_DIR"/libnss_mdns*_minimal.so*
 		# electron has a resources directory that may have binaries
 		d="${ELECTRON_BIN%/*}"/resources
 		if [ -d "$d" ]; then
