@@ -67,8 +67,8 @@ _setup_archlinuxcn() {
 	if ! grep -q '^\[archlinuxcn\]' /etc/pacman.conf; then
 		echo '[archlinuxcn]' >> /etc/pacman.conf
 		echo 'Server = https://repo.archlinuxcn.org/$arch' >> /etc/pacman.conf
-		pacman -Sy
-		pacman -S archlinuxcn-keyring
+		pacman -Sy --no-confirm
+		pacman -S --no-confirm archlinuxcn-keyring
 	fi
 }
 
