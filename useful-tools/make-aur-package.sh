@@ -59,7 +59,24 @@ _install_chaotic_aur_pkg() {
 	_setup_chaotic_aur
 	_info_msg "Adding Chaotic AUR packages: $*"
 	# no -Syu here since it can remove the debloated packages
-	sudo pacman -Sy --noconfirm "$@"
+	pacman -Sy --noconfirm "$@"
+	exit 0
+}
+
+_setup_archlinuxcn() {
+	if ! grep -q '^\[archlinuxcn\]' /etc/pacman.conf; then
+		echo '[archlinuxcn]' >> /etc/pacman.conf
+		echo 'Server = https://repo.archlinuxcn.org/$arch' >> /etc/pacman.conf
+		pacman -Sy
+		pacman -S archlinuxcn-keyring
+	fi
+}
+
+_install_archlinuxcn_pkg() {
+	_setup_archlinuxcn
+	_info_msg "Adding archlinuxcn packages: $*"
+	# no -Syu here since it can remove the debloated packages
+	pacman -Sy --noconfirm "$@"
 	exit 0
 }
 
@@ -110,6 +127,7 @@ _prepare
 case "$1" in
 	--chaotic-aur)   shift; _install_chaotic_aur_pkg "$@";;
 	--archlinux-pkg) shift; _get_archlinux_pkgbuild "$@";;
+	--archlinuxcn)   shift; _install_archlinuxcn_pkg "$@";;
 	http*/*)         _external_pkgbuild "$@";;
 	'')              _local_pkgbuild;;
 	*)               _get_aur_pkgbuild "$@";;
