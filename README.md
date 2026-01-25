@@ -75,6 +75,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
+[Keypunch](https://github.com/pkgforge-dev/Keypunch-AppImage)                                                            |
 [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage)                                                                  |
 [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage)                                                                |
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
