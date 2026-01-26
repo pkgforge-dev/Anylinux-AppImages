@@ -173,6 +173,18 @@ fi
 _deploy_desktop_and_icon
 
 DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
+
+if [ "$DEVEL_RELEASE" = 1 ]; then
+	if ! ! grep -q '^Name=.*Nightly' "$DESKTOP_ENTRY"; then
+		>&2 echo "Adding Nightly to desktop entry name"
+		sed -i -e 's/^\(Name=.*\)$/\1 Nightly/' "$DESKTOP_ENTRY"
+	fi
+	# also change UPINFO to use nightly tag
+	if [ -n "$UPINFO" ]; then
+		UPINFO=$(echo "$UPINFO" | sed 's/|latest|/|nightly|/')
+	fi
+fi
+
 APPNAME=${APPNAME:-$(awk -F'=' '/^Name=/{gsub(/ /,"_",$2); print $2; exit}' "$DESKTOP_ENTRY")}
 APPNAME=${APPNAME%_}
 
