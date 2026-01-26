@@ -454,13 +454,18 @@ _make_deployment_array() {
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 
-		# some distros have a qt dir rather than qt6 or qt5 dir
-		if [ ! -d "$LIB_DIR"/"$QT_DIR" ]; then
-			QT_DIR=qt
-		fi
+
 		_echo "* Deploying $QT_DIR"
 
-		plugindir="$LIB_DIR"/"$QT_DIR"/plugins
+		if [ -d "$QT_LOCATION" ]; then
+			plugindir="$QT_LOCATION"/plugins
+		else
+			# some distros have a qt dir rather than qt6 or qt5 dir
+			if [ ! -d "$LIB_DIR"/"$QT_DIR" ]; then
+				QT_DIR=qt
+			fi
+			plugindir="$LIB_DIR"/"$QT_DIR"/plugins
+		fi
 
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
@@ -501,20 +506,21 @@ _make_deployment_array() {
 		done
 
 		if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
-			if ! qtwebenginebin=$(find "$LIB_DIR" -type f \
-				-name 'QtWebEngineProcess' -print -quit 2>/dev/null); then
+			if ! enginebin=$(find "${QT_LOCATION:-$LIB_DIR}" -type f \
+			  -name 'QtWebEngineProcess' -print -quit 2>/dev/null); then
 				_err_msg "Cannot find QtWebEngineProcess!"
 				exit 1
-			else
-				set -- "$@" "$qtwebenginebin"
 			fi
+			set -- "$@" "$enginebin"
 		fi
 
 		if [ "$DEPLOY_QML" = 1 ]; then
 			_echo "* Deploying qml"
-			dst_qml="$APPDIR"/shared/lib/"$QT_DIR"
-			mkdir -p "$dst_qml"
-			cp -r "$LIB_DIR"/"$QT_DIR"/qml "$dst_qml"
+			qmldir="${QT_LOCATION:-$LIB_DIR/$QT_DIR}"/qml
+			ADD_DIR="
+				$ADD_DIR
+				$qmldir
+			"
 		fi
 	fi
 	if [ "$DEPLOY_GTK" = 1 ]; then
