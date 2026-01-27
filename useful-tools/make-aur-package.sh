@@ -26,6 +26,27 @@ _prepare() {
 		fi
 	done
 
+	if [ "$ARCH" = 'x86_64' ] && [ "$TARGET_V3_CPU" = 1 ]; then
+		echo "$l"
+		echo "Targetting x86-64-v3..."
+
+		if ! grep -q 'march=x86-64-v3' /etc/makepkg.conf; then
+			sed -i -e 's|march=x86-64|march=x86-64-v3|g' /etc/makepkg.conf
+		fi
+		sed -i \
+			-e 's|-mno-omit-leaf-frame-pointer||' \
+			-e 's|-fno-omit-frame-pointer||'      \
+			-e 's|-fstack-clash-protection||'     \
+			-e 's|-fcf-protection||'              \
+			-e 's|-fexceptions||'                 \
+			-e 's|-O2|-O3|g'                      \
+			/etc/makepkg.conf
+
+		echo "$l"
+		grep -A5 -B5 '^CFLAGS=.*' /etc/makepkg.conf
+		echo "$l"
+	fi
+
 	if ! grep -q 'EUID == 69' /usr/bin/makepkg; then
 		# makepkg cannot not as root by default
 		sed -i -e 's|EUID == 0|EUID == 69|g' /usr/bin/makepkg
