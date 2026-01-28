@@ -811,7 +811,7 @@ _make_deployment_array() {
 							set -- "$@" "$f"
 							;;
 						*)
-							if _is_deployable_binary; then
+							if _is_deployable_binary "$f"; then
 								set -- "$@" "$f"
 							fi
 							;;
