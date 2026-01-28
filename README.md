@@ -104,6 +104,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
+[Pyglossary](https://github.com/pkgforge-dev/PyGlossary)                                                                 |
 [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
 [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
