@@ -297,6 +297,18 @@ _remove_empty_dirs() {
 	  -exec rmdir -p --ignore-fail-on-non-empty {} + 2>/dev/null || true
 }
 
+# skip non executable binaries and .node binaries
+# these are actually libraries and cannot be wrapped with sharun
+_is_deployable_binary() {
+	if [ -x "$1" ]; then
+		case "$1" in
+			*.node) :;;
+			*) return 0;;
+		esac
+	fi
+	return 1
+}
+
 _determine_what_to_deploy() {
 	mkdir -p "$APPDIR"/share
 	for bin do
@@ -595,7 +607,7 @@ _make_deployment_array() {
 		d="${ELECTRON_BIN%/*}"/resources
 		if [ -d "$d" ]; then
 			for f in $(find "$d" -type f ! -name '*.so*'); do
-				if [ -x "$f" ]; then
+				if _is_deployable_binary "$f"; then
 					set -- "$@" "$f"
 				fi
 			done
@@ -799,7 +811,7 @@ _make_deployment_array() {
 							set -- "$@" "$f"
 							;;
 						*)
-							if [ -x "$f" ]; then
+							if _is_deployable_binary; then
 								set -- "$@" "$f"
 							fi
 							;;
