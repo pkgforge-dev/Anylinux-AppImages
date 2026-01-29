@@ -140,8 +140,8 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [RSDKv3](https://github.com/pkgforge-dev/RSDKv3-AppImage)                                                                |
 [RSDKv4](https://github.com/pkgforge-dev/RSDKv4-AppImage)                                                                |
 [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced)                                                   |
-[SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage)                                                                |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
+[SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage)                                                                |
 [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage)                                                                |
