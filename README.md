@@ -127,6 +127,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
+[Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage)                                                        |
 [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
 [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
