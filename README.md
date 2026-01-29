@@ -43,7 +43,6 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
-[CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage)                                                      |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
@@ -66,7 +65,6 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [ExtremeTuxRacer](https://github.com/pkgforge-dev/ExtremeTuxRacer-AppImage)                                              |
 [Exult](https://github.com/pkgforge-dev/Exult-AppImage)                                                                  |
 [Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage)                                                        |
-[Fabother-World](https://github.com/pkgforge-dev/Fabother-World-AppImage)                                                |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
@@ -105,7 +103,6 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Mini-vMac](https://github.com/pkgforge-dev/Mini-vMac-AppImage)                                                          |
 [Mousai](https://github.com/pkgforge-dev/Mousai-AppImage)                                                                |
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
-[NBlood](https://github.com/pkgforge-dev/NBlood-AppImage)                                                                |
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
@@ -114,11 +111,9 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [okteta](https://github.com/pkgforge-dev/okteta-AppImage)                                                                |
 [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced)                                                   |
 [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage)                                                            |
-[OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage)                                                            |
 [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage)                                                |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
-[PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
 [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage)                                            |
 [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
