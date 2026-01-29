@@ -38,23 +38,23 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced)                                                           |
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
 [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage)                                                              |
-[Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
-[Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage)                                                        |
+[Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
 [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
+[Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
 [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage)                                                      |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
 [DarkPlaces](https://github.com/pkgforge-dev/DarkPlaces-AppImage)                                                        |
-[Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
-[Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
 [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage)                                                            |
 [Defold](https://github.com/pkgforge-dev/Defold-AppImage)                                                                |
 [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage)                                                              |
 [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage)                                                      |
 [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage)                                                                |
+[Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
+[Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
 [Drum Machine](https://github.com/pkgforge-dev/Drum-Machine-AppImage)                                                    |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
@@ -126,14 +126,14 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
-[Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
 [Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage)                                                        |
-[Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
-[RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
 [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
+[Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
+[Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
+[RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
@@ -145,6 +145,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage)                                                                |
 [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
+[Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage)                                                                |
 [soh](https://github.com/pkgforge-dev/soh-AppImage)                                                                      |
 [Sonic-Mania-Decompilation](https://github.com/pkgforge-dev/Sonic-Mania-Decompilation-AppImage)                          |
@@ -156,7 +157,6 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [Stella](https://github.com/pkgforge-dev/Stella-AppImage)                                                                |
 [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage)                                                    |
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
-[Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
 [SuperTux](https://github.com/pkgforge-dev/SuperTux-AppImage-Enhanced)                                                   |
 [SuperTuxKart](https://github.com/pkgforge-dev/SuperTuxKart-AppImage-Enhanced)                                           |
