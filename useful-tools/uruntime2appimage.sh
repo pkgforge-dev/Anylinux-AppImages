@@ -175,7 +175,7 @@ _deploy_desktop_and_icon
 DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
 
 if [ "$DEVEL_RELEASE" = 1 ]; then
-	if ! ! grep -q '^Name=.*Nightly' "$DESKTOP_ENTRY"; then
+	if ! grep -q '^Name=.*Nightly' "$DESKTOP_ENTRY"; then
 		>&2 echo "Adding Nightly to desktop entry name"
 		sed -i -e 's/^\(Name=.*\)$/\1 Nightly/' "$DESKTOP_ENTRY"
 	fi
