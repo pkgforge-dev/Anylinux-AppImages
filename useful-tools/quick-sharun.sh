@@ -775,6 +775,8 @@ _make_deployment_array() {
 			"$LIB_DIR"/libXcursor.so*        \
 			"$LIB_DIR"/libxcb-dri*.so*       \
 			"$LIB_DIR"/libxcb-glx.so*        \
+			"$LIB_DIR"/libxcb-ewmh.so*       \
+			"$LIB_DIR"/libxcb-icccm.so*      \
 			"$LIB_DIR"/libxkbcommon.so*      \
 			"$LIB_DIR"/libxkbcommon-x11.so*  \
 			"$LIB_DIR"/libXext.so*           \
