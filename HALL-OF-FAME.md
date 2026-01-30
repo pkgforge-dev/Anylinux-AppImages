@@ -36,6 +36,10 @@ The only reason it is not excellent is becuase deploying QML is a bit complicate
 
 Qt also often links to libicudata (30 MiB lib) even though the vast majority of applications do not need this, thankfully it can be disabled at compile time, but ideally this should be dlopened instead when needed.
 
+# Good - .NET
+
+Surprisingly easy to deploy. We do not need to set environments variable to make it relocable, applications already rely on relative paths. Often times however dotnet apps need to be launched by a shell script with hardcoded paths that needs to be edited, as it is usually something like `exec dotnet /usr/lib/app.dll "#@"`.
+
 # Good - MESA
 
 Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently MESA now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files. **And the icd files support relative library locations to the icd file itself** 👀 
@@ -46,9 +50,15 @@ My only complain is that we need to set `GBM_BACKENDS_PATH` and `LIBVA_DRIVERS_P
 
 This would have been horrible a few years ago, but libdecor has really done a lot of improve its situation and they want to [improve it more](https://gitlab.freedesktop.org/libdecor/libdecor/-/issues/44), so I will give them credit for that. I still think this library is totally useless, this wouldn't be needed at all if GNOME was so retarded to not provide server side decorations...
 
-# Good ffmpeg
+# Good - ffmpeg
 
 We do not have to do anything to make this relocatable, it just works™, However ffmpeg directly links to a ton of libraries, which means a lot of bloat often gets added, thankfully this can be mitigated by buidling ffmpeg with those options disabled, but ideally ffmpeg should dlopen the libraries when needed, there is no need to link and load libx265 because your music players uses ffmpeg, just no...
+
+# Good - NVIDIA ??
+
+This is a bit odd but I will mention it, **we never need to bundle the nvidia drivers**, nvidia releases its driver linking to a +10yo version of glibc, that means we can use that driver without issue. [The only issues we have had nvidia specific are distros breaking stuff...](https://github.com/pkgforge-dev/Citron-AppImage/issues/67) and also that we need to make sure some [ancient libs](https://github.com/VHSgunzo/sharun/issues/34) are present lol
+
+I still see this idea on relying on host libraries as flawed, who knows what will happen in the future. Also a good chunk of the issues at sharun are issues related to the logic we have to use the nvidia driver, [it has been a pain](https://github.com/VHSgunzo/sharun/issues/90). 
 
 # Bad - alsa
 
@@ -58,11 +68,19 @@ alsa doesn't check `XDG_DATA_DIRS` to find its data directory, we have to set `A
 
 glibc supports the `LOCPATH` env varaible but this doesn't work with locale archives, This problem affects NixOS and they have to [patch](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/libraries/glibc/nix-locale-archive.patch) it so that locale-archives can be made relocatable. We also have to set `GCONV_PATH` and good luck figuring out which gconv plugin your app exactly needs, and when the plugin is missing there is no error about it, [it is just totally random what happens](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20)
 
-# Bad Gstreamer
+# Bad - Gstreamer
 
 It is insane how you can screw up a system that is modular? First it is very difficult to determine what Gstreamer plugin an application needs unless you already know it before hand since you built it, Gstreamer uses something called `gst-plugin-scanner` which opens every single gstreamer plugin on the system, so we cannot easily determine using `strace` what plugin an application needs. It needs 4 env variables to be made relocatable `GST_PLUGIN_PATH`, `GST_PLUGIN_SYSTEM_PATH`, `GST_PLUGIN_SYSTEM_PATH_1_0` (lol?), and `GST_PLUGIN_SCANNER`.
 
 Also sometimes the bloody [thing needs ffmpeg to work](https://github.com/pkgforge-dev/strawberry-AppImage/issues/21#issuecomment-3625129688), it is useless. Just use ffmpeg directly and do not bother with Gstreamer.
+
+# Bad - OpenSSL
+
+This is a general failure of linux that there is no standard path to the certificates on the host, there is however a convention that most distros have the certificates in `/etc/ssl/certs/ca-certificates.crt`, that location is there in Alpine, Arch, Ubuntu, Fedora and even NixOS. For the distros that do not we have to play this game of [finding the certs and setting a ton of variables](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/f2d9fcb8b18d7c3639633a18caf59d90ed587469/useful-tools/quick-sharun.sh#L1007-L1024). At least there are variables we can set, because the project does not have them. 😹
+
+# Horrible - p11kit
+
+[You need to recompile the library to enable environment variables to make it relocatable.](https://github.com/p11-glue/p11-kit/issues/700) And none of the vars are documented!
 
 # Horrible - WebKit
 
@@ -89,3 +107,12 @@ Where do I even start?
 * It also depends on Gstreamer 😹
 
 At least more recently they are looking into adding [svg support into GTK4](https://www.phoronix.com/news/GTK-4.22-Native-SVG), which hopefully means they will get rid of the gdk-pixbuf and glycin dependency.
+
+# Garbage - Python
+
+* Applications break horribly with the sightless version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215) 
+* cpython running `/sbin/ldconfig -p` to find libraries, super broken. [1](https://github.com/python/cpython/issues/112417) [2](https://github.com/python/cpython/issues/142020) [3](https://github.com/python/cpython/issues/142020#issuecomment-3590632764)
+* [uv python breaks if you strip it](https://github.com/VHSgunzo/sharun/blob/9ced775c762193ab525acfb9a9497b17945db8de/lib4bin#L182-L184) 😹
+* Builds randomly began to fail **on the same python uv version** and had to use [this to it](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage/commit/e6a5601eeb7a3c4013b9452ca9c01eda7c5ec9e0)
+* python apps are often written with a ton of hardcoded paths, **even more than GTK apps**, so a lot of manual patches are needed to fix them. This is the result of a language that suggests containers to work.
+* Good luck figuring the dependencies of python apps, you often run into missing undeclared dependencies [1](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/256#issuecomment-3797407784) [2](https://github.com/pkgforge-dev/blender-AppImage/issues/5#issuecomment-3815841765)
