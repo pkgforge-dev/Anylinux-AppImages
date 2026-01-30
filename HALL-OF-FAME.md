@@ -38,7 +38,7 @@ Qt also often links to libicudata (30 MiB lib) even though the vast majority of 
 
 # Good - MESA
 
-Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently MESA now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files.
+Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently MESA now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files. **And the icd files support relative library locations to the icd file itself** 👀 
 
 My only complain is that we need to set `GBM_BACKENDS_PATH` and `LIBVA_DRIVERS_PATH`, these should be loaded relative to the location of libgallium. Hopefully mesa can do this like they did with [LIBGL_DRIVERS_PATH](https://www.phoronix.com/news/Mesa-24.2-Modern-Interfaces)
 
@@ -82,7 +82,7 @@ Where do I even start?
 
 * it depends on stuff like Gio, gdk-pixbuf, glycin, which bloats the final application. And those projects have their own set of issues when made relocable. And in the case of glycin it is a [total disaster.](https://github.com/VHSgunzo/sharun/issues/68).
 
-* The vulkan backend was [totally broken wayland with intel gpus](https://www.phoronix.com/news/Mesa-25.3.3-Released), before that we had to fix it by building GTK4 without the vulkan backend, as sometimes `GSK_RENDERER=gl` just did not work as it ignores the variable, and in fact it looks like we will keep building GTK4 without vulkan as long as possible, because we also had an incident with one user on a super old intel laptop that does not support vulkan where gnome apps did not just work even with `GSK_RENDERER=vulkan` while the apppimages we make did.
+* The vulkan backend was [totally broken wayland with intel gpus](https://www.phoronix.com/news/Mesa-25.3.3-Released), before that we had to fix it by building GTK4 without the vulkan backend, as sometimes `GSK_RENDERER=gl` just did not work as it ignores the variable, and in fact it looks like we will keep building GTK4 without vulkan as long as possible, because we also had an incident with one user on a super old intel laptop that does not support vulkan where gnome apps did not just work even with `GSK_RENDERER=gl` while the apppimages we make did.
 
 * All GTK apps also have a useless dependency to a 30 MiB libicudata library, which is needed by libxml which is needed by libappstream which why would you even need to link to libappstream at all?? This is used to make AppStream metadata used in software stores, dafuck? 
 
