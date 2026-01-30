@@ -37,6 +37,7 @@ pacman -Syu --noconfirm \
 	vkmark           \
 	vulkan-tools     \
 	wget             \
+	xcb-util-wm      \
 	xorg-server-xvfb \
 	zsync
 
