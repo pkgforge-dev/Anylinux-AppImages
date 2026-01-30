@@ -16,6 +16,11 @@ export DESKTOP=DUMMY
 export OUTPATH=./dist
 export OUTNAME=vkcube+glxgears-demo-"$ARCH".AppImage
 export MAIN_BIN=vkcube
+# vkmark is hardcoded to look in /usr/share/vkmark and /usr/lib/vkmark
+export PATH_MAPPING='
+	/usr/share/vkmark:${SHARUN_DIR}/share/vkmark
+	/usr/lib/vkmark:${SHARUN_DIR}/lib/vkmark
+'
 
 pacman -Syu --noconfirm \
 	base-devel       \
@@ -45,7 +50,7 @@ echo "Bundling AppImage..."
 echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
-./quick-sharun /usr/bin/vkcube /usr/bin/vkmark /usr/bin/glxgears /usr/bin/eglgears*
+./quick-sharun /usr/bin/vkcube /usr/*/vkmark /usr/bin/glxgears /usr/bin/eglgears*
 
 ./quick-sharun --make-appimage
 
