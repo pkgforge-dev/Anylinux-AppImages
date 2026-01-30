@@ -38,7 +38,7 @@ Qt also often links to libicudata (30 MiB lib) even though the vast majority of 
 
 # Good - .NET
 
-Surprisingly easy to deploy. We do not need to set environments variable to make it relocable, applications already rely on relative paths. Often times however dotnet apps need to be launched by a shell script with hardcoded paths that needs to be edited, as it is usually something like `exec dotnet /usr/lib/app.dll "#@"`.
+Surprisingly easy to deploy. We do not need to set environments variable to make it relocable, applications already rely on relative paths. Often times however dotnet apps need to be launched by a shell script with hardcoded paths that needs to be edited, as it is usually something like `exec dotnet /usr/lib/app.dll "$@"`.
 
 # Good - MESA
 
@@ -76,7 +76,7 @@ Also sometimes the bloody [thing needs ffmpeg to work](https://github.com/pkgfor
 
 # Bad - OpenSSL
 
-This is a general failure of linux that there is no standard path to the certificates on the host, there is however a convention that most distros have the certificates in `/etc/ssl/certs/ca-certificates.crt`, that location is there in Alpine, Arch, Ubuntu, Fedora and even NixOS. For the distros that do not we have to play this game of [finding the certs and setting a ton of variables](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/f2d9fcb8b18d7c3639633a18caf59d90ed587469/useful-tools/quick-sharun.sh#L1007-L1024). At least there are variables we can set, because the project does not have them. 😹
+This is a general failure of linux that there is no standard path to the certificates on the host, there is however a convention that most distros have the certificates in `/etc/ssl/certs/ca-certificates.crt`, that location is there in Alpine, Arch, Ubuntu, Fedora and even NixOS. For the distros that do not we have to play this game of [finding the certs and setting a ton of variables](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/f2d9fcb8b18d7c3639633a18caf59d90ed587469/useful-tools/quick-sharun.sh#L1007-L1024). At least there are variables we can set, because the next project does not 😹
 
 # Horrible - p11kit
 
