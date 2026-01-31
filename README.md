@@ -66,6 +66,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 [ExtremeTuxRacer](https://github.com/pkgforge-dev/ExtremeTuxRacer-AppImage)                                              |
 [Exult](https://github.com/pkgforge-dev/Exult-AppImage)                                                                  |
 [Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage)                                                        |
+[FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage)                                                                |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
