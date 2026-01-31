@@ -1,4 +1,4 @@
-<div align="center">
+<div align="center" markdown="1">
 
 # Deploying libraries - Hall of Fame/Shame
 We have been deploying applications for over 1 year already, so I thought I would rank how difficult it has been to deal with several common toolkits and libraries.
