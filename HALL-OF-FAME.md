@@ -9,8 +9,8 @@ Inspired by [Dolphin Emulator and OpenGL drivers - Hall of Fame/Shame](https://d
 
 # Excellent - SDL
 
-very easy to deploy, SDL does not have excessive dependencies and it is very configurable thru env variables.
-There was only one [problem](https://github.com/libsdl-org/SDL/issues/14887) which which SDL fixed quickly once I let them know: 
+Very easy to deploy, SDL does not have excessive dependencies and it is very configurable thru env variables.
+There was only one [problem](https://github.com/libsdl-org/SDL/issues/14887) which SDL fixed quickly once I let them know.
 
 # Excellent - iced and glfw
 
