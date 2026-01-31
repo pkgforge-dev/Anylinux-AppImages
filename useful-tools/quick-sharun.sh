@@ -2076,6 +2076,12 @@ if [ -f "$1" ]; then
 	fi
 fi
 
+# always make sure that AppDir/lib exists, sometimes lib4bin does not make it
+# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
+if [ ! -d "$APPDIR"/lib ] && [ -d "$APPDIR"/shared/lib ]; then
+	ln -s shared/lib "$APPDIR"/lib
+fi
+
 echo ""
 if [ "$OUTPUT_APPIMAGE" = 1 ]; then
 	_make_appimage
