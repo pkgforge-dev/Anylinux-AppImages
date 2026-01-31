@@ -19,7 +19,7 @@ _info_msg() {
 }
 
 _prepare() {
-	for d in base-devel git; do
+	for d in base-devel git yes; do
 		if ! pacman -Q "$d" 2>/dev/null; then
 			_info_msg "Adding build dependency: $d"
 			pacman -S --noconfirm "$d"
@@ -171,9 +171,9 @@ ls -la ./
 
 _info_msg "Installing package..."
 if [ "$OVERWRITE_CONFLICTS" = 1 ]; then
-	pacman --noconfirm -U ./*.pkg.tar.* --overwrite '*'
+	yes | pacman -U ./*.pkg.tar.* --overwrite '*'
 else
-	pacman --noconfirm -U ./*.pkg.tar.*
+	yes | pacman -U ./*.pkg.tar.*
 fi
 
 _info_msg "All done!"
