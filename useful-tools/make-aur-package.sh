@@ -19,7 +19,7 @@ _info_msg() {
 }
 
 _prepare() {
-	for d in base-devel git yes; do
+	for d in base-devel git; do
 		if ! pacman -Q "$d" 2>/dev/null; then
 			_info_msg "Adding build dependency: $d"
 			pacman -S --noconfirm "$d"
