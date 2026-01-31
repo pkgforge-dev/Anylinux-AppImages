@@ -16,6 +16,10 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 | **AnyLinux AppImages** (made with sharun) | Use **FUSE if available**, else **fallback to using namespaces** and if that is not possible then we automatically extract to `TMPDIR` and run with post cleanup, we **do not need an FHS filesystem** and **do not depend on the host libc**, so eh make sure you have `/bin/sh` and write access to `/tmp`??? (If you can boot to a graphical session you already met those requirements). **How is this possible?** See: [How to guide](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/HOW-TO-MAKE-THESE.md) |
 | **AnyLinux AppImages** (made with RunImage) | Similar to sharun AppImages but have a **Hard dependency on namespaces**, Lutris and virt-manager are the only ones that use this method, pending migration to sharun. |
 
+For more useful documentation about Anylinux-AppImages, see the pages below:
+
+- [How to make these](HOW-TO-MAKE-THESE.md)
+- [Hall of fame/shame](HALL-OF-FAME.md)
 
 ---
 
