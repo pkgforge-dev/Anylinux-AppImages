@@ -90,6 +90,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
+[ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage)                                                  |
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
