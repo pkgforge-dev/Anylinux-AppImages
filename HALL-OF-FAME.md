@@ -42,9 +42,7 @@ Surprisingly easy to deploy. We do not need to set environments variable to make
 
 # Good - MESA
 
-Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently MESA now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files. **And the icd files support relative library locations to the icd file itself** 👀 
-
-My only complain is that we need to set `GBM_BACKENDS_PATH` and `LIBVA_DRIVERS_PATH`, these should be loaded relative to the location of libgallium. Hopefully mesa can do this like they did with [LIBGL_DRIVERS_PATH](https://www.phoronix.com/news/Mesa-24.2-Modern-Interfaces)
+Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently MESA now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files. **And the icd files support relative library locations to the icd file itself** 👀
 
 # Good - libdecor
 
