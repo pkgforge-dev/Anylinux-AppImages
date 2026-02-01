@@ -143,6 +143,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [RSDKv4](https://github.com/pkgforge-dev/RSDKv4-AppImage)                                                                |
 [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced)                                                   |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
+[ScummVM](https://github.com/pkgforge-dev/ScummVM-AppImage)                                                              |
 [SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage)                                                                |
 [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
