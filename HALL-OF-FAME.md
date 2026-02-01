@@ -24,6 +24,10 @@ These are already very portable on their own and very very easy to deploy as res
 
 These are relocatable always, in fact distros often need to put the application in dedicated directory in `/usr/share` or `/usr/lib` since they need a relative `lib` directory next to the binary to work.
 
+# Excellent - MESA
+
+Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently MESA now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files. **And the icd files support relative library locations to the icd file itself** 👀
+
 # Excellent - pipewire
 
 Needs `PIPEWIRE_MODULE_DIR` and `SPA_PLUGIN_DIR` to be made relocatable. Otherwise perfect for deployment, it does have some performance issues but with pipewire-jack though.
@@ -39,10 +43,6 @@ Qt also often links to libicudata (30 MiB lib) even though the vast majority of 
 # Good - .NET
 
 Surprisingly easy to deploy. We do not need to set environments variable to make it relocable, applications already rely on relative paths. Often times however dotnet apps need to be launched by a shell script with hardcoded paths that needs to be edited, as it is usually something like `exec dotnet /usr/lib/app.dll "$@"`.
-
-# Good - MESA
-
-Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently MESA now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files. **And the icd files support relative library locations to the icd file itself** 👀
 
 # Good - libdecor
 
