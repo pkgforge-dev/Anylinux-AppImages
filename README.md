@@ -73,6 +73,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage)                                                                |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
+[FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage)                                                            |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
