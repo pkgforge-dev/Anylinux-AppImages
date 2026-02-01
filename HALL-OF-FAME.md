@@ -36,7 +36,7 @@ Needs `PIPEWIRE_MODULE_DIR` and `SPA_PLUGIN_DIR` to be made relocatable. Otherwi
 
 Qt is very easy to make relocable, it supports a `qt.conf` file that accepts relative paths which prevents using the env variable `QT_PLUGIN_PATH` which is very problematic for child processes, Qt also looks into `XDG_DATA_DIRS` and several other locations to find its translation files, QtWebEgnine is super easy to dewploy as well.
 
-The only reason it is not excellent is becuase deploying QML is a bit complicated since the .qml files have to deployed along with the libraries and determining which ones to add is a mess. Right now we just add all of qml when deployign qml as result of this. 
+The only reason it is not excellent is becuase deploying QML is a bit complicated since the .qml files have to deployed along with the libraries and determining which ones to add is a mess. Right now we just add all of qml when deployign qml as result of this.
 
 Qt also often links to libicudata (30 MiB lib) even though the vast majority of applications do not need this, thankfully it can be disabled at compile time, but ideally this should be dlopened instead when needed.
 
@@ -56,7 +56,11 @@ We do not have to do anything to make this relocatable, it just works™, Howeve
 
 This is a bit odd but I will mention it, **we never need to bundle the nvidia drivers**, nvidia releases its driver linking to a +10yo version of glibc, that means we can use that driver without issue. [The only issues we have had nvidia specific are distros breaking stuff...](https://github.com/pkgforge-dev/Citron-AppImage/issues/67) and also that we need to make sure some [ancient libs](https://github.com/VHSgunzo/sharun/issues/34) are present lol
 
-I still see this idea on relying on host libraries as flawed, who knows what will happen in the future. Also a good chunk of the issues at sharun are issues related to the logic we have to use the nvidia driver, [it has been a pain](https://github.com/VHSgunzo/sharun/issues/90). 
+I still see this idea on relying on host libraries as flawed, who knows what will happen in the future. Also a good chunk of the issues at sharun are issues related to the logic we have to use the nvidia driver, [it has been a pain](https://github.com/VHSgunzo/sharun/issues/90).
+
+# Mediocre - LLVM
+
+Easy to deploy but it is insanely bloated, to the point that [Valve had to make ACO for MESA](https://www.forbes.com/sites/jasonevangelho/2019/07/11/valves-latest-linux-gaming-work-is-boosting-amd-vulkan-performance-by-up-to-44-percent/) and [zig is moving away from it](https://github.com/ziglang/zig/issues/16270), you can build smaller versions of LLVM by limiting the targets with `-DLLVM_TARGETS_TO_BUILD` but this still results in a **60 MIB** libray and it [breaks compilers](https://github.com/pkgforge-dev/alacritty-AppImage/blob/19b437f7ec5ac737bf7abe15a8225744a3ea4e7a/get-dependencies.sh#L26) in the processes, and it rare cases it still breaks the binary that links to it for some reason so you have to ship the massive version with all the targets...
 
 # Bad - alsa
 
@@ -100,7 +104,7 @@ Where do I even start?
 
 * The vulkan backend was [totally broken wayland with intel gpus](https://www.phoronix.com/news/Mesa-25.3.3-Released), before that we had to fix it by building GTK4 without the vulkan backend, as sometimes `GSK_RENDERER=gl` just did not work as it ignores the variable, and in fact it looks like we will keep building GTK4 without vulkan as long as possible, because we also had an incident with one user on a super old intel laptop that does not support vulkan where gnome apps did not just work even with `GSK_RENDERER=gl` while the apppimages we make did.
 
-* All GTK apps also have a useless dependency to a 30 MiB libicudata library, which is needed by libxml which is needed by libappstream which why would you even need to link to libappstream at all?? This is used to make AppStream metadata used in software stores, dafuck? 
+* All GTK apps also have a useless dependency to a 30 MiB libicudata library, which is needed by libxml which is needed by libappstream which why would you even need to link to libappstream at all?? This is used to make AppStream metadata used in software stores, dafuck?
 
 * It also depends on Gstreamer 😹
 
@@ -108,7 +112,7 @@ At least more recently they are looking into adding [svg support into GTK4](http
 
 # Garbage - Python
 
-* Applications break horribly with the sightless version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215) 
+* Applications break horribly with the sightless version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215)
 * cpython running `/sbin/ldconfig -p` to find libraries, super broken. [1](https://github.com/python/cpython/issues/112417) [2](https://github.com/python/cpython/issues/142020) [3](https://github.com/python/cpython/issues/142020#issuecomment-3590632764)
 * [uv python breaks if you strip it](https://github.com/VHSgunzo/sharun/blob/9ced775c762193ab525acfb9a9497b17945db8de/lib4bin#L182-L184) 😹
 * Builds randomly began to fail **on the same python uv version** and had to use [this to it](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage/commit/e6a5601eeb7a3c4013b9452ca9c01eda7c5ec9e0)
