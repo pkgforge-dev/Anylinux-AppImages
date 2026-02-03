@@ -27,6 +27,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | ------------------------------------------------------------------------------------------------------------------------ |
 [12to11](https://github.com/pkgforge-dev/12to11-AppImage)                                                                |
 [AAAAXY](https://github.com/pkgforge-dev/AAAAXY-AppImage-Enhanced)                                                       |
+[Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage)                                                            |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
 [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage)                                                  |
 [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
