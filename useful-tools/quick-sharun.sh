@@ -1876,9 +1876,22 @@ if [ "$DEPLOY_FLUTTER" = 1 ]; then
 fi
 if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 	mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
-	cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
-	cp -r /etc/ImageMagick-*       "$APPDIR"/etc
-	cp -r /usr/share/ImageMagick-* "$APPDIR"/share
+	cp -rv "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
+	cp -rv /etc/ImageMagick-*       "$APPDIR"/etc
+
+	# we can copy /usr/share/ImageMagick to the AppDir and set MAGICK_CONFIGURE_PATH
+	# to include both the etc/ImageMagick and share/ImageMagick directory
+	# but it is simpler to instead have all the config files in a single location
+	# imagemagick will load them all regardless
+	set -- /usr/share/ImageMagick-*/*.xml
+	if [ -f "$1" ]; then
+		cp -rv /usr/share/ImageMagick-*/*.xml "$APPDIR"/etc/ImageMagick*
+	fi
+	# there is also a configuration file in libdir
+	set -- "$LIB_DIR"/ImageMagick-*/config*/configure.xml
+	if [ -f "$1" ]; then
+		cp -v "$1" "$APPDIR"/etc/ImageMagick*
+	fi
 
 	# MAGICK_HOME is all that needs to be set
 	echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
@@ -1893,11 +1906,17 @@ if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 		fi
 		set -- shared/lib/ImageMagick-*/modules*/filters
 		if [ -d "$1" ]; then
+			# checking the code it seems that MAGICK_FILTER_MODULE_PATH
+			# is NOT USED in the code and seems to be an error!!! the variable 
+			# that modules.c references is MAGICK_CODER_FILTER_PATH
+			# we will still be set both just in case
+			echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
 			echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+
 		fi
-		set -- etc/ImageMagick* share/ImageMagick*
-		if [ -d "$1" ] && [ -d "$2" ]; then
-			echo "MAGICK_CONFIGURE_PATH=\${SHARUN_DIR}/$1:\${SHARUN_DIR}/$2" >> "$APPENV"
+		set -- etc/ImageMagick*
+		if [ -d "$1" ]; then
+			echo "MAGICK_CONFIGURE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
 		fi
 	)
 
