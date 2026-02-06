@@ -1694,11 +1694,6 @@ for lib do case "$lib" in
 	*libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
-	*libMagick*.so*)
-		# MAGICK_HOME only works on portable builds of imagemagick
-		# so we will have to patch it manually instead
-		_patch_away_usr_lib_dir "$lib" || continue
-		;;
 	*libmlt*.so*)
 		_patch_away_usr_lib_dir "$lib" || continue
 		_patch_away_usr_share_dir "$lib" || continue
@@ -1772,22 +1767,23 @@ topleveldirs=$(find "$APPDIR"/shared/lib/ -maxdepth 1  -type d | sed 's|/.*/||')
 for dir in $topleveldirs; do
 	# skip directories we already handle here on in sharun
 	case "$dir" in
-		alsa-lib   |\
-		dri        |\
-		gbm        |\
-		gconv      |\
-		gdk-pixbuf*|\
-		gio        |\
-		gtk*       |\
-		gstreamer* |\
-		gvfs       |\
-		libproxy   |\
-		locale     |\
-		pipewire*  |\
-		pulseaudio |\
-		qt*        |\
-		spa*       |\
-		vdpau      )
+		alsa-lib    |\
+		dri         |\
+		gbm         |\
+		gconv       |\
+		gdk-pixbuf* |\
+		gio         |\
+		gtk*        |\
+		gstreamer*  |\
+		gvfs        |\
+		ImageMagick*|\
+		libproxy    |\
+		locale      |\
+		pipewire*   |\
+		pulseaudio  |\
+		qt*         |\
+		spa*        |\
+		vdpau       )
 			continue
 			;;
 	esac
@@ -1881,9 +1877,30 @@ fi
 if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 	mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
 	cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
-	cp -r /etc/ImageMagick-*       "$APPDIR"/etc/ImageMagick
+	cp -r /etc/ImageMagick-*       "$APPDIR"/etc
+	cp -r /usr/share/ImageMagick-* "$APPDIR"/share
+
+	# MAGICK_HOME is all that needs to be set
 	echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
-	echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc/ImageMagick' >> "$APPENV"
+	# however MAGICK_HOME only works when compiled with a specific flag
+	# we can still make this relocatable by setting these other env variables
+	# which will always work even not compiled with MAGICK_HOME support
+	(
+		cd "$APPDIR"
+		set -- shared/lib/ImageMagick-*/modules*/coders
+		if [ -d "$1" ]; then
+			echo "MAGICK_CODER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+		fi
+		set -- shared/lib/ImageMagick-*/modules*/filters
+		if [ -d "$1" ]; then
+			echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+		fi
+		set -- etc/ImageMagick* share/ImageMagick*
+		if [ -d "$1" ] && [ -d "$2" ]; then
+			echo "MAGICK_CONFIGURE_PATH=\${SHARUN_DIR}/$1:\${SHARUN_DIR}/$2" >> "$APPENV"
+		fi
+	)
+
 	_echo "* Copied ImageMagick directories"
 fi
 if [ "$DEPLOY_GEGL" = 1 ]; then
