@@ -714,6 +714,12 @@ _make_deployment_array() {
 		set -- "$@" "$LIB_DIR"/libMagick*.so*
 		if b=$(command -v magick);  then set -- "$@" "$b"; fi
 		if b=$(command -v convert); then set -- "$@" "$b"; fi
+
+		magickdir=$(echo "$LIB_DIR"/ImageMagick*)
+		ADD_DIR="
+			$ADD_DIR
+			$magickdir
+		"
 	fi
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		if pythonbin=$(command -v python); then
@@ -1876,8 +1882,7 @@ if [ "$DEPLOY_FLUTTER" = 1 ]; then
 fi
 if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 	mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
-	cp -rv "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
-	cp -rv /etc/ImageMagick-*       "$APPDIR"/etc
+	cp -rv /etc/ImageMagick-* "$APPDIR"/etc
 
 	# we can copy /usr/share/ImageMagick to the AppDir and set MAGICK_CONFIGURE_PATH
 	# to include both the etc/ImageMagick and share/ImageMagick directory
@@ -1907,7 +1912,7 @@ if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 		set -- shared/lib/ImageMagick-*/modules*/filters
 		if [ -d "$1" ]; then
 			# checking the code it seems that MAGICK_FILTER_MODULE_PATH
-			# is NOT USED in the code and seems to be an error!!! the variable 
+			# is NOT USED in the code and seems to be an error!!! the variable
 			# that modules.c references is MAGICK_CODER_FILTER_PATH
 			# we will still be set both just in case
 			echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
@@ -2001,6 +2006,12 @@ sed -i \
 	"$APPDIR"/AppRun
 
 chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null || :
+
+# always make sure that AppDir/lib exists, sometimes lib4bin does not make it
+# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
+if [ ! -d "$APPDIR"/lib ] && [ -d "$APPDIR"/shared/lib ]; then
+	ln -s shared/lib "$APPDIR"/lib
+fi
 
 # deploy directories
 while read -r d; do
@@ -2110,12 +2121,6 @@ if [ -f "$1" ]; then
 	if ! ldd "$1" | grep -q 'libpipewire'; then
 		_err_msg "$libjackwarning"
 	fi
-fi
-
-# always make sure that AppDir/lib exists, sometimes lib4bin does not make it
-# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
-if [ ! -d "$APPDIR"/lib ] && [ -d "$APPDIR"/shared/lib ]; then
-	ln -s shared/lib "$APPDIR"/lib
 fi
 
 echo ""
