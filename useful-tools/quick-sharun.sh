@@ -734,8 +734,8 @@ _make_deployment_array() {
 			"$LIB_DIR"/imlib2/loaders/*
 
 		# TODO upstream to sharun
-		echo 'IMLIB2_FILTER_PATH=${SHARUN_DIR}/imlib2/filters' >> "$APPENV"
-		echo 'IMLIB2_LOADER_PATH=${SHARUN_DIR}/imlib2/loaders' >> "$APPENV"
+		echo 'IMLIB2_FILTER_PATH=${SHARUN_DIR}/lib/imlib2/filters' >> "$APPENV"
+		echo 'IMLIB2_LOADER_PATH=${SHARUN_DIR}/lib/imlib2/loaders' >> "$APPENV"
 
 		# Setting IMLIB2_FILTER_PATH and IMLIB2_LOADER_PATH is good
 		# enough to make imlib2 relocatable, however there is one specific
