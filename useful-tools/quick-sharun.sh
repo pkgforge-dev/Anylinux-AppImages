@@ -714,6 +714,14 @@ _make_deployment_array() {
 		set -- "$@" "$LIB_DIR"/libMagick*.so*
 		if b=$(command -v magick);  then set -- "$@" "$b"; fi
 		if b=$(command -v convert); then set -- "$@" "$b"; fi
+		# imagemagick optionally requires potrace to convert png to svg
+		if b=$(command -v potrace); then set -- "$@" "$b"; fi
+
+		magickdir=$(echo "$LIB_DIR"/ImageMagick*)
+		ADD_DIR="
+			$ADD_DIR
+			$magickdir
+		"
 	fi
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		if pythonbin=$(command -v python); then
@@ -1694,11 +1702,6 @@ for lib do case "$lib" in
 	*libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
-	*libMagick*.so*)
-		# MAGICK_HOME only works on portable builds of imagemagick
-		# so we will have to patch it manually instead
-		_patch_away_usr_lib_dir "$lib" || continue
-		;;
 	*libmlt*.so*)
 		_patch_away_usr_lib_dir "$lib" || continue
 		_patch_away_usr_share_dir "$lib" || continue
@@ -1772,22 +1775,23 @@ topleveldirs=$(find "$APPDIR"/shared/lib/ -maxdepth 1  -type d | sed 's|/.*/||')
 for dir in $topleveldirs; do
 	# skip directories we already handle here on in sharun
 	case "$dir" in
-		alsa-lib   |\
-		dri        |\
-		gbm        |\
-		gconv      |\
-		gdk-pixbuf*|\
-		gio        |\
-		gtk*       |\
-		gstreamer* |\
-		gvfs       |\
-		libproxy   |\
-		locale     |\
-		pipewire*  |\
-		pulseaudio |\
-		qt*        |\
-		spa*       |\
-		vdpau      )
+		alsa-lib    |\
+		dri         |\
+		gbm         |\
+		gconv       |\
+		gdk-pixbuf* |\
+		gio         |\
+		gtk*        |\
+		gstreamer*  |\
+		gvfs        |\
+		ImageMagick*|\
+		libproxy    |\
+		locale      |\
+		pipewire*   |\
+		pulseaudio  |\
+		qt*         |\
+		spa*        |\
+		vdpau       )
 			continue
 			;;
 	esac
@@ -1880,10 +1884,49 @@ if [ "$DEPLOY_FLUTTER" = 1 ]; then
 fi
 if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 	mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
-	cp -r "$LIB_DIR"/ImageMagick-* "$APPDIR"/shared/lib
-	cp -r /etc/ImageMagick-*       "$APPDIR"/etc/ImageMagick
+	cp -rv /etc/ImageMagick-* "$APPDIR"/etc
+
+	# we can copy /usr/share/ImageMagick to the AppDir and set MAGICK_CONFIGURE_PATH
+	# to include both the etc/ImageMagick and share/ImageMagick directory
+	# but it is simpler to instead have all the config files in a single location
+	# imagemagick will load them all regardless
+	set -- /usr/share/ImageMagick-*/*.xml
+	if [ -f "$1" ]; then
+		cp -rv /usr/share/ImageMagick-*/*.xml "$APPDIR"/etc/ImageMagick*
+	fi
+	# there is also a configuration file in libdir
+	set -- "$LIB_DIR"/ImageMagick-*/config*/configure.xml
+	if [ -f "$1" ]; then
+		cp -v "$1" "$APPDIR"/etc/ImageMagick*
+	fi
+
+	# MAGICK_HOME is all that needs to be set
 	echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
-	echo 'MAGICK_CONFIGURE_PATH=${SHARUN_DIR}/etc/ImageMagick' >> "$APPENV"
+	# however MAGICK_HOME only works when compiled with a specific flag
+	# we can still make this relocatable by setting these other env variables
+	# which will always work even when not compiled with MAGICK_HOME support
+	(
+		cd "$APPDIR"
+		set -- shared/lib/ImageMagick-*/modules*/coders
+		if [ -d "$1" ]; then
+			echo "MAGICK_CODER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+		fi
+		set -- shared/lib/ImageMagick-*/modules*/filters
+		if [ -d "$1" ]; then
+			# checking the code it seems that MAGICK_FILTER_MODULE_PATH
+			# is NOT USED in the code and seems to be an error!!! the variable
+			# that modules.c references is MAGICK_CODER_FILTER_PATH
+			# we will still be set both just in case
+			echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+			echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+
+		fi
+		set -- etc/ImageMagick*
+		if [ -d "$1" ]; then
+			echo "MAGICK_CONFIGURE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+		fi
+	)
+
 	_echo "* Copied ImageMagick directories"
 fi
 if [ "$DEPLOY_GEGL" = 1 ]; then
@@ -1965,6 +2008,12 @@ sed -i \
 	"$APPDIR"/AppRun
 
 chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null || :
+
+# always make sure that AppDir/lib exists, sometimes lib4bin does not make it
+# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
+if [ ! -d "$APPDIR"/lib ] && [ -d "$APPDIR"/shared/lib ]; then
+	ln -s shared/lib "$APPDIR"/lib
+fi
 
 # deploy directories
 while read -r d; do
@@ -2074,12 +2123,6 @@ if [ -f "$1" ]; then
 	if ! ldd "$1" | grep -q 'libpipewire'; then
 		_err_msg "$libjackwarning"
 	fi
-fi
-
-# always make sure that AppDir/lib exists, sometimes lib4bin does not make it
-# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
-if [ ! -d "$APPDIR"/lib ] && [ -d "$APPDIR"/shared/lib ]; then
-	ln -s shared/lib "$APPDIR"/lib
 fi
 
 echo ""
