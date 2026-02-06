@@ -714,6 +714,8 @@ _make_deployment_array() {
 		set -- "$@" "$LIB_DIR"/libMagick*.so*
 		if b=$(command -v magick);  then set -- "$@" "$b"; fi
 		if b=$(command -v convert); then set -- "$@" "$b"; fi
+		# imagemagick optionally requires potrace to convert png to svg
+		if b=$(command -v potrace); then set -- "$@" "$b"; fi
 
 		magickdir=$(echo "$LIB_DIR"/ImageMagick*)
 		ADD_DIR="
