@@ -1884,7 +1884,7 @@ if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
 	echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
 	# however MAGICK_HOME only works when compiled with a specific flag
 	# we can still make this relocatable by setting these other env variables
-	# which will always work even not compiled with MAGICK_HOME support
+	# which will always work even when not compiled with MAGICK_HOME support
 	(
 		cd "$APPDIR"
 		set -- shared/lib/ImageMagick-*/modules*/coders
