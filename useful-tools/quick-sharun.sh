@@ -400,6 +400,9 @@ _determine_what_to_deploy() {
 				*libMagick*.so*)
 					DEPLOY_IMAGEMAGICK=${DEPLOY_IMAGEMAGICK:-1}
 					;;
+				*libImlib2.so*)
+					DEPLOY_IMLIB2=${DEPLOY_IMLIB2:-1}
+					;;
 				*libgegl*.so*)
 					DEPLOY_GEGL=${DEPLOY_GEGL:-1}
 					;;
@@ -722,6 +725,48 @@ _make_deployment_array() {
 			$ADD_DIR
 			$magickdir
 		"
+	fi
+	if [ "$DEPLOY_IMLIB2" = 1 ]; then
+		_echo "* Deploying Imlib2"
+		set -- "$@" \
+			"$LIB_DIR"/libImlib2.so*    \
+			"$LIB_DIR"/imlib2/filters/* \
+			"$LIB_DIR"/imlib2/loaders/*
+
+		# TODO upstream to sharun
+		echo 'IMLIB2_FILTER_PATH=${SHARUN_DIR}/imlib2/filters' >> "$APPENV"
+		echo 'IMLIB2_LOADER_PATH=${SHARUN_DIR}/imlib2/loaders' >> "$APPENV"
+
+		# Setting IMLIB2_FILTER_PATH and IMLIB2_LOADER_PATH is good
+		# enough to make imlib2 relocatable, however there is one specific
+		# loader xpm.so that reads a file in /usr/share/imlib2/rgb.txt
+		# there is no env variable to relocate this file,
+		# so we will have resort to binary patching later on for now
+
+		# # # # # # # # # # # # # # # # # # # # # # # # # # #
+		# TODO: attempt to get upstream to adopt this patch #
+		# # # # # # # # # # # # # # # # # # # # # # # # # # #
+		#diff --git a/src/modules/loaders/loader_xpm.c b/src/modules/loaders/loader_xpm.c
+		#index e38493c..02c5d91 100644
+		#--- a/src/modules/loaders/loader_xpm.c
+		#+++ b/src/modules/loaders/loader_xpm.c
+		#@@ -89,6 +89,16 @@ xpm_parse_color(const char *color)
+		#     }
+		#
+		#     /* look in rgb txt database */
+		#+    if (!rgb_txt)
+		#+    {
+		#+        const char *data_dir = getenv("IMLIB2_DATADIR_PATH");
+		#+        if (data_dir)
+		#+        {
+		#+            char path[4096];
+		#+            snprintf(path, sizeof(path), "%s/rgb.txt", data_dir);
+		#+            rgb_txt = fopen(path, "r");
+		#+        }
+		#+    }
+		#     if (!rgb_txt)
+		#         rgb_txt = fopen(PACKAGE_DATA_DIR "/rgb.txt", "r");
+		#     if (!rgb_txt)
 	fi
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		if pythonbin=$(command -v python); then
@@ -1767,6 +1812,15 @@ for lib do case "$lib" in
 			sed -i -e 's|libdecor-0.so.0|fuck-gnome.so.X|g' "$lib"
 		fi
 		;;
+	*/xpm.so)
+		f=/usr/share/imlib2/rgb.txt
+		if [ -f "$f" ]; then
+			mkdir -p "$APPDIR"/share/imlib2
+			cp -v "$f" "$APPDIR"/share/imlib2
+			_patch_away_usr_share_dir "$lib" || continue
+			_echo "Copied and patched imlib2 xpm loader"
+		fi
+		;;
 	esac
 done
 
@@ -1785,6 +1839,7 @@ for dir in $topleveldirs; do
 		gstreamer*  |\
 		gvfs        |\
 		ImageMagick*|\
+		imlib2      |\
 		libproxy    |\
 		locale      |\
 		pipewire*   |\
