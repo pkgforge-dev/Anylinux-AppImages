@@ -10,12 +10,16 @@
  * causing them to start using the fake .home dir instead of the real home
  *
  * It also offers the option to change argv0 of the running binary
+ *
+ * It also offers the ability to block specific libraries from being loaded via dlopen
+ * by setting ANYLINUX_DO_NOT_LOAD_LIBS to a colon-separated list of glob patterns
 */
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
 #include <dlfcn.h>
+#include <fnmatch.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,10 +30,11 @@
 #include <errno.h>
 
 typedef int (*execve_func_t)(const char *filename, char *const argv[], char *const envp[]);
+typedef void *(*dlopen_func_t)(const char *filename, int flags);
 
 #define VISIBLE __attribute__ ((visibility ("default")))
 
-// print to stderr when APPIMAGE_EXEC_DEBUG=1
+// print to stderr when ANYLINUX_LIB_DEBUG=1
 static int appimage_exec_debug_enabled(void) {
 	const char *v = getenv("ANYLINUX_LIB_DEBUG");
 	return v && strcmp(v, "1") == 0;
@@ -49,6 +54,40 @@ static void spoof_argv0(int argc, char **argv) {
 		argv[0] = (char *)new_argv0;
 		unsetenv("ANYLINUX_ARGV0");
 	}
+}
+
+// Check if a library should be blocked from loading via dlopen
+static int should_block_library(const char *filename) {
+	if (!filename) return 0;
+
+	const char *blocklist = getenv("ANYLINUX_DO_NOT_LOAD_LIBS");
+	if (!blocklist || !*blocklist) return 0;
+
+	// Extract the basename from the filename for matching
+	const char *basename = strrchr(filename, '/');
+	basename = basename ? basename + 1 : filename;
+
+	// Make a mutable copy of the blocklist to tokenize
+	char *list_copy = strdup(blocklist);
+	if (!list_copy) return 0;
+
+	int blocked = 0;
+	char *saveptr = NULL;
+	char *token = strtok_r(list_copy, ":", &saveptr);
+	while (token) {
+		// Skip empty tokens (e.g. from "lib1::lib2")
+		if (*token) {
+			// Match against both the full path and the basename
+			if (fnmatch(token, basename, 0) == 0 || fnmatch(token, filename, 0) == 0) {
+				blocked = 1;
+				break;
+			}
+		}
+		token = strtok_r(NULL, ":", &saveptr);
+	}
+
+	free(list_copy);
+	return blocked;
 }
 
 // problematic vars to check
@@ -253,4 +292,22 @@ VISIBLE int execvpe(const char *filename, char *const argv[], char *const envp[]
 VISIBLE int execvp(const char *filename, char *const argv[]) {
 	DEBUG_PRINT("execvp hijacked: %s\n", filename);
 	return execvpe(filename, argv, environ);
+}
+
+// Intercept dlopen to block loading of specific libraries
+VISIBLE void *dlopen(const char *filename, int flags) {
+	dlopen_func_t dlopen_orig = dlsym(RTLD_NEXT, "dlopen");
+	if (!dlopen_orig) {
+		DEBUG_PRINT("Error getting original dlopen symbol: %s\n", dlerror());
+		return NULL;
+	}
+
+	// NULL filename means the caller wants a handle to the main program
+	if (filename && should_block_library(filename)) {
+		DEBUG_PRINT("Blocked dlopen of '%s' (matched ANYLINUX_DO_NOT_LOAD_LIBS)\n", filename);
+		return NULL;
+	}
+
+	DEBUG_PRINT("dlopen pass-through: %s\n", filename ? filename : "(NULL)");
+	return dlopen_orig(filename, flags);
 }
