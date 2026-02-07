@@ -305,6 +305,10 @@ VISIBLE void *dlopen(const char *filename, int flags) {
 	// NULL filename means the caller wants a handle to the main program
 	if (filename && should_block_library(filename)) {
 		DEBUG_PRINT("Blocked dlopen of '%s' (matched ANYLINUX_DO_NOT_LOAD_LIBS)\n", filename);
+		// We must make dlerror() return a proper error string after returning NULL
+		// If dlerror() returns NULL here the caller will segfault on the string format.
+		// Trigger a real dlopen failure so the dynamic linker sets the error state.
+		(void)dlopen_orig("/anylinux_blocked_lib_that_does_not_exist.so", RTLD_NOW);
 		return NULL;
 	}
 
