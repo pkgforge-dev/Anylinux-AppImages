@@ -1712,6 +1712,7 @@ _echo "------------------------------------------------------------"
 
 _get_sharun
 _deploy_libs "$@"
+_check_always_software
 _handle_bins_scripts
 
 echo ""
