@@ -18,6 +18,8 @@ export OUTPATH=./dist
 export OUTNAME=gtk4-demo-onlysoftware-"$ARCH".AppImage
 export STARTUPWMCLASS=fuck.gnome
 export GTK_CLASS_FIX=1
+# disable hardware accel
+export ALWAYS_SOFTWARE=1
 
 pacman -Syu --noconfirm \
 	base-devel       \
