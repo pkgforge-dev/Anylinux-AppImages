@@ -49,7 +49,7 @@ DEPENDENCIES="
 "
 
 # keep this for backwards compat until all existing scripts have been updated
-if [ "$EXEC_WRAPPER" = 1 ] || [ "$LOCALE_FIX" = 1 ]; then
+if [ "$EXEC_WRAPPER" = 1 ] || [ "$LOCALE_FIX" = 1 ] || [ "$ALWAYS_SOFTWARE" = 1 ]; then
 	ANYLINUX_LIB=1
 fi
 
@@ -466,7 +466,6 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/UNICODE*.so*
 	fi
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
-		ANYLINUX_LIB=1
 		DEPLOY_OPENGL=0
 		DEPLOY_VULKAN=0
 		echo 'GSK_RENDERER=cairo'        >> "$APPENV"
@@ -1001,6 +1000,9 @@ _add_anylinux_lib() {
 		_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
 		cc -shared -fPIC \
 		  "$APPDIR"/.anylinux.c -o "$APPDIR"/shared/lib/anylinux.so
+	fi
+
+	if ! grep -q 'anylinux.so' "$APPDIR"/.preload 2>/dev/null; then
 		echo "anylinux.so" >> "$APPDIR"/.preload
 	fi
 
@@ -1062,6 +1064,20 @@ _add_locale_check() {
 	else
 		# do not stop the CI if this fails
 		_err_msg "Could not add locale-check"
+	fi
+}
+
+_check_always_software() {
+	if [ "$ALWAYS_SOFTWARE" != 1 ]; then
+		return 0
+	fi
+	set -- "$APPDIR"/shared/lib/libgallium-*.so*
+	if [ -f "$1" ]; then
+		_err_msg "ALWAYS_SOFTWARE was enabled but mesa was deployed!"
+		_err_msg "Likely this application needs hardware acceleration."
+		_err_msg "Do not use this option or find a way to make sure"
+		_err_msg "the application does not dlopen mesa when running!"
+		exit 1
 	fi
 }
 
@@ -2025,15 +2041,6 @@ if [ "$DEPLOY_QT" = 1 ]; then
 fi
 if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
 	_fix_cpython_ldconfig_mess
-fi
-if [ "$ALWAYS_SOFTWARE" = 1 ] && [ -f "$APPDIR"/shared/lib/libgallium-*.so* ]; then
-	_err_msg "ALWAYS_SOFTWARE was set to 1 but mesa ended up being"
-	_err_msg "deployed to the AppDir anyway, it is likely this application"
-	_err_msg "really needs hardware acceleration, do not use this option."
-	_err_msg "If you are sure this application can work without hardware"
-	_err_msg "acceleration, then try force removing the mesa packages"
-	_err_msg "from the CI container and make sure to test the final application!"
-	exit 1
 fi
 
 # some libraries may need to look for a relative ../share directory
