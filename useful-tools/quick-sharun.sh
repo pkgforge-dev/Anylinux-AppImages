@@ -469,12 +469,6 @@ _make_deployment_array() {
 		ANYLINUX_LIB=1
 		DEPLOY_OPENGL=0
 		DEPLOY_VULKAN=0
-		if [ -f "$LIB_DIR"/libgallium-*.so* ]; then
-			_err_msg "ALWAYS_SOFTWARE cannot be used when mesa is present on the system"
-			_err_msg "deploy in a container with the mesa package removed"
-			_err_msg "you will likely need to force remove the mesa package as well"
-			exit 1
-		fi
 		echo 'GSK_RENDERER=cairo'        >> "$APPENV"
 		echo 'GDK_DISABLE=gl,vulkan'     >> "$APPENV"
 		echo 'QT_QUICK_BACKEND=software' >> "$APPENV"
@@ -2031,6 +2025,15 @@ if [ "$DEPLOY_QT" = 1 ]; then
 fi
 if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
 	_fix_cpython_ldconfig_mess
+fi
+if [ "$ALWAYS_SOFTWARE" = 1 ] && [ -f "$APPDIR"/shared/lib/libgallium-*.so* ]; then
+	_err_msg "ALWAYS_SOFTWARE was set to 1 but mesa ended up being"
+	_err_msg "deployed to the AppDir anyway, it is likely this application"
+	_err_msg "really needs hardware acceleration, do not use this option."
+	_err_msg "If you are sure this application can work without hardware"
+	_err_msg "acceleration, then try force removing the mesa packages"
+	_err_msg "from the CI container and make sure to test the final application!"
+	exit 1
 fi
 
 # some libraries may need to look for a relative ../share directory
