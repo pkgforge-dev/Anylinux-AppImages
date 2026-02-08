@@ -465,10 +465,21 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/LATIN*.so* \
 			"$LIB_DIR"/gconv/UNICODE*.so*
 	fi
+	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
+		DEPLOY_OPENGL=0
+		DEPLOY_VULKAN=0
+		echo 'GSK_RENDERER=cairo'        >> "$APPENV"
+		echo 'GDK_DISABLE=gl,vulkan'     >> "$APPENV"
+		echo 'QT_QUICK_BACKEND=software' >> "$APPENV"
+		export GSK_RENDERER=cairo
+		export GDK_DISABLE=gl,vulkan
+		export QT_QUICK_BACKEND=software
+		export ANYLINUX_LIB=1
+		export ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:$ANYLINUX_DO_NOT_LOAD_LIBS"
+	fi
 	if [ "$DEPLOY_QT" = 1 ]; then
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
-
 
 		_echo "* Deploying $QT_DIR"
 
@@ -901,7 +912,11 @@ _deploy_libs() {
 	# 'sharun-aio l /path/to/bin -- google.com' works (site is opened)
 	# 'sharun-aio l /path/to/lib /path/to/bin -- google.com' does not work
 	if [ "$STRACE_ARGS_PROVIDED" = 1 ]; then
+		if [ -f /tmp/lib/anylinux.so ]; then
+			export LD_PRELOAD=/tmp/lib/anylinux.so
+		fi
 		$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
+		unset LD_PRELOAD
 	fi
 
 	# now merge the deployment array
@@ -911,7 +926,11 @@ _deploy_libs() {
 	if [ -n "$PYTHON_PACKAGES" ]; then
 		STRACE_MODE=0
 	fi
+	if [ -f /tmp/lib/anylinux.so ]; then
+		export LD_PRELOAD=/tmp/lib/anylinux.so
+	fi
 	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
+	unset LD_PRELOAD
 
 	# strace the individual python pacakges
 	if [ -n "$PYTHON_PACKAGES" ]; then
@@ -980,14 +999,25 @@ _handle_bins_scripts() {
 }
 
 _add_anylinux_lib() {
+	if [ -n "$ANYLINUX_DO_NOT_LOAD_LIBS" ]; then
+		ANYLINUX_LIB=1
+	fi
 	if [ "$ANYLINUX_LIB" != 1 ]; then
 		return 0
 	fi
 
-	_echo "* Building anylinux.so..."
-	_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
-	cc -shared -fPIC "$APPDIR"/.anylinux.c -o "$APPDIR"/shared/lib/anylinux.so
-	echo "anylinux.so" >> "$APPDIR"/.preload
+	if [ ! -f /tmp/lib/anylinux.so ]; then
+		mkdir -p /tmp/lib
+		_echo "* Building anylinux.so..."
+		_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
+		# we need to build the lib into /tmp, we cannot place it
+		# into shared/lib directly, because sometimes sharun needs
+		# to make AppDir/lib the real lib directory and shared/lib
+		# a symlink, so we cannot make the directory beforehand as
+		# this function gets called early before deployment
+		cc -shared -fPIC "$APPDIR"/.anylinux.c -o /tmp/lib/anylinux.so
+		echo "anylinux.so" >> "$APPDIR"/.preload
+	fi
 
 	# remove xdg-open wrapper not needed when the lib is in use
 	# we still need to have a wrapper for gio-launch-desktop though
@@ -1680,6 +1710,7 @@ _echo "Now jumping to sharun..."
 _echo "------------------------------------------------------------"
 
 _get_sharun
+_add_anylinux_lib
 _deploy_libs "$@"
 _handle_bins_scripts
 
@@ -1691,7 +1722,6 @@ _deploy_icon_and_desktop
 _determine_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
-_add_anylinux_lib
 _add_locale_check
 _deploy_datadir
 _deploy_locale
@@ -2068,6 +2098,9 @@ chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null 
 # https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
 if [ ! -d "$APPDIR"/lib ] && [ -d "$APPDIR"/shared/lib ]; then
 	ln -s shared/lib "$APPDIR"/lib
+fi
+if [ -f /tmp/lib/anylinux.so ]; then
+	cp -f /tmp/lib/anylinux.so "$APPDIR"/shared/lib
 fi
 
 # deploy directories
