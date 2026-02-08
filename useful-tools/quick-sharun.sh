@@ -487,7 +487,7 @@ _make_deployment_array() {
 		export GDK_DISABLE=gl,vulkan
 		export QT_QUICK_BACKEND=software
 
-		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*:$ANYLINUX_DO_NOT_LOAD_LIBS"
+		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*${ANYLINUX_DO_NOT_LOAD_LIBS:+:$ANYLINUX_DO_NOT_LOAD_LIBS}"
 	fi
 	if [ "$DEPLOY_QT" = 1 ]; then
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
