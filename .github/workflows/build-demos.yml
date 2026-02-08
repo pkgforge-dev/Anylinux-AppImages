@@ -19,45 +19,47 @@ jobs:
       matrix:
         include:
           - arch: x86_64
-            platform: linux/amd64
             runs-on: ubuntu-24.04
             script: vkcube-glxgears-appimage
           - arch: aarch64
-            platform: linux/amd64
             runs-on: ubuntu-24.04-arm
             script: vkcube-glxgears-appimage
           - arch: x86_64
-            platform: linux/amd64
             runs-on: ubuntu-24.04
             script: zink-vkcube-glxgears-appimage
           - arch: aarch64
-            platform: linux/amd64
             runs-on: ubuntu-24.04-arm
             script: zink-vkcube-glxgears-appimage
           - arch: x86_64
-            platform: linux/amd64
             runs-on: ubuntu-24.04
             script: gtk3-demo-appimage
           - arch: aarch64
-            platform: linux/amd64
             runs-on: ubuntu-24.04-arm
             script: gtk3-demo-appimage
           - arch: x86_64
-            platform: linux/amd64
             runs-on: ubuntu-24.04
             script: gtk4-demo-appimage
           - arch: aarch64
-            platform: linux/amd64
             runs-on: ubuntu-24.04-arm
             script: gtk4-demo-appimage
           - arch: x86_64
-            platform: linux/amd64
+            runs-on: ubuntu-24.04
+            script: gtk4-demo-onlysoftware-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: gtk4-demo-onlysoftware-appimage
+          - arch: x86_64
             runs-on: ubuntu-24.04
             script: qt6-dbus-demo-appimage
           - arch: aarch64
-            platform: linux/amd64
             runs-on: ubuntu-24.04-arm
             script: qt6-dbus-demo-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: qt6-dbus-demo-onlysoftware-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: qt6-dbus-demo-onlysoftware-appimage
     container: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
       - uses: actions/checkout@v4

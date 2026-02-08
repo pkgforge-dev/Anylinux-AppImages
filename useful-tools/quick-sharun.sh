@@ -49,7 +49,7 @@ DEPENDENCIES="
 "
 
 # keep this for backwards compat until all existing scripts have been updated
-if [ "$EXEC_WRAPPER" = 1 ] || [ "$LOCALE_FIX" = 1 ]; then
+if [ "$EXEC_WRAPPER" = 1 ] || [ "$LOCALE_FIX" = 1 ] || [ "$ALWAYS_SOFTWARE" = 1 ]; then
 	ANYLINUX_LIB=1
 fi
 
@@ -188,6 +188,18 @@ _help_msg() {
 	  APPDIR           Destination AppDir (default: ./AppDir).
 	  ANYLINUX_LIB     Preloads a library that unsets environment variables known to cause
 	                   problems to child processes. Set to 0 to disable.
+	                   Additionally you can set ANYLINUX_DO_NOT_LOAD_LIBS to a
+	                   list of colon separated libraries to prevent from being
+	                   dlopened, the entries support simple globbing, example:
+	                     export ANYLINUX_DO_NOT_LOAD_LIBS='libpipewire-0.3.so*'
+	                   Useful for applications that will try to dlopen several
+	                   optional dependencies that you do not want to include.
+
+	  ALWAYS_SOFTWARE  Set to 1 to enable. Sets several env variables to make
+	                   applications use software rendering, use this option when
+	                   you do not want hardware acceleration.
+	                   Enables ANYLINUX_LIB and will fail if we detect the
+	                   application made use of mesa during deployment.
 
 	  PATH_MAPPING    Configures and preloads pathmap.
 	                  Set this variable if the application is hardcoded to look
@@ -465,10 +477,21 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/LATIN*.so* \
 			"$LIB_DIR"/gconv/UNICODE*.so*
 	fi
+	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
+		DEPLOY_OPENGL=0
+		DEPLOY_VULKAN=0
+		echo 'GSK_RENDERER=cairo'        >> "$APPENV"
+		echo 'GDK_DISABLE=gl,vulkan'     >> "$APPENV"
+		echo 'QT_QUICK_BACKEND=software' >> "$APPENV"
+		export GSK_RENDERER=cairo
+		export GDK_DISABLE=gl,vulkan
+		export QT_QUICK_BACKEND=software
+
+		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*${ANYLINUX_DO_NOT_LOAD_LIBS:+:$ANYLINUX_DO_NOT_LOAD_LIBS}"
+	fi
 	if [ "$DEPLOY_QT" = 1 ]; then
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
-
 
 		_echo "* Deploying $QT_DIR"
 
@@ -984,10 +1007,16 @@ _add_anylinux_lib() {
 		return 0
 	fi
 
-	_echo "* Building anylinux.so..."
-	_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
-	cc -shared -fPIC "$APPDIR"/.anylinux.c -o "$APPDIR"/shared/lib/anylinux.so
-	echo "anylinux.so" >> "$APPDIR"/.preload
+	if [ ! -f "$APPDIR"/shared/lib/anylinux.so ]; then
+		_echo "* Building anylinux.so..."
+		_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
+		cc -shared -fPIC \
+		  "$APPDIR"/.anylinux.c -o "$APPDIR"/shared/lib/anylinux.so
+	fi
+
+	if ! grep -q 'anylinux.so' "$APPDIR"/.preload 2>/dev/null; then
+		echo "anylinux.so" >> "$APPDIR"/.preload
+	fi
 
 	# remove xdg-open wrapper not needed when the lib is in use
 	# we still need to have a wrapper for gio-launch-desktop though
@@ -1047,6 +1076,20 @@ _add_locale_check() {
 	else
 		# do not stop the CI if this fails
 		_err_msg "Could not add locale-check"
+	fi
+}
+
+_check_always_software() {
+	if [ "$ALWAYS_SOFTWARE" != 1 ]; then
+		return 0
+	fi
+	set -- "$APPDIR"/shared/lib/libgallium-*.so*
+	if [ -f "$1" ]; then
+		_err_msg "ALWAYS_SOFTWARE was enabled but mesa was deployed!"
+		_err_msg "Likely this application needs hardware acceleration."
+		_err_msg "Do not use this option or find a way to make sure"
+		_err_msg "the application does not dlopen mesa when running!"
+		exit 1
 	fi
 }
 
@@ -1681,6 +1724,7 @@ _echo "------------------------------------------------------------"
 
 _get_sharun
 _deploy_libs "$@"
+_check_always_software
 _handle_bins_scripts
 
 echo ""
@@ -2129,6 +2173,10 @@ for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*'); do
 		_echo "* Wrapped nested bin executable '$b' with sharun"
 	fi
 done
+
+if [ -n "$ANYLINUX_DO_NOT_LOAD_LIBS" ]; then
+	echo "ANYLINUX_DO_NOT_LOAD_LIBS=$ANYLINUX_DO_NOT_LOAD_LIBS:\${ANYLINUX_DO_NOT_LOAD_LIBS}" >> "$APPENV"
+fi
 
 # make sure the .env has all the "unset" last, due to a bug in the dotenv
 # library used by sharun all the unsets have to be declared last in the .env
