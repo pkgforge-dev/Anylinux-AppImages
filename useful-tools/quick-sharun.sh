@@ -188,6 +188,18 @@ _help_msg() {
 	  APPDIR           Destination AppDir (default: ./AppDir).
 	  ANYLINUX_LIB     Preloads a library that unsets environment variables known to cause
 	                   problems to child processes. Set to 0 to disable.
+	                   Additionally you can set ANYLINUX_DO_NOT_LOAD_LIBS to a
+	                   list of colon separated libraries to prevent from being
+	                   dlopened, the entries support simple globbing, example:
+	                     export ANYLINUX_DO_NOT_LOAD_LIBS='libpipewire-0.3.so*'
+	                   Useful for applications that will try to dlopen several
+	                   optional dependencies that you do not want to include.
+
+	  ALWAYS_SOFTWARE  Set to 1 to enable. Sets several env variables to make
+	                   applications use software rendering, use this option when
+	                   you do not want hardware acceleration.
+	                   Enables ANYLINUX_LIB and will fail if we detect the
+	                   application made use of mesa during deployment.
 
 	  PATH_MAPPING    Configures and preloads pathmap.
 	                  Set this variable if the application is hardcoded to look
