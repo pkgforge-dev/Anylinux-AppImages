@@ -466,6 +466,12 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/UNICODE*.so*
 	fi
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
+		if [ -f "$LIB_DIR"/libgallium-*.so* ]; then
+			_err_msg "ALWAYS_SOFTWARE cannot be used when mesa is present on the system"
+			_err_msg "deploy in a container with the mesa package removed"
+			_err_msg "you will likely need to force remove the mesa package as well"
+			exit 1
+		fi
 		DEPLOY_OPENGL=0
 		DEPLOY_VULKAN=0
 		echo 'GSK_RENDERER=cairo'        >> "$APPENV"
@@ -475,7 +481,7 @@ _make_deployment_array() {
 		export GDK_DISABLE=gl,vulkan
 		export QT_QUICK_BACKEND=software
 		export ANYLINUX_LIB=1
-		export ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*:$ANYLINUX_DO_NOT_LOAD_LIBS"
+		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*:$ANYLINUX_DO_NOT_LOAD_LIBS"
 	fi
 	if [ "$DEPLOY_QT" = 1 ]; then
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
@@ -912,11 +918,7 @@ _deploy_libs() {
 	# 'sharun-aio l /path/to/bin -- google.com' works (site is opened)
 	# 'sharun-aio l /path/to/lib /path/to/bin -- google.com' does not work
 	if [ "$STRACE_ARGS_PROVIDED" = 1 ]; then
-		if [ -f /tmp/lib/anylinux.so ]; then
-			export LD_PRELOAD=/tmp/lib/anylinux.so
-		fi
 		$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
-		unset LD_PRELOAD
 	fi
 
 	# now merge the deployment array
@@ -926,11 +928,7 @@ _deploy_libs() {
 	if [ -n "$PYTHON_PACKAGES" ]; then
 		STRACE_MODE=0
 	fi
-	if [ -f /tmp/lib/anylinux.so ]; then
-		export LD_PRELOAD=/tmp/lib/anylinux.so
-	fi
 	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
-	unset LD_PRELOAD
 
 	# strace the individual python pacakges
 	if [ -n "$PYTHON_PACKAGES" ]; then
@@ -999,23 +997,15 @@ _handle_bins_scripts() {
 }
 
 _add_anylinux_lib() {
-	if [ -n "$ANYLINUX_DO_NOT_LOAD_LIBS" ]; then
-		ANYLINUX_LIB=1
-	fi
 	if [ "$ANYLINUX_LIB" != 1 ]; then
 		return 0
 	fi
 
-	if [ ! -f /tmp/lib/anylinux.so ]; then
-		mkdir -p /tmp/lib
+	if [ ! -f "$APPDIR"/shared/lib/anylinux.so ]; then
 		_echo "* Building anylinux.so..."
 		_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
-		# we need to build the lib into /tmp, we cannot place it
-		# into shared/lib directly, because sometimes sharun needs
-		# to make AppDir/lib the real lib directory and shared/lib
-		# a symlink, so we cannot make the directory beforehand as
-		# this function gets called early before deployment
-		cc -shared -fPIC "$APPDIR"/.anylinux.c -o /tmp/lib/anylinux.so
+		cc -shared -fPIC \
+		  "$APPDIR"/.anylinux.c -o "$APPDIR"/shared/lib/anylinux.so
 		echo "anylinux.so" >> "$APPDIR"/.preload
 	fi
 
@@ -1710,7 +1700,6 @@ _echo "Now jumping to sharun..."
 _echo "------------------------------------------------------------"
 
 _get_sharun
-_add_anylinux_lib
 _deploy_libs "$@"
 _handle_bins_scripts
 
@@ -1722,6 +1711,7 @@ _deploy_icon_and_desktop
 _determine_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
+_add_anylinux_lib
 _add_locale_check
 _deploy_datadir
 _deploy_locale
@@ -2099,9 +2089,6 @@ chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null 
 if [ ! -d "$APPDIR"/lib ] && [ -d "$APPDIR"/shared/lib ]; then
 	ln -s shared/lib "$APPDIR"/lib
 fi
-if [ -f /tmp/lib/anylinux.so ]; then
-	cp -f /tmp/lib/anylinux.so "$APPDIR"/shared/lib
-fi
 
 # deploy directories
 while read -r d; do
@@ -2162,6 +2149,10 @@ for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*'); do
 		_echo "* Wrapped nested bin executable '$b' with sharun"
 	fi
 done
+
+if [ -n "$ANYLINUX_DO_NOT_LOAD_LIBS" ]; then
+	echo "ANYLINUX_DO_NOT_LOAD_LIBS=$ANYLINUX_DO_NOT_LOAD_LIBS:\${ANYLINUX_DO_NOT_LOAD_LIBS}" >> "$APPENV"
+fi
 
 # make sure the .env has all the "unset" last, due to a bug in the dotenv
 # library used by sharun all the unsets have to be declared last in the .env
