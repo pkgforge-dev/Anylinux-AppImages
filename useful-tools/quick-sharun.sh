@@ -330,6 +330,11 @@ _determine_what_to_deploy() {
 			-*) continue;;
 		esac
 
+		if [ ! -e "$bin" ]; then
+			_err_msg "'$bin' is NOT present!"
+			exit 1
+		fi
+
 		# if the argument is a directory save it to later it copy it
 		if [ -d "$bin" ]; then
 			ADD_DIR="
