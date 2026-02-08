@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Demonstration that bundles gtk3 demo app
+# Demonstration that bundles gtk4 demo app
 
 # this version deploys without hardware acceleration which results in a smaller
 # appimage, good for simple apps that do not really need hardware acceleration
