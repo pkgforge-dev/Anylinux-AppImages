@@ -482,9 +482,11 @@ _make_deployment_array() {
 		DEPLOY_VULKAN=0
 		echo 'GSK_RENDERER=cairo'        >> "$APPENV"
 		echo 'GDK_DISABLE=gl,vulkan'     >> "$APPENV"
+		echo 'GDK_GL=disable'            >> "$APPENV"
 		echo 'QT_QUICK_BACKEND=software' >> "$APPENV"
 		export GSK_RENDERER=cairo
 		export GDK_DISABLE=gl,vulkan
+		export GDK_GL=disable
 		export QT_QUICK_BACKEND=software
 
 		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*${ANYLINUX_DO_NOT_LOAD_LIBS:+:$ANYLINUX_DO_NOT_LOAD_LIBS}"
