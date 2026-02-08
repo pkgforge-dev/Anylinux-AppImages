@@ -338,7 +338,9 @@ Any application made with sharun ends up being able to work **on any linux distr
 
 ### *Isn't this very bloated?*
 
-Not really, if your application isn't hardware accelerated, bundling all the libraries will usually only increase the size of the application by less than 10 MiB.
+Not really, if your application isn't hardware accelerated, bundling all the libraries will usually only increase the size of the application by less than 6 MiB.
+
+**UPDATE:** We are actually now able to build mesa without linking to LLVM, so AppImages are even smaller as result, **fully hardware accelerated Qt/GTK apps can be made while being less than 35 MiB in the final size.**
 
 For applications that are hardware accelerated, there is the problem that mesa links to `libLLVM.so`, which is a huge +130 MiB library that's used for a lot of things. Distros by default build it with support for the following:
 
@@ -368,8 +370,7 @@ When for most applications you only need llvm to support AMDGPU and X86/AArch64.
 
 We already make such version of llvm here: https://github.com/pkgforge-dev/archlinux-pkgs-debloated which reduces the size of libLLVM.so down to 66 MiB.
 
-
-Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results a **60 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things.
+Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results a **50 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things.
 
 -----------------------------------
 
@@ -399,7 +400,7 @@ Goes without saying that sharun handles all of this already on its own.
 
 See the ready-to-use demo scripts in [`useful-tools/demo/`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/demo):
 
-* [vkcube + glxgears](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/vkcube-glxgears-appimage.sh) - Bundles OpenGL and Vulkan test applications ([download demo](https://github.com/pkgforge-dev/Anylinux-AppImages/releases/tag/demo))
+* [vkcube + glxgears](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/vkcube-glxgears-appimage.sh) - Bundles OpenGL and Vulkan test binaries
 * [gtk3-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk3-demo-appimage.sh) - Simple GTK3 application
 * [gtk4-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-appimage.sh) - Simple GTK4 application
 * [qt6-dbus-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-appimage.sh) - Qt6 application with D-Bus
