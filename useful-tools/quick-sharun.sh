@@ -466,21 +466,22 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/UNICODE*.so*
 	fi
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
+		ANYLINUX_LIB=1
+		DEPLOY_OPENGL=0
+		DEPLOY_VULKAN=0
 		if [ -f "$LIB_DIR"/libgallium-*.so* ]; then
 			_err_msg "ALWAYS_SOFTWARE cannot be used when mesa is present on the system"
 			_err_msg "deploy in a container with the mesa package removed"
 			_err_msg "you will likely need to force remove the mesa package as well"
 			exit 1
 		fi
-		DEPLOY_OPENGL=0
-		DEPLOY_VULKAN=0
 		echo 'GSK_RENDERER=cairo'        >> "$APPENV"
 		echo 'GDK_DISABLE=gl,vulkan'     >> "$APPENV"
 		echo 'QT_QUICK_BACKEND=software' >> "$APPENV"
 		export GSK_RENDERER=cairo
 		export GDK_DISABLE=gl,vulkan
 		export QT_QUICK_BACKEND=software
-		export ANYLINUX_LIB=1
+
 		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*:$ANYLINUX_DO_NOT_LOAD_LIBS"
 	fi
 	if [ "$DEPLOY_QT" = 1 ]; then
