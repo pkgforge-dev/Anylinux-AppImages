@@ -1,3 +1,8 @@
+---
+layout: default
+title: Disk usage vs Flatpak
+---
+
 <div align="center" markdown="1">
 
 # Flatpak vs Anylinux-AppImages 
