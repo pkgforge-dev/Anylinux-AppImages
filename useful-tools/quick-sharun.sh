@@ -1917,8 +1917,15 @@ src_fonts=/usr/share/fonts
 dst_fonts="$APPDIR"/share/fonts
 if grep -aoq -m 1 "$src_fonts" "$APPDIR"/shared/bin/*; then
 	if [ -d "$src_fonts" ] && [ ! -d "$dst_fonts" ]; then
-		mkdir -p "${dst_fonts%/*}"
-		cp -vr "$src_fonts" "$dst_fonts"
+		mkdir -p "$dst_fonts"
+		for d in "$src_fonts"/*; do
+			if [ "${d##*/}" = "Adwaita" ]; then
+				continue
+			fi
+			if [ -e "$d" ]; then
+				cp -vr "$d" "$dst_fonts"
+			fi
+		done
 	fi
 fi
 
