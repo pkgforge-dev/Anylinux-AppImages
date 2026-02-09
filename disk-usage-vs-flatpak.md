@@ -89,7 +89,7 @@ AnyLinux-AppImages use **3.1 times** less storage than flatpak.
 
 Worthy note: 
 
-* Not all filesystems support transparent compression, if this test had been done on ext4 filesystem then flatpak would have taken **14.86 GiB** of disk, **more than 7x more than AppImage.**
+* Not all filesystems support transparent compression, if this test had been done on ext4 filesystem then flatpak would have taken **14.86 GiB** of disk, **more than 7x compared to AppImage.**
 
 In the end, a lot of the flatpak bloat comes from the fact that flatpak suffers from something that I call flatpak-hell, flatpak-hell is when one application depends on runtime version 2.2.0 but application B depends on a runtime version 2.2.1 so that means that both runtimes need to be downloaded and installed.
 
