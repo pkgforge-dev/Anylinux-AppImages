@@ -296,8 +296,8 @@ _test_appimage() {
 	if [ -z "$1" ]; then
 		_err_msg "ERROR: Missing application to run!"
 		exit 1
-	elif ! command -v xvfb-run 1>/dev/null; then
-		_err_msg "--test requires 'xvfb-run'!"
+	elif ! _is_cmd xvfb-run; then
+		_err_msg "ERROR: --test requires 'xvfb-run'!"
 		exit 1
 	fi
 
