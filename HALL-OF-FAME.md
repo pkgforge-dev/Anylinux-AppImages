@@ -1,3 +1,8 @@
+---
+layout: default
+title: Hall of Fame
+---
+
 <div align="center" markdown="1">
 
 # Deploying libraries - Hall of Fame/Shame

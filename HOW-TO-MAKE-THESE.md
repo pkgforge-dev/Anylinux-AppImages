@@ -1,3 +1,8 @@
+---
+layout: default
+title: How To Make These
+---
+
 # How to make truly portable AppImages that work on any linux system.
 
 -----------------------------------

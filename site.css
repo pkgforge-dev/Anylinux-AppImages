@@ -1,0 +1,68 @@
+/* Syntax highlighting using Pico CSS variables */
+.highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+
+.highlight {
+  background-color: var(--pico-code-background-color);
+}
+
+/* Comments */
+.highlight .cm, .highlight .c1, .highlight .c, .highlight .ch, .highlight .cd, .highlight .cpf,
+.highlight .cp, .highlight .cs {
+  color: var(--pico-muted-color);
+  font-style: italic;
+}
+.highlight .cp, .highlight .cs { font-weight: bold; }
+
+/* Errors, deleted */
+.highlight .err { color: var(--pico-del-color); }
+.highlight .gd { color: var(--pico-del-color); }
+.highlight .ge { color: var(--pico-muted-color); font-style: italic; }
+.highlight .gr { color: var(--pico-del-color); }
+.highlight .gh { color: var(--pico-muted-color); }
+.highlight .gi { color: var(--pico-ins-color); }
+.highlight .go { color: var(--pico-muted-color); }
+.highlight .gp { color: var(--pico-muted-color); }
+.highlight .gs { font-weight: bold; }
+.highlight .gu { color: var(--pico-muted-color); }
+.highlight .gt { color: var(--pico-del-color); }
+
+/* Keywords */
+.highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr,
+.highlight .k, .highlight .kv {
+  color: var(--pico-primary);
+  font-weight: bold;
+}
+.highlight .kt { color: var(--pico-primary); font-weight: bold; }
+
+/* Numbers */
+.highlight .mf, .highlight .mh, .highlight .il, .highlight .mi, .highlight .mo,
+.highlight .m, .highlight .mb, .highlight .mx {
+  color: var(--pico-secondary);
+}
+
+/* Strings */
+.highlight .sa { color: var(--pico-color); font-weight: bold; }
+.highlight .sb, .highlight .sc, .highlight .sd, .highlight .s2, .highlight .se,
+.highlight .sh, .highlight .si, .highlight .sx, .highlight .s1, .highlight .s, .highlight .dl {
+  color: var(--pico-primary-hover);
+}
+.highlight .sr { color: var(--pico-ins-color); }
+.highlight .ss { color: var(--pico-primary); }
+
+/* Names, attributes, etc. */
+.highlight .na { color: var(--pico-secondary); }
+.highlight .bp { color: var(--pico-muted-color); }
+.highlight .nb { color: var(--pico-primary); }
+.highlight .nc { color: var(--pico-primary); font-weight: bold; }
+.highlight .no { color: var(--pico-secondary); }
+.highlight .nd { color: var(--pico-secondary); font-weight: bold; }
+.highlight .ni { color: var(--pico-primary); }
+.highlight .ne { color: var(--pico-del-color); font-weight: bold; }
+.highlight .nf, .highlight .fm { color: var(--pico-primary); font-weight: bold; }
+.highlight .nl { color: var(--pico-primary); font-weight: bold; }
+.highlight .nn { color: var(--pico-muted-color); }
+.highlight .nt { color: var(--pico-ins-color); }
+.highlight .vc, .highlight .vg, .highlight .vi, .highlight .nv, .highlight .vm { color: var(--pico-secondary); }
+.highlight .ow, .highlight .o { color: var(--pico-color); font-weight: bold; }
+.highlight .w { color: var(--pico-muted-color); }
