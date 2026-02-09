@@ -290,6 +290,53 @@ _make_appimage() {
 	exec "$TMPDIR"/uruntime2appimage.sh
 }
 
+# do a basic test to make sure at least the application is not totally broken
+# like when libraries are missing symbols and similar stuff
+_test_appimage() {
+	if [ -z "$1" ]; then
+		_err_msg "ERROR: Missing application to run!"
+		exit 1
+	elif ! command -v xvfb-run 1>/dev/null; then
+		_err_msg "--test requires 'xvfb-run'!"
+		exit 1
+	fi
+
+	APP=$1
+	shift
+
+	_echo "------------------------------------------------------------"
+	_echo "Testing '$APP'..."
+	_echo "------------------------------------------------------------"
+
+	xvfb-run -a -- "$APP" "$@" &
+	pid=$!
+
+	# let the app run for 12 seconds, if it exits early it means something is wrong
+	COUNT=0
+	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt 12 ]; do
+		sleep 1
+		COUNT=$((COUNT + 1))
+	done
+
+	set +e
+	if kill -0 $pid 2>/dev/null; then
+		_echo "------------------------------------------------------------"
+		_echo "Test went OK."
+		_echo "------------------------------------------------------------"
+		kill $pid 2>/dev/null || :
+		sleep 1
+		exit 0
+	else
+		# process exited before timeout, something went wrong.
+		wait $pid
+		status=$?
+		_err_msg "------------------------------------------------------------"
+		_err_msg "ERROR: '$APP' failed in ${COUNT} seconds with code $status"
+		_err_msg "------------------------------------------------------------"
+		exit 1
+	fi
+}
+
 # POSIX shell doesn't support arrays we use awk to save it into a variable
 # then with 'eval set -- $var' we add it to the positional array
 # see https://unix.stackexchange.com/questions/421158/how-to-use-pseudo-arrays-in-posix-shell-script
@@ -1702,6 +1749,10 @@ case "$1" in
 		;;
 	--make-appimage)
 		_make_appimage
+		;;
+	--test)
+		shift
+		_test_appimage "$@"
 		;;
 	--make-static-bin)
 		shift
