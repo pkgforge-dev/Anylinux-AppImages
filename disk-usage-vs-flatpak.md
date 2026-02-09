@@ -75,7 +75,7 @@ flatpak-dedup-checker
 
 # Result 
 
-ApppImage: 2.0 GiB.
+AppImage: 2.0 GiB.
 
 flatpak: 6.27 GiB.
 
