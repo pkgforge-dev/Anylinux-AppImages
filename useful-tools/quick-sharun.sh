@@ -1912,7 +1912,17 @@ for dir in $topleveldirs; do
 	done
 done
 
-# make sure there is no hardcoded path to /usr/share/... in bins
+# first check for hardcoded path to /usr/share/fonts and copy if so
+src_fonts=/usr/share/fonts
+dst_fonts="$APPDIR"/share/fonts
+if grep -aoq -m 1 "$src_fonts" "$APPDIR"/shared/bin/*; then
+	if [ -d "$src_fonts" ] && [ ! -d "$dst_fonts" ]; then
+		mkdir -p "${dst_fonts%/*}"
+		cp -vr "$src_fonts" "$dst_fonts"
+	fi
+fi
+
+# patch away any hardcoded path to /usr/share or /usr/lib in bins...
 set -- "$APPDIR"/shared/bin/*
 for bin do
 	if p=$(grep -ao -m 1 '/usr/share/.*/' "$bin"); then
