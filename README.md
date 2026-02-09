@@ -56,6 +56,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage)                                                            |
 [Defold](https://github.com/pkgforge-dev/Defold-AppImage)                                                                |
 [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage)                                                              |
+[dethrace](https://github.com/pkgforge-dev/dethrace-AppImage)                                                            |
 [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced)                                             |
 [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage)                                                                |
 [Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
