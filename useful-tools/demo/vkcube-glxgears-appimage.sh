@@ -55,5 +55,11 @@ chmod +x ./quick-sharun
 
 ./quick-sharun --make-appimage
 
+# becasue this app launches vkcube and there is no gpu in the CI, we have to
+# install vkswrast, we do not normally bundle this since it is slow and has
+# a massive dependency to llvm
+pacman -S --noconfirm vulkan-swrast
+export SHARUN_ALLOW_SYS_VKICD=1
+
 # test the final app
 ./quick-sharun --test ./dist/*.AppImage
