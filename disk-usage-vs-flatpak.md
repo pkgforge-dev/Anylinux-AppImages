@@ -36,7 +36,7 @@ appman -i \
 	ppsspp \
 	puddletag \
 	rnote \
-  sas
+	sas
 
 appman -f
 ```
