@@ -47,3 +47,5 @@ chmod +x ./quick-sharun
 
 ./quick-sharun --make-appimage
 
+# test the final app
+./quick-sharun --test ./dist/*.AppImage
