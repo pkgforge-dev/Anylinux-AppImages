@@ -14,7 +14,7 @@ Steps:
 
 * AppImages were installed with [appman](https://github.com/ivan-hc/AM) with this command.
 
-```
+```shell
 appman -i \
 	ares \
 	azahar-enhanced \
@@ -43,7 +43,7 @@ appman -f
 
 * With `flatpak` the following command was used: 
 
-```
+```shell
 flatpak install \
 	com.dec05eba.gpu_screen_recorder \
 	com.discordapp.Discord \
@@ -91,3 +91,59 @@ Worthy note:
 
 * Not all filesystems support transparent compression, if this test had been done on ext4 filesystem then flatpak would have taken **14.86 GiB** of disk, **more than 7x more than AppImage.**
 
+In the end a lot of the bloat is flatpak comes from the fact that flatpak suffers what I call flatpak-hell, flatpak-hell is when one application depends on runtime version 2.2.0 but application B depends on a runtime version 2.2.1 so that means that both runtimes need to be downloaded and installed.
+
+Lets assume flatpak manages to fix this issue (will never happen), how will that look? Well we can simulate that using alpine linux:
+
+<div align="center" markdown="1">
+
+---
+
+# Bonus comparison: Anylinux-AppImages vs Alpine linux
+
+</div>
+
+
+Alpine linux is a very minimal distro whose developers actually put effort to reduce the size of the packages, [example](https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/main/icu/data-filter-en.yml).
+
+We have to upgrade to the edge repo since stable is too old and lacks a lot of apps:
+
+```shell
+distrobox create -i alpine
+distrobox enter alpine
+printf "%s\n" \
+	"https://dl-cdn.alpinelinux.org/alpine/edge/main" \
+	"https://dl-cdn.alpinelinux.org/alpine/edge/community" \
+	"https://dl-cdn.alpinelinux.org/alpine/edge/testing" \
+	| sudo tee -a /etc/apk/repositories
+sudo sed -i -e '/v3.21/d' /etc/apk/repositories
+sudo apk upgrade
+```
+
+After doing this `podman ps -a --size --filter "name=alpine"` reports a container size of `535MB (virtual 560MB)`. 
+
+Now lets add the applications, even after upgrading to the edge repo a lot of applications are not available, I was only able to install the following 12 applications:
+
+- Note: These 12 applications as AppImage use **1.5 GiB**.
+
+```shell
+sudo apk add \
+	cemu \
+	chromium \
+	freetube \
+	kdenlive \
+	lutris \
+	wine \
+	mame \
+	mpv \
+	obs-studio \
+	pinta \
+	ppsspp \
+	rnote
+```
+
+* No idea how alpine does not list wine as a dependency of lutris, in the appimage this is included.
+
+* chromium is the closest thing we have here to cromite.
+
+After adding those 12 applications the container size increase **`3.27GB (virtual 3.29GB)`.** So yeah we also use less storage than Alpine, note however I think this size does not take Btrfs compression into account, I tried to get the value but couldn't (running `btrfs filesystem du -s` on the alpine container reported 7 MIb which is just impossible lol). 
