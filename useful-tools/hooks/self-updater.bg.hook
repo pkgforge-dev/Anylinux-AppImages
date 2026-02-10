@@ -38,9 +38,10 @@ APPIMAGEUPDATETOOL_LINK="${APPIMAGEUPDATETOOL_LINK:-https://github.com/AppImageC
 # it is also not able to do delta updates at the time of writting this
 _is_another_updater_here() {
 	if [ "$DO_NOT_CHECK_FOR_OTHER_APPIMAGE_MANAGERS" != 1 ]; then
-		if command -v am       \
-		  || command -v appman \
-		  || command -v dbin   \
+		if command -v am            \
+		  || command -v appman      \
+		  || command -v app-manager \
+		  || command -v dbin        \
 		  || command -v soar; then
 			return 0
 		fi
