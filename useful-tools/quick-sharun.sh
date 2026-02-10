@@ -101,6 +101,9 @@ fi
 export USER="${LOGNAME:-${USER:-${USERNAME:-yomama}}}"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 
+# apps often need this to work
+export $(dbus-launch 2>/dev/null || echo 'NO_DBUS=1')
+
 _echo() {
 	printf '\033[1;92m%s\033[0m\n' " $*"
 }
