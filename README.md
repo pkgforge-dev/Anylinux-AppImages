@@ -172,6 +172,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [spacecadetpinball](https://github.com/pkgforge-dev/spacecadetpinball-AppImage)                                          |
 [SpaghettiKart](https://github.com/pkgforge-dev/SpaghettiKart-AppImage-Enhanced)                                         |
 [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
+[SRB2Kart](https://github.com/pkgforge-dev/SRB2Kart-AppImage)                                                            |
 [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
 [Stella](https://github.com/pkgforge-dev/Stella-AppImage)                                                                |
 [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage)                                                    |
