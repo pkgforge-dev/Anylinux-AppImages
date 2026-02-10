@@ -345,6 +345,10 @@ _test_appimage() {
 		_err_msg "------------------------------------------------------------"
 		_err_msg "ERROR: '$APP' failed in ${COUNT} seconds with code $status"
 		_err_msg "------------------------------------------------------------"
+		# wait 20 seconds before failing, this way for example if we have a Ci run
+		# for x86_64 and aarch64, if one fails it does not instantly stop the other
+		# and people are left wondering if the problem affects both matrix or just one
+		sleep 20
 		exit 1
 	fi
 }
