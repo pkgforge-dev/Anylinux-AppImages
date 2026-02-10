@@ -88,7 +88,7 @@ AnyLinux-AppImages use **3.1 times** less storage than flatpak.
 
 </div>
 
-![results](https://github.com/user-attachments/assets/6bad6b23-beb1-45b0-9e08-07042341ff73)
+![results](https://github.com/user-attachments/assets/1548c3b7-5117-4af8-8126-0a780f7eadbe)
 
 ---
 
