@@ -62,7 +62,6 @@ chmod +x ./quick-sharun
 # install vkswrast, we do not normally bundle this since it is slow and has
 # a massive dependency to llvm
 pacman -S --noconfirm vulkan-swrast
-export SHARUN_ALLOW_SYS_VKICD=1
 
 # test the final app
 ./quick-sharun --test ./dist/*.AppImage
