@@ -22,10 +22,15 @@ jobs:
       - name: Get stats
         run: |
           LIST="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/README.md"
-          REPOS="$(wget -q "$LIST" -O - | sed -n '0,/---/d; p' | sed 's/[()",{} ]/\n/g' \
-            | grep -i 'https.*pkgforge-dev.*AppImage.*' | awk -F'/' '{print $NF}' | grep -v '\.md')"
+          REPOS="$(
+            wget -q "$LIST" -O - \
+            | awk '/APPS_LIST_START/{p=1; next}/APPS_LIST_END/{p=0} p' \
+            | grep -io 'pkgforge-dev/.*AppImage.*)' \
+            | awk -F')' '{print $1}'
+          )"
           
           for REPO in $REPOS; do
+            REPO=${REPO##*/}
           	NUM=$(wget -q --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
           		| ./gron.awk | awk -F'=' '/download_count/ {total += $2} END {print total}')
@@ -53,3 +58,4 @@ jobs:
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
