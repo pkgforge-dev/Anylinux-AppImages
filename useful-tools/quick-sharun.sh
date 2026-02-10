@@ -314,6 +314,12 @@ _test_appimage() {
 	# Allow host vulkan for vulkan-swrast since there is no GPU in the CI
 	export SHARUN_ALLOW_SYS_VKICD=1
 
+	# since there is no fuse available in CI and userns are also broken
+	# the appimage may not run if it is bigger than 400 MiB due to a restriction
+	# in the uruntime, so we will have to always force it to extract and run
+	export APPIMAGE_TARGET_DIR="$PWD"/_test-app
+	export APPIMAGE_EXTRACT_AND_RUN=1
+
 	xvfb-run -a -- "$APP" "$@" &
 	pid=$!
 
