@@ -70,6 +70,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage)                                                                |
 [Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
 [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
+[Dr. Robotnik's Ring Racers](https://github.com/pkgforge-dev/Dr-Robotniks-Ring-Racers-AppImage)                          |
 [Drum Machine](https://github.com/pkgforge-dev/Drum-Machine-AppImage)                                                    |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
@@ -174,6 +175,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [spacecadetpinball](https://github.com/pkgforge-dev/spacecadetpinball-AppImage)                                          |
 [SpaghettiKart](https://github.com/pkgforge-dev/SpaghettiKart-AppImage-Enhanced)                                         |
 [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
+[SRB2Kart](https://github.com/pkgforge-dev/SRB2Kart-AppImage)                                                            |
 [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
 [Stella](https://github.com/pkgforge-dev/Stella-AppImage)                                                                |
 [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage)                                                    |
