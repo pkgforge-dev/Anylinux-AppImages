@@ -311,6 +311,9 @@ _test_appimage() {
 	_echo "Testing '$APP'..."
 	_echo "------------------------------------------------------------"
 
+	# Allow host vulkan for vulkan-swrast since there is no GPU in the CI
+	export SHARUN_ALLOW_SYS_VKICD=1
+
 	xvfb-run -a -- "$APP" "$@" &
 	pid=$!
 
