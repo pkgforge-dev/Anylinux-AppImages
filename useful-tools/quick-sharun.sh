@@ -2022,6 +2022,7 @@ if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 	if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
 		(
 			cd "$APPDIR"/shared/lib/"${1##*/}"
+			find ./ -type f -name '*.a' -delete || :
 			for f in $(find ./ -type f -name '*.pyc' -print); do
 				case "$f" in
 					*/"$MAIN_BIN"*) :;;
