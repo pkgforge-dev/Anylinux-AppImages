@@ -195,6 +195,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Tux Football](https://github.com/pkgforge-dev/Tux-Football-AppImage)                                                    |
 [Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage)                                                              |
 [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
+[UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage)                                                            |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
 [Varia](https://github.com/pkgforge-dev/Varia-AppImage)                                                                  |
 [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage)                                                                    |
