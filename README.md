@@ -181,6 +181,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage)                                                    |
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
 [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
+[Supermodel](https://github.com/pkgforge-dev/Supermodel-AppImage)                                                        |
 [SuperTux](https://github.com/pkgforge-dev/SuperTux-AppImage-Enhanced)                                                   |
 [SuperTuxKart](https://github.com/pkgforge-dev/SuperTuxKart-AppImage-Enhanced)                                           |
 [sView](https://github.com/pkgforge-dev/sView-AppImage)                                                                  |
@@ -194,6 +195,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Tux Football](https://github.com/pkgforge-dev/Tux-Football-AppImage)                                                    |
 [Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage)                                                              |
 [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
+[UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage)                                                            |
 [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
 [Varia](https://github.com/pkgforge-dev/Varia-AppImage)                                                                  |
 [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage)                                                                    |
