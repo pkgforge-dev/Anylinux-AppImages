@@ -62,13 +62,13 @@ jobs:
             script: qt6-dbus-demo-onlysoftware-appimage
     container: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Make AppImage
         run: sh ./useful-tools/demo/${{ matrix.script }}.sh
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: AppImage-${{ matrix.arch }}-${{ matrix.script }}
           path: dist
@@ -79,13 +79,13 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4.3.0
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           pattern: AppImage-*
           merge-multiple: true
 
       - name: Release Artifacts
-        uses: softprops/action-gh-release@v2.2.2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
         with:
           name: "demos"
           tag_name: "demo"
