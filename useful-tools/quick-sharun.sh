@@ -104,6 +104,12 @@ export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 # apps often need this to work
 export $(dbus-launch 2>/dev/null || echo 'NO_DBUS=1')
 
+# CI containers often run as root which prevents
+# web apps from running with lib4bin strace mode
+export ELECTRON_DISABLE_SANDBOX=1
+export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1
+export QTWEBENGINE_DISABLE_SANDBOX=1
+
 _echo() {
 	printf '\033[1;92m%s\033[0m\n' " $*"
 }
