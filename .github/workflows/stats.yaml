@@ -35,19 +35,22 @@ jobs:
                   "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
                   | ./gron.awk | awk -F'=' '/download_count/ {total += $2} END {print total}')
           
-              [ -n "$NUM" ] || continue
+              if [ -z "$NUM" ]; then
+                >&2 echo "WARNINGS, COULD NOT GET STATS FROM $REPO"
+                continue
+              fi
           
               if ! grep -q "$REPO:" ./.github/repos.stats; then
                   echo "${REPO}: $NUM" >> ./.github/repos.stats
               else
                   sed -i -e "s|$REPO:.*|${REPO}: $NUM|" ./.github/repos.stats
               fi
-          
-              TOTAL=$(( TOTAL + NUM ))
           done
           
           sorted=$(sort -u ./.github/repos.stats)
           echo "$sorted" > ./.github/repos.stats
+
+          TOTAL=$(awk -F':' '{sum += $2} END {print sum}' ./.github/repos.stats)
 
           echo "Total: $TOTAL"
           cat << EOF > .github/badge.json
