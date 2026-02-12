@@ -35,7 +35,7 @@ jobs:
               "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
           		| ./gron.awk | awk -F'=' '/download_count/ {total += $2} END {print total}')
           	[ -n "$NUM" ] || exit 1
-          	echo "${REPO}: $NUM "
+          	echo "${REPO}: $NUM" >> ./.github/repos.stats
           	TOTAL=$(( TOTAL + NUM ))
           done
 
