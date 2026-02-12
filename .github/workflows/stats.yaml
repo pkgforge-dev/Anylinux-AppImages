@@ -36,7 +36,7 @@ jobs:
                   | ./gron.awk | awk -F'=' '/download_count/ {total += $2} END {print total}')
           
               if [ -z "$NUM" ]; then
-                >&2 echo "WARNINGS, COULD NOT GET STATS FROM $REPO"
+                >&2 echo "WARNING, COULD NOT GET STATS FROM $REPO"
                 continue
               fi
           
