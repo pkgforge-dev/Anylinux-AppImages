@@ -155,6 +155,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
 [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
 [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
+[Riseup-VPN](https://github.com/pkgforge-dev/Riseup-VPN-AppImage)                                                        |
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
