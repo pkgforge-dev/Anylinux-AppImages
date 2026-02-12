@@ -112,6 +112,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
 [Keypunch](https://github.com/pkgforge-dev/Keypunch-AppImage)                                                            |
 [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage)                                                                  |
+[Knights](https://github.com/pkgforge-dev/Knights-AppImage)                                                              |
 [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage)                                                                |
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
 [Libation](https://github.com/pkgforge-dev/Libation-AppImage)                                                            |
@@ -206,6 +207,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
 [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage)                                                          |
 [wine](https://github.com/pkgforge-dev/wine-AppImage)                                                                    |
+[Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced)                                             |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
 [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage)                                                                |
 [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
