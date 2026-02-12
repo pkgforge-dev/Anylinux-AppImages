@@ -30,14 +30,24 @@ jobs:
           )"
           
           for REPO in $REPOS; do
-            REPO=${REPO##*/}
-          	NUM=$(wget -q --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
-          		| ./gron.awk | awk -F'=' '/download_count/ {total += $2} END {print total}')
-          	[ -n "$NUM" ] || exit 1
-          	echo "${REPO}: $NUM" >> ./.github/repos.stats
-          	TOTAL=$(( TOTAL + NUM ))
+              REPO=${REPO##*/}
+              NUM=$(wget -q --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                  "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
+                  | ./gron.awk | awk -F'=' '/download_count/ {total += $2} END {print total}')
+          
+              [ -n "$NUM" ] || continue
+          
+              if ! grep -q "$REPO:" ./.github/repos.stats; then
+                  echo "${REPO}: $NUM" >> ./.github/repos.stats
+              else
+                  sed -i -e "s|$REPO:.*|${REPO}: $NUM|" ./.github/repos.stats
+              fi
+          
+              TOTAL=$(( TOTAL + NUM ))
           done
+          
+          sorted=$(sort -u ./.github/repos.stats)
+          echo "$sorted" > ./.github/repos.stats
 
           echo "Total: $TOTAL"
           cat << EOF > .github/badge.json
@@ -53,7 +63,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ./.github/badge.json
+          git add ./.github/badge.json ./.github/repos.stats
           git commit -m "total-downloads badge auto-commit"
           git push origin main
         env:
