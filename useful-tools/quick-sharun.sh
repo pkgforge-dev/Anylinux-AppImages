@@ -110,6 +110,12 @@ export ELECTRON_DISABLE_SANDBOX=1
 export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1
 export QTWEBENGINE_DISABLE_SANDBOX=1
 
+_cleanup() {
+	killall pulseaudio 2>/dev/null || :
+}
+
+trap _cleanup INT TERM EXIT
+
 _echo() {
 	printf '\033[1;92m%s\033[0m\n' " $*"
 }
@@ -1764,6 +1770,10 @@ _make_static_bin() (
 	_echo "------------------------------------------------------------"
 )
 
+# Some apps will fail to run in strace mode if there is no sound server
+if _is_cmd pulseaudio && ! pgrep pulseaudio; then
+	pulseaudio --daemonize --system --verbose --exit-idle-time=60 &
+fi
 
 case "$1" in
 	--help)
