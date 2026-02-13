@@ -121,6 +121,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
+[melonDS](https://github.com/pkgforge-dev/melonDS-AppImage-Enhanced)                                                     |
 [MESA](https://github.com/pkgforge-dev/MESA-AppImage)                                                                    |
 [Mini-vMac](https://github.com/pkgforge-dev/Mini-vMac-AppImage)                                                          |
 [Mousai](https://github.com/pkgforge-dev/Mousai-AppImage)                                                                |
