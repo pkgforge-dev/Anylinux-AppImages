@@ -1772,7 +1772,7 @@ _make_static_bin() (
 
 # Some apps will fail to run in strace mode if there is no sound server
 if _is_cmd pulseaudio && ! pgrep pulseaudio; then
-	pulseaudio --daemonize --system --verbose --exit-idle-time=60 &
+	pulseaudio --daemonize --system --verbose --disallow-exit --exit-idle-time=60 &
 fi
 
 case "$1" in
