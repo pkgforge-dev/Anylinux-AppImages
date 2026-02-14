@@ -112,6 +112,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
 [Keypunch](https://github.com/pkgforge-dev/Keypunch-AppImage)                                                            |
 [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage)                                                                  |
+[Kid3](https://github.com/pkgforge-dev/Kid3-AppImage)                                                                    |
 [Knights](https://github.com/pkgforge-dev/Knights-AppImage)                                                              |
 [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage)                                                                |
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
