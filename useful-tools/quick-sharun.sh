@@ -1183,27 +1183,38 @@ _add_certs_check() {
 
 	cat <<-'EOF' > "$cert_check"
 	#!/bin/sh
-	if [ ! -f /etc/ssl/certs/ca-certificates.crt ]; then
-	    _possible_certs='
-	      /etc/pki/tls/cert.pem
-	      /etc/pki/tls/cacert.pem
-	      /etc/ssl/cert.pem
-	      /var/lib/ca-certificates/ca-bundle.pem
-	    '
-	    for c in $_possible_certs; do
-	        if [ -f "$c" ]; then
-	            REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-$c}
-	            CURL_CA_BUNDLE=${CURL_CA_BUNDLE:-$c}
-	            SSL_CERT_FILE=${SSL_CERT_FILE:-$c}
-	            export REQUESTS_CA_BUNDLE CURL_CA_BUNDLE SSL_CERT_FILE
-	            break
-	        fi
-	    done
-	    if [ ! -f "$c" ]; then
+	
+	_possible_certs='
+	  /etc/ssl/certs/ca-certificates.crt
+	  /etc/pki/tls/cert.pem
+	  /etc/pki/tls/cacert.pem
+	  /etc/ssl/cert.pem
+	  /var/lib/ca-certificates/ca-bundle.pem
+	'
+	
+	for c in $_possible_certs; do
+	    if [ -f "$c" ]; then
+	        break
+	    fi
+	done
+	
+	if [ ! -f "$c" ]; then
 	        >&2 echo "WARNING: Cannot find CA Certificates in host!"
-	    elif [ -d "$APPDIR"/lib/pkcs11 ]; then
-	        # With p11kit we also have to make a symlink in /tmp because
-	        # the meme library does not check any of these variables...
+	else
+	    # only export these vars if no /etc/ssl/certs/ca-certificates.crt
+	    # most libraries already check this location with one exception below
+	    if [ ! -f /etc/ssl/certs/ca-certificates.crt ]; then
+	        REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-$c}
+	        CURL_CA_BUNDLE=${CURL_CA_BUNDLE:-$c}
+	        SSL_CERT_FILE=${SSL_CERT_FILE:-$c}
+	        export REQUESTS_CA_BUNDLE CURL_CA_BUNDLE SSL_CERT_FILE
+	    fi
+	
+	    # With p11kit we also have to make a symlink in /tmp because
+	    # the meme library does not check any of the previous varaibles
+	    # and since we had to patch it to a random path in tmp we have to always
+	    # make the symlink, even when /etc/ssl/certs/ca-certificates.crt is present
+	    if [ -d "$APPDIR"/lib/pkcs11 ]; then
 	        mkdir -p /tmp/.___host-certs
 	        ln -sfn "$c" /tmp/.___host-certs/ca-certificates.crt
 	    fi
