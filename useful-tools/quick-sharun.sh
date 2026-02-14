@@ -1188,6 +1188,7 @@ _add_certs_check() {
 	      /etc/pki/tls/cert.pem
 	      /etc/pki/tls/cacert.pem
 	      /etc/ssl/cert.pem
+		  /var/lib/ca-certificates/ca-bundle.pem
 	    '
 	    for c in $_possible_certs; do
 	        if [ -f "$c" ]; then
