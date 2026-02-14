@@ -1188,7 +1188,7 @@ _add_certs_check() {
 	      /etc/pki/tls/cert.pem
 	      /etc/pki/tls/cacert.pem
 	      /etc/ssl/cert.pem
-		  /var/lib/ca-certificates/ca-bundle.pem
+	      /var/lib/ca-certificates/ca-bundle.pem
 	    '
 	    for c in $_possible_certs; do
 	        if [ -f "$c" ]; then
@@ -1199,7 +1199,14 @@ _add_certs_check() {
 	            break
 	        fi
 	    done
-	    [ -f "$c" ] || >&2 echo "WARNING: Cannot find CA Certificates in '/etc'!"
+	    if [ ! -f "$c" ]; then
+	        >&2 echo "WARNING: Cannot find CA Certificates in host!"
+	    elif [ -d "$APPDIR"/lib/pkcs11 ]; then
+	        # With p11kit we also have to make a symlink in /tmp because
+	        # the meme library does not check any of these variables...
+	        mkdir -p /tmp/.___host-certs
+	        ln -sfn "$c" /tmp/.___host-certs/ca-certificates.crt
+	    fi
 	fi
 	EOF
 	chmod +x "$cert_check"
@@ -1863,20 +1870,26 @@ for lib do case "$lib" in
 		continue
 		;;
 	*p11-kit-trust.so*)
-		# good path that library should have
-		ssl_path="/etc/ssl/certs/ca-certificates.crt"
+		# Because OpenSUSE had to ruin this, we will have to patch the
+		# the certificates to a path in /tmp that we will later make
+		# a symlink that points to the real host certs location
+
+		# Originally we just patch to etc/ssl/certs/ca-certificates.crt
+		# See https://github.com/kem-a/AppManager/issues/39
 
 		# string has to be same length
 		problem_path="/usr/share/ca-certificates/trust-source"
-		ssl_path_fix="/etc/ssl/certs//////ca-certificates.crt"
+		ssl_path_fix="/tmp/.___host-certs/ca-certificates.crt"
 
-		if grep -Eaoq -m 1 "$ssl_path" "$lib"; then
+		if grep -Eaoq -m 1 "$ssl_path_fix" "$lib"; then
 			continue # all good nothing to fix
 		elif grep -Eaoq -m 1 "$problem_path" "$lib"; then
 			sed -i -e "s|$problem_path|$ssl_path_fix|g" "$lib"
 		else
 			continue # TODO add more possible problematic paths
 		fi
+
+		_add_certs_check
 
 		_echo "* fixed path to /etc/ssl/certs in $lib"
 		_patch_away_usr_share_dir "$lib" || continue
