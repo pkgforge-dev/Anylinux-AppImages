@@ -1215,8 +1215,8 @@ _add_certs_check() {
 	    # and since we had to patch it to a random path in tmp we have to always
 	    # make the symlink, even when /etc/ssl/certs/ca-certificates.crt is present
 	    if [ -d "$APPDIR"/lib/pkcs11 ]; then
-	        mkdir -p /tmp/.___host-certs
-	        ln -sfn "$c" /tmp/.___host-certs/ca-certificates.crt
+	        mkdir -p /tmp/.___host-certs || :
+	        ln -sfn "$c" /tmp/.___host-certs/ca-certificates.crt || :
 	    fi
 	fi
 	EOF
