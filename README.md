@@ -131,6 +131,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
+[Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced)                                             |
 [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced)                                           |
 [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
 [okteta](https://github.com/pkgforge-dev/okteta-AppImage)                                                                |
