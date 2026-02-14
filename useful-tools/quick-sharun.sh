@@ -1199,7 +1199,7 @@ _add_certs_check() {
 	done
 	
 	if [ ! -f "$c" ]; then
-	        >&2 echo "WARNING: Cannot find CA Certificates in host!"
+	    >&2 echo "WARNING: Cannot find CA Certificates in host!"
 	else
 	    # only export these vars if no /etc/ssl/certs/ca-certificates.crt
 	    # most libraries already check this location with one exception below
