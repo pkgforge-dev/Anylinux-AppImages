@@ -1183,23 +1183,41 @@ _add_certs_check() {
 
 	cat <<-'EOF' > "$cert_check"
 	#!/bin/sh
-	if [ ! -f /etc/ssl/certs/ca-certificates.crt ]; then
-	    _possible_certs='
-	      /etc/pki/tls/cert.pem
-	      /etc/pki/tls/cacert.pem
-	      /etc/ssl/cert.pem
-		  /var/lib/ca-certificates/ca-bundle.pem
-	    '
-	    for c in $_possible_certs; do
-	        if [ -f "$c" ]; then
-	            REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-$c}
-	            CURL_CA_BUNDLE=${CURL_CA_BUNDLE:-$c}
-	            SSL_CERT_FILE=${SSL_CERT_FILE:-$c}
-	            export REQUESTS_CA_BUNDLE CURL_CA_BUNDLE SSL_CERT_FILE
-	            break
-	        fi
-	    done
-	    [ -f "$c" ] || >&2 echo "WARNING: Cannot find CA Certificates in '/etc'!"
+	
+	_possible_certs='
+	  /etc/ssl/certs/ca-certificates.crt
+	  /etc/pki/tls/cert.pem
+	  /etc/pki/tls/cacert.pem
+	  /etc/ssl/cert.pem
+	  /var/lib/ca-certificates/ca-bundle.pem
+	'
+	
+	for c in $_possible_certs; do
+	    if [ -f "$c" ]; then
+	        break
+	    fi
+	done
+	
+	if [ ! -f "$c" ]; then
+	    >&2 echo "WARNING: Cannot find CA Certificates in host!"
+	else
+	    # only export these vars if no /etc/ssl/certs/ca-certificates.crt
+	    # most libraries already check this location with one exception below
+	    if [ ! -f /etc/ssl/certs/ca-certificates.crt ]; then
+	        REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-$c}
+	        CURL_CA_BUNDLE=${CURL_CA_BUNDLE:-$c}
+	        SSL_CERT_FILE=${SSL_CERT_FILE:-$c}
+	        export REQUESTS_CA_BUNDLE CURL_CA_BUNDLE SSL_CERT_FILE
+	    fi
+	
+	    # With p11kit we also have to make a symlink in /tmp because
+	    # the meme library does not check any of the previous varaibles
+	    # and since we had to patch it to a random path in tmp we have to always
+	    # make the symlink, even when /etc/ssl/certs/ca-certificates.crt is present
+	    if [ -d "$APPDIR"/lib/pkcs11 ]; then
+	        mkdir -p /tmp/.___host-certs
+	        ln -sfn "$c" /tmp/.___host-certs/ca-certificates.crt
+	    fi
 	fi
 	EOF
 	chmod +x "$cert_check"
@@ -1863,20 +1881,26 @@ for lib do case "$lib" in
 		continue
 		;;
 	*p11-kit-trust.so*)
-		# good path that library should have
-		ssl_path="/etc/ssl/certs/ca-certificates.crt"
+		# Because OpenSUSE had to ruin this, we will have to patch the
+		# the certificates to a path in /tmp that we will later make
+		# a symlink that points to the real host certs location
+
+		# Originally we just patch to etc/ssl/certs/ca-certificates.crt
+		# See https://github.com/kem-a/AppManager/issues/39
 
 		# string has to be same length
 		problem_path="/usr/share/ca-certificates/trust-source"
-		ssl_path_fix="/etc/ssl/certs//////ca-certificates.crt"
+		ssl_path_fix="/tmp/.___host-certs/ca-certificates.crt"
 
-		if grep -Eaoq -m 1 "$ssl_path" "$lib"; then
+		if grep -Eaoq -m 1 "$ssl_path_fix" "$lib"; then
 			continue # all good nothing to fix
 		elif grep -Eaoq -m 1 "$problem_path" "$lib"; then
 			sed -i -e "s|$problem_path|$ssl_path_fix|g" "$lib"
 		else
 			continue # TODO add more possible problematic paths
 		fi
+
+		_add_certs_check
 
 		_echo "* fixed path to /etc/ssl/certs in $lib"
 		_patch_away_usr_share_dir "$lib" || continue
