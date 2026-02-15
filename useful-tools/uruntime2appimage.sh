@@ -45,7 +45,17 @@ _download() {
 		>&2 echo "ERROR: we need wget or curl to download $1"
 		exit 1
 	fi
-	$DOWNLOAD_CMD "$@"
+	COUNT=0
+	while [ "$COUNT" -lt 5 ]; do
+		if $DOWNLOAD_CMD "$@"; then
+			return 0
+		fi
+		_err_msg "Download failed! Trying again..."
+		COUNT=$((COUNT + 1))
+		sleep 5
+	done
+	_err_msg "Failed to download 5 times"
+	return 1
 }
 
 _deploy_desktop_and_icon() {
