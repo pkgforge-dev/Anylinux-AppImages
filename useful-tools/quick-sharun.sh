@@ -831,41 +831,6 @@ _make_deployment_array() {
 			"$LIB_DIR"/libImlib2.so*    \
 			"$LIB_DIR"/imlib2/filters/* \
 			"$LIB_DIR"/imlib2/loaders/*
-
-		# TODO upstream to sharun
-		echo 'IMLIB2_FILTER_PATH=${SHARUN_DIR}/lib/imlib2/filters' >> "$APPENV"
-		echo 'IMLIB2_LOADER_PATH=${SHARUN_DIR}/lib/imlib2/loaders' >> "$APPENV"
-
-		# Setting IMLIB2_FILTER_PATH and IMLIB2_LOADER_PATH is good
-		# enough to make imlib2 relocatable, however there is one specific
-		# loader xpm.so that reads a file in /usr/share/imlib2/rgb.txt
-		# there is no env variable to relocate this file,
-		# so we will have resort to binary patching later on for now
-
-		# # # # # # # # # # # # # # # # # # # # # # # # # # #
-		# TODO: attempt to get upstream to adopt this patch #
-		# # # # # # # # # # # # # # # # # # # # # # # # # # #
-		#diff --git a/src/modules/loaders/loader_xpm.c b/src/modules/loaders/loader_xpm.c
-		#index e38493c..02c5d91 100644
-		#--- a/src/modules/loaders/loader_xpm.c
-		#+++ b/src/modules/loaders/loader_xpm.c
-		#@@ -89,6 +89,16 @@ xpm_parse_color(const char *color)
-		#     }
-		#
-		#     /* look in rgb txt database */
-		#+    if (!rgb_txt)
-		#+    {
-		#+        const char *data_dir = getenv("IMLIB2_DATADIR_PATH");
-		#+        if (data_dir)
-		#+        {
-		#+            char path[4096];
-		#+            snprintf(path, sizeof(path), "%s/rgb.txt", data_dir);
-		#+            rgb_txt = fopen(path, "r");
-		#+        }
-		#+    }
-		#     if (!rgb_txt)
-		#         rgb_txt = fopen(PACKAGE_DATA_DIR "/rgb.txt", "r");
-		#     if (!rgb_txt)
 	fi
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		if pythonbin=$(command -v python); then
@@ -1169,7 +1134,7 @@ _check_always_software() {
 	fi
 }
 
-_add_certs_check() {
+_add_p11kit_cert_hook() {
 	cert_check="$APPDIR"/bin/check-ca-certs.src.hook
 	if [ -f "$cert_check" ]; then
 		return 0
@@ -1177,7 +1142,7 @@ _add_certs_check() {
 
 	cat <<-'EOF' > "$cert_check"
 	#!/bin/sh
-	
+
 	_possible_certs='
 	  /etc/ssl/certs/ca-certificates.crt
 	  /etc/pki/tls/cert.pem
@@ -1185,29 +1150,23 @@ _add_certs_check() {
 	  /etc/ssl/cert.pem
 	  /var/lib/ca-certificates/ca-bundle.pem
 	'
-	
+
 	for c in $_possible_certs; do
 	    if [ -f "$c" ]; then
 	        break
 	    fi
 	done
-	
-	if [ ! -f "$c" ]; then
-	    >&2 echo "WARNING: Cannot find CA Certificates in host!"
-	else
-	    # only export these vars if no /etc/ssl/certs/ca-certificates.crt
-	    # most libraries already check this location with one exception below
-	    if [ ! -f /etc/ssl/certs/ca-certificates.crt ]; then
-	        REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-$c}
-	        CURL_CA_BUNDLE=${CURL_CA_BUNDLE:-$c}
-	        SSL_CERT_FILE=${SSL_CERT_FILE:-$c}
-	        export REQUESTS_CA_BUNDLE CURL_CA_BUNDLE SSL_CERT_FILE
-	    fi
-	
-	    # With p11kit we also have to make a symlink in /tmp because
-	    # the meme library does not check any of the previous varaibles
-	    # and since we had to patch it to a random path in tmp we have to always
-	    # make the symlink, even when /etc/ssl/certs/ca-certificates.crt is present
+
+	if [ -f "$c" ]; then
+	    # With p11kit we have to make a symlink in /tmp because the meme
+	    # library does not check any of these variables set by sharun:
+	    #
+	    # REQUESTS_CA_BUNDLE
+	    # CURL_CA_BUNDLE
+	    # SSL_CERT_FILE
+	    #
+	    # So we had to patch it to a path in /tmp and now symlink to the
+	    # found certificate at runtime...
 	    if [ -d "$APPDIR"/lib/pkcs11 ]; then
 	        mkdir -p /tmp/.___host-certs || :
 	        ln -sfn "$c" /tmp/.___host-certs/ca-certificates.crt || :
@@ -1887,7 +1846,7 @@ for lib do case "$lib" in
 			continue # TODO add more possible problematic paths
 		fi
 
-		_add_certs_check
+		_add_p11kit_cert_hook
 
 		_echo "* fixed path to /etc/ssl/certs in $lib"
 		_patch_away_usr_share_dir "$lib" || continue
@@ -1937,9 +1896,6 @@ for lib do case "$lib" in
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_bin_dir "$lib" || :
 		_add_bwrap_wrapper
-		;;
-	*libssl*.so*)
-		_add_certs_check
 		;;
 	*libdecor*.so*)
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
