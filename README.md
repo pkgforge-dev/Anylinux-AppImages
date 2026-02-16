@@ -77,6 +77,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [ECWolf](https://github.com/pkgforge-dev/ECWolf-AppImage)                                                                |
 [EDuke32](https://github.com/pkgforge-dev/EDuke32-AppImage)                                                              |
 [Elastic](https://github.com/pkgforge-dev/Elastic-AppImage)                                                              |
+[Element Desktop](https://github.com/pkgforge-dev/Element-Desktop-AppImage)                                              |
 [ePSXe](https://github.com/pkgforge-dev/ePSXe-AppImage)                                                                  |
 [Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage)                                          |
 [ExtremeTuxRacer](https://github.com/pkgforge-dev/ExtremeTuxRacer-AppImage)                                              |
