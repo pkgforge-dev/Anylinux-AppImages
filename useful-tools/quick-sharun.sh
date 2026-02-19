@@ -1678,7 +1678,7 @@ _check_hardcoded_lib_dirs() {
 	for d do
 		[ -d "$d" ] || continue
 		d=${d##*/}
-		# skip directories we already handle here on in sharun
+		# skip directories we already handle here or in sharun
 		case "$d" in
 			alsa-lib    |\
 			dri         |\
@@ -1736,7 +1736,7 @@ _check_hardcoded_data_dirs() {
 	for d do
 		[ -d "$d" ] || continue
 		d=${d##*/}
-		# skip directories we already handle here on in sharun
+		# skip directories we already handle here or in sharun
 		case "$d" in
 			alsa     |\
 			drirc.d  |\
