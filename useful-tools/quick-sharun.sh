@@ -1738,16 +1738,17 @@ _check_hardcoded_data_dirs() {
 		d=${d##*/}
 		# skip directories we already handle here on in sharun
 		case "$d" in
-			vulkan   |\
-			glvnd    |\
 			alsa     |\
 			drirc.d  |\
-			X11      |\
-			glib-*   |\
-			terminfo |\
 			file     |\
+			glib-*   |\
+			glvnd    |\
+			libdrm   |\
 			libthai  |\
-			libdrm   )
+			locale   |\
+			terminfo |\
+			vulkan   |\
+			X11      )
 				continue
 				;;
 		esac
