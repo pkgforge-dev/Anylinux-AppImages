@@ -1743,6 +1743,7 @@ _check_hardcoded_data_dirs() {
 			file     |\
 			glib-*   |\
 			glvnd    |\
+			icons    |\
 			libdrm   |\
 			libthai  |\
 			locale   |\
