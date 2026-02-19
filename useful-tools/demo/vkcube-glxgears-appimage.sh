@@ -48,9 +48,14 @@ wget --retry-connrefused --tries=30 "$EXTRA_PACKAGES" -O ./get-debloated-pkgs.sh
 chmod +x ./get-debloated-pkgs.sh
 ./get-debloated-pkgs.sh --add-mesa --prefer-nano
 
-wget --retry-connrefused --tries=30 "$AUR" -O ./make-aur-package
-chmod +x ./make-aur-package
-./make-aur-package vulkan-terakan-git
+# We are experimenting with adding vulkan-terakan
+# This adds vulkan support for super old radeon gpus
+# It hasn't been upstreamed to mesa so we have to build it
+echo "Building vulkan-terakan aur package..."
+echo "---------------------------------------------------------------"
+wget --retry-connrefused --tries=30 "$AUR" -O ./make-aur-package.sh
+chmod +x ./make-aur-package.sh
+./make-aur-package.sh vulkan-terakan-git
 
 echo "Bundling AppImage..."
 echo "---------------------------------------------------------------"
