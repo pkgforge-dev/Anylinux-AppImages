@@ -2295,7 +2295,7 @@ for b in $(find "$APPDIR"/shared/lib/ -type f ! -name '*.so*'); do
 done
 
 # do the same for possible nested binaries in bin
-for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*'); do
+for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*' 2>/dev/null); do
 	if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
 		rm -f "$b"
 		ln "$APPDIR"/sharun "$b"
