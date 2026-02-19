@@ -1672,6 +1672,99 @@ _patch_away_usr_share_dir() {
 	sed -i -e "s|_tmp_share=.*|_tmp_share=$_tmp_share|g" "$PATH_MAPPING_SCRIPT"
 }
 
+_check_hardcoded_lib_dirs() {
+	# check for hardcoded path to any other possibly bundled library dir
+	set -- "$APPDIR"/shared/lib/*
+	for d do
+		[ -d "$d" ] || continue
+		d=${d##*/}
+		# skip directories we already handle here or in sharun
+		case "$d" in
+			alsa-lib    |\
+			dri         |\
+			gbm         |\
+			gconv       |\
+			gdk-pixbuf* |\
+			gio         |\
+			gtk*        |\
+			gstreamer*  |\
+			gvfs        |\
+			ImageMagick*|\
+			imlib2      |\
+			libproxy    |\
+			locale      |\
+			pipewire*   |\
+			pulseaudio  |\
+			qt*         |\
+			spa*        |\
+			vdpau       )
+				continue
+				;;
+		esac
+
+		for f in "$APPDIR"/shared/lib/*.so* "$APPDIR"/shared/bin/*; do
+			if [ ! -f "$f" ]; then
+				continue
+			elif grep -aoq -m 1 "$LIB_DIR"/"$d" "$f"; then
+				_echo "* Detected hardcoded path to $LIB_DIR/$d in $f"
+				_patch_away_usr_lib_dir "$f" || :
+			fi
+		done
+	done
+}
+
+_check_hardcoded_data_dirs() {
+	# first check for hardcoded path to /usr/share/fonts and copy if so
+	src_fonts=/usr/share/fonts
+	dst_fonts="$APPDIR"/share/fonts
+	if grep -aoq -m 1 "$src_fonts" "$APPDIR"/shared/bin/*; then
+		if [ -d "$src_fonts" ] && [ ! -d "$dst_fonts" ]; then
+			mkdir -p "$dst_fonts"
+			for d in "$src_fonts"/*; do
+				if [ "${d##*/}" = "Adwaita" ]; then
+					continue
+				fi
+				if [ -e "$d" ]; then
+					cp -vr "$d" "$dst_fonts"
+				fi
+			done
+		fi
+	fi
+
+	# now check if any of the bundled datadirs need to be patched
+	set -- "$APPDIR"/share/*
+	for d do
+		[ -d "$d" ] || continue
+		d=${d##*/}
+		# skip directories we already handle here or in sharun
+		case "$d" in
+			alsa     |\
+			drirc.d  |\
+			file     |\
+			glib-*   |\
+			glvnd    |\
+			icons    |\
+			libdrm   |\
+			libthai  |\
+			locale   |\
+			terminfo |\
+			vulkan   |\
+			X11      )
+				continue
+				;;
+		esac
+
+		for f in "$APPDIR"/shared/lib/*.so* "$APPDIR"/shared/bin/*; do
+			if [ ! -f "$f" ]; then
+				continue
+			elif grep -aoq -m 1 /usr/share/"$d" "$f"; then
+				_echo "* Detected hardcoded path to /usr/share/$d in $f"
+				_patch_away_usr_share_dir "$f" || :
+			fi
+		done
+	done
+}
+
 # sometimes developers add stuff like /bin/sh or env as the Exec= key of the
 # desktop entry, 99.99% of the time this is not wanted, so we have to error that
 _check_main_bin_name() {
@@ -1938,59 +2031,8 @@ for lib do case "$lib" in
 	esac
 done
 
-# check for hardcoded path to any other possibly bundled library dir
-topleveldirs=$(find "$APPDIR"/shared/lib/ -maxdepth 1  -type d | sed 's|/.*/||')
-for dir in $topleveldirs; do
-	# skip directories we already handle here on in sharun
-	case "$dir" in
-		alsa-lib    |\
-		dri         |\
-		gbm         |\
-		gconv       |\
-		gdk-pixbuf* |\
-		gio         |\
-		gtk*        |\
-		gstreamer*  |\
-		gvfs        |\
-		ImageMagick*|\
-		imlib2      |\
-		libproxy    |\
-		locale      |\
-		pipewire*   |\
-		pulseaudio  |\
-		qt*         |\
-		spa*        |\
-		vdpau       )
-			continue
-			;;
-	esac
-
-	for f in "$APPDIR"/shared/lib/*.so* "$APPDIR"/shared/bin/*; do
-		if [ ! -f "$f" ]; then
-			continue
-		elif grep -aoq -m 1 "$LIB_DIR"/"$dir" "$f"; then
-			_echo "* Detected hardcoded path to $LIB_DIR/$dir in $f"
-			_patch_away_usr_lib_dir "$f" || :
-		fi
-	done
-done
-
-# first check for hardcoded path to /usr/share/fonts and copy if so
-src_fonts=/usr/share/fonts
-dst_fonts="$APPDIR"/share/fonts
-if grep -aoq -m 1 "$src_fonts" "$APPDIR"/shared/bin/*; then
-	if [ -d "$src_fonts" ] && [ ! -d "$dst_fonts" ]; then
-		mkdir -p "$dst_fonts"
-		for d in "$src_fonts"/*; do
-			if [ "${d##*/}" = "Adwaita" ]; then
-				continue
-			fi
-			if [ -e "$d" ]; then
-				cp -vr "$d" "$dst_fonts"
-			fi
-		done
-	fi
-fi
+_check_hardcoded_lib_dirs
+_check_hardcoded_data_dirs
 
 # patch away any hardcoded path to /usr/share or /usr/lib in bins...
 set -- "$APPDIR"/shared/bin/*
@@ -2254,7 +2296,7 @@ for b in $(find "$APPDIR"/shared/lib/ -type f ! -name '*.so*'); do
 done
 
 # do the same for possible nested binaries in bin
-for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*'); do
+for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*' 2>/dev/null); do
 	if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
 		rm -f "$b"
 		ln "$APPDIR"/sharun "$b"
