@@ -268,8 +268,6 @@ _sanity_check() {
 		_err_msg "'PATH_MAPPING=/etc:\${SHARUN_DIR}/etc'"
 		_err_msg 'NOTE: The braces in the variable are needed!'
 		exit 1
-	elif [ -z "$ICON" ] && [ ! -f "$APPDIR"/.DirIcon ]; then
-		_err_msg "WARNING: No .DirIcon in $APPDIR and ICON is not set!"
 	fi
 
 	if [ "$STRACE_MODE" = 1 ]; then
