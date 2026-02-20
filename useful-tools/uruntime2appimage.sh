@@ -163,7 +163,7 @@ _try_to_find_icon() {
 	set --
 
 	# Now search deeper
-	icon=$(awk -F'=' '/^Icon=/{print $2; exit}' "$APPDIR"/*.desktop)
+	icon=$(awk -F'=' '/^Icon=/{print $2; exit}' "$DESKTOP_ENTRY")
 	icon=${icon##*/}
 	[ -n "$icon" ] || return 1
 	sizes='256x256 512x512 192x192 128x128 scalable'
