@@ -58,6 +58,10 @@ _prepare() {
 		cat /etc/makepkg.conf
 	fi
 
+	# disable building debug packages by default
+	# even artix doesn't do this nonsense
+	sed -i -e 's| debug | !debug |g' /etc/makepkg.conf
+
 	# always disable this nonsense that was recently added to makepkg
 	sed -i \
 		-e 's/(( ${#arch\[@\]} != $(printf "%s\\n" ${arch\[@\]} | sort -u | wc -l) ))/false/' \
