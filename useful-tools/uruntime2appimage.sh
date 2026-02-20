@@ -153,7 +153,7 @@ _check_window_class() {
 
 _try_to_find_icon() {
 	# try the first top level .png or .svg before searching
-	set -- "$APPDIR"/*.png "$APPDIR"/.svg
+	set -- "$APPDIR"/*.png "$APPDIR"/*.svg
 	for i do
 		if [ -f "$i" ]; then
 			cp -v "$i" "$APPDIR"/.DirIcon
@@ -164,6 +164,8 @@ _try_to_find_icon() {
 
 	# Now search deeper
 	icon=$(awk -F'=' '/^Icon=/{print $2; exit}' "$APPDIR"/*.desktop)
+	icon=${icon##*/}
+	[ -n "$icon" ] || return 1
 	sizes='256x256 512x512 192x192 128x128 scalable'
 	for s in $sizes; do
 		set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon"*
