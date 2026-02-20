@@ -152,23 +152,44 @@ _check_window_class() {
 }
 
 _try_to_find_icon() {
-	>&2 echo "No $APPDIR/.DirIcon found, trying to find it in $APPDIR"
-
 	# try the first top level .png or .svg before searching
-	if cp -v "$APPDIR"/*.png "$APPDIR"/.DirIcon 2>/dev/null \
-	  || cp -v "$APPDIR"/*.svg "$APPDIR"/.DirIcon 2>/dev/null; then
-		>&2 echo "Found icon and copied it to $APPDIR/.DirIcon"
-		return 0
-	fi
+	set -- "$APPDIR"/*.png "$APPDIR"/.svg
+	for i do
+		if [ -f "$i" ]; then
+			cp -v "$i" "$APPDIR"/.DirIcon
+			return 0
+		fi
+	done
+	set --
 
-	# Now search depper
-	icon_name=$(awk -F'=' '/^Icon=/{print $2; exit}' "$APPDIR"/*.desktop)
-	icon=$(find "$APPDIR" -type f -name "$icon_name".png -print -quit)
-	if [ -n "$icon" ] && cp -v "$icon" "$APPDIR"/.DirIcon; then
-		>&2 echo "Found $icon and copied it to $APPDIR/.DirIcon"
-	else
-		return 1
-	fi
+	# Now search deeper
+	icon=$(awk -F'=' '/^Icon=/{print $2; exit}' "$APPDIR"/*.desktop)
+	sizes='256x256 512x512 192x192 128x128 scalable'
+	for s in $sizes; do
+		set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon"*
+	done
+	# add system dirs last to check
+	for s in $sizes; do
+		set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon"*
+	done
+
+	for i do
+		if [ -f "$i" ]; then
+			# only png and svg are valid
+			case "$i" in
+				*.png|*.svg)
+					cp -v "$i" "$APPDIR"
+					cp -v "$i" "$APPDIR"/.DirIcon
+					return 0
+					;;
+				*)
+					continue
+					;;
+			esac
+		fi
+	done
+
+	return 1
 }
 
 if [ ! -d "$APPDIR" ]; then
@@ -231,6 +252,8 @@ if [ ! -f "$DESKTOP_ENTRY" ]; then
 	exit 1
 elif [ ! -f "$APPDIR"/.DirIcon ] && ! _try_to_find_icon; then
 	>&2 echo "ERROR: No top level .DirIcon file found in $APPDIR"
+	>&2 echo "Could not find icon listed in $DESKTOP_ENTRY either"
+	>&2 echo "Set ICON env variable to the location/url of the icon"
 	exit 1
 elif ! mkdir -p "$OUTPATH"; then
 	>&2 echo "ERROR: Cannot create output directory: '$OUTPATH'"
