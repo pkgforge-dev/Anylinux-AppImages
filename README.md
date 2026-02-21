@@ -49,7 +49,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
 [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage)                                                        |
 [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage)                                                        |
-[CDogs-SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage)                                                          |
+[C-Dogs_SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage)                                                         |
 [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced)                                                           |
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
 [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage)                                                              |
@@ -70,6 +70,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage)                                                                |
 [Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
 [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
+[DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage)                                                            |
 [Dr. Robotnik's Ring Racers](https://github.com/pkgforge-dev/Dr-Robotniks-Ring-Racers-AppImage)                          |
 [Drum Machine](https://github.com/pkgforge-dev/Drum-Machine-AppImage)                                                    |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
