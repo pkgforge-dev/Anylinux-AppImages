@@ -49,7 +49,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
 [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage)                                                        |
 [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage)                                                        |
-[C-Dogs_SDL](https://github.com/pkgforge-dev/C-Dogs_SDL-AppImage)                                                        |
+[C-Dogs_SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage)                                                         |
 [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced)                                                           |
 [Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
 [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage)                                                              |
