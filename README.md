@@ -131,6 +131,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
 [NBlood](https://github.com/pkgforge-dev/NBlood-AppImage)                                                                |
 [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage)                                                            |
+[Neverbal](https://github.com/pkgforge-dev/Neverball-AppImage)                                                           |
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
@@ -160,6 +161,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
+[REDRIVER2](https://github.com/pkgforge-dev/REDRIVER2-AppImage)                                                          |
 [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
 [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
 [Riseup-VPN](https://github.com/pkgforge-dev/Riseup-VPN-AppImage)                                                        |
