@@ -131,7 +131,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
 [NBlood](https://github.com/pkgforge-dev/NBlood-AppImage)                                                                |
 [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage)                                                            |
-[Neverbal](https://github.com/pkgforge-dev/Neverball-AppImage)                                                           |
+[Neverball](https://github.com/pkgforge-dev/Neverball-AppImage)                                                           |
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
