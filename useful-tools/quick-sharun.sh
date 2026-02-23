@@ -367,6 +367,42 @@ _test_appimage() {
 	fi
 }
 
+# if full test is not possible lets at least check some possible issues
+_simple_test_appimage() {
+	log="$TMPDIR"/simple-test.log
+	APP=$1
+	shift
+
+	_echo "------------------------------------------------------------"
+	_echo "Doing simple test '$APP'..."
+	_echo "------------------------------------------------------------"
+
+	"$APP" "$@" 2>"$log" &
+	pid=$!
+
+	sleep 7
+	kill $pid 2>/dev/null || :
+	sleep 1
+
+	test="$(cat "$log")"
+	case "$test" in
+		*'symbol lookup error'*|\
+		*'error while loading shared libraries'*)
+			>&2 echo "$test"
+			_err_msg "------------------------------------------------------------"
+			_err_msg "ERROR: '$APP' failed simple test!"
+			_err_msg "------------------------------------------------------------"
+			sleep 20
+			exit 1
+			;;
+	esac
+
+	_echo "------------------------------------------------------------"
+	_echo "Test went OK."
+	_echo "------------------------------------------------------------"
+	exit 0
+}
+
 # POSIX shell doesn't support arrays we use awk to save it into a variable
 # then with 'eval set -- $var' we add it to the positional array
 # see https://unix.stackexchange.com/questions/421158/how-to-use-pseudo-arrays-in-posix-shell-script
@@ -2016,6 +2052,10 @@ case "$1" in
 	--test)
 		shift
 		_test_appimage "$@"
+		;;
+	--simple-test)
+		shift
+		_simple_test_appimage "$@"
 		;;
 	--make-static-bin)
 		shift
