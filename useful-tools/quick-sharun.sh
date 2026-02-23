@@ -1175,9 +1175,10 @@ _add_p11kit_cert_hook() {
 	    #
 	    # So we had to patch it to a path in /tmp and now symlink to the
 	    # found certificate at runtime...
-	    if [ -d "$APPDIR"/lib/pkcs11 ]; then
+	    _host_cert=/tmp/.___host-certs/ca-certificates.crt
+	    if [ -d "$APPDIR"/lib/pkcs11 ] && [ ! -f "$_host_cert" ]; then
 	        mkdir -p /tmp/.___host-certs || :
-	        ln -sfn "$c" /tmp/.___host-certs/ca-certificates.crt || :
+	        ln -sfn "$c" "$_host_cert" || :
 	    fi
 	fi
 	EOF
