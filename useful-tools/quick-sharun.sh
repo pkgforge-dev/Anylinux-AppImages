@@ -1763,6 +1763,167 @@ _check_hardcoded_data_dirs() {
 	done
 }
 
+_post_deployment_steps() {
+	# these need to be done later because sharun may make shared/lib a symlink
+	# to lib and if we make shared/lib first then it breaks sharun
+	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
+		set -- "$LIB_DIR"/python*
+		if [ -d "$1" ]; then
+			cp -r "$1" "$APPDIR"/shared/lib
+		else
+			_err_msg "ERROR: Cannot find python installation in $LIB_DIR"
+			exit 1
+		fi
+		if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
+			(
+				cd "$APPDIR"/shared/lib/"${1##*/}"
+				find ./ -type f -name '*.a' -delete || :
+				for f in $(find ./ -type f -name '*.pyc' -print); do
+					case "$f" in
+						*/"$MAIN_BIN"*) :;;
+						*) [ ! -f "$f" ] || rm -f "$f";;
+					esac
+				done
+			)
+		fi
+	fi
+	if [ "$DEPLOY_FLUTTER" = 1 ]; then
+		if [ -z "$FLUTTER_LIB" ]; then
+			_err_msg "Flutter deployment was forced but looks like the"
+			_err_msg "the application does not link to libflutter at all"
+			_err_msg "If you see this message please open a bug report!"
+			exit 1
+		fi
+
+		# flutter apps need to have a relative lib and data directory
+		# we need to find the directory that contains libapp.so
+		if libapp=$(cd "$APPDIR"/bin \
+		  && find ../shared/lib/ -type f -name 'libapp.so' -print -quit); then
+			d=${libapp%/*}
+			if [ ! -d "$APPDIR"/bin/"${d##*/}" ]; then
+				ln -s "$d" "$APPDIR"/bin/"${d##*/}"
+			fi
+		else
+			_err_msg "Cannot find libapp.so in $APPDIR"
+			_err_msg "include it for flutter deployment to work"
+		fi
+
+		dst_flutter_dir="$APPDIR"/bin/data
+		if [ ! -d "$dst_flutter_dir" ]; then
+			if [ -z "$FLUTTER_DATA_DIR" ]; then
+				d=${FLUTTER_LIB%/*.so*}
+				# find data dir, we assume it is relative to
+				# where libflutter*.so came from
+				if [ -d "$d"/../data ]; then
+					FLUTTER_DATA_DIR="$d"/../data
+				elif [ -d "$d"/../../data ]; then
+					FLUTTER_DATA_DIR="$d"/../../data
+				else
+					_err_msg "Cannot find data directory of $FLUTTER_LIB"
+					_err_msg "Please set FLUTTER_DATA_DIR to its location"
+					exit 1
+				fi
+			fi
+			cp -rv "$FLUTTER_DATA_DIR" "$dst_flutter_dir"
+			_echo "* Copied flutter data directory"
+		fi
+	fi
+	if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
+		mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
+		cp -rv /etc/ImageMagick-* "$APPDIR"/etc
+
+		# we can copy /usr/share/ImageMagick to the AppDir and set MAGICK_CONFIGURE_PATH
+		# to include both the etc/ImageMagick and share/ImageMagick directory
+		# but it is simpler to instead have all the config files in a single location
+		# imagemagick will load them all regardless
+		set -- /usr/share/ImageMagick-*/*.xml
+		if [ -f "$1" ]; then
+			cp -rv /usr/share/ImageMagick-*/*.xml "$APPDIR"/etc/ImageMagick*
+		fi
+		# there is also a configuration file in libdir
+		set -- "$LIB_DIR"/ImageMagick-*/config*/configure.xml
+		if [ -f "$1" ]; then
+			cp -v "$1" "$APPDIR"/etc/ImageMagick*
+		fi
+
+		# MAGICK_HOME is all that needs to be set
+		echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
+		# however MAGICK_HOME only works when compiled with a specific flag
+		# we can still make this relocatable by setting these other env variables
+		# which will always work even when not compiled with MAGICK_HOME support
+		(
+			cd "$APPDIR"
+			set -- shared/lib/ImageMagick-*/modules*/coders
+			if [ -d "$1" ]; then
+				echo "MAGICK_CODER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+			fi
+			set -- shared/lib/ImageMagick-*/modules*/filters
+			if [ -d "$1" ]; then
+				# checking the code it seems that MAGICK_FILTER_MODULE_PATH
+				# is NOT USED in the code and seems to be an error!!! the variable
+				# that modules.c references is MAGICK_CODER_FILTER_PATH
+				# we will still be set both just in case
+				echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+				echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+
+			fi
+			set -- etc/ImageMagick*
+			if [ -d "$1" ]; then
+				echo "MAGICK_CONFIGURE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+			fi
+		)
+
+		_echo "* Copied ImageMagick directories"
+	fi
+	if [ "$DEPLOY_GEGL" = 1 ]; then
+		gegldir=$(echo "$LIB_DIR"/gegl-*)
+		dst_gegldir="$APPDIR"/shared/lib/"${gegldir##*/}"
+		if [ -d "$gegldir" ] && [ -d "$dst_gegldir" ]; then
+			cp "$gegldir"/*.json "$dst_gegldir"
+			_echo "* Copied gegl json files"
+		fi
+	fi
+	if [ "$DEPLOY_QT" = 1 ]; then
+		src_trans=/usr/share/"$QT_DIR"/translations
+		dst_trans="$APPDIR"/shared/lib/"$QT_DIR"/translations
+		if [ -d "$src_trans" ] && [ ! -d "$dst_trans" ]; then
+			mkdir -p "${dst_trans%/*}"
+			cp -r "$src_trans" "$dst_trans"
+			rm -f "$dst_trans"/assistant*.qm
+			rm -f "$dst_trans"/designer*.qm
+		fi
+		if [ -f "$TMPDIR"/libqgtk3.so ]; then
+			d="$APPDIR"/lib/"$QT_DIR"/plugins/platformthemes
+			mkdir -p "$d"
+			mv "$TMPDIR"/libqgtk3.so "$d"
+			"$APPDIR"/sharun -g 2>/dev/null || :
+		fi
+	fi
+	if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
+		_fix_cpython_ldconfig_mess
+	fi
+}
+
+_handle_nested_bins() {
+	# wrap any executable in lib with sharun
+	for b in $(find "$APPDIR"/shared/lib/ -type f ! -name '*.so*'); do
+		if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
+			rm -f "$b"
+			ln "$APPDIR"/sharun "$b"
+			_echo "* Wrapped lib executable '$b' with sharun"
+		fi
+	done
+
+	# do the same for possible nested binaries in bin
+	for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*' 2>/dev/null); do
+		if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
+			rm -f "$b"
+			ln "$APPDIR"/sharun "$b"
+			_echo "* Wrapped nested bin executable '$b' with sharun"
+		fi
+	done
+}
+
 # sometimes developers add stuff like /bin/sh or env as the Exec= key of the
 # desktop entry, 99.99% of the time this is not wanted, so we have to error that
 _check_main_bin_name() {
@@ -2029,6 +2190,7 @@ for lib do case "$lib" in
 	esac
 done
 
+_post_deployment_steps
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
 
@@ -2044,145 +2206,6 @@ for bin do
 		_patch_away_usr_lib_dir "$bin" || :
 	fi
 done
-
-# these need to be done later because sharun may make shared/lib a symlink to lib
-# and if we make shared/lib first then it breaks sharun
-if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-	set -- "$LIB_DIR"/python*
-	if [ -d "$1" ]; then
-		cp -r "$1" "$APPDIR"/shared/lib
-	else
-		_err_msg "ERROR: Cannot find python installation in $LIB_DIR"
-		exit 1
-	fi
-	if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
-		(
-			cd "$APPDIR"/shared/lib/"${1##*/}"
-			find ./ -type f -name '*.a' -delete || :
-			for f in $(find ./ -type f -name '*.pyc' -print); do
-				case "$f" in
-					*/"$MAIN_BIN"*) :;;
-					*) [ ! -f "$f" ] || rm -f "$f";;
-				esac
-			done
-		)
-	fi
-fi
-if [ "$DEPLOY_FLUTTER" = 1 ]; then
-	if [ -z "$FLUTTER_LIB" ]; then
-		_err_msg "Flutter deployment was forced but looks like the"
-		_err_msg "the application does not link to libflutter at all"
-		_err_msg "If you see this message please open a bug report!"
-		exit 1
-	fi
-
-	# flutter apps need to have a relative lib and data directory
-	# we need to find the directory that contains libapp.so
-	if libapp=$(cd "$APPDIR"/bin \
-	  && find ../shared/lib/ -type f -name 'libapp.so' -print -quit); then
-		d=${libapp%/*}
-		if [ ! -d "$APPDIR"/bin/"${d##*/}" ]; then
-			ln -s "$d" "$APPDIR"/bin/"${d##*/}"
-		fi
-	else
-		_err_msg "Cannot find libapp.so in $APPDIR"
-		_err_msg "include it for flutter deployment to work"
-	fi
-
-	dst_flutter_dir="$APPDIR"/bin/data
-	if [ ! -d "$dst_flutter_dir" ]; then
-		if [ -z "$FLUTTER_DATA_DIR" ]; then
-			d=${FLUTTER_LIB%/*.so*}
-			# find data dir, we assume it is relative to
-			# where libflutter*.so came from
-			if [ -d "$d"/../data ]; then
-				FLUTTER_DATA_DIR="$d"/../data
-			elif [ -d "$d"/../../data ]; then
-				FLUTTER_DATA_DIR="$d"/../../data
-			else
-				_err_msg "Cannot find data directory of $FLUTTER_LIB"
-				_err_msg "Please set FLUTTER_DATA_DIR to its location"
-				exit 1
-			fi
-		fi
-		cp -rv "$FLUTTER_DATA_DIR" "$dst_flutter_dir"
-		_echo "* Copied flutter data directory"
-	fi
-fi
-if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
-	mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
-	cp -rv /etc/ImageMagick-* "$APPDIR"/etc
-
-	# we can copy /usr/share/ImageMagick to the AppDir and set MAGICK_CONFIGURE_PATH
-	# to include both the etc/ImageMagick and share/ImageMagick directory
-	# but it is simpler to instead have all the config files in a single location
-	# imagemagick will load them all regardless
-	set -- /usr/share/ImageMagick-*/*.xml
-	if [ -f "$1" ]; then
-		cp -rv /usr/share/ImageMagick-*/*.xml "$APPDIR"/etc/ImageMagick*
-	fi
-	# there is also a configuration file in libdir
-	set -- "$LIB_DIR"/ImageMagick-*/config*/configure.xml
-	if [ -f "$1" ]; then
-		cp -v "$1" "$APPDIR"/etc/ImageMagick*
-	fi
-
-	# MAGICK_HOME is all that needs to be set
-	echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
-	# however MAGICK_HOME only works when compiled with a specific flag
-	# we can still make this relocatable by setting these other env variables
-	# which will always work even when not compiled with MAGICK_HOME support
-	(
-		cd "$APPDIR"
-		set -- shared/lib/ImageMagick-*/modules*/coders
-		if [ -d "$1" ]; then
-			echo "MAGICK_CODER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-		fi
-		set -- shared/lib/ImageMagick-*/modules*/filters
-		if [ -d "$1" ]; then
-			# checking the code it seems that MAGICK_FILTER_MODULE_PATH
-			# is NOT USED in the code and seems to be an error!!! the variable
-			# that modules.c references is MAGICK_CODER_FILTER_PATH
-			# we will still be set both just in case
-			echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-			echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-
-		fi
-		set -- etc/ImageMagick*
-		if [ -d "$1" ]; then
-			echo "MAGICK_CONFIGURE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-		fi
-	)
-
-	_echo "* Copied ImageMagick directories"
-fi
-if [ "$DEPLOY_GEGL" = 1 ]; then
-	gegldir=$(echo "$LIB_DIR"/gegl-*)
-	dst_gegldir="$APPDIR"/shared/lib/"${gegldir##*/}"
-	if [ -d "$gegldir" ] && [ -d "$dst_gegldir" ]; then
-		cp "$gegldir"/*.json "$dst_gegldir"
-		_echo "* Copied gegl json files"
-	fi
-fi
-if [ "$DEPLOY_QT" = 1 ]; then
-	src_trans=/usr/share/"$QT_DIR"/translations
-	dst_trans="$APPDIR"/shared/lib/"$QT_DIR"/translations
-	if [ -d "$src_trans" ] && [ ! -d "$dst_trans" ]; then
-		mkdir -p "${dst_trans%/*}"
-		cp -r "$src_trans" "$dst_trans"
-		rm -f "$dst_trans"/assistant*.qm
-		rm -f "$dst_trans"/designer*.qm
-	fi
-	if [ -f "$TMPDIR"/libqgtk3.so ]; then
-		d="$APPDIR"/lib/"$QT_DIR"/plugins/platformthemes
-		mkdir -p "$d"
-		mv "$TMPDIR"/libqgtk3.so "$d"
-		"$APPDIR"/sharun -g 2>/dev/null || :
-	fi
-fi
-if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
-	_fix_cpython_ldconfig_mess
-fi
 
 # some libraries may need to look for a relative ../share directory
 # normally this is for when they are located in /usr/lib
@@ -2284,23 +2307,7 @@ done <<-EOF
 $ADD_DIR
 EOF
 
-# wrap any executable in lib with sharun
-for b in $(find "$APPDIR"/shared/lib/ -type f ! -name '*.so*'); do
-	if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
-		rm -f "$b"
-		ln "$APPDIR"/sharun "$b"
-		_echo "* Wrapped lib executable '$b' with sharun"
-	fi
-done
-
-# do the same for possible nested binaries in bin
-for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*' 2>/dev/null); do
-	if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
-		rm -f "$b"
-		ln "$APPDIR"/sharun "$b"
-		_echo "* Wrapped nested bin executable '$b' with sharun"
-	fi
-done
+_handle_nested_bins
 
 if [ -n "$ANYLINUX_DO_NOT_LOAD_LIBS" ]; then
 	echo "ANYLINUX_DO_NOT_LOAD_LIBS=$ANYLINUX_DO_NOT_LOAD_LIBS:\${ANYLINUX_DO_NOT_LOAD_LIBS}" >> "$APPENV"
