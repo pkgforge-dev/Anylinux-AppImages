@@ -1618,14 +1618,15 @@ _add_path_mapping_hardcoded() {
 	    exit 1
 	fi
 
-	if [ -n "$_tmp_bin" ]; then
-	    ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin"
+	_symlink_error_msg="Failed to create a very important symlink in /tmp"
+	if [ -n "$_tmp_bin" ] && ! ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin"; then
+	    >&2 echo "$_symlink_error_msg"
 	fi
-	if [ -n "$_tmp_lib" ]; then
-	    ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib"
+	if [ -n "$_tmp_lib" ] && ! ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib"; then
+	    >&2 echo "$_symlink_error_msg"
 	fi
-	if [ -n "$_tmp_share" ]; then
-	    ln -sfn "$APPDIR"/share /tmp/"$_tmp_share"
+	if [ -n "$_tmp_share" ] && ! ln -sfn "$APPDIR"/share /tmp/"$_tmp_share"; then
+	    >&2 echo "$_symlink_error_msg"
 	fi
 	EOF
 	chmod +x "$PATH_MAPPING_SCRIPT"
