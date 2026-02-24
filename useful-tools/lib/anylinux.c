@@ -13,6 +13,9 @@
  *
  * It also offers the ability to block specific libraries from being loaded via dlopen
  * by setting ANYLINUX_DO_NOT_LOAD_LIBS to a colon-separated list of glob patterns
+ *
+ * It also overrides bindtextdomain calls to /usr/share/locale to TEXTDOMAINDIR
+ * which sharun automatically sets to our bundled locale dir
 */
 
 #ifndef _GNU_SOURCE
@@ -65,18 +68,29 @@ static const char *override_textdomaindir;
 
 __attribute__((constructor))
 static void init_bindtextdomain_override(void) {
-    real_bindtextdomain = (bindtextdomain_t)dlsym(RTLD_NEXT, "bindtextdomain");
-    override_textdomaindir = getenv("TEXTDOMAINDIR");
+	real_bindtextdomain = (bindtextdomain_t)dlsym(RTLD_NEXT, "bindtextdomain");
+	override_textdomaindir = getenv("TEXTDOMAINDIR");
+	DEBUG_PRINT("original_bindtextdomain=%p override_textdomaindir=%s\n",
+			(void*)real_bindtextdomain,
+			override_textdomaindir ? override_textdomaindir : "NULL");
 }
 
 VISIBLE char *bindtextdomain(const char *domainname, const char *dirname) {
-    const char *use_dir = dirname;
-    if (dirname && strcmp(dirname, "/usr/share/locale") == 0) {
-        if (override_textdomaindir && *override_textdomaindir)
-            use_dir = override_textdomaindir;
-    }
-
-    return real_bindtextdomain ? real_bindtextdomain(domainname, use_dir) : NULL;
+	const char *use_dir = dirname;
+	if (dirname && strcmp(dirname, "/usr/share/locale") == 0) {
+		if (override_textdomaindir && *override_textdomaindir)
+		use_dir = override_textdomaindir;
+		DEBUG_PRINT("Overriding bindtextdomain call to %s -> %s\n", dirname, use_dir);
+	}
+	// Also override any dirs that start with /tmp since quick-sharun
+	// will patch hardcoded paths from /usr/share to /tmp/XXXXX
+	else if (strncmp(dirname, "/tmp", 4) == 0) {
+		if (override_textdomaindir && *override_textdomaindir) {
+			use_dir = override_textdomaindir;
+		DEBUG_PRINT("Overriding bindtextdomain call to (%s) -> %s\n", dirname, use_dir);
+		}
+	}
+	return real_bindtextdomain ? real_bindtextdomain(domainname, use_dir) : NULL;
 }
 
 // Check if a library should be blocked from loading via dlopen
