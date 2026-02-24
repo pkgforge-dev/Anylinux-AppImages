@@ -131,7 +131,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
 [NBlood](https://github.com/pkgforge-dev/NBlood-AppImage)                                                                |
 [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage)                                                            |
-[Neverball](https://github.com/pkgforge-dev/Neverball-AppImage)                                                           |
+[Neverball](https://github.com/pkgforge-dev/Neverball-AppImage)                                                          |
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
@@ -143,6 +143,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced)                                                   |
 [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage)                                                            |
 [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage)                                                            |
+[openMSX](https://github.com/pkgforge-dev/openMSX-AppImage)                                                              |
 [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage)                                                |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
