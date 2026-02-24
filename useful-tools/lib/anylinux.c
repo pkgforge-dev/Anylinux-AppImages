@@ -82,7 +82,7 @@ VISIBLE char *bindtextdomain(const char *domainname, const char *dirname) {
 	}
 	// Also override any dirs that start with /tmp since quick-sharun
 	// will patch hardcoded paths from /usr/share to /tmp/XXXXX
-	else if (strncmp(dirname, "/tmp", 4) == 0) {
+	else if (dirname && strncmp(dirname, "/tmp", 4) == 0) {
 		if (override_textdomaindir && *override_textdomaindir) {
 			use_dir = override_textdomaindir;
 			DEBUG_PRINT("Overriding bindtextdomain call to (%s) -> %s\n", dirname, use_dir);
