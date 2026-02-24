@@ -56,6 +56,29 @@ static void spoof_argv0(int argc, char **argv) {
 	}
 }
 
+// Redirect bindtextdomain calls to our locale, TEXTDOMAINDIR is set by sharun
+// We only do it for calls that point to /usr/share/locale, some apps may have
+// additional locales in in different locations, in those cases we do not intercept
+typedef char *(*bindtextdomain_t)(const char *, const char *);
+static bindtextdomain_t real_bindtextdomain;
+static const char *override_textdomaindir;
+
+__attribute__((constructor))
+static void init_bindtextdomain_override(void) {
+    real_bindtextdomain = (bindtextdomain_t)dlsym(RTLD_NEXT, "bindtextdomain");
+    override_textdomaindir = getenv("TEXTDOMAINDIR");
+}
+
+VISIBLE char *bindtextdomain(const char *domainname, const char *dirname) {
+    const char *use_dir = dirname;
+    if (dirname && strcmp(dirname, "/usr/share/locale") == 0) {
+        if (override_textdomaindir && *override_textdomaindir)
+            use_dir = override_textdomaindir;
+    }
+
+    return real_bindtextdomain ? real_bindtextdomain(domainname, use_dir) : NULL;
+}
+
 // Check if a library should be blocked from loading via dlopen
 static int should_block_library(const char *filename) {
 	if (!filename) return 0;
