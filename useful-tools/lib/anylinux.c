@@ -55,7 +55,7 @@ static void spoof_argv0(int argc, char **argv) {
 	if (new_argv0 && *new_argv0) {
 		DEBUG_PRINT("Overriding argv[0] from '%s' to '%s'\n", argv[0], new_argv0);
 		argv[0] = (char *)new_argv0;
-		unsetenv("ANYLINUX_ARGV0");
+		unsetenv("OVERRIDE_ARGV0");
 	}
 }
 
