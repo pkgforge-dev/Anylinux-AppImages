@@ -144,6 +144,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage)                                                            |
 [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage)                                                            |
 [openMSX](https://github.com/pkgforge-dev/openMSX-AppImage)                                                              |
+[OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced)                                                   |
 [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage)                                                |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
