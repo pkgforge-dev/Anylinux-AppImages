@@ -144,6 +144,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage)                                                            |
 [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage)                                                            |
 [openMSX](https://github.com/pkgforge-dev/openMSX-AppImage)                                                              |
+[OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced)                                                   |
+[OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage)                                                              |
 [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage)                                                |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
@@ -219,6 +221,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
 [Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
 [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage)                                                          |
+[WebCord](https://github.com/pkgforge-dev/WebCord-AppImage-Enhanced)                                                     |
 [WhatsDesk](https://github.com/pkgforge-dev/WhatsDesk-AppImage)                                                          |
 [wine](https://github.com/pkgforge-dev/wine-AppImage)                                                                    |
 [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage)                                              |
