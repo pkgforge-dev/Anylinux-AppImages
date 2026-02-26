@@ -835,10 +835,26 @@ _make_deployment_array() {
 				rm -f "$GST_DIR"/*gstmpeg2enc*
 				# wtf is this?
 				rm -f "$GST_DIR"/*gstmplex*
+				# gstreamer already has png and svg plugins
+				# so it is unlikely that we also need gdkpixbuf
+				rm -f "$GST_DIR"/*libgstgdkpixbuf*
+				# Apprently this can be used by some video players
+				# but I cannot find a single one that uses it lol
+				rm -f "$GST_DIR"/*libgstcairo*
+				# text to speech
+				rm -f "$GST_DIR"/*libgstfestival*
 				# gstvulkan pulls vulkan, remove unless vulkan is deployed
 				if [ "$DEPLOY_VULKAN" != 1 ]; then
 					rm -f "$GST_DIR"/*gstvulkan*
 				fi
+				# also make sure to delete gstreamer plugins
+				# that are missing libraries, otherwise they
+				# will load libraries from the host and crash
+				for plugin in "$GST_DIR"/*.so*; do
+					if ldd "$plugin" | grep -q 'not found'; then
+						rm -f "$plugin"
+					fi
+				done
 			fi
 		fi
 		set -- "$@" \
