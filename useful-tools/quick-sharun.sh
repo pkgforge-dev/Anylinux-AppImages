@@ -38,6 +38,7 @@ LOCALE_CHECK=${LOCALE_CHECK:-1}
 
 DEPENDENCIES="
 	awk
+	cc
 	cp
 	find
 	grep
@@ -250,10 +251,7 @@ _sanity_check() {
 		_is_cmd "$d" || _err_msg "ERROR: Missing dependency '$d'!"
 	done
 
-	if [ "$ANYLINUX_LIB" = 1 ] && ! _is_cmd cc; then
-		_err_msg "ERROR: Using ANYLINUX_LIB requires cc"
-		exit 1
-	elif [ "$GTK_CLASS_FIX" = 1 ] && ! _is_cmd gcc pkg-config; then
+	if [ "$GTK_CLASS_FIX" = 1 ] && ! _is_cmd gcc pkg-config; then
 		_err_msg "ERROR: Using GTK_CLASS_FIX requires gcc and pkg-config"
 		exit 1
 	elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
@@ -1175,8 +1173,8 @@ _add_locale_check() {
 		chmod +x "$loc_check_bin"
 		_echo "* locale-check successfully added!"
 	else
-		# do not stop the CI if this fails
-		_err_msg "Could not add locale-check"
+		_err_msg "Failed to build locale-check!"
+		exit 1
 	fi
 }
 
