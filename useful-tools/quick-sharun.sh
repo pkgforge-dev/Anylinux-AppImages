@@ -512,6 +512,9 @@ _determine_what_to_deploy() {
 				*libwebkit*gtk*.so*)
 					DEPLOY_WEBKIT2GTK=${DEPLOY_WEBKIT2GTK:-1}
 					;;
+				*libsoup-*.so*)
+					DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
+					;;
 				*libSDL*.so*)
 					DEPLOY_SDL=${DEPLOY_SDL:-1}
 					;;
@@ -699,6 +702,14 @@ _make_deployment_array() {
 			DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 			DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 			set -- "$@" "$LIB_DIR"/libnss_mdns*minimal.so*
+		fi
+
+		if [ "$DEPLOY_GLIB_NETWORKING" = 1 ]; then
+			_echo "* Deploying Glib-Netwroking"
+			set -- "$@" \
+				"$LIB_DIR"/gio/modules/libgiognutls.so   \
+				"$LIB_DIR"/gio/modules/libgiolibproxy.so \
+				"$LIB_DIR"/gio/modules/libgiognomeproxy.so
 		fi
 	fi
 	if [ "$DEPLOY_GDK" = 1 ]; then

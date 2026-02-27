@@ -85,6 +85,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Exult](https://github.com/pkgforge-dev/Exult-AppImage)                                                                  |
 [Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage)                                                        |
 [Fabother-World](https://github.com/pkgforge-dev/Fabother-World-AppImage)                                                |
+[FeatherPad](https://github.com/pkgforge-dev/FeatherPad-AppImage)                                                        |
 [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage)                                                                |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
 [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage)                                                    |
@@ -163,6 +164,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
 [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
+[QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
 [REDRIVER2](https://github.com/pkgforge-dev/REDRIVER2-AppImage)                                                          |
