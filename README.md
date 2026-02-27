@@ -56,6 +56,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage)                                                              |
 [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage)                                                        |
 [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
+[Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage)                                                             |
 [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
@@ -233,6 +234,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage)                                              |
 [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced)                                             |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
+[Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
 [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage)                                                                |
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
