@@ -87,6 +87,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Fabother-World](https://github.com/pkgforge-dev/Fabother-World-AppImage)                                                |
 [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage)                                                                |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
+[Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage)                                                    |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
 [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage)                                                            |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
