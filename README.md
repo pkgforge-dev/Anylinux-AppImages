@@ -101,11 +101,13 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage)                                                |
 [Gnome System Monitor](https://github.com/pkgforge-dev/Gnome-System-Monitor-AppImage)                                    |
 [Gnome Text Editor](https://github.com/pkgforge-dev/Gnome-Text-Editor-AppImage)                                          |
+[GNU FreeDink](https://github.com/pkgforge-dev/GNU-FreeDink-AppImage)                                                    |
 [Godot](https://github.com/pkgforge-dev/Godot-AppImage)                                                                  |
 [GoldenDict-ng](https://github.com/pkgforge-dev/GoldenDict-ng-AppImage)                                                  |
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [Gradia](https://github.com/pkgforge-dev/Gradia-AppImage)                                                                |
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
+[Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
