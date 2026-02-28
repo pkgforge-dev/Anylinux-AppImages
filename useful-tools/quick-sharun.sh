@@ -701,11 +701,13 @@ _make_deployment_array() {
 			_echo "* Deploying webkit2gtk"
 			DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 			DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
+			DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
 			set -- "$@" "$LIB_DIR"/libnss_mdns*minimal.so*
 		fi
 
 		if [ "$DEPLOY_GLIB_NETWORKING" = 1 ]; then
 			_echo "* Deploying Glib-Netwroking"
+			DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 			set -- "$@" \
 				"$LIB_DIR"/gio/modules/libgiognutls.so   \
 				"$LIB_DIR"/gio/modules/libgiolibproxy.so \
