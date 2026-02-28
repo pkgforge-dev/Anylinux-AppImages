@@ -82,6 +82,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Elastic](https://github.com/pkgforge-dev/Elastic-AppImage)                                                              |
 [Element Desktop](https://github.com/pkgforge-dev/Element-Desktop-AppImage)                                              |
 [ePSXe](https://github.com/pkgforge-dev/ePSXe-AppImage)                                                                  |
+[ET Legacy](https://github.com/pkgforge-dev/ETLegacy-AppImage)                                                           |
 [Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage)                                          |
 [ExtremeTuxRacer](https://github.com/pkgforge-dev/ExtremeTuxRacer-AppImage)                                              |
 [Exult](https://github.com/pkgforge-dev/Exult-AppImage)                                                                  |
