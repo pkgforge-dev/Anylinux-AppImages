@@ -82,6 +82,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Elastic](https://github.com/pkgforge-dev/Elastic-AppImage)                                                              |
 [Element Desktop](https://github.com/pkgforge-dev/Element-Desktop-AppImage)                                              |
 [ePSXe](https://github.com/pkgforge-dev/ePSXe-AppImage)                                                                  |
+[ET Legacy](https://github.com/pkgforge-dev/ETLegacy-AppImage)                                                           |
 [Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage)                                          |
 [ExtremeTuxRacer](https://github.com/pkgforge-dev/ExtremeTuxRacer-AppImage)                                              |
 [Exult](https://github.com/pkgforge-dev/Exult-AppImage)                                                                  |
@@ -156,6 +157,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
 [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
+[Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage)                                                    |
 [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage)                                            |
 [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
