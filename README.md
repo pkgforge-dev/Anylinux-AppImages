@@ -157,6 +157,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
 [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
+[Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage)                                                    |
 [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage)                                            |
 [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
