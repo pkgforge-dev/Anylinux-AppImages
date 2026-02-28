@@ -922,10 +922,24 @@ _make_deployment_array() {
 		_echo "* Deploying libheif"
 
 		if [ -d "$LIB_DIR"/libheif/plugins ]; then
-			set -- "$@" "$LIB_DIR"/libheif/plugins/*
+			heifdir="$LIB_DIR"/libheif/plugins
 		elif [ -d "$LIB_DIR"/libheif ]; then
-			set -- "$@" "$LIB_DIR"/libheif/*
+			heifdir="$LIB_DIR"/libheif
 		fi
+
+		# do not add the ffmpeg plugin by default
+		# only do it if libavcodec is already required
+		for p in "$heifdir"/*; do
+			case "$p" in
+				*ffmpeg*) continue;;
+				*)        set -- "$@" "$p";;
+			esac
+		done
+		for lib in $NEEDED_LIBS; do
+			case "$lib" in
+				*libavcodec.so*)  set -- "$@" "$heifdir"/*ffmpeg*.so*;;
+			esac
+		done
 	fi
 	if [ "$DEPLOY_P11KIT" = 1 ]; then
 		_echo "* Deploying p11kit"
