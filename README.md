@@ -66,6 +66,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
 [D1X-Rebirth](https://github.com/pkgforge-dev/D1X-Rebirth-AppImage)                                                      |
+[D2X-Rebirth](https://github.com/pkgforge-dev/D2X-Rebirth-AppImage)                                                      |
 [DarkPlaces](https://github.com/pkgforge-dev/DarkPlaces-AppImage)                                                        |
 [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage)                                                            |
 [Defold](https://github.com/pkgforge-dev/Defold-AppImage)                                                                |
