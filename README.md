@@ -119,6 +119,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
+[ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
