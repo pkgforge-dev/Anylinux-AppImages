@@ -256,6 +256,54 @@ _help_msg() {
 	exit 1
 }
 
+_find_dir_icon() {
+	if [ -f "$APPDIR"/.DirIcon ]; then
+		return 0
+	fi
+
+	# try the first top level .png or .svg before searching
+	set -- "$APPDIR"/*.png "$APPDIR"/*.svg
+	for i do
+		if [ -f "$i" ]; then
+			cp -v "$i" "$APPDIR"/.DirIcon
+			break
+		fi
+	done
+	set --
+
+	if [ -f "$APPDIR"/.DirIcon ]; then
+		return 0
+	fi
+
+	# Now search deeper
+	_desktop_entry=$(echo "$APPDIR"/*.desktop)
+	[ -f "$_desktop_entry" ] || return 1
+	icon=$(awk -F'=' '/^Icon=/{print $2; exit}' "$_desktop_entry")
+	icon=${icon##*/}
+	[ -n "$icon" ] || return 1
+	sizes='256x256 512x512 192x192 128x128 scalable'
+	for s in $sizes; do
+		set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon"*
+	done
+	for s in $sizes; do
+		set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon"*
+	done
+	for i do
+		if [ -f "$i" ]; then
+			case "$i" in
+				*.png|*.svg)
+					cp -v "$i" "$APPDIR"
+					cp -v "$i" "$APPDIR"/.DirIcon
+					break
+					;;
+			esac
+		fi
+	done
+	set --
+
+	[ -f "$APPDIR"/.DirIcon ]
+}
+
 _sanity_check() {
 	for d in $DEPENDENCIES; do
 		_is_cmd "$d" || _err_msg "ERROR: Missing dependency '$d'!"
@@ -303,6 +351,14 @@ _sanity_check() {
 			_err_msg "set the LIB_DIR variable to where you have libraries"
 			exit 1
 		fi
+	fi
+
+	# when making an AppImage without an explicit ICON, check early if we
+	# can find a .DirIcon so we fail before running the heavy deployment
+	if [ "$OUTPUT_APPIMAGE" = 1 ] && [ -z "$ICON" ] && ! _find_dir_icon; then
+		_err_msg "ERROR: No .DirIcon found in $APPDIR and no icon source available"
+		_err_msg "Set ICON to the path or URL of the icon to use"
+		exit 1
 	fi
 }
 
@@ -2191,50 +2247,11 @@ _make_appimage() {
 	echo "X-AppImage-Version=${VERSION:-UNKNOWN}" >> "$DESKTOP_ENTRY"
 	echo "X-AppImage-Arch=$APPIMAGE_ARCH"         >> "$DESKTOP_ENTRY"
 
-	if [ ! -f "$APPDIR"/.DirIcon ]; then
-		# try the first top level .png or .svg before searching
-		set -- "$APPDIR"/*.png "$APPDIR"/*.svg
-		for i do
-			if [ -f "$i" ]; then
-				cp -v "$i" "$APPDIR"/.DirIcon
-				break
-			fi
-		done
-		set --
-
-		if [ ! -f "$APPDIR"/.DirIcon ]; then
-			# Now search deeper
-			icon=$(awk -F'=' '/^Icon=/{print $2; exit}' "$DESKTOP_ENTRY")
-			icon=${icon##*/}
-			if [ -n "$icon" ]; then
-				sizes='256x256 512x512 192x192 128x128 scalable'
-				for s in $sizes; do
-					set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon"*
-				done
-				for s in $sizes; do
-					set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon"*
-				done
-				for i do
-					if [ -f "$i" ]; then
-						case "$i" in
-							*.png|*.svg)
-								cp -v "$i" "$APPDIR"
-								cp -v "$i" "$APPDIR"/.DirIcon
-								break
-								;;
-						esac
-					fi
-				done
-				set --
-			fi
-		fi
-
-		if [ ! -f "$APPDIR"/.DirIcon ]; then
-			>&2 echo "ERROR: No top level .DirIcon file found in $APPDIR"
-			>&2 echo "Could not find icon listed in $DESKTOP_ENTRY either"
-			>&2 echo "Set ICON env variable to the location/url of the icon"
-			exit 1
-		fi
+	if ! _find_dir_icon; then
+		_err_msg "ERROR: No top level .DirIcon file found in $APPDIR"
+		_err_msg "Could not find icon listed in $DESKTOP_ENTRY either"
+		_err_msg "Set ICON env variable to the location/url of the icon"
+		exit 1
 	fi
 
 	if ! mkdir -p "$OUTPATH"; then
