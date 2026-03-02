@@ -223,7 +223,10 @@ APPNAME=${APPNAME%_}
 
 # check for a ~/version file if VERSION is not set
 if [ -z "$VERSION" ] && [ -f "$HOME"/version ]; then
-	read -r VERSION < "$HOME"/version
+	if ! read -r VERSION < "$HOME"/version; then
+		>&2 echo "ERROR: Failed to read ~/version file! Is it empty?"
+		exit 1
+	fi
 fi
 
 # sanitize VERSION and APPNAME
