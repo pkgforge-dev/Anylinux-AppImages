@@ -1602,7 +1602,7 @@ _get_desktop() {
 	DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
 	if [ ! -f "$DESKTOP_ENTRY" ]; then
 		_err_msg "ERROR: No top level .desktop file found in $APPDIR"
-		_err_msg "Note it cannot be more than .desktop file in that location"
+		_err_msg "Note there cannot be more than one .desktop file in that location"
 		exit 1
 	fi
 }
