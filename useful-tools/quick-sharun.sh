@@ -713,6 +713,10 @@ _make_deployment_array() {
 				"$LIB_DIR"/gio/modules/libgiolibproxy.so \
 				"$LIB_DIR"/gio/modules/libgiognomeproxy.so
 		fi
+
+		if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
+			set -- "$@" "$LIB_DIR"/libgirepository*.so*
+		fi
 	fi
 	if [ "$DEPLOY_GDK" = 1 ]; then
 		_echo "* Deploying gdk-pixbuf"
