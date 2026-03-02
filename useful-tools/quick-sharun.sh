@@ -18,6 +18,8 @@ ARCH=${ARCH:-$APPIMAGE_ARCH}
 TMPDIR=${TMPDIR:-/tmp}
 APPDIR=${APPDIR:-$PWD/AppDir}
 APPENV=$APPDIR/.env
+DIRICON=$APPDIR/.DirIcon
+MAIN_BIN=${MAIN_BIN##*/}
 
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
@@ -257,22 +259,22 @@ _help_msg() {
 }
 
 _get_icon() {
-	if [ -f "$APPDIR"/.DirIcon ]; then
+	if [ -f "$DIRICON" ]; then
 		return 0
 	fi
 
+	icon_name=$(awk -F'=' '/^Icon=/{print $2; exit}' "$DESKTOP_ENTRY")
+	icon_name=${icon_name##*/}
+
 	if [ "$ICON" = "DUMMY" ]; then
-		if [ -n "$MAIN_BIN" ]; then
-			f=${MAIN_BIN##*/}
-		else
-			# use the first binary name in shared/bin as filename
-			set -- "$APPDIR"/shared/bin/*
-			[ -f "$1" ] || exit 1
-			f=${1##*/}
+		if [ -z "$icon_name" ]; then
+			_err_msg "ERROR: Cannot get icon name from $DESKTOP_ENTRY"
+			_err_msg "Make sure it contains a valid 'Icon=' key!"
+			exit 1
 		fi
-		_echo "* Adding dummy $f icon to $APPDIR..."
-		:> "$APPDIR"/"$f".png
-		:> "$APPDIR"/.DirIcon
+		_echo "* Adding dummy $icon_name icon to $APPDIR..."
+		:> "$APPDIR"/"$icon_name".png
+		:> "$DIRICON"
 	elif [ -f "$ICON" ]; then
 		_echo "* Adding $ICON to $APPDIR..."
 		cp -v "$ICON" "$APPDIR"
@@ -284,34 +286,32 @@ _get_icon() {
 		exit 1
 	if
 
-	if [ ! -f "$APPDIR"/.DirIcon ]; then
+	if [ ! -f "$DIRICON" ]; then
 		# try the first top level .png or .svg before searching
 		set -- "$APPDIR"/*.png "$APPDIR"/*.svg
 		for i do
 			if [ -f "$i" ]; then
-				cp -v "$i" "$APPDIR"/.DirIcon
+				cp -v "$i" "$DIRICON"
 				return 0
 			fi
 		done
 		set --
 
 		# Now search deeper
-		icon=$(awk -F'=' '/^Icon=/{print $2; exit}' "$DESKTOP_ENTRY")
-		icon=${icon##*/}
-		[ -n "$icon" ] || return 1
+		[ -n "$icon_name" ] || return 1
 		sizes='256x256 512x512 192x192 128x128 scalable'
 		for s in $sizes; do
-			set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon"*
+			set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon_name"*
 		done
 		for s in $sizes; do
-			set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon"*
+			set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon_name"*
 		done
 		for i do
 			if [ -f "$i" ]; then
 				case "$i" in
 					*.png|*.svg)
 						cp -v "$i" "$APPDIR"
-						cp -v "$i" "$APPDIR"/.DirIcon
+						cp -v "$i" "$DIRICON"
 						break
 						;;
 				esac
@@ -320,8 +320,8 @@ _get_icon() {
 		set --
 	fi
 
-	if [ ! -f "$APPDIR"/.DirIcon ]; then
-		_err_msg "ERROR: No top level .DirIcon file found in $APPDIR"
+	if [ ! -f "$DIRICON" ]; then
+		_err_msg "ERROR: Missing '$DIRICON'!"
 		_err_msg "Could not find icon listed in $DESKTOP_ENTRY either"
 		_err_msg "Set ICON env variable to the location/url of the icon"
 		exit 1
@@ -1563,24 +1563,20 @@ _get_desktop() {
 	fi
 
 	if [ "$DESKTOP" = "DUMMY" ]; then
-		if [ -n "$MAIN_BIN" ]; then
-			f=${MAIN_BIN##*/}
-		else
-			# use the first binary name in shared/bin as filename
-			set -- "$APPDIR"/shared/bin/*
-			[ -f "$1" ] || exit 1
-			f=${1##*/}
+		if [ -z "$MAIN_BIN" ]; then
+			_err_msg "ERROR: DESKTOP=DUMMY needs MAIN_BIN to be set"
+			exit 1
 		fi
-		_echo "* Adding dummy $f desktop entry to $APPDIR..."
+		_echo "* Adding dummy $MAIN_BIN desktop entry to $APPDIR..."
 		cat <<-EOF > "$APPDIR"/"$f".desktop
 		[Desktop Entry]
-		Name=$f
-		Exec=$f
+		Name=$MAIN_BIN
+		Exec=$MAIN_BIN
 		Comment=Dummy made by quick-sharun
 		Type=Application
 		Hidden=true
 		Categories=Utility
-		Icon=$f
+		Icon=$MAIN_BIN
 		EOF
 	elif [ -f "$DESKTOP" ]; then
 		_echo "* Adding $DESKTOP to $APPDIR..."
@@ -2089,44 +2085,30 @@ _handle_nested_bins() {
 
 # sometimes developers add stuff like /bin/sh or env as the Exec= key of the
 # desktop entry, 99.99% of the time this is not wanted, so we have to error that
-_check_main_bin_name() {
-	MAIN_BIN=${MAIN_BIN##*/}
-	case "$MAIN_BIN" in
-		env|sh|bash)
-			_err_msg "ERROR: determined $MAIN_BIN as the main binary"
-			_err_msg "by reading the Exec= key in the desktop entry"
-			_err_msg "it is unlikely you are actually going to package"
-			_err_msg "a shell or env into an appimage, bailing out..."
-			_err_msg "Set the MAIN_BIN variable to $MAIN_BIN if you"
-			_err_msg "intend to actually make an appimage of such binary"
-			exit 1
-			;;
-		*)
-			return 0
-			;;
-	esac
-}
-
-_determine_main_bin() {
+_check_main_bin() {
 	if [ -z "$MAIN_BIN" ]; then
-		MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$APPDIR"/*.desktop)
-		_check_main_bin_name
+		MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$DESKTOP_ENTRY")
+		MAIN_BIN=${MAIN_BIN##*/}
+		case "$MAIN_BIN" in
+			env|sh|bash)
+				_err_msg "Main binary is '$MAIN_BIN', it is unlikely you"
+				_err_msg "are actually going to package '$MAIN_BIN'"
+				_err_msg "as an appimage, bailing out..."
+				_err_msg "set MAIN_BIN=$MAIN_BIN if you want to do this."
+				exit 1
+				;;
+		esac
 	fi
-
-	# get basename of binary only
-	MAIN_BIN=${MAIN_BIN##*/}
 
 	if [ -f "$APPDIR"/bin/"$MAIN_BIN" ]; then
 		return 0
 	fi
 
-	_err_msg "MAIN_BIN is set to '$MAIN_BIN', but this file is NOT present"
+	_err_msg "Main binary is set to '$MAIN_BIN', but this file is NOT present"
 	_err_msg "This is the default binary to be launched in this application"
 	_err_msg "Please make sure to bundle $MAIN_BIN"
-	_err_msg "By default the main binary is taken from the top level"
-	_err_msg "desktop entry in '$APPDIR', make sure to add the correct"
-	_err_msg "desktop entry, if you are using DESKTOP=DUMMY, make sure to"
-	_err_msg "specify the correct binary name in the MAIN_BIN env variable"
+	_err_msg "By default the main binary is taken from the top level desktop"
+	_err_msg "entry in '$APPDIR', make sure to add the correct desktop entry"
 	exit 1
 }
 
@@ -2428,7 +2410,7 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
-_determine_main_bin
+_check_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
