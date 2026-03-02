@@ -2140,7 +2140,9 @@ _make_appimage() {
 		fi
 	fi
 
-	APPNAME="${APPNAME:-$(awk -F'=' '/^Name=/{gsub(/ /,"_",$2); print $2; exit}' "$DESKTOP_ENTRY")}"
+	# get name of app from desktop entry and sanitize it
+	APPNAME="${APPNAME:-$(awk -F'=' '/^Name=/{print $2; exit}' "$DESKTOP_ENTRY")}"
+	APPNAME=$(printf '%s' "$APPNAME" | tr '[:space:]":><*|\?\r\n' '_')
 	APPNAME=${APPNAME%_}
 
 	# check for a ~/version file if VERSION is not set
@@ -2150,14 +2152,11 @@ _make_appimage() {
 			exit 1
 		fi
 	fi
-
-	# sanitize VERSION and APPNAME
+	# sanitize VERSION
 	if [ -n "$VERSION" ]; then
 		VERSION=${VERSION#*:} # remove epoch from VERSION
-		VERSION=$(printf '%s' "$VERSION" | tr '":><*|\?\r\n' '_')
-	fi
-	if [ -n "$APPNAME" ]; then
-		APPNAME=$(printf '%s' "$APPNAME" | tr '":><*|\?\r\n' '_')
+		VERSION=$(printf '%s' "$VERSION" | tr '[:space:]":><*|\?\r\n' '_')
+		VERSION=${VERSION%_}
 	fi
 
 	# add appimage info to desktop entry, first make sure to remove existing info
