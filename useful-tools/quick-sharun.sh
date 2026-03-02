@@ -279,9 +279,12 @@ _get_icon() {
 	elif [ -f "$ICON" ]; then
 		_echo "* Adding $ICON to $APPDIR..."
 		cp -v "$ICON" "$APPDIR"
+		cp -v "$ICON" "$DIRICON"
 	elif echo "$ICON" | grep -q 'http'; then
 		_echo "* Downloading $ICON to $APPDIR..."
-		_download "$APPDIR"/"${ICON##*/}" "$ICON"
+		dst=$APPDIR/${ICON##*/}
+		_download "$dst" "$ICON"
+		cp -v "$dst" "$DIRICON"
 	elif [ -n "$ICON" ]; then
 		_err_msg "$ICON is NOT a valid path!"
 		exit 1
