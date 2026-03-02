@@ -2115,6 +2115,8 @@ _make_appimage() {
 	_echo "Making AppImage..."
 	_echo "------------------------------------------------------------"
 
+	DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
+
 	if [ ! -d "$APPDIR" ]; then
 		_err_msg "ERROR: No $APPDIR directory found"
 		_err_msg "Set APPDIR if you have it at another location"
@@ -2122,12 +2124,31 @@ _make_appimage() {
 	elif [ ! -f "$APPDIR"/AppRun ]; then
 		_err_msg "ERROR: No $APPDIR/AppRun file found!"
 		exit 1
-	else
-		chmod +x "$APPDIR"/AppRun
-		_sort_env_file
+	elif [ ! -f "$DESKTOP_ENTRY" ]; then
+		_err_msg "ERROR: No top level .desktop file found in $APPDIR"
+		_err_msg "Note it cannot be more than .desktop file in that location"
+		exit 1
+	elif ! command -v zsyncmake 1>/dev/null; then
+		_err_msg "ERROR: Missing dependency zsyncmake"
+		exit 1
 	fi
 
-	DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
+	chmod +x "$APPDIR"/AppRun
+	_sort_env_file
+
+	_echo "------------------------------------------------------------"
+	if [ -z "$UPINFO" ]; then
+		echo "No update information given, trying to guess it..."
+		if [ -n "$GITHUB_REPOSITORY" ]; then
+			UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
+			_echo "Guessed $UPINFO as the update information"
+			_echo "It may be wrong so please set the UPINFO instead"
+		else
+			_err_msg "We were not able to guess the update information"
+			_err_msg "Please add it if you will distribute the AppImage"
+		fi
+	fi
+	_echo "------------------------------------------------------------"
 
 	if [ "$DEVEL_RELEASE" = 1 ]; then
 		if ! grep -q '^Name=.*Nightly' "$DESKTOP_ENTRY"; then
@@ -2169,12 +2190,6 @@ _make_appimage() {
 	echo "X-AppImage-Name=$APPNAME"               >> "$DESKTOP_ENTRY"
 	echo "X-AppImage-Version=${VERSION:-UNKNOWN}" >> "$DESKTOP_ENTRY"
 	echo "X-AppImage-Arch=$APPIMAGE_ARCH"         >> "$DESKTOP_ENTRY"
-
-	if [ ! -f "$DESKTOP_ENTRY" ]; then
-		>&2 echo "ERROR: No top level .desktop file found in $APPDIR"
-		>&2 echo "Note it cannot be more than .desktop file in that location"
-		exit 1
-	fi
 
 	if [ ! -f "$APPDIR"/.DirIcon ]; then
 		# try the first top level .png or .svg before searching
@@ -2234,27 +2249,6 @@ _make_appimage() {
 			>&2 echo "WARNING: VERSION is not set"
 			>&2 echo "WARNING: set it to include it in $OUTNAME"
 		fi
-	fi
-
-	if [ -z "$UPINFO" ]; then
-		>&2 echo "No update information given, trying to guess it..."
-		if [ -n "$GITHUB_REPOSITORY" ]; then
-			UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
-			>&2 echo
-			>&2 echo "Guessed $UPINFO as the update information"
-			>&2 echo "It may be wrong so please set the UPINFO instead"
-			>&2 echo
-		else
-			>&2 echo
-			>&2 echo "We were not able to guess the update information"
-			>&2 echo "Please add it if you will distribute the AppImage"
-			>&2 echo
-		fi
-	fi
-
-	if ! command -v zsyncmake 1>/dev/null; then
-		>&2 echo "ERROR: Missing dependency zsyncmake"
-		exit 1
 	fi
 
 	if command -v mkdwarfs 1>/dev/null; then
