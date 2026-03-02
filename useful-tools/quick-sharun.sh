@@ -284,7 +284,7 @@ _get_icon() {
 	elif [ -n "$ICON" ]; then
 		_err_msg "$ICON is NOT a valid path!"
 		exit 1
-	if
+	fi
 
 	if [ ! -f "$DIRICON" ]; then
 		# try the first top level .png or .svg before searching
@@ -332,6 +332,11 @@ _sanity_check() {
 	for d in $DEPENDENCIES; do
 		_is_cmd "$d" || _err_msg "ERROR: Missing dependency '$d'!"
 	done
+
+	if ! mkdir -p "$APPDIR"/share "$APPDIR"/bin; then
+		_err_msg "ERROR: Cannot create '$APPDIR' directory!"
+		exit 1
+	fi
 
 	if [ "$GTK_CLASS_FIX" = 1 ] && ! _is_cmd gcc pkg-config; then
 		_err_msg "ERROR: Using GTK_CLASS_FIX requires gcc and pkg-config"
@@ -503,7 +508,6 @@ _is_deployable_binary() {
 }
 
 _determine_what_to_deploy() {
-	mkdir -p "$APPDIR"/share
 	for bin do
 		# ignore flags
 		case "$bin" in
@@ -1040,7 +1044,6 @@ _make_deployment_array() {
 		set -- "$@" \
 			"$(command -v dotnet)"  \
 			$(find "$DOTNET_DIR"/shared -type f -name '*.so*' -print)
-		mkdir -p "$APPDIR"/bin
 		cp -r "$DOTNET_DIR"/shared "$APPDIR"/bin
 		cp -r "$DOTNET_DIR"/host   "$APPDIR"/bin
 	fi
@@ -1568,7 +1571,7 @@ _get_desktop() {
 			exit 1
 		fi
 		_echo "* Adding dummy $MAIN_BIN desktop entry to $APPDIR..."
-		cat <<-EOF > "$APPDIR"/"$f".desktop
+		cat <<-EOF > "$APPDIR"/"$MAIN_BIN".desktop
 		[Desktop Entry]
 		Name=$MAIN_BIN
 		Exec=$MAIN_BIN
@@ -1629,7 +1632,6 @@ _check_window_class() {
 }
 
 _add_bwrap_wrapper() {
-	mkdir -p "$APPDIR"/bin
 	cat <<-'EOF' > "$APPDIR"/bin/bwrap
 	#!/bin/sh
 
