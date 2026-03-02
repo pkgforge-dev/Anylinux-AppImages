@@ -13,13 +13,26 @@
 
 set -e
 
-ARCH="$(uname -m)"
+APPIMAGE_ARCH=$(uname -m)
+ARCH=${ARCH:-$APPIMAGE_ARCH}
 TMPDIR=${TMPDIR:-/tmp}
 APPDIR=${APPDIR:-$PWD/AppDir}
 APPENV=$APPDIR/.env
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio}
+DIRICON=$APPDIR/.DirIcon
+MAIN_BIN=${MAIN_BIN##*/}
+
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
+
+OUTPATH=${OUTPATH:-$PWD}
+DWARFS_COMP="${DWARFS_COMP:-zstd:level=22 -S26 -B6}"
+DWARFS_CMD=${DWARFS_CMD:-$TMPDIR/mkdwarfs}
+RUNTIME=${RUNTIME:-$TMPDIR/uruntime}
+DWARFSPROF=${DWARFSPROF:-$APPDIR/.dwarfsprofile}
+OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
+URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.6/uruntime-appimage-dwarfs-lite-$APPIMAGE_ARCH}
+DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$APPIMAGE_ARCH}
 
 ANYLINUX_LIB=${ANYLINUX_LIB:-0}
 ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
@@ -27,7 +40,6 @@ GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
 NOTIFY_SOURCE=${NOTIFY_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/notify}
 APPRUN_SOURCE=${APPRUN_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/AppRun-generic}
-URUNTIME2APPIMAGE_SOURCE=${URUNTIME2APPIMAGE_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh}
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
@@ -45,6 +57,7 @@ DEPENDENCIES="
 	ldd
 	mv
 	rm
+	sleep
 	strings
 	tr
 "
@@ -246,19 +259,95 @@ _help_msg() {
 	exit 1
 }
 
+_get_icon() {
+	if [ -f "$DIRICON" ]; then
+		return 0
+	fi
+
+	icon_name=$(awk -F'=' '/^Icon=/{print $2; exit}' "$DESKTOP_ENTRY")
+	icon_name=${icon_name##*/}
+
+	if [ "$ICON" = "DUMMY" ]; then
+		if [ -z "$icon_name" ]; then
+			_err_msg "ERROR: Cannot get icon name from $DESKTOP_ENTRY"
+			_err_msg "Make sure it contains a valid 'Icon=' key!"
+			exit 1
+		fi
+		_echo "* Adding dummy $icon_name icon to $APPDIR..."
+		:> "$APPDIR"/"$icon_name".png
+		:> "$DIRICON"
+	elif [ -f "$ICON" ]; then
+		_echo "* Adding $ICON to $APPDIR..."
+		cp -v "$ICON" "$APPDIR"
+		cp -v "$ICON" "$DIRICON"
+	elif echo "$ICON" | grep -q 'http'; then
+		_echo "* Downloading $ICON to $APPDIR..."
+		dst=$APPDIR/${ICON##*/}
+		_download "$dst" "$ICON"
+		cp -v "$dst" "$DIRICON"
+	elif [ -n "$ICON" ]; then
+		_err_msg "$ICON is NOT a valid path!"
+		exit 1
+	fi
+
+	if [ ! -f "$DIRICON" ]; then
+		# try the first top level .png or .svg before searching
+		set -- "$APPDIR"/*.png "$APPDIR"/*.svg
+		for i do
+			if [ -f "$i" ]; then
+				cp -v "$i" "$DIRICON"
+				return 0
+			fi
+		done
+		set --
+
+		# Now search deeper
+		if [ -n "$icon_name" ]; then
+			sizes='256x256 512x512 192x192 128x128 scalable'
+			for s in $sizes; do
+				set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon_name"*
+			done
+			for s in $sizes; do
+				set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon_name"*
+			done
+			for i do
+				if [ -f "$i" ]; then
+					case "$i" in
+						*.png|*.svg)
+							cp -v "$i" "$APPDIR"
+							cp -v "$i" "$DIRICON"
+							break
+							;;
+					esac
+				fi
+			done
+			set --
+		fi
+	fi
+
+	if [ ! -f "$DIRICON" ]; then
+		_err_msg "ERROR: Missing '$DIRICON'!"
+		_err_msg "Could not find icon listed in $DESKTOP_ENTRY either"
+		_err_msg "Set ICON env variable to the location/url of the icon"
+		exit 1
+	fi
+}
+
 _sanity_check() {
 	for d in $DEPENDENCIES; do
 		_is_cmd "$d" || _err_msg "ERROR: Missing dependency '$d'!"
 	done
+
+	if ! mkdir -p "$APPDIR"/share "$APPDIR"/bin; then
+		_err_msg "ERROR: Cannot create '$APPDIR' directory!"
+		exit 1
+	fi
 
 	if [ "$GTK_CLASS_FIX" = 1 ] && ! _is_cmd gcc pkg-config; then
 		_err_msg "ERROR: Using GTK_CLASS_FIX requires gcc and pkg-config"
 		exit 1
 	elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		_err_msg "ERROR: DEPLOY_PYTHON and DEPLOY_SYS_PYTHON cannot be both enabled!"
-		exit 1
-	elif [ -z "$DESKTOP" ] && [ ! -f "$APPDIR"/*.desktop ]; then
-		_err_msg "ERROR: No desktop entry in $APPDIR and DESKTOP is not set!"
 		exit 1
 	elif  [ -n "$PATH_MAPPING" ] && ! echo "$PATH_MAPPING" | grep -q 'SHARUN_DIR'; then
 		_err_msg 'ERROR: PATH_MAPPING must contain unexpanded ${SHARUN_DIR} variable'
@@ -284,8 +373,8 @@ _sanity_check() {
 	fi
 
 	if [ -z "$LIB_DIR" ]; then
-		if [ -d "/usr/lib/$ARCH-linux-gnu" ]; then
-			LIB_DIR="/usr/lib/$ARCH-linux-gnu"
+		if [ -d "/usr/lib/$APPIMAGE_ARCH-linux-gnu" ]; then
+			LIB_DIR="/usr/lib/$APPIMAGE_ARCH-linux-gnu"
 		elif [ -d "/usr/lib" ]; then
 			LIB_DIR="/usr/lib"
 		else
@@ -294,15 +383,6 @@ _sanity_check() {
 			exit 1
 		fi
 	fi
-}
-
-_make_appimage() {
-	_echo "------------------------------------------------------------"
-	_echo "Making AppImage..."
-	_echo "------------------------------------------------------------"
-	_download "$TMPDIR"/uruntime2appimage.sh "$URUNTIME2APPIMAGE_SOURCE"
-	chmod +x "$TMPDIR"/uruntime2appimage.sh
-	exec "$TMPDIR"/uruntime2appimage.sh
 }
 
 # do a basic test to make sure at least the application is not totally broken
@@ -433,7 +513,6 @@ _is_deployable_binary() {
 }
 
 _determine_what_to_deploy() {
-	mkdir -p "$APPDIR"/share
 	for bin do
 		# ignore flags
 		case "$bin" in
@@ -970,7 +1049,6 @@ _make_deployment_array() {
 		set -- "$@" \
 			"$(command -v dotnet)"  \
 			$(find "$DOTNET_DIR"/shared -type f -name '*.so*' -print)
-		mkdir -p "$APPDIR"/bin
 		cp -r "$DOTNET_DIR"/shared "$APPDIR"/bin
 		cp -r "$DOTNET_DIR"/host   "$APPDIR"/bin
 	fi
@@ -1486,26 +1564,27 @@ _deploy_locale() {
 	fi
 }
 
-_deploy_icon_and_desktop() {
+_get_desktop() {
+	DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
+	if [ -f "$DESKTOP_ENTRY" ]; then
+		return 0
+	fi
+
 	if [ "$DESKTOP" = "DUMMY" ]; then
-		if [ -n "$MAIN_BIN" ]; then
-			f=${MAIN_BIN##*/}
-		else
-			# use the first binary name in shared/bin as filename
-			set -- "$APPDIR"/shared/bin/*
-			[ -f "$1" ] || exit 1
-			f=${1##*/}
+		if [ -z "$MAIN_BIN" ]; then
+			_err_msg "ERROR: DESKTOP=DUMMY needs MAIN_BIN to be set"
+			exit 1
 		fi
-		_echo "* Adding dummy $f desktop entry to $APPDIR..."
-		cat <<-EOF > "$APPDIR"/"$f".desktop
+		_echo "* Adding dummy $MAIN_BIN desktop entry to $APPDIR..."
+		cat <<-EOF > "$APPDIR"/"$MAIN_BIN".desktop
 		[Desktop Entry]
-		Name=$f
-		Exec=$f
+		Name=$MAIN_BIN
+		Exec=$MAIN_BIN
 		Comment=Dummy made by quick-sharun
 		Type=Application
 		Hidden=true
 		Categories=Utility
-		Icon=$f
+		Icon=$MAIN_BIN
 		EOF
 	elif [ -f "$DESKTOP" ]; then
 		_echo "* Adding $DESKTOP to $APPDIR..."
@@ -1524,36 +1603,11 @@ _deploy_icon_and_desktop() {
 		mv "$APPDIR"/*.desktop* "$APPDIR"/"${filename%.desktop*}".desktop
 	fi
 
-	if [ "$ICON" = "DUMMY" ]; then
-		if [ -n "$MAIN_BIN" ]; then
-			f=${MAIN_BIN##*/}
-		else
-			# use the first binary name in shared/bin as filename
-			set -- "$APPDIR"/shared/bin/*
-			[ -f "$1" ] || exit 1
-			f=${1##*/}
-		fi
-		_echo "* Adding dummy $f icon to $APPDIR..."
-		:> "$APPDIR"/"$f".png
-		:> "$APPDIR"/.DirIcon
-	elif [ -f "$ICON" ]; then
-		_echo "* Adding $ICON to $APPDIR..."
-		cp -v "$ICON" "$APPDIR"
-	elif echo "$ICON" | grep -q 'http'; then
-		_echo "* Downloading $ICON to $APPDIR..."
-		_download "$APPDIR"/"${ICON##*/}" "$ICON"
-	elif [ -n "$ICON" ]; then
-		_err_msg "$ICON is NOT a valid path!"
+	DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
+	if [ ! -f "$DESKTOP_ENTRY" ]; then
+		_err_msg "ERROR: No top level .desktop file found in $APPDIR"
+		_err_msg "Note there cannot be more than one .desktop file in that location"
 		exit 1
-	fi
-
-	# copy the entire hicolor icons dir
-	# by default the hicolor icon theme ships no icons, this
-	# means any present icon is likely needed by the application
-	if [ -d /usr/share/icons/hicolor ]; then
-		mkdir -p "$APPDIR"/share/icons
-		cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
-		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
 }
 
@@ -1583,7 +1637,6 @@ _check_window_class() {
 }
 
 _add_bwrap_wrapper() {
-	mkdir -p "$APPDIR"/bin
 	cat <<-'EOF' > "$APPDIR"/bin/bwrap
 	#!/bin/sh
 
@@ -1846,6 +1899,28 @@ _check_hardcoded_data_dirs() {
 	done
 }
 
+_sort_env_file() {
+	# make sure the .env has all the "unset" last, due to a bug in the dotenv
+	# library used by sharun all the unsets have to be declared last in the .env
+	if [ -f "$APPDIR"/.env ]; then
+		sorted_env="$(LC_ALL=C awk '
+			{
+				if ($0 ~ /^unset/) {
+					unset_array[++u] = $0
+				} else {
+					print
+				}
+			}
+			END {
+				for (i = 1; i <= u; i++) {
+					print unset_array[i]
+				}
+			}' "$APPDIR"/.env
+		)"
+		echo "$sorted_env" > "$APPDIR"/.env
+	fi
+}
+
 _post_deployment_steps() {
 	# these need to be done later because sharun may make shared/lib a symlink
 	# to lib and if we make shared/lib first then it breaks sharun
@@ -1985,6 +2060,14 @@ _post_deployment_steps() {
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
 		_fix_cpython_ldconfig_mess
 	fi
+	# copy the entire hicolor icons dir
+	# by default the hicolor icon theme ships no icons, this
+	# means any present icon is likely needed by the application
+	if [ -d /usr/share/icons/hicolor ]; then
+		mkdir -p "$APPDIR"/share/icons
+		cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
+		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
+	fi
 }
 
 _handle_nested_bins() {
@@ -2009,44 +2092,30 @@ _handle_nested_bins() {
 
 # sometimes developers add stuff like /bin/sh or env as the Exec= key of the
 # desktop entry, 99.99% of the time this is not wanted, so we have to error that
-_check_main_bin_name() {
-	MAIN_BIN=${MAIN_BIN##*/}
-	case "$MAIN_BIN" in
-		env|sh|bash)
-			_err_msg "ERROR: determined $MAIN_BIN as the main binary"
-			_err_msg "by reading the Exec= key in the desktop entry"
-			_err_msg "it is unlikely you are actually going to package"
-			_err_msg "a shell or env into an appimage, bailing out..."
-			_err_msg "Set the MAIN_BIN variable to $MAIN_BIN if you"
-			_err_msg "intend to actually make an appimage of such binary"
-			exit 1
-			;;
-		*)
-			return 0
-			;;
-	esac
-}
-
-_determine_main_bin() {
+_check_main_bin() {
 	if [ -z "$MAIN_BIN" ]; then
-		MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$APPDIR"/*.desktop)
-		_check_main_bin_name
+		MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$DESKTOP_ENTRY")
+		MAIN_BIN=${MAIN_BIN##*/}
+		case "$MAIN_BIN" in
+			env|sh|bash)
+				_err_msg "Main binary is '$MAIN_BIN', it is unlikely you"
+				_err_msg "are actually going to package '$MAIN_BIN'"
+				_err_msg "as an appimage, bailing out..."
+				_err_msg "set MAIN_BIN=$MAIN_BIN if you want to do this."
+				exit 1
+				;;
+		esac
 	fi
-
-	# get basename of binary only
-	MAIN_BIN=${MAIN_BIN##*/}
 
 	if [ -f "$APPDIR"/bin/"$MAIN_BIN" ]; then
 		return 0
 	fi
 
-	_err_msg "MAIN_BIN is set to '$MAIN_BIN', but this file is NOT present"
+	_err_msg "Main binary is set to '$MAIN_BIN', but this file is NOT present"
 	_err_msg "This is the default binary to be launched in this application"
 	_err_msg "Please make sure to bundle $MAIN_BIN"
-	_err_msg "By default the main binary is taken from the top level"
-	_err_msg "desktop entry in '$APPDIR', make sure to add the correct"
-	_err_msg "desktop entry, if you are using DESKTOP=DUMMY, make sure to"
-	_err_msg "specify the correct binary name in the MAIN_BIN env variable"
+	_err_msg "By default the main binary is taken from the top level desktop"
+	_err_msg "entry in '$APPDIR', make sure to add the correct desktop entry"
 	exit 1
 }
 
@@ -2087,6 +2156,212 @@ _make_static_bin() (
 	_echo "------------------------------------------------------------"
 )
 
+_make_appimage() {
+	_echo "------------------------------------------------------------"
+	_echo "Making AppImage..."
+	_echo "------------------------------------------------------------"
+
+	if [ ! -d "$APPDIR" ]; then
+		_err_msg "ERROR: No $APPDIR directory found"
+		_err_msg "Set APPDIR if you have it at another location"
+		exit 1
+	elif [ ! -f "$APPDIR"/AppRun ]; then
+		_err_msg "ERROR: No $APPDIR/AppRun file found!"
+		exit 1
+	elif ! command -v zsyncmake 1>/dev/null; then
+		_err_msg "ERROR: Missing dependency zsyncmake"
+		exit 1
+	fi
+	chmod +x "$APPDIR"/AppRun
+	_get_desktop
+	_get_icon
+	_sort_env_file
+
+	_echo "------------------------------------------------------------"
+	if [ -z "$UPINFO" ]; then
+		echo "No update information given, trying to guess it..."
+		if [ -n "$GITHUB_REPOSITORY" ]; then
+			UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
+			_echo "Guessed $UPINFO as the update information"
+			_echo "It may be wrong so please set the UPINFO instead"
+		else
+			_err_msg "We were not able to guess the update information"
+			_err_msg "Please add it if you will distribute the AppImage"
+		fi
+	fi
+	_echo "------------------------------------------------------------"
+
+	if [ "$DEVEL_RELEASE" = 1 ]; then
+		if ! grep -q '^Name=.*Nightly' "$DESKTOP_ENTRY"; then
+			>&2 echo "Adding Nightly to desktop entry name"
+			sed -i -e 's/^\(Name=.*\)$/\1 Nightly/' "$DESKTOP_ENTRY"
+		fi
+		# also change UPINFO to use nightly tag
+		if [ -n "$UPINFO" ]; then
+			UPINFO=$(echo "$UPINFO" | sed 's/|latest|/|nightly|/')
+		fi
+	fi
+
+	# get name of app from desktop entry and sanitize it
+	APPNAME="${APPNAME:-$(awk -F'=' '/^Name=/{print $2; exit}' "$DESKTOP_ENTRY")}"
+	APPNAME=$(printf '%s' "$APPNAME" | tr '[:space:]":><*|\?\r\n' '_')
+	APPNAME=${APPNAME%_}
+
+	# check for a ~/version file if VERSION is not set
+	if [ -z "$VERSION" ] && [ -f "$HOME"/version ]; then
+		if ! read -r VERSION < "$HOME"/version; then
+			>&2 echo "ERROR: Failed to read ~/version file! Is it empty?"
+			exit 1
+		fi
+	fi
+	# sanitize VERSION
+	if [ -n "$VERSION" ]; then
+		VERSION=${VERSION#*:} # remove epoch from VERSION
+		VERSION=$(printf '%s' "$VERSION" | tr '[:space:]":><*|\?\r\n' '_')
+		VERSION=${VERSION%_}
+	fi
+
+	# add appimage info to desktop entry, first make sure to remove existing info
+	sed -i \
+		-e '/X-AppImage-Name/d'    \
+		-e '/X-AppImage-Version/d' \
+		-e '/X-AppImage-Arch/d'    \
+		"$DESKTOP_ENTRY"
+	echo ""                                       >> "$DESKTOP_ENTRY"
+	echo "X-AppImage-Name=$APPNAME"               >> "$DESKTOP_ENTRY"
+	echo "X-AppImage-Version=${VERSION:-UNKNOWN}" >> "$DESKTOP_ENTRY"
+	echo "X-AppImage-Arch=$APPIMAGE_ARCH"         >> "$DESKTOP_ENTRY"
+
+	if ! mkdir -p "$OUTPATH"; then
+		_err_msg "ERROR: Cannot create output directory: '$OUTPATH'"
+		exit 1
+	fi
+	if [ -z "$OUTNAME" ]; then
+		if [ -n "$VERSION" ]; then
+			OUTNAME="$APPNAME"-"$VERSION"-anylinux-"$ARCH".AppImage
+		else
+			OUTNAME="$APPNAME"-anylinux-"$ARCH".AppImage
+			>&2 echo "WARNING: VERSION is not set"
+			>&2 echo "WARNING: set it to include it in $OUTNAME"
+		fi
+	fi
+
+	if command -v mkdwarfs 1>/dev/null; then
+		DWARFS_CMD="$(command -v mkdwarfs)"
+	elif [ ! -x "$DWARFS_CMD" ]; then
+		_echo "Downloading dwarfs binary from $DWARFS_LINK"
+		_download "$DWARFS_CMD" "$DWARFS_LINK"
+		chmod +x "$DWARFS_CMD"
+	fi
+
+	if [ ! -x "$RUNTIME" ]; then
+		_echo "Downloading uruntime from $URUNTIME_LINK"
+		_download "$RUNTIME" "$URUNTIME_LINK"
+		chmod +x "$RUNTIME"
+	fi
+
+	if [ "$URUNTIME_PRELOAD" = 1 ]; then
+		_echo "------------------------------------------------------------"
+		_echo "Setting runtime to always keep the mount point..."
+		_echo "------------------------------------------------------------"
+		sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=0|' "$RUNTIME"
+	fi
+
+	if [ -n "$UPINFO" ]; then
+		_echo "------------------------------------------------------------"
+		_echo "Adding update information \"$UPINFO\" to runtime..."
+		_echo "------------------------------------------------------------"
+		"$RUNTIME" --appimage-addupdinfo "$UPINFO"
+	fi
+
+	if [ -n "$ADD_PERMA_ENV_VARS" ]; then
+		while IFS= read -r VAR; do
+			case "$VAR" in
+				*=*) "$RUNTIME" --appimage-addenvs "$VAR";;
+			esac
+		done <<-EOF
+		$ADD_PERMA_ENV_VARS
+		EOF
+	fi
+
+	_echo "------------------------------------------------------------"
+	_echo "Making AppImage..."
+	_echo "------------------------------------------------------------"
+
+	set -- \
+		--force               \
+		--set-owner 0         \
+		--set-group 0         \
+		--no-history          \
+		--no-create-timestamp \
+		--header "$RUNTIME"   \
+		--input  "$APPDIR"
+
+	if [ "$OPTIMIZE_LAUNCH" = 1 ]; then
+		if ! _is_cmd xvfb-run pkill; then
+			_err_msg "ERROR: OPTIMIZE_LAUNCH requires xvfb-run and pkill"
+			exit 1
+		fi
+
+		tmpappimage="$TMPDIR"/.analyze
+
+		_echo "* Making dwarfs profile optimization at $DWARFSPROF..."
+		"$DWARFS_CMD" "$@" -C zstd:level=5 -S19 --output "$tmpappimage"
+		chmod +x "$tmpappimage"
+
+		( DWARFS_ANALYSIS_FILE="$DWARFSPROF" xvfb-run -a -- "$tmpappimage" ) &
+		pid=$!
+
+		sleep 10
+		pkill -P "$pid" || true
+		umount "$TMPDIR"/.mount_* || true
+		wait "$pid" || true
+		rm -f "$tmpappimage"
+	fi
+
+	if [ -f "$DWARFSPROF" ]; then
+		_echo "* Using $DWARFSPROF..."
+		sleep 3
+		set -- --categorize=hotness --hotness-list="$DWARFSPROF" "$@"
+	fi
+
+	if ! "$DWARFS_CMD" "$@" -C $DWARFS_COMP --output "$OUTPATH"/"$OUTNAME"; then
+		_err_msg "ERROR: Something went wrong making dwarfs image!"
+		if [ -f "$DWARFSPROF" ]; then
+			_err_msg "Found '$DWARFSPROF' file in '$APPDIR', may be causing issues:"
+			_err_msg "------------------------------------------------------------"
+			>&2 cat "$DWARFSPROF" || :
+			_err_msg "------------------------------------------------------------"
+		fi
+		exit 1
+	fi
+
+	if [ -n "$UPINFO" ]; then
+		_echo "------------------------------------------------------------"
+		_echo "Making zsync file..."
+		_echo "------------------------------------------------------------"
+		zsyncmake -u "$OUTNAME" "$OUTPATH"/"$OUTNAME"
+
+		# there is a nasty bug that zsync make places the .zsync file in PWD
+		if [ ! -f "$OUTPATH"/"$OUTNAME".zsync ] && [ -f "$OUTNAME".zsync ]; then
+			mv "$OUTNAME".zsync "$OUTPATH"/"$OUTNAME".zsync
+		fi
+	fi
+
+	chmod +x "$OUTPATH"/"$OUTNAME"
+
+	# make a appinfo file next to the artifact, this can be used for
+	# later getting info when making a github release
+	echo "X-AppImage-Name=$APPNAME"               >  "$OUTPATH"/appinfo
+	echo "X-AppImage-Version=${VERSION:-UNKNOWN}" >> "$OUTPATH"/appinfo
+	echo "X-AppImage-Arch=$APPIMAGE_ARCH"         >> "$OUTPATH"/appinfo
+
+	_echo "------------------------------------------------------------"
+	_echo "All done! AppImage at: $OUTPATH/$OUTNAME"
+	_echo "------------------------------------------------------------"
+	exit 0
+}
+
 case "$1" in
 	--help)
 		_help_msg
@@ -2116,6 +2391,8 @@ case "$1" in
 esac
 
 _sanity_check
+_get_desktop
+_get_icon
 
 _echo "------------------------------------------------------------"
 _echo "Starting deployment, checking if extra libraries need to be added..."
@@ -2137,8 +2414,7 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
-_deploy_icon_and_desktop
-_determine_main_bin
+_check_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
@@ -2316,7 +2592,7 @@ if [ -n "$ADD_HOOKS" ]; then
 	for hook do
 		if [ -f "$hook_dst"/"$hook" ]; then
 			continue
-		elif [ "$ARCH" != 'x86_64' ] \
+		elif [ "$APPIMAGE_ARCH" != 'x86_64' ] \
 		  && echo "$hook" | grep -q 'x86.*64'; then
 			continue # do not add x86-64 hooks in other arches
 		elif _download "$hook_dst"/"$hook" "$HOOKSRC"/"$hook"; then
@@ -2341,7 +2617,7 @@ fi
 # Set APPIMAGE_ARCH and MAIN_BIN in AppRun
 sed -i \
 	-e "s|@MAIN_BIN@|$MAIN_BIN|"  \
-	-e "s|@APPIMAGE_ARCH@|$ARCH|" \
+	-e "s|@APPIMAGE_ARCH@|$APPIMAGE_ARCH|" \
 	"$APPDIR"/AppRun
 
 chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null || :
@@ -2400,27 +2676,6 @@ if [ -n "$ANYLINUX_DO_NOT_LOAD_LIBS" ]; then
 	echo "ANYLINUX_DO_NOT_LOAD_LIBS=$ANYLINUX_DO_NOT_LOAD_LIBS:\${ANYLINUX_DO_NOT_LOAD_LIBS}" >> "$APPENV"
 fi
 
-# make sure the .env has all the "unset" last, due to a bug in the dotenv
-# library used by sharun all the unsets have to be declared last in the .env
-if [ -f "$APPENV" ]; then
-	sorted_env="$(LC_ALL=C awk '
-		{
-			if ($0 ~ /^unset/) {
-				unset_array[++u] = $0
-			} else {
-				print
-			}
-		}
-		END {
-			for (i = 1; i <= u; i++) {
-				print unset_array[i]
-			}
-		}' "$APPENV"
-	)"
-	echo "$sorted_env" > "$APPENV"
-fi
-
-
 # check if we have libjack.so in the AppImage, jack needs matching
 # server and client library versions to work, instead we need to use
 # pipewire-jack, which gives a libjack.so that does not have this limitation
@@ -2454,6 +2709,7 @@ echo ""
 if [ "$OUTPUT_APPIMAGE" = 1 ]; then
 	_make_appimage
 else
+	_sort_env_file
 	_echo "------------------------------------------------------------"
 	_echo "All done!"
 	_echo "------------------------------------------------------------"

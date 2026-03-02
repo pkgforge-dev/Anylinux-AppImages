@@ -7,6 +7,13 @@
 # By default it will assume that the AppDir is in the $PWD
 # And will output the AppImage there as well
 
+# WARNING: What this script does has been merged into
+# quick-sharun as result this script is now deprecated!
+
+>&2 echo "WARNING: 'uruntime2appimage' is now deprecated"
+>&2 echo "Use 'quick-sharun --make-appimage' instead"
+sleep 3
+
 set -e
 
 ARCH=${ARCH:-$(uname -m)}
@@ -439,3 +446,7 @@ X-AppImage-Arch=$APPIMAGE_ARCH
 _echo "------------------------------------------------------------"
 _echo "All done! AppImage at: $OUTPATH/$OUTNAME"
 _echo "------------------------------------------------------------"
+
+>&2 echo "WARNING: 'uruntime2appimage' is now deprecated"
+>&2 echo "Use 'quick-sharun --make-appimage' instead"
+sleep 3
