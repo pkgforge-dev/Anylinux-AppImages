@@ -298,26 +298,27 @@ _get_icon() {
 		set --
 
 		# Now search deeper
-		[ -n "$icon_name" ] || return 1
-		sizes='256x256 512x512 192x192 128x128 scalable'
-		for s in $sizes; do
-			set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon_name"*
-		done
-		for s in $sizes; do
-			set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon_name"*
-		done
-		for i do
-			if [ -f "$i" ]; then
-				case "$i" in
-					*.png|*.svg)
-						cp -v "$i" "$APPDIR"
-						cp -v "$i" "$DIRICON"
-						break
-						;;
-				esac
-			fi
-		done
-		set --
+		if [ -n "$icon_name" ]; then
+			sizes='256x256 512x512 192x192 128x128 scalable'
+			for s in $sizes; do
+				set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon_name"*
+			done
+			for s in $sizes; do
+				set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon_name"*
+			done
+			for i do
+				if [ -f "$i" ]; then
+					case "$i" in
+						*.png|*.svg)
+							cp -v "$i" "$APPDIR"
+							cp -v "$i" "$DIRICON"
+							break
+							;;
+					esac
+				fi
+			done
+			set --
+		fi
 	fi
 
 	if [ ! -f "$DIRICON" ]; then
