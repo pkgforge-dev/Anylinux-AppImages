@@ -256,52 +256,76 @@ _help_msg() {
 	exit 1
 }
 
-_find_dir_icon() {
+_get_icon() {
 	if [ -f "$APPDIR"/.DirIcon ]; then
 		return 0
 	fi
 
-	# try the first top level .png or .svg before searching
-	set -- "$APPDIR"/*.png "$APPDIR"/*.svg
-	for i do
-		if [ -f "$i" ]; then
-			cp -v "$i" "$APPDIR"/.DirIcon
-			break
+	if [ "$ICON" = "DUMMY" ]; then
+		if [ -n "$MAIN_BIN" ]; then
+			f=${MAIN_BIN##*/}
+		else
+			# use the first binary name in shared/bin as filename
+			set -- "$APPDIR"/shared/bin/*
+			[ -f "$1" ] || exit 1
+			f=${1##*/}
 		fi
-	done
-	set --
+		_echo "* Adding dummy $f icon to $APPDIR..."
+		:> "$APPDIR"/"$f".png
+		:> "$APPDIR"/.DirIcon
+	elif [ -f "$ICON" ]; then
+		_echo "* Adding $ICON to $APPDIR..."
+		cp -v "$ICON" "$APPDIR"
+	elif echo "$ICON" | grep -q 'http'; then
+		_echo "* Downloading $ICON to $APPDIR..."
+		_download "$APPDIR"/"${ICON##*/}" "$ICON"
+	elif [ -n "$ICON" ]; then
+		_err_msg "$ICON is NOT a valid path!"
+		exit 1
+	if
 
-	if [ -f "$APPDIR"/.DirIcon ]; then
-		return 0
+	if [ ! -f "$APPDIR"/.DirIcon ]; then
+		# try the first top level .png or .svg before searching
+		set -- "$APPDIR"/*.png "$APPDIR"/*.svg
+		for i do
+			if [ -f "$i" ]; then
+				cp -v "$i" "$APPDIR"/.DirIcon
+				return 0
+			fi
+		done
+		set --
+
+		# Now search deeper
+		icon=$(awk -F'=' '/^Icon=/{print $2; exit}' "$DESKTOP_ENTRY")
+		icon=${icon##*/}
+		[ -n "$icon" ] || return 1
+		sizes='256x256 512x512 192x192 128x128 scalable'
+		for s in $sizes; do
+			set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon"*
+		done
+		for s in $sizes; do
+			set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon"*
+		done
+		for i do
+			if [ -f "$i" ]; then
+				case "$i" in
+					*.png|*.svg)
+						cp -v "$i" "$APPDIR"
+						cp -v "$i" "$APPDIR"/.DirIcon
+						break
+						;;
+				esac
+			fi
+		done
+		set --
 	fi
 
-	# Now search deeper
-	_desktop_entry=$(echo "$APPDIR"/*.desktop)
-	[ -f "$_desktop_entry" ] || return 1
-	icon=$(awk -F'=' '/^Icon=/{print $2; exit}' "$_desktop_entry")
-	icon=${icon##*/}
-	[ -n "$icon" ] || return 1
-	sizes='256x256 512x512 192x192 128x128 scalable'
-	for s in $sizes; do
-		set -- "$@" "$APPDIR"/share/icons/hicolor/"$s"/apps/"$icon"*
-	done
-	for s in $sizes; do
-		set -- "$@" /usr/share/icons/hicolor/"$s"/apps/"$icon"*
-	done
-	for i do
-		if [ -f "$i" ]; then
-			case "$i" in
-				*.png|*.svg)
-					cp -v "$i" "$APPDIR"
-					cp -v "$i" "$APPDIR"/.DirIcon
-					break
-					;;
-			esac
-		fi
-	done
-	set --
-
-	[ -f "$APPDIR"/.DirIcon ]
+	if [ ! -f "$APPDIR"/.DirIcon ]; then
+		_err_msg "ERROR: No top level .DirIcon file found in $APPDIR"
+		_err_msg "Could not find icon listed in $DESKTOP_ENTRY either"
+		_err_msg "Set ICON env variable to the location/url of the icon"
+		exit 1
+	fi
 }
 
 _sanity_check() {
@@ -314,9 +338,6 @@ _sanity_check() {
 		exit 1
 	elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		_err_msg "ERROR: DEPLOY_PYTHON and DEPLOY_SYS_PYTHON cannot be both enabled!"
-		exit 1
-	elif [ -z "$DESKTOP" ] && [ ! -f "$APPDIR"/*.desktop ]; then
-		_err_msg "ERROR: No desktop entry in $APPDIR and DESKTOP is not set!"
 		exit 1
 	elif  [ -n "$PATH_MAPPING" ] && ! echo "$PATH_MAPPING" | grep -q 'SHARUN_DIR'; then
 		_err_msg 'ERROR: PATH_MAPPING must contain unexpanded ${SHARUN_DIR} variable'
@@ -351,14 +372,6 @@ _sanity_check() {
 			_err_msg "set the LIB_DIR variable to where you have libraries"
 			exit 1
 		fi
-	fi
-
-	# when making an AppImage without an explicit ICON, check early if we
-	# can find a .DirIcon so we fail before running the heavy deployment
-	if [ "$OUTPUT_APPIMAGE" = 1 ] && [ -z "$ICON" ] && ! _find_dir_icon; then
-		_err_msg "ERROR: No .DirIcon found in $APPDIR and no icon source available"
-		_err_msg "Set ICON to the path or URL of the icon to use"
-		exit 1
 	fi
 }
 
@@ -1543,7 +1556,12 @@ _deploy_locale() {
 	fi
 }
 
-_deploy_icon_and_desktop() {
+_get_desktop() {
+	DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
+	if [ -f "$DESKTOP_ENTRY" ]; then
+		return 0
+	fi
+
 	if [ "$DESKTOP" = "DUMMY" ]; then
 		if [ -n "$MAIN_BIN" ]; then
 			f=${MAIN_BIN##*/}
@@ -1581,36 +1599,11 @@ _deploy_icon_and_desktop() {
 		mv "$APPDIR"/*.desktop* "$APPDIR"/"${filename%.desktop*}".desktop
 	fi
 
-	if [ "$ICON" = "DUMMY" ]; then
-		if [ -n "$MAIN_BIN" ]; then
-			f=${MAIN_BIN##*/}
-		else
-			# use the first binary name in shared/bin as filename
-			set -- "$APPDIR"/shared/bin/*
-			[ -f "$1" ] || exit 1
-			f=${1##*/}
-		fi
-		_echo "* Adding dummy $f icon to $APPDIR..."
-		:> "$APPDIR"/"$f".png
-		:> "$APPDIR"/.DirIcon
-	elif [ -f "$ICON" ]; then
-		_echo "* Adding $ICON to $APPDIR..."
-		cp -v "$ICON" "$APPDIR"
-	elif echo "$ICON" | grep -q 'http'; then
-		_echo "* Downloading $ICON to $APPDIR..."
-		_download "$APPDIR"/"${ICON##*/}" "$ICON"
-	elif [ -n "$ICON" ]; then
-		_err_msg "$ICON is NOT a valid path!"
+	DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
+	if [ ! -f "$DESKTOP_ENTRY" ]; then
+		_err_msg "ERROR: No top level .desktop file found in $APPDIR"
+		_err_msg "Note it cannot be more than .desktop file in that location"
 		exit 1
-	fi
-
-	# copy the entire hicolor icons dir
-	# by default the hicolor icon theme ships no icons, this
-	# means any present icon is likely needed by the application
-	if [ -d /usr/share/icons/hicolor ]; then
-		mkdir -p "$APPDIR"/share/icons
-		cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
-		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
 }
 
@@ -2064,6 +2057,14 @@ _post_deployment_steps() {
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
 		_fix_cpython_ldconfig_mess
 	fi
+	# copy the entire hicolor icons dir
+	# by default the hicolor icon theme ships no icons, this
+	# means any present icon is likely needed by the application
+	if [ -d /usr/share/icons/hicolor ]; then
+		mkdir -p "$APPDIR"/share/icons
+		cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
+		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
+	fi
 }
 
 _handle_nested_bins() {
@@ -2171,7 +2172,8 @@ _make_appimage() {
 	_echo "Making AppImage..."
 	_echo "------------------------------------------------------------"
 
-	DESKTOP_ENTRY=$(echo "$APPDIR"/*.desktop)
+	_get_desktop
+	_get_icon
 
 	if [ ! -d "$APPDIR" ]; then
 		_err_msg "ERROR: No $APPDIR directory found"
@@ -2179,10 +2181,6 @@ _make_appimage() {
 		exit 1
 	elif [ ! -f "$APPDIR"/AppRun ]; then
 		_err_msg "ERROR: No $APPDIR/AppRun file found!"
-		exit 1
-	elif [ ! -f "$DESKTOP_ENTRY" ]; then
-		_err_msg "ERROR: No top level .desktop file found in $APPDIR"
-		_err_msg "Note it cannot be more than .desktop file in that location"
 		exit 1
 	elif ! command -v zsyncmake 1>/dev/null; then
 		_err_msg "ERROR: Missing dependency zsyncmake"
@@ -2246,13 +2244,6 @@ _make_appimage() {
 	echo "X-AppImage-Name=$APPNAME"               >> "$DESKTOP_ENTRY"
 	echo "X-AppImage-Version=${VERSION:-UNKNOWN}" >> "$DESKTOP_ENTRY"
 	echo "X-AppImage-Arch=$APPIMAGE_ARCH"         >> "$DESKTOP_ENTRY"
-
-	if ! _find_dir_icon; then
-		_err_msg "ERROR: No top level .DirIcon file found in $APPDIR"
-		_err_msg "Could not find icon listed in $DESKTOP_ENTRY either"
-		_err_msg "Set ICON env variable to the location/url of the icon"
-		exit 1
-	fi
 
 	if ! mkdir -p "$OUTPATH"; then
 		_err_msg "ERROR: Cannot create output directory: '$OUTPATH'"
@@ -2414,6 +2405,8 @@ case "$1" in
 esac
 
 _sanity_check
+_get_desktop
+_get_icon
 
 _echo "------------------------------------------------------------"
 _echo "Starting deployment, checking if extra libraries need to be added..."
@@ -2435,7 +2428,6 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
-_deploy_icon_and_desktop
 _determine_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
