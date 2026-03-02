@@ -57,6 +57,7 @@ DEPENDENCIES="
 	ldd
 	mv
 	rm
+	sleep
 	strings
 	tr
 "
@@ -2294,14 +2295,12 @@ _make_appimage() {
 		--input  "$APPDIR"
 
 	if [ "$OPTIMIZE_LAUNCH" = 1 ]; then
+		if ! _is_cmd xvfb-run pkill; then
+			_err_msg "ERROR: OPTIMIZE_LAUNCH requires xvfb-run and pkill"
+			exit 1
+		fi
+
 		tmpappimage="$TMPDIR"/.analyze
-		deps="xvfb-run pkill"
-		for d in $deps; do
-			if ! command -v "$d" 1>/dev/null; then
-				>&2 echo "ERROR: Using OPTIMIZE_LAUNCH requires $d"
-				exit 1
-			fi
-		done
 
 		_echo "* Making dwarfs profile optimization at $DWARFSPROF..."
 		"$DWARFS_CMD" "$@" -C zstd:level=5 -S19 --output "$tmpappimage"
@@ -2324,7 +2323,7 @@ _make_appimage() {
 	fi
 
 	if ! "$DWARFS_CMD" "$@" -C $DWARFS_COMP --output "$OUTPATH"/"$OUTNAME"; then
-		>&2 echo "ERROR: Something went wrong making dwarfs image!"
+		_err_msg "ERROR: Something went wrong making dwarfs image!"
 		if [ -f "$DWARFSPROF" ]; then
 			_err_msg "Found '$DWARFSPROF' file in '$APPDIR', may be causing issues:"
 			_err_msg "------------------------------------------------------------"
