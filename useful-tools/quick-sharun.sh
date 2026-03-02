@@ -2157,9 +2157,6 @@ _make_appimage() {
 	_echo "Making AppImage..."
 	_echo "------------------------------------------------------------"
 
-	_get_desktop
-	_get_icon
-
 	if [ ! -d "$APPDIR" ]; then
 		_err_msg "ERROR: No $APPDIR directory found"
 		_err_msg "Set APPDIR if you have it at another location"
@@ -2171,8 +2168,9 @@ _make_appimage() {
 		_err_msg "ERROR: Missing dependency zsyncmake"
 		exit 1
 	fi
-
 	chmod +x "$APPDIR"/AppRun
+	_get_desktop
+	_get_icon
 	_sort_env_file
 
 	_echo "------------------------------------------------------------"
@@ -2359,6 +2357,7 @@ _make_appimage() {
 	_echo "------------------------------------------------------------"
 	_echo "All done! AppImage at: $OUTPATH/$OUTNAME"
 	_echo "------------------------------------------------------------"
+	exit 0
 }
 
 case "$1" in
