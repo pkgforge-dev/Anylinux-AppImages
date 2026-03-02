@@ -2352,7 +2352,7 @@ _make_appimage() {
 
 	# make a appinfo file next to the artifact, this can be used for
 	# later getting info when making a github release
-	echo "X-AppImage-Name=$APPNAME"               >> "$OUTPATH"/appinfo
+	echo "X-AppImage-Name=$APPNAME"               > "$OUTPATH"/appinfo
 	echo "X-AppImage-Version=${VERSION:-UNKNOWN}" >> "$OUTPATH"/appinfo
 	echo "X-AppImage-Arch=$APPIMAGE_ARCH"         >> "$OUTPATH"/appinfo
 
