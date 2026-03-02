@@ -13,14 +13,16 @@
 
 set -e
 
-ARCH="$(uname -m)"
-APPIMAGE_ARCH="$(uname -m)"
+APPIMAGE_ARCH=$(uname -m)
+ARCH=${ARCH:-$APPIMAGE_ARCH}
 TMPDIR=${TMPDIR:-/tmp}
 APPDIR=${APPDIR:-$PWD/AppDir}
 APPENV=$APPDIR/.env
+
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
+
 OUTPATH=${OUTPATH:-$PWD}
 DWARFS_COMP="${DWARFS_COMP:-zstd:level=22 -S26 -B6}"
 DWARFS_CMD=${DWARFS_CMD:-$TMPDIR/mkdwarfs}
