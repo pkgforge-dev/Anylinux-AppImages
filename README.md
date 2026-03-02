@@ -44,8 +44,10 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)                                        |
 [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)                                                            |
 [Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage)                                                  |
+[Augustus](https://github.com/pkgforge-dev/Augustus-AppImage-Enhanced)                                                   |
 [Authenticator](https://github.com/pkgforge-dev/Authenticator-AppImage)                                                  |
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
+[BibleTime](https://github.com/pkgforge-dev/BibleTime-AppImage)                                                          |
 [Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
 [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage)                                                        |
 [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage)                                                        |
@@ -63,6 +65,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
+[D1X-Rebirth](https://github.com/pkgforge-dev/D1X-Rebirth-AppImage)                                                      |
+[D2X-Rebirth](https://github.com/pkgforge-dev/D2X-Rebirth-AppImage)                                                      |
 [DarkPlaces](https://github.com/pkgforge-dev/DarkPlaces-AppImage)                                                        |
 [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage)                                                            |
 [Defold](https://github.com/pkgforge-dev/Defold-AppImage)                                                                |
@@ -115,6 +119,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
+[ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
@@ -133,6 +138,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
 [melonDS](https://github.com/pkgforge-dev/melonDS-AppImage-Enhanced)                                                     |
 [MESA](https://github.com/pkgforge-dev/MESA-AppImage)                                                                    |
+[mGBA](https://github.com/pkgforge-dev/mGBA-AppImage-Enhanced)                                                           |
 [Mini-vMac](https://github.com/pkgforge-dev/Mini-vMac-AppImage)                                                          |
 [Mousai](https://github.com/pkgforge-dev/Mousai-AppImage)                                                                |
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
@@ -152,6 +158,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage)                                                            |
 [openMSX](https://github.com/pkgforge-dev/openMSX-AppImage)                                                              |
 [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced)                                                   |
+[OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage)                                                          |
 [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage)                                                              |
 [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage)                                                |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
@@ -238,6 +245,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
 [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
 [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage)                                                                |
+[Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage)                                              |
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
 [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
