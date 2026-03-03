@@ -250,6 +250,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
 [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
+[ZSNES](https://github.com/pkgforge-dev/ZSNES-AppImage)                                                                  |
 
 ---
 
