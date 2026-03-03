@@ -114,6 +114,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [Gradia](https://github.com/pkgforge-dev/Gradia-AppImage)                                                                |
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
+[Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
 [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
@@ -184,6 +185,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
 [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
 [Riseup-VPN](https://github.com/pkgforge-dev/Riseup-VPN-AppImage)                                                        |
+[Ristretto](https://github.com/pkgforge-dev/Ristretto-AppImage)                                                          |
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
