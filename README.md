@@ -146,6 +146,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage)                                                            |
 [Neverball](https://github.com/pkgforge-dev/Neverball-AppImage)                                                          |
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
+[NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage)                                                              |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
 [Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced)                                             |
