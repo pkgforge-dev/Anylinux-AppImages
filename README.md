@@ -146,6 +146,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage)                                                            |
 [Neverball](https://github.com/pkgforge-dev/Neverball-AppImage)                                                          |
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
+[NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage)                                                              |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
 [Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced)                                             |
@@ -202,6 +203,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced)                                                             |
 [Sonic 3 A.I.R.](https://github.com/pkgforge-dev/Sonic-3-AIR-AppImage)                                                   |
 [Sonic-Mania-Decompilation](https://github.com/pkgforge-dev/Sonic-Mania-Decompilation-AppImage)                          |
+[Sonic Robo Blast 2](https://github.com/pkgforge-dev/SRB2-AppImage)                                                      |
 [sound-space-plus](https://github.com/pkgforge-dev/sound-space-plus-AppImage)                                            |
 [spacecadetpinball](https://github.com/pkgforge-dev/spacecadetpinball-AppImage)                                          |
 [SpaghettiKart](https://github.com/pkgforge-dev/SpaghettiKart-AppImage-Enhanced)                                         |
@@ -249,6 +251,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
 [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
+[ZSNES](https://github.com/pkgforge-dev/ZSNES-AppImage)                                                                  |
 
 ---
 
