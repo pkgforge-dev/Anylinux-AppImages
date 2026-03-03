@@ -202,6 +202,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced)                                                             |
 [Sonic 3 A.I.R.](https://github.com/pkgforge-dev/Sonic-3-AIR-AppImage)                                                   |
 [Sonic-Mania-Decompilation](https://github.com/pkgforge-dev/Sonic-Mania-Decompilation-AppImage)                          |
+[Sonic Robo Blast 2](https://github.com/pkgforge-dev/SRB2-AppImage)                                                      |
 [sound-space-plus](https://github.com/pkgforge-dev/sound-space-plus-AppImage)                                            |
 [spacecadetpinball](https://github.com/pkgforge-dev/spacecadetpinball-AppImage)                                          |
 [SpaghettiKart](https://github.com/pkgforge-dev/SpaghettiKart-AppImage-Enhanced)                                         |
