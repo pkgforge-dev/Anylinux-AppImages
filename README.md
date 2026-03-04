@@ -247,6 +247,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
 [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
 [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage)                                                                |
+[xournalpp](https://github.com/pkgforge-dev/xournalpp-AppImage-Enhanced)                                                 |
 [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage)                                              |
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
