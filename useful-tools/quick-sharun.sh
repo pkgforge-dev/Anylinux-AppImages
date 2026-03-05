@@ -1558,7 +1558,7 @@ _deploy_locale() {
 					set -- "$@" ! -name "*$f*"
 				fi
 			done
-			find "$APPDIR"/share/locale "$@" -type f -o -type l -delete
+			find "$APPDIR"/share/locale "$@" \( -type f -o -type l \) -delete
 			_remove_empty_dirs "$APPDIR"/share/locale
 		fi
 		echo ""
