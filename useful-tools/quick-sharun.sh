@@ -669,11 +669,12 @@ _make_deployment_array() {
 	if [ -d "$LIB_DIR"/gconv ]; then
 		_echo "* Deploying minimal gconv"
 		set -- "$@" \
-			"$LIB_DIR"/gconv/UTF*.so*   \
-			"$LIB_DIR"/gconv/ANSI*.so*  \
-			"$LIB_DIR"/gconv/CP*.so*    \
-			"$LIB_DIR"/gconv/LATIN*.so* \
-			"$LIB_DIR"/gconv/UNICODE*.so*
+			"$LIB_DIR"/gconv/UTF*.so*     \
+			"$LIB_DIR"/gconv/ANSI*.so*    \
+			"$LIB_DIR"/gconv/CP*.so*      \
+			"$LIB_DIR"/gconv/LATIN*.so*   \
+			"$LIB_DIR"/gconv/UNICODE*.so* \
+			"$LIB_DIR"/gconv/ISO8859*.so*
 	fi
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
 		DEPLOY_OPENGL=0
