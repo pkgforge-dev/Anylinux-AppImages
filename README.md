@@ -76,6 +76,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage)                                                                |
 [Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
 [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
+[DOOM64EXUltra](https://github.com/pkgforge-dev/DOOM64EXUltra-AppImage)                                                  |
 [DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage)                                                            |
 [Dr. Robotnik's Ring Racers](https://github.com/pkgforge-dev/Dr-Robotniks-Ring-Racers-AppImage)                          |
 [Drum Machine](https://github.com/pkgforge-dev/Drum-Machine-AppImage)                                                    |
