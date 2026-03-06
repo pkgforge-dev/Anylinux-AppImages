@@ -88,12 +88,13 @@ fi
 # because it will include the libs of sh, grep, cat, etc from the hooks
 # with this var we can set LD_DEBUG=libs for the bundled application only
 if [ "$APPIMAGE_DEBUG" = 1 ]; then
+	cat /etc/os-release >"$PWD"/"${APPIMAGE##*/}"-debug.log || :
 	export LD_DEBUG=libs
 	export VK_LOADER_DEBUG=all
 	export LC_ALL=C
 	export SHARUN_PRINTENV=1
-	"$TO_LAUNCH" "$@" 2>"$HOME"/"${APPIMAGE##*/}"-debug.log || :
-	>&2 echo "Debug log at: '$HOME/${APPIMAGE##*/}-debug.log'"
+	"$TO_LAUNCH" "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
+	>&2 echo "Debug log at: '$PWD/${APPIMAGE##*/}-debug.log'"
 else
 	exec "$TO_LAUNCH" "$@"
 fi
