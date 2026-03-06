@@ -133,6 +133,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
 [Libation](https://github.com/pkgforge-dev/Libation-AppImage)                                                            |
 [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage)                                                            |
+[LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage)                                                          |
 [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage)                                                          |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
