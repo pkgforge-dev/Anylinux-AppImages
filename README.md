@@ -126,6 +126,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
+[Kega Fusion](https://github.com/pkgforge-dev/Kega-Fusion-AppImage)                                                      |
 [Keypunch](https://github.com/pkgforge-dev/Keypunch-AppImage)                                                            |
 [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage)                                                                  |
 [Kid3](https://github.com/pkgforge-dev/Kid3-AppImage)                                                                    |
