@@ -2050,6 +2050,7 @@ _post_deployment_steps() {
 			cp -r "$src_trans" "$dst_trans"
 			rm -f "$dst_trans"/assistant*.qm
 			rm -f "$dst_trans"/designer*.qm
+			rm -f "$dst_trans"/linguist*.qm
 		fi
 		if [ -f "$TMPDIR"/libqgtk3.so ]; then
 			d="$APPDIR"/lib/"$QT_DIR"/plugins/platformthemes
