@@ -115,6 +115,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [Gradia](https://github.com/pkgforge-dev/Gradia-AppImage)                                                                |
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
+[Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
 [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
@@ -187,6 +188,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
 [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
 [Riseup-VPN](https://github.com/pkgforge-dev/Riseup-VPN-AppImage)                                                        |
+[Ristretto](https://github.com/pkgforge-dev/Ristretto-AppImage)                                                          |
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
@@ -249,6 +251,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
 [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
 [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage)                                                                |
+[xournalpp](https://github.com/pkgforge-dev/xournalpp-AppImage-Enhanced)                                                 |
 [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage)                                              |
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
