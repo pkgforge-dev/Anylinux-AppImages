@@ -214,7 +214,7 @@ _help_msg() {
 	                if you can to deploy ALL Gstreamer plugins. (Very bloated).
 	  DEPLOY_LOCALE       Set to 1 to deploy locale data.
 	  DEPLOY_PYTHON   Set to 1 to deploy system Python. Will remove all pycache
-	                 pycache files, set DEBLOAT_PYTHON to 0 to prevent this.
+	                  files, set DEBLOAT_PYTHON to 0 to prevent this.
 
 	  LIB_DIR          Set source library directory if autodetection fails.
 	  NO_STRIP         Disable stripping binaries and libraries if set.
