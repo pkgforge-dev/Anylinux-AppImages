@@ -673,6 +673,9 @@ _make_deployment_array() {
 
 		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*${ANYLINUX_DO_NOT_LOAD_LIBS:+:$ANYLINUX_DO_NOT_LOAD_LIBS}"
 	fi
+	if [ "$DEPLOY_PYTHON" = 1 ]; then
+		_echo "* Deploying system python"
+	fi
 	if [ "$DEPLOY_QT" = 1 ]; then
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
