@@ -85,12 +85,6 @@ _tmp_lib="${_tmp_lib:-$(tr -dc "$regex" < /dev/urandom | head -c 3)}"
 _tmp_share="${_tmp_share:-$(tr -dc "$regex" < /dev/urandom | head -c 5)}"
 
 if [ "$DEPLOY_PYTHON" = 1 ]; then
-	>&2 echo "WARNING: DEPLOY_PYTHON was deprecated for DEPLOY_SYS_PYTHON"
-	>&2 echo "In the future this warning will be removed"
-	>&2 echo ""
-	>&2 echo "Using DEPLOY_SYS_PYTHON instead..."
-	>&2 echo ""
-	sleep 3
 	DEPLOY_SYS_PYTHON=1
 fi
 
