@@ -63,6 +63,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
+[Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage)                                                            |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
 [D1X-Rebirth](https://github.com/pkgforge-dev/D1X-Rebirth-AppImage)                                                      |
