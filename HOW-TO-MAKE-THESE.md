@@ -165,8 +165,7 @@ See all hooks in [`useful-tools/hooks/`](https://github.com/pkgforge-dev/Anylinu
 **Deployment options:**
 - `DEPLOY_OPENGL=1` - Bundles OpenGL libraries (mesa) (should happen automatically)
 - `DEPLOY_VULKAN=1` - Bundles Vulkan libraries (mesa) (should happen automatically)
-- `DEPLOY_PYTHON=1` - Bundles Python using lib4bin uv python deployment (likely to be deprecated since DEPLOY_SYS_PYTHON is better)
-- `DEPLOY_SYS_PYTHON=1` - Bundles system Python installation, often a lot smaller than using DEPLOY_PYTHON
+- `DEPLOY_PYTHON=1` - Bundles system Python installation.
 - `DEPLOY_LOCALE=1` - Deploys locale files (default: enabled)
 
 **Library handling:**
