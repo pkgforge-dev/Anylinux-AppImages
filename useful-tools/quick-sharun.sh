@@ -84,7 +84,20 @@ _tmp_bin="${_tmp_bin:-$(tr -dc "$regex" < /dev/urandom | head -c 3)}"
 _tmp_lib="${_tmp_lib:-$(tr -dc "$regex" < /dev/urandom | head -c 3)}"
 _tmp_share="${_tmp_share:-$(tr -dc "$regex" < /dev/urandom | head -c 5)}"
 
+if [ "$DEPLOY_PYTHON" = 1 ]; then
+	>&2 echo "WARNING: DEPLOY_PYTHON was deprecated for DEPLOY_SYS_PYTHON"
+	>&2 echo "In the future this warning will be removed"
+	>&2 echo ""
+	>&2 echo "Using DEPLOY_SYS_PYTHON instead..."
+	>&2 echo ""
+	sleep 3
+	DEPLOY_SYS_PYTHON=1
+fi
+
 if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
+	if [ "$DEBLOAT_PYTHON" = 0 ]; then
+		DEBLOAT_SYS_PYTHON=${DEBLOAT_SYS_PYTHON:-0}
+	fi
 	DEBLOAT_SYS_PYTHON=${DEBLOAT_SYS_PYTHON:-1}
 fi
 
@@ -103,11 +116,6 @@ export VERBOSE=1
 
 if [ -z "$NO_STRIP" ]; then
 	export STRIP=1
-fi
-
-if [ "$DEPLOY_PYTHON" = 1 ]; then
-	export WITH_PYTHON=1
-	export PYTHON_VER="${PYTHON_VER:-3.13}"
 fi
 
 # github actions doesn't set USER and XDG_RUNTIME_DIR
@@ -211,10 +219,8 @@ _help_msg() {
 	                several gstreamer plugins are removed, set DEPLOY_GSTREAMER_ALL=1
 	                if you can to deploy ALL Gstreamer plugins. (Very bloated).
 	  DEPLOY_LOCALE       Set to 1 to deploy locale data.
-	  DEPLOY_SYS_PYTHON   Set to 1 to deploy system Python. Will remove all pycache
-	                 pycache files, set DEBLOAT_SYS_PYTHON to 0 to prevent this.
-	  DEPLOY_PYTHON      Set to 1 to deploy UV Python (sharun feature).
-	                 Set PYTHON_VER and PYTHON_PACKAGES for version and packages to add.
+	  DEPLOY_PYTHON   Set to 1 to deploy system Python. Will remove all pycache
+	                 pycache files, set DEBLOAT_PYTHON to 0 to prevent this.
 
 	  LIB_DIR          Set source library directory if autodetection fails.
 	  NO_STRIP         Disable stripping binaries and libraries if set.
@@ -345,9 +351,6 @@ _sanity_check() {
 
 	if [ "$GTK_CLASS_FIX" = 1 ] && ! _is_cmd gcc pkg-config; then
 		_err_msg "ERROR: Using GTK_CLASS_FIX requires gcc and pkg-config"
-		exit 1
-	elif [ "$DEPLOY_PYTHON" = 1 ] && [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-		_err_msg "ERROR: DEPLOY_PYTHON and DEPLOY_SYS_PYTHON cannot be both enabled!"
 		exit 1
 	elif  [ -n "$PATH_MAPPING" ] && ! echo "$PATH_MAPPING" | grep -q 'SHARUN_DIR'; then
 		_err_msg 'ERROR: PATH_MAPPING must contain unexpanded ${SHARUN_DIR} variable'
@@ -651,20 +654,6 @@ _determine_what_to_deploy() {
 }
 
 _make_deployment_array() {
-	if [ "$DEPLOY_PYTHON" = 1 ]; then
-		_echo "* Deploying python $PYTHON_VER"
-		if [ -n "$PYTHON_PACKAGES" ]; then
-			old_ifs="$IFS"
-			IFS=':'
-			set -- $PYTHON_PACKAGES
-			IFS="$old_ifs"
-			for pypkg do
-				_echo "* Deploying python package $pypkg"
-				echo "$pypkg" >> "$TMPDIR"/requirements.txt
-			done
-			set -- --python-pkg "$TMPDIR"/requirements.txt
-		fi
-	fi
 	# always deploy minimal amount of gconv
 	if [ -d "$LIB_DIR"/gconv ]; then
 		_echo "* Deploying minimal gconv"
@@ -794,7 +783,7 @@ _make_deployment_array() {
 				"$LIB_DIR"/gio/modules/libgiognomeproxy.so
 		fi
 
-		if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
+		if [ "$DEPLOY_SYS_PYTHON" = 1 ] ; then
 			set -- "$@" "$LIB_DIR"/libgirepository*.so*
 		fi
 	fi
@@ -1140,30 +1129,7 @@ _deploy_libs() {
 	ARRAY=$(_save_array "$@")
 	eval set -- "$TO_DEPLOY_ARRAY" "$ARRAY"
 
-	if [ -n "$PYTHON_PACKAGES" ]; then
-		STRACE_MODE=0
-	fi
 	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
-
-	# strace the individual python pacakges
-	if [ -n "$PYTHON_PACKAGES" ]; then
-		# if not unsetlib4bin will replace the top level sharun
-		# with a hardlink to python breaking everything
-		unset  WITH_PYTHON PYTHON_VER
-
-		old_ifs="$IFS"
-		IFS=':'
-		set -- $PYTHON_PACKAGES
-		IFS="$old_ifs"
-
-		for pypkg do
-			pybin="$APPDIR"/bin/"$pypkg"
-			[ -e "$pybin" ] || continue
-			_echo "Running strace on python package $pypkg..."
-			$XVFB_CMD "$TMPDIR"/sharun-aio l \
-				--strace-mode  "$APPDIR"/sharun -- "$pybin"
-		done
-	fi
 }
 
 _handle_bins_scripts() {
@@ -2055,7 +2021,7 @@ _post_deployment_steps() {
 			"$APPDIR"/sharun -g 2>/dev/null || :
 		fi
 	fi
-	if [ "$DEPLOY_SYS_PYTHON" = 1 ] || [ "$DEPLOY_PYTHON" = 1 ]; then
+	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		_fix_cpython_ldconfig_mess
 	fi
 	# copy the entire hicolor icons dir
@@ -2382,9 +2348,7 @@ case "$1" in
 		exit 0
 		;;
 	'')
-		if [ -z "$PYTHON_PACKAGES" ]; then
-			_help_msg
-		fi
+		_help_msg
 		;;
 esac
 
