@@ -63,6 +63,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
+[Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage)                                                            |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
 [D1X-Rebirth](https://github.com/pkgforge-dev/D1X-Rebirth-AppImage)                                                      |
@@ -123,6 +124,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
 [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
+[ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage)                                                            |
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
