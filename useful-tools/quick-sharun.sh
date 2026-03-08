@@ -777,7 +777,7 @@ _make_deployment_array() {
 				"$LIB_DIR"/gio/modules/libgiognomeproxy.so
 		fi
 
-		if [ "$DEPLOY_SYS_PYTHON" = 1 ] ; then
+		if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 			set -- "$@" "$LIB_DIR"/libgirepository*.so*
 		fi
 	fi
