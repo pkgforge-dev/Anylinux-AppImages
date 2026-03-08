@@ -69,7 +69,7 @@ fi
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
-PATH_MAPPING_SCRIPT="$APPDIR"/bin/path-mapping-hardcoded.src.hook
+PATH_MAPPING_SCRIPT="$APPDIR"/bin/path-mapping-hardcoded.hook
 
 if [ -f "$PATH_MAPPING_SCRIPT" ]; then
 	while IFS= read -r line; do
@@ -1747,11 +1747,7 @@ _add_path_mapping_hardcoded() {
 	_tmp_lib=""
 	_tmp_share=""
 
-	if ! command -v ln 1>/dev/null; then
-	    >&2 echo "path-mapping-hardcoded: ERROR we cannot make symlinks"
-	    >&2 echo "because command 'ln' is missing from the system! Aborting..."
-	    exit 1
-	fi
+	export LC_ALL=C
 
 	_symlink_error_msg="Failed to create a very important symlink in /tmp"
 	if [ -n "$_tmp_bin" ] && ! ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin"; then
