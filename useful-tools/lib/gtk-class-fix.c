@@ -17,236 +17,159 @@
 
 #define _GNU_SOURCE
 #include <dlfcn.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <glib.h>
-#include <gio/gio.h>
-#include <gobject/gobject.h>
 
-static const char *override_id = NULL;
-static int override_checked = 0;
-static int in_override = 0;
+typedef void           *gpointer;
+typedef unsigned long   GType;
+typedef unsigned int    guint;
+typedef int             gboolean;
+typedef char            gchar;
+typedef struct _GObject      GObject;
+typedef struct _GApplication GApplication;
+typedef unsigned int    GApplicationFlags;
+typedef struct _GValue GValue;
 
-typedef GApplication *(*fp_g_application_new)(const char *, GApplicationFlags);
-typedef GApplication *(*fp_gtk_application_new)(const char *, GApplicationFlags);
-typedef void (*fp_g_application_set_application_id)(GApplication *, const char *);
-typedef void (*fp_g_set_prgname)(const char *);
-typedef const char *(*fp_g_get_prgname)(void);
-typedef gpointer (*fp_g_object_new)(GType, const gchar *, ...);
-typedef GObject *(*fp_g_object_new_valist)(GType, const gchar *, va_list);
-typedef GObject *(*fp_g_object_new_with_properties)(GType, guint, const gchar **, const GValue *);
+static GType     (*fn_g_application_get_type)(void);
+static gboolean  (*fn_g_type_check_instance_is_a)(gpointer, GType);
+static const char *(*fn_g_application_get_application_id)(GApplication *);
 
-static fp_g_application_new                real_g_application_new                = NULL;
-static fp_gtk_application_new              real_gtk_application_new              = NULL;
-static fp_g_application_set_application_id real_g_application_set_application_id = NULL;
-static fp_g_set_prgname                    real_g_set_prgname                    = NULL;
-static fp_g_get_prgname                    real_g_get_prgname                    = NULL;
-static fp_g_object_new                     real_g_object_new                     = NULL;
-static fp_g_object_new_valist              real_g_object_new_valist              = NULL;
-static fp_g_object_new_with_properties     real_g_object_new_with_properties     = NULL;
+#define G_IS_APPLICATION(o) \
+    (fn_g_application_get_type && fn_g_type_check_instance_is_a && \
+     fn_g_type_check_instance_is_a((gpointer)(o), fn_g_application_get_type()))
+#define G_APPLICATION(o) ((GApplication *)(o))
+#define G_OBJECT(o)      ((GObject *)(o))
+
+
+static const char *override_id      = NULL;
+static int         override_checked = 0;
+static int         in_override      = 0;
+static GApplication *(*real_g_application_new)(const char *, GApplicationFlags);
+static GApplication *(*real_gtk_application_new)(const char *, GApplicationFlags);
+static void          (*real_g_application_set_application_id)(GApplication *, const char *);
+static void          (*real_g_set_prgname)(const char *);
+static const char   *(*real_g_get_prgname)(void);
+static gpointer      (*real_g_object_new)(GType, const gchar *, ...);
+static GObject      *(*real_g_object_new_valist)(GType, const gchar *, va_list);
+static GObject      *(*real_g_object_new_with_properties)(GType, guint, const gchar **, const GValue *);
+
+#define LOAD(sym) \
+    do { if (!real_##sym) real_##sym = (__typeof__(real_##sym))dlsym(RTLD_NEXT, #sym); } while (0)
+#define LOAD_FN(dst, name) \
+    do { if (!dst) *(void **)(&dst) = dlsym(RTLD_NEXT, name); } while (0)
 
 static void init_override_id(void) {
-    if (override_checked) { return; }
+    if (override_checked) return;
     override_checked = 1;
-
-    /* Get the class */
-    const char *env = getenv("GTK_WINDOW_CLASS");
-    if (env && *env) {
-        override_id = env;
+    override_id = getenv("GTK_WINDOW_CLASS");
+    if (override_id && *override_id)
         fprintf(stderr, " [gtk-class-fix.so] Setting window class to '%s'\n", override_id);
-    }
 }
 
 static const char *effective_id(const char *requested) {
     init_override_id();
-    /* If override_id is set and not empty, use it; otherwise use requested */
-    if (override_id && *override_id) { return override_id; }
-    return requested;
+    return (override_id && *override_id) ? override_id : requested;
 }
 
 static void resolve(void) {
-    /* Only look up each function once (if not already found) */
-    if (! real_g_application_new) {
-        real_g_application_new = (fp_g_application_new)
-            dlsym(RTLD_NEXT, "g_application_new");
-    }
-    if (!real_gtk_application_new) {
-        real_gtk_application_new = (fp_gtk_application_new)
-            dlsym(RTLD_NEXT, "gtk_application_new");
-    }
-    if (!real_g_application_set_application_id) {
-        real_g_application_set_application_id = (fp_g_application_set_application_id)
-            dlsym(RTLD_NEXT, "g_application_set_application_id");
-    }
-    if (!real_g_set_prgname) {
-        real_g_set_prgname = (fp_g_set_prgname)
-            dlsym(RTLD_NEXT, "g_set_prgname");
-    }
-    if (!real_g_get_prgname) {
-        real_g_get_prgname = (fp_g_get_prgname)
-            dlsym(RTLD_NEXT, "g_get_prgname");
-    }
-    if (!real_g_object_new) {
-        real_g_object_new = (fp_g_object_new)
-            dlsym(RTLD_NEXT, "g_object_new");
-    }
-    if (!real_g_object_new_valist) {
-        real_g_object_new_valist = (fp_g_object_new_valist)
-            dlsym(RTLD_NEXT, "g_object_new_valist");
-    }
-    if (! real_g_object_new_with_properties) {
-        real_g_object_new_with_properties = (fp_g_object_new_with_properties)
-            dlsym(RTLD_NEXT, "g_object_new_with_properties");
-    }
+    LOAD(g_application_new);
+    LOAD(gtk_application_new);
+    LOAD(g_application_set_application_id);
+    LOAD(g_set_prgname);
+    LOAD(g_get_prgname);
+    LOAD(g_object_new);
+    LOAD(g_object_new_valist);
+    LOAD(g_object_new_with_properties);
+    LOAD_FN(fn_g_application_get_type,          "g_application_get_type");
+    LOAD_FN(fn_g_type_check_instance_is_a,      "g_type_check_instance_is_a");
+    LOAD_FN(fn_g_application_get_application_id, "g_application_get_application_id");
 }
 
 static void maybe_override(GObject *obj) {
-    /* Sanity checks */
-    if (!obj) { return; }
-    if (in_override) { return; }
-
+    if (!obj || in_override) return;
     init_override_id();
+    if (!override_id || !*override_id) return;
+    if (!G_IS_APPLICATION(obj)) return;
 
-    if (!override_id || !*override_id) { return; }
-
-    /* Is this a GApplication?  If not, skip it */
-    if (!G_IS_APPLICATION(obj)) { return; }
     GApplication *app = G_APPLICATION(obj);
 
-    /* Get current ID and check if it's already what we want */
-    const char *current_id = g_application_get_application_id(app);
-    if (current_id && strcmp(current_id, override_id) == 0) {
-        return;  /* Already set correctly */
+    if (fn_g_application_get_application_id) {
+        const char *current_id = fn_g_application_get_application_id(app);
+        if (current_id && strcmp(current_id, override_id) == 0) return;
     }
 
-    /* Prevent recursion */
     in_override = 1;
-
-    /* Apply the override */
-    if (real_g_application_set_application_id) {
+    if (real_g_application_set_application_id)
         real_g_application_set_application_id(app, override_id);
-    }
-    if (real_g_set_prgname) {
+    if (real_g_set_prgname)
         real_g_set_prgname(override_id);
-    }
-
-    /* Clear the flag */
     in_override = 0;
 }
 
 GApplication *g_application_new(const char *application_id, GApplicationFlags flags) {
     resolve();
-
-    /* Call real function with possibly-modified ID */
-    GApplication *app = NULL;
-    if (real_g_application_new) {
-        app = real_g_application_new(effective_id(application_id), flags);
-    }
-
-    /* Ensure override is applied */
+    GApplication *app = real_g_application_new
+        ? real_g_application_new(effective_id(application_id), flags) : NULL;
     maybe_override(G_OBJECT(app));
-
     return app;
 }
 
 GApplication *gtk_application_new(const char *application_id, GApplicationFlags flags) {
     resolve();
-
-    GApplication *app = NULL;
-    if (real_gtk_application_new) {
-        app = real_gtk_application_new(effective_id(application_id), flags);
-    }
-
+    GApplication *app = real_gtk_application_new
+        ? real_gtk_application_new(effective_id(application_id), flags) : NULL;
     maybe_override(G_OBJECT(app));
-
     return app;
 }
 
 void g_application_set_application_id(GApplication *app, const char *application_id) {
     resolve();
-
-    if (real_g_application_set_application_id) {
+    if (real_g_application_set_application_id)
         real_g_application_set_application_id(app, effective_id(application_id));
-    }
 }
 
 void g_set_prgname(const char *prgname) {
     resolve();
-
-    if (real_g_set_prgname) {
-        real_g_set_prgname(effective_id(prgname));
-    }
+    if (real_g_set_prgname) real_g_set_prgname(effective_id(prgname));
 }
 
 const char *g_get_prgname(void) {
     resolve();
     init_override_id();
-
-    /* If override is set, return it */
-    if (override_id && *override_id) {
-        return override_id;
-    }
-
-    /* Otherwise, return what the real function returns */
-    if (real_g_get_prgname) {
-        return real_g_get_prgname();
-    }
-
-    return NULL;
+    if (override_id && *override_id) return override_id;
+    return real_g_get_prgname ? real_g_get_prgname() : NULL;
 }
 
 gpointer g_object_new(GType type, const gchar *first_property_name, ...) {
     resolve();
-
     GObject *obj = NULL;
-
     if (real_g_object_new_valist) {
-        /* Set up to handle variable arguments */
         va_list ap;
-        va_start(ap, first_property_name);  /* Start reading args after first_property_name */
+        va_start(ap, first_property_name);
         obj = real_g_object_new_valist(type, first_property_name, ap);
         va_end(ap);
     } else if (real_g_object_new) {
-        /* Fallback:  call with just the first property */
-        obj = (GObject*)real_g_object_new(type, first_property_name);
+        obj = (GObject *)real_g_object_new(type, first_property_name, NULL);
     }
-
-    /* Check if this created a GApplication and override if needed */
     maybe_override(obj);
-
     return obj;
 }
 
 GObject *g_object_new_valist(GType type, const gchar *first_property_name, va_list var_args) {
     resolve();
-
-    GObject *obj = NULL;
-    if (real_g_object_new_valist) {
-        obj = real_g_object_new_valist(type, first_property_name, var_args);
-    }
-
+    GObject *obj = real_g_object_new_valist
+        ? real_g_object_new_valist(type, first_property_name, var_args) : NULL;
     maybe_override(obj);
-
     return obj;
 }
 
-GObject *g_object_new_with_properties(
-    GType type,
-    guint n_properties,
-    const gchar **names,
-    const GValue *values
-) {
+GObject *g_object_new_with_properties(GType type, guint n_properties, const gchar **names, const GValue *values) {
     resolve();
-
-    GObject *obj = NULL;
-    if (real_g_object_new_with_properties) {
-        obj = real_g_object_new_with_properties(type, n_properties, names, values);
-    }
-
+    GObject *obj = real_g_object_new_with_properties
+        ? real_g_object_new_with_properties(type, n_properties, names, values) : NULL;
     maybe_override(obj);
-
     return obj;
 }
 
@@ -254,8 +177,5 @@ __attribute__((constructor))
 static void gtk_class_fix_ctor(void) {
     resolve();
     init_override_id();
-    /* If we have an override, set the program name immediately */
-    if (override_id && real_g_set_prgname) {
-        real_g_set_prgname(override_id);
-    }
+    if (override_id && real_g_set_prgname) real_g_set_prgname(override_id);
 }

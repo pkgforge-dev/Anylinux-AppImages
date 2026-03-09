@@ -343,10 +343,7 @@ _sanity_check() {
 		exit 1
 	fi
 
-	if [ "$GTK_CLASS_FIX" = 1 ] && ! _is_cmd gcc pkg-config; then
-		_err_msg "ERROR: Using GTK_CLASS_FIX requires gcc and pkg-config"
-		exit 1
-	elif  [ -n "$PATH_MAPPING" ] && ! echo "$PATH_MAPPING" | grep -q 'SHARUN_DIR'; then
+	if  [ -n "$PATH_MAPPING" ] && ! echo "$PATH_MAPPING" | grep -q 'SHARUN_DIR'; then
 		_err_msg 'ERROR: PATH_MAPPING must contain unexpanded ${SHARUN_DIR} variable'
 		_err_msg 'Example:'
 		_err_msg "'PATH_MAPPING=/etc:\${SHARUN_DIR}/etc'"
@@ -1214,9 +1211,8 @@ _add_gtk_class_fix() {
 
 	_echo "* Building gtk-class-fix.so"
 	_download "$APPDIR"/.gtk-class-fix.c "$GTK_CLASS_FIX_SOURCE"
-	gcc -shared -fPIC "$APPDIR"/.gtk-class-fix.c \
-		-o "$APPDIR"/shared/lib/gtk-class-fix.so \
-		$(pkg-config --cflags --libs glib-2.0 gio-2.0 gobject-2.0) -ldl
+	cc -shared -fPIC -O2 "$APPDIR"/.gtk-class-fix.c \
+		-o "$APPDIR"/shared/lib/gtk-class-fix.so -ldl
 
 	# _check_window_class will make sure StartupWMClass is added to desktop entry
 
