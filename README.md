@@ -230,6 +230,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [SuperTuxKart](https://github.com/pkgforge-dev/SuperTuxKart-AppImage-Enhanced)                                           |
 [sView](https://github.com/pkgforge-dev/sView-AppImage)                                                                  |
 [system-monitoring-center](https://github.com/pkgforge-dev/system-monitoring-center-AppImage)                            |
+[tachoparser](https://github.com/pkgforge-dev/tachoparser-AppImage)                                                      |
 [Tagger](https://github.com/pkgforge-dev/Tagger-AppImage)                                                                |
 [Taisei Project](https://github.com/pkgforge-dev/Taisei-Project-AppImage)                                                |
 [Taradino](https://github.com/pkgforge-dev/Taradino-AppImage)                                                            |
