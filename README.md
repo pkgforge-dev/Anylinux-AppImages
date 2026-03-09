@@ -77,6 +77,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced)                                             |
 [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage)                                                                |
 [Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
+[DNZH Recompiled](https://github.com/pkgforge-dev/DNZHRecomp-AppImage)                                                   |
 [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
 [DOOM64EXUltra](https://github.com/pkgforge-dev/DOOM64EXUltra-AppImage)                                                  |
 [DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage)                                                            |
@@ -142,7 +143,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage)                                                          |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
-[MarioKart64 Recomp](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage)                                         |
+[MarioKart64 Recompiled](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage)                                     |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
 [melonDS](https://github.com/pkgforge-dev/melonDS-AppImage-Enhanced)                                                     |
 [MESA](https://github.com/pkgforge-dev/MESA-AppImage)                                                                    |
