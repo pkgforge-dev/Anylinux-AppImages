@@ -77,7 +77,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced)                                             |
 [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage)                                                                |
 [Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
-[DNZH Recompiled](https://github.com/pkgforge-dev/DNZHRecomp-AppImage)                                                   |
+[DNZHRecomp](https://github.com/pkgforge-dev/DNZHRecomp-AppImage)                                                        |
 [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
 [DOOM64EXUltra](https://github.com/pkgforge-dev/DOOM64EXUltra-AppImage)                                                  |
 [DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage)                                                            |
@@ -143,7 +143,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage)                                                          |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
-[MarioKart64 Recompiled](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage)                                     |
+[MarioKart64Recomp](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage)                                          |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
 [melonDS](https://github.com/pkgforge-dev/melonDS-AppImage-Enhanced)                                                     |
 [MESA](https://github.com/pkgforge-dev/MESA-AppImage)                                                                    |
@@ -220,7 +220,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
 [SRB2Kart](https://github.com/pkgforge-dev/SRB2Kart-AppImage)                                                            |
 [st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
-[Starfox64 Recompiled](https://github.com/pkgforge-dev/Starfox64Recomp-AppImage)                                         |
+[Starfox64Recomp](https://github.com/pkgforge-dev/Starfox64Recomp-AppImage)                                              |
 [Stella](https://github.com/pkgforge-dev/Stella-AppImage)                                                                |
 [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage)                                                    |
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
@@ -262,7 +262,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage)                                              |
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
-[Zelda64 Recompiled](https://github.com/pkgforge-dev/Zelda64-Recompiled-AppImage)                                        |
+[Zelda64Recomp](https://github.com/pkgforge-dev/Zelda64Recomp-AppImage)                                                  |
 [Zen Browser](https://github.com/pkgforge-dev/Zen-Browser-AppImage-Enhanced)                                             |
 [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
 [ZSNES](https://github.com/pkgforge-dev/ZSNES-AppImage)                                                                  |
