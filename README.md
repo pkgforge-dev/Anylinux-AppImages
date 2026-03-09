@@ -262,7 +262,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage)                                              |
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
-[Zelda64 Recompiled](https://github.com/Zelda64Recomp/Zelda64Recomp)                                                     |
+[Zelda64 Recompiled](https://github.com/pkgforge-dev/Zelda64-Recompiled-AppImage)                                        |
 [Zen Browser](https://github.com/pkgforge-dev/Zen-Browser-AppImage-Enhanced)                                             |
 [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
 [ZSNES](https://github.com/pkgforge-dev/ZSNES-AppImage)                                                                  |
