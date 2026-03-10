@@ -48,7 +48,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Augustus](https://github.com/pkgforge-dev/Augustus-AppImage-Enhanced)                                                   |
 [Authenticator](https://github.com/pkgforge-dev/Authenticator-AppImage)                                                  |
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
-[BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage)                                                 |
+[BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage)                                                      |
+[BasiliskII](https://github.com/pkgforge-dev/BasiliskII-AppImage-Enhanced)                                               |
 [BibleTime](https://github.com/pkgforge-dev/BibleTime-AppImage)                                                          |
 [Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
 [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage)                                                        |
