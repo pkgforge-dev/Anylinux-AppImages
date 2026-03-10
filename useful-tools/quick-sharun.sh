@@ -1173,7 +1173,7 @@ _add_anylinux_lib() {
 	if [ ! -f "$APPDIR"/shared/lib/anylinux.so ]; then
 		_echo "* Building anylinux.so..."
 		_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
-		cc -shared -fPIC \
+		cc -shared -fPIC -O2 \
 		  "$APPDIR"/.anylinux.c -o "$APPDIR"/shared/lib/anylinux.so
 	fi
 
