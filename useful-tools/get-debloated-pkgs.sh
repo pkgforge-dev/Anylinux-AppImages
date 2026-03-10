@@ -217,8 +217,7 @@ if [ "$COMMON_PACKAGES" = 1 ]; then
 		gtk3-mini        \
 		gtk4-mini        \
 		gdk-pixbuf2-mini \
-		librsvg-mini     \
-		llvm-libs-"$PKG_TYPE"
+		librsvg-mini
 fi
 
 if [ "$ADD_MESA" = 1 ]; then
