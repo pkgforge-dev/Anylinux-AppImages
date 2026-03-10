@@ -34,7 +34,7 @@ OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
 URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.6/uruntime-appimage-dwarfs-lite-$APPIMAGE_ARCH}
 DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$APPIMAGE_ARCH}
 
-ANYLINUX_LIB=${ANYLINUX_LIB:-0}
+ANYLINUX_LIB=${ANYLINUX_LIB:-1}
 ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
 GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
@@ -61,11 +61,6 @@ DEPENDENCIES="
 	strings
 	tr
 "
-
-# keep this for backwards compat until all existing scripts have been updated
-if [ "$EXEC_WRAPPER" = 1 ] || [ "$LOCALE_FIX" = 1 ] || [ "$ALWAYS_SOFTWARE" = 1 ]; then
-	ANYLINUX_LIB=1
-fi
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
@@ -219,8 +214,8 @@ _help_msg() {
 	  LIB_DIR          Set source library directory if autodetection fails.
 	  NO_STRIP         Disable stripping binaries and libraries if set.
 	  APPDIR           Destination AppDir (default: ./AppDir).
-	  ANYLINUX_LIB     Preloads a library that unsets environment variables known to cause
-	                   problems to child processes. Set to 0 to disable.
+	  ANYLINUX_LIB     Preloads a library that unsets environment variables known to
+	                   cause problems to child processes. Set to 0 to disable.
 	                   Additionally you can set ANYLINUX_DO_NOT_LOAD_LIBS to a
 	                   list of colon separated libraries to prevent from being
 	                   dlopened, the entries support simple globbing, example:
@@ -231,8 +226,7 @@ _help_msg() {
 	  ALWAYS_SOFTWARE  Set to 1 to enable. Sets several env variables to make
 	                   applications use software rendering, use this option when
 	                   you do not want hardware acceleration.
-	                   Enables ANYLINUX_LIB and will fail if we detect the
-	                   application made use of mesa during deployment.
+	                   Will fail if the application makes use of mesa during deployment.
 
 	  PATH_MAPPING    Configures and preloads pathmap.
 	                  Set this variable if the application is hardcoded to look
@@ -2669,3 +2663,4 @@ else
 	_echo "All done!"
 	_echo "------------------------------------------------------------"
 fi
+
