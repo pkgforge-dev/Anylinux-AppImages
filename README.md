@@ -125,6 +125,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
 [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
+[Iris](https://github.com/pkgforge-dev/Iris-AppImage-Enhanced)                                                           |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
 [ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage)                                                            |
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
