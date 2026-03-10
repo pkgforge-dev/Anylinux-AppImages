@@ -13,7 +13,6 @@ EXTRA_PACKAGES="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITH
 
 export DEPLOY_OPENGL=1
 export DEPLOY_VULKAN=1
-export ANYLINUX_LIB=1
 export ICON=DUMMY
 export DESKTOP=DUMMY
 export OUTPATH=./dist

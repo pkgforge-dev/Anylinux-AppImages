@@ -8,7 +8,6 @@ ARCH="$(uname -m)"
 SHARUN="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/quick-sharun.sh"
 EXTRA_PACKAGES="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 
-export ANYLINUX_LIB=1
 export ICON=/usr/share/icons/hicolor/scalable/apps/org.gtk.Demo4.svg
 export DESKTOP=/usr/share/applications/org.gtk.Demo4.desktop
 export OUTPATH=./dist
