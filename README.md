@@ -35,6 +35,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | Applications                                                                                                             |
 | ------------------------------------------------------------------------------------------------------------------------ |
 [12to11](https://github.com/pkgforge-dev/12to11-AppImage)                                                                |
+[86Box](https://github.com/pkgforge-dev/86box-AppImage-Enhanced)                                                         |
 [AAAAXY](https://github.com/pkgforge-dev/AAAAXY-AppImage-Enhanced)                                                       |
 [Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage)                                                            |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
@@ -47,7 +48,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Augustus](https://github.com/pkgforge-dev/Augustus-AppImage-Enhanced)                                                   |
 [Authenticator](https://github.com/pkgforge-dev/Authenticator-AppImage)                                                  |
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
-[BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage)                                                 |
+[BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage)                                                      |
+[BasiliskII](https://github.com/pkgforge-dev/BasiliskII-AppImage-Enhanced)                                               |
 [BibleTime](https://github.com/pkgforge-dev/BibleTime-AppImage)                                                          |
 [Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
 [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage)                                                        |
@@ -99,6 +101,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [FeatherPad](https://github.com/pkgforge-dev/FeatherPad-AppImage)                                                        |
 [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage)                                                                |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
+[Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced)                                                     |
 [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage)                                                    |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
 [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage)                                                            |
@@ -125,6 +128,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
 [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
+[Iris](https://github.com/pkgforge-dev/Iris-AppImage-Enhanced)                                                           |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
 [ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage)                                                            |
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
