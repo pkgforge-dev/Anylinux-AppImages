@@ -35,6 +35,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | Applications                                                                                                             |
 | ------------------------------------------------------------------------------------------------------------------------ |
 [12to11](https://github.com/pkgforge-dev/12to11-AppImage)                                                                |
+[86Box](https://github.com/pkgforge-dev/86box-AppImage-Enhanced)                                                         |
 [AAAAXY](https://github.com/pkgforge-dev/AAAAXY-AppImage-Enhanced)                                                       |
 [Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage)                                                            |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
@@ -99,6 +100,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [FeatherPad](https://github.com/pkgforge-dev/FeatherPad-AppImage)                                                        |
 [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage)                                                                |
 [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
+[Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced)                                                     |
 [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage)                                                    |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
 [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage)                                                            |
