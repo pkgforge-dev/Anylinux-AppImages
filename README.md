@@ -64,6 +64,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage)                                                             |
 [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
+[Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage)                                            |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage)                                                            |
@@ -166,6 +167,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced)                                             |
 [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced)                                           |
 [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
+[Odamex](https://github.com/pkgforge-dev/Odamex-AppImage)                                                                |
 [okteta](https://github.com/pkgforge-dev/okteta-AppImage)                                                                |
 [OpenClaw](https://github.com/pkgforge-dev/OpenClaw-AppImage)                                                            |
 [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced)                                                   |
