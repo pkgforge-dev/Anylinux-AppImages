@@ -64,6 +64,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage)                                                             |
 [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
+[Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage)                                            |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage)                                                            |
