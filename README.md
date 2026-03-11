@@ -168,6 +168,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
 [okteta](https://github.com/pkgforge-dev/okteta-AppImage)                                                                |
 [OpenClaw](https://github.com/pkgforge-dev/OpenClaw-AppImage)                                                            |
+[Odamex](https://github.com/pkgforge-dev/Odamex-AppImage)                                                                |
 [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced)                                                   |
 [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage)                                                            |
 [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage)                                                            |
