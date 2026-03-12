@@ -183,6 +183,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
 [PCSX2](https://github.com/pkgforge-dev/PCSX2-AppImage-Enhanced)                                                         |
 [Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage)                                                    |
+[Phantom-Satellite](https://github.com/pkgforge-dev/Phantom-Satellite-AppImage)                                          |
 [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage)                                            |
 [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
