@@ -2654,6 +2654,21 @@ if [ -f "$1" ]; then
 	fi
 fi
 
+# also warn when several common qt theme plugins are missing, we only do this for qt6
+if [ -d "$APPDIR"/shared/lib/qt6 ]; then
+	for p in kvantum qtlxqt qt6ct; do
+		set -- "$APPDIR"/shared/lib/qt*/plugins/*/*$p*
+		if [ ! -f "$1" ]; then
+			_err_msg "------------------------------------------------------------"
+			_err_msg "WARNING: Qt was deployed but there is no $p plugin!"
+			_err_msg "This means the application will lack proper theme support!"
+			_err_msg "Install the packages that provide theme support before deploying"
+			_err_msg "In archlinux those are: qt6ct kvantum lxqt-qtplugin"
+			_err_msg "------------------------------------------------------------"
+		fi
+	done
+fi
+
 echo ""
 if [ "$OUTPUT_APPIMAGE" = 1 ]; then
 	_make_appimage
@@ -2663,4 +2678,3 @@ else
 	_echo "All done!"
 	_echo "------------------------------------------------------------"
 fi
-
