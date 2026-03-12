@@ -23,6 +23,7 @@ pacman -Syu --noconfirm \
 	base-devel       \
 	curl             \
 	git              \
+	kvantum          \
 	libxcb           \
 	libxcursor       \
 	libxi            \
@@ -30,7 +31,9 @@ pacman -Syu --noconfirm \
 	libxkbcommon-x11 \
 	libxrandr        \
 	libxtst          \
+	lxqt-qtplugin    \
 	mesa-utils       \
+	qt6ct            \
 	qt6-tools        \
 	vulkan-tools     \
 	wget             \
