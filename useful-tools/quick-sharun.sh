@@ -1423,12 +1423,14 @@ _deploy_datadir() {
 					glvnd       |\
 					gvfs        |\
 					help        |\
+					i18n        |\
 					icons       |\
 					info        |\
 					java        |\
 					locale      |\
 					man         |\
 					misc        |\
+					model       |\
 					pipewire    |\
 					pixmaps     |\
 					qt          |\
@@ -1437,7 +1439,9 @@ _deploy_datadir() {
 					qt6         |\
 					qt7         |\
 					ss          |\
+					systemd     |\
 					themes      |\
+					vala        |\
 					vulkan      |\
 					wayland     |\
 					WebP        |\
@@ -1827,7 +1831,6 @@ _check_hardcoded_data_dirs() {
 			file     |\
 			glib-*   |\
 			glvnd    |\
-			i18n     |\
 			icons    |\
 			libdrm   |\
 			libthai  |\
