@@ -38,6 +38,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [86Box](https://github.com/pkgforge-dev/86box-AppImage-Enhanced)                                                         |
 [AAAAXY](https://github.com/pkgforge-dev/AAAAXY-AppImage-Enhanced)                                                       |
 [Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage)                                                            |
+[Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage)                                                          |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
 [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage)                                                  |
 [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
