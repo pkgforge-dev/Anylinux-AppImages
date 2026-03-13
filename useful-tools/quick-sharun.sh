@@ -1827,6 +1827,7 @@ _check_hardcoded_data_dirs() {
 			file     |\
 			glib-*   |\
 			glvnd    |\
+			i18n     |\
 			icons    |\
 			libdrm   |\
 			libthai  |\
