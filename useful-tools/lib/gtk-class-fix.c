@@ -51,9 +51,6 @@ static GApplication *(*real_gtk_application_new)(const char *, GApplicationFlags
 static void          (*real_g_application_set_application_id)(GApplication *, const char *);
 static void          (*real_g_set_prgname)(const char *);
 static const char   *(*real_g_get_prgname)(void);
-static gpointer      (*real_g_object_new)(GType, const gchar *, ...);
-static GObject      *(*real_g_object_new_valist)(GType, const gchar *, va_list);
-static GObject      *(*real_g_object_new_with_properties)(GType, guint, const gchar **, const GValue *);
 
 #define LOAD(sym) \
     do { if (!real_##sym) real_##sym = (__typeof__(real_##sym))dlsym(RTLD_NEXT, #sym); } while (0)
@@ -79,21 +76,15 @@ static void resolve(void) {
     LOAD(g_application_set_application_id);
     LOAD(g_set_prgname);
     LOAD(g_get_prgname);
-    LOAD(g_object_new);
-    LOAD(g_object_new_valist);
-    LOAD(g_object_new_with_properties);
     LOAD_FN(fn_g_application_get_type,          "g_application_get_type");
     LOAD_FN(fn_g_type_check_instance_is_a,      "g_type_check_instance_is_a");
     LOAD_FN(fn_g_application_get_application_id, "g_application_get_application_id");
 }
 
-static void maybe_override(GObject *obj) {
-    if (!obj || in_override) return;
+static void maybe_override(GApplication *app) {
+    if (!app || in_override) return;
     init_override_id();
     if (!override_id || !*override_id) return;
-    if (!G_IS_APPLICATION(obj)) return;
-
-    GApplication *app = G_APPLICATION(obj);
 
     if (fn_g_application_get_application_id) {
         const char *current_id = fn_g_application_get_application_id(app);
@@ -112,7 +103,7 @@ GApplication *g_application_new(const char *application_id, GApplicationFlags fl
     resolve();
     GApplication *app = real_g_application_new
         ? real_g_application_new(effective_id(application_id), flags) : NULL;
-    maybe_override(G_OBJECT(app));
+    maybe_override(app);
     return app;
 }
 
@@ -120,7 +111,7 @@ GApplication *gtk_application_new(const char *application_id, GApplicationFlags 
     resolve();
     GApplication *app = real_gtk_application_new
         ? real_gtk_application_new(effective_id(application_id), flags) : NULL;
-    maybe_override(G_OBJECT(app));
+    maybe_override(app);
     return app;
 }
 
@@ -140,37 +131,6 @@ const char *g_get_prgname(void) {
     init_override_id();
     if (override_id && *override_id) return override_id;
     return real_g_get_prgname ? real_g_get_prgname() : NULL;
-}
-
-gpointer g_object_new(GType type, const gchar *first_property_name, ...) {
-    resolve();
-    GObject *obj = NULL;
-    if (real_g_object_new_valist) {
-        va_list ap;
-        va_start(ap, first_property_name);
-        obj = real_g_object_new_valist(type, first_property_name, ap);
-        va_end(ap);
-    } else if (real_g_object_new) {
-        obj = (GObject *)real_g_object_new(type, first_property_name, NULL);
-    }
-    maybe_override(obj);
-    return obj;
-}
-
-GObject *g_object_new_valist(GType type, const gchar *first_property_name, va_list var_args) {
-    resolve();
-    GObject *obj = real_g_object_new_valist
-        ? real_g_object_new_valist(type, first_property_name, var_args) : NULL;
-    maybe_override(obj);
-    return obj;
-}
-
-GObject *g_object_new_with_properties(GType type, guint n_properties, const gchar **names, const GValue *values) {
-    resolve();
-    GObject *obj = real_g_object_new_with_properties
-        ? real_g_object_new_with_properties(type, n_properties, names, values) : NULL;
-    maybe_override(obj);
-    return obj;
 }
 
 __attribute__((constructor))
