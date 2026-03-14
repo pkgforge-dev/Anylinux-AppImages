@@ -748,10 +748,12 @@ _make_deployment_array() {
 			"$LIB_DIR"/gvfs/libgvfscommon.so      \
 			"$LIB_DIR"/gio/modules/libgvfsdbus.so \
 			"$LIB_DIR"/gio/modules/libdconfsettings.so
-		echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
 
 		case "$GTK_DIR" in
-			*4*) DEPLOY_OPENGL=${DEPLOY_OPENGL:-1};;
+			*4*)
+				DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
+				echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
+				;;
 		esac
 
 		if [ "$DEPLOY_WEBKIT2GTK" = 1 ]; then
