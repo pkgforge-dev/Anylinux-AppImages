@@ -211,6 +211,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [ROLLER](https://github.com/pkgforge-dev/ROLLER-AppImage)                                                                |
 [RSDKv3](https://github.com/pkgforge-dev/RSDKv3-AppImage)                                                                |
 [RSDKv4](https://github.com/pkgforge-dev/RSDKv4-AppImage)                                                                |
+[Ruffle](https://github.com/pkgforge-dev/Ruffle-AppImage)                                                                |
 [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced)                                                   |
 [Sanicball](https://github.com/pkgforge-dev/Sanicball-AppImage)                                                          |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
