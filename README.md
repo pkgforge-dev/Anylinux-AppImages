@@ -190,6 +190,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
 [Play!](https://github.com/pkgforge-dev/Play-AppImage-Enhanced)                                                          |
 [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)                                                          |
+[PokeMMO](https://github.com/pkgforge-dev/PokeMMO-AppImage)                                                              |
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
@@ -211,6 +212,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [ROLLER](https://github.com/pkgforge-dev/ROLLER-AppImage)                                                                |
 [RSDKv3](https://github.com/pkgforge-dev/RSDKv3-AppImage)                                                                |
 [RSDKv4](https://github.com/pkgforge-dev/RSDKv4-AppImage)                                                                |
+[Ruffle](https://github.com/pkgforge-dev/Ruffle-AppImage)                                                                |
 [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced)                                                   |
 [Sanicball](https://github.com/pkgforge-dev/Sanicball-AppImage)                                                          |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
