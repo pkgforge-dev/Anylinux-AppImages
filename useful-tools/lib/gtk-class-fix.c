@@ -31,6 +31,9 @@ static GApplication *(*real_gtk_application_new)(const char *, GApplicationFlags
 static void (*real_g_application_set_application_id)(GApplication *, const char *);
 static void (*real_g_set_prgname)(const char *);
 static const char *(*real_g_get_prgname)(void);
+static void (*real_gdk_surface_set_app_id)(void *surface, const char *app_id);
+static void (*real_gdk_wayland_window_set_app_id)(void *window, const char *app_id);
+static void (*real_gdk_window_set_app_id)(void *window, const char *app_id);
 
 static void init(void) {
     if (initialized) return;
@@ -48,6 +51,9 @@ static void init(void) {
     real_g_application_set_application_id = dlsym(RTLD_NEXT, "g_application_set_application_id");
     real_g_set_prgname = dlsym(RTLD_NEXT, "g_set_prgname");
     real_g_get_prgname = dlsym(RTLD_NEXT, "g_get_prgname");
+    real_gdk_surface_set_app_id = dlsym(RTLD_NEXT, "gdk_surface_set_app_id");
+    real_gdk_wayland_window_set_app_id = dlsym(RTLD_NEXT, "gdk_wayland_window_set_app_id");
+    real_gdk_window_set_app_id = dlsym(RTLD_NEXT, "gdk_window_set_app_id");
 }
 
 static const char *effective_id(const char *requested) {
@@ -82,6 +88,27 @@ const char *g_get_prgname(void) {
     init();
     if (override_id) return override_id;
     return real_g_get_prgname ? real_g_get_prgname() : NULL;
+}
+
+void gdk_surface_set_app_id(void *surface, const char *app_id) {
+    init();
+    if (real_gdk_surface_set_app_id) {
+        real_gdk_surface_set_app_id(surface, effective_id(app_id));
+    }
+}
+
+void gdk_wayland_window_set_app_id(void *window, const char *app_id) {
+    init();
+    if (real_gdk_wayland_window_set_app_id) {
+        real_gdk_wayland_window_set_app_id(window, effective_id(app_id));
+    }
+}
+
+void gdk_window_set_app_id(void *window, const char *app_id) {
+    init();
+    if (real_gdk_window_set_app_id) {
+        real_gdk_window_set_app_id(window, effective_id(app_id));
+    }
 }
 
 __attribute__((constructor))
