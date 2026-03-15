@@ -190,6 +190,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
 [Play!](https://github.com/pkgforge-dev/Play-AppImage-Enhanced)                                                          |
 [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)                                                          |
+[PokeMMO](https://github.com/pkgforge-dev/PokeMMO-AppImage)                                                              |
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
