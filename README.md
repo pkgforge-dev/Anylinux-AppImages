@@ -113,6 +113,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
 [Ghostship](https://github.com/pkgforge-dev/Ghostship-AppImage-Enhanced)                                                 |
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
+[Gopher64](https://github.com/pkgforge-dev/Gopher64-AppImage)                                                            |
 [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)                                        |
 [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage)                                            |
 [Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage)                                                |
