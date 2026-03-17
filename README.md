@@ -113,7 +113,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
 [Ghostship](https://github.com/pkgforge-dev/Ghostship-AppImage-Enhanced)                                                 |
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
-[Gopher64](https://github.com/pkgforge-dev/Gopher64-AppImage)                                                            |
 [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)                                        |
 [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage)                                            |
 [Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage)                                                |
@@ -122,6 +121,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [GNU FreeDink](https://github.com/pkgforge-dev/GNU-FreeDink-AppImage)                                                    |
 [Godot](https://github.com/pkgforge-dev/Godot-AppImage)                                                                  |
 [GoldenDict-ng](https://github.com/pkgforge-dev/GoldenDict-ng-AppImage)                                                  |
+[Gopher64](https://github.com/pkgforge-dev/Gopher64-AppImage)                                                            |
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [Gradia](https://github.com/pkgforge-dev/Gradia-AppImage)                                                                |
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
