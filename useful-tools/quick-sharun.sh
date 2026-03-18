@@ -2505,6 +2505,9 @@ for lib do case "$lib" in
 			_echo "Copied and patched imlib2 xpm loader"
 		fi
 		;;
+	*/7z.so)
+		cp -v "$lib" "$APPDIR"/bin
+		;;
 	esac
 done
 
