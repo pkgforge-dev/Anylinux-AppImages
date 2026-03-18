@@ -67,6 +67,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage)                                            |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
+[CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage)                                                      |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage)                                                            |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
