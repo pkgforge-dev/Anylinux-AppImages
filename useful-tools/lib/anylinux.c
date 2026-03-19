@@ -271,6 +271,10 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 			DEBUG_PRINT("Failed to restore HOME to %s\n", real_home);
 	}
 
+	// always unset LD_DEBUG to child processes to help when
+	// troubleshooting with APPIMAGE_DEBUG=1
+	unsetenv("LD_DEBUG");
+
 	// remove problematic variables
 	char* const *env = envp;
 	const char* path_to_check = fullpath ? fullpath : filename;
