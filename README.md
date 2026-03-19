@@ -74,6 +74,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
 [D1X-Rebirth](https://github.com/pkgforge-dev/D1X-Rebirth-AppImage)                                                      |
 [D2X-Rebirth](https://github.com/pkgforge-dev/D2X-Rebirth-AppImage)                                                      |
+[Daggerfall-Unity](https://github.com/pkgforge-dev/Daggerfall-Unity-AppImage)                                            |
 [DarkPlaces](https://github.com/pkgforge-dev/DarkPlaces-AppImage)                                                        |
 [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage)                                                            |
 [Defold](https://github.com/pkgforge-dev/Defold-AppImage)                                                                |
@@ -146,6 +147,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Knights](https://github.com/pkgforge-dev/Knights-AppImage)                                                              |
 [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage)                                                                |
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
+[lba2-classic-community](https://github.com/pkgforge-dev/lba2-classic-community-AppImage)                                |
 [Libation](https://github.com/pkgforge-dev/Libation-AppImage)                                                            |
 [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage)                                                            |
 [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage)                                                          |
