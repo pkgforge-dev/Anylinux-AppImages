@@ -115,6 +115,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
 [Gearlynx](https://github.com/pkgforge-dev/Gearlynx-AppImage)                                                            |
+[Gearsystem](https://github.com/pkgforge-dev/Gearsystem-AppImage)                                                        |
 [Ghostship](https://github.com/pkgforge-dev/Ghostship-AppImage-Enhanced)                                                 |
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
 [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)                                        |
