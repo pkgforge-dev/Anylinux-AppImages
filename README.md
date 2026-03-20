@@ -114,6 +114,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
+[Geargrafx](https://github.com/pkgforge-dev/Geargrafx-AppImage)                                                          |
 [Gearlynx](https://github.com/pkgforge-dev/Gearlynx-AppImage)                                                            |
 [Gearsystem](https://github.com/pkgforge-dev/Gearsystem-AppImage)                                                        |
 [Ghostship](https://github.com/pkgforge-dev/Ghostship-AppImage-Enhanced)                                                 |
