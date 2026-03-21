@@ -256,6 +256,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Tagger](https://github.com/pkgforge-dev/Tagger-AppImage)                                                                |
 [Taisei Project](https://github.com/pkgforge-dev/Taisei-Project-AppImage)                                                |
 [Taradino](https://github.com/pkgforge-dev/Taradino-AppImage)                                                            |
+[Telegram](https://github.com/pkgforge-dev/Telegram-AppImage)                                                            |
 [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
 [TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage)                                                            |
 [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
