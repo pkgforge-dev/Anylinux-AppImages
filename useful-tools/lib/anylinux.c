@@ -67,28 +67,21 @@ __attribute__((constructor))
 static void init_locale(void) {
 	// If locale is already valid, nothing to do
 	if (setlocale(LC_ALL, "")) {
-		DEBUG_PRINT("Locale is valid\n");
+		DEBUG_PRINT("Host locale is valid\n");
 		return;
 	}
 	DEBUG_PRINT("Host locale is broken; attempting to fix\n");
 
-	// Try setting LOCPATH to our bundled locales if the directory exists
+	// set LOCPATH to our bundled locales
 	const char *appdir = getenv("APPDIR");
 	if (appdir && *appdir) {
-		char lcdir[PATH_MAX];
-		int n = snprintf(lcdir, sizeof(lcdir), "%s/shared/lib/locale", appdir);
-		if (n > 0 && n < (int)sizeof(lcdir)) {
-			struct stat st;
-			if (stat(lcdir, &st) == 0 && S_ISDIR(st.st_mode)) {
-				DEBUG_PRINT("Setting LOCPATH to %s\n", lcdir);
-				setenv("LOCPATH", lcdir, 1);
-			}
+	    char lcdir[PATH_MAX];
+	    snprintf(lcdir, sizeof(lcdir), "%s/shared/lib/locale", appdir);
+	    setenv("LOCPATH", lcdir, 1);
+		if (setlocale(LC_ALL, "")) {
+			DEBUG_PRINT("Locale fixed via LOCPATH to bundled locales\n");
+			return;
 		}
-	}
-
-	if (setlocale(LC_ALL, "")) {
-		DEBUG_PRINT("Locale fixed via LOCPATH to bundled locales\n");
-		return;
 	}
 
 	// Fallback chain: try progressively simpler locales
