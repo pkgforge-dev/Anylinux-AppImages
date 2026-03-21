@@ -65,7 +65,6 @@ static void spoof_argv0(int argc, char **argv) {
 // Fix host locale issues; mirrors the locale-check logic previously in AppRun-generic
 __attribute__((constructor))
 static void init_locale(void) {
-	// If locale is already valid, nothing to do
 	if (setlocale(LC_ALL, "")) {
 		DEBUG_PRINT("Host locale is valid\n");
 		return;
@@ -195,6 +194,7 @@ static const char* vars_to_unset[] = {
 	"LIBGL_DRIVERS_PATH",
 	"LIBHEIF_PLUGIN_PATH",
 	"LIBVA_DRIVERS_PATH",
+	"LOCPATH",
 	"MAGIC",
 	"MAGICK_CODER_FILTER_PATH",
 	"MAGICK_CODER_MODULE_PATH",
