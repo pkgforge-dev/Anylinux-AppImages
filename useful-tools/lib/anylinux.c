@@ -75,9 +75,9 @@ static void init_locale(void) {
 	// set LOCPATH to our bundled locales
 	const char *appdir = getenv("APPDIR");
 	if (appdir && *appdir) {
-	    char lcdir[PATH_MAX];
-	    snprintf(lcdir, sizeof(lcdir), "%s/shared/lib/locale", appdir);
-	    setenv("LOCPATH", lcdir, 1);
+		char lcdir[PATH_MAX];
+		snprintf(lcdir, sizeof(lcdir), "%s/shared/lib/locale", appdir);
+		setenv("LOCPATH", lcdir, 1);
 		if (setlocale(LC_ALL, "")) {
 			DEBUG_PRINT("Locale fixed via LOCPATH to bundled locales\n");
 			return;
