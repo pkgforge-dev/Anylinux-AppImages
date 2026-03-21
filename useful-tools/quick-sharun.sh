@@ -662,7 +662,7 @@ _make_deployment_array() {
 		export GDK_GL=disable
 		export QT_QUICK_BACKEND=software
 
-		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*${ANYLINUX_DO_NOT_LOAD_LIBS:+:$ANYLINUX_DO_NOT_LOAD_LIBS}"
+		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*:libGLX_indirect.so*${ANYLINUX_DO_NOT_LOAD_LIBS:+:$ANYLINUX_DO_NOT_LOAD_LIBS}"
 	fi
 	if [ "$DEPLOY_PYTHON" = 1 ]; then
 		_echo "* Deploying system python"
