@@ -43,7 +43,6 @@ APPRUN_SOURCE=${APPRUN_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/An
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
-
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
 LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
 
