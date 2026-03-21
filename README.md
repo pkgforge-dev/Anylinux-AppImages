@@ -283,6 +283,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
 [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage)                                                                |
 [xournalpp](https://github.com/pkgforge-dev/xournalpp-AppImage-Enhanced)                                                 |
+[Xsnow](https://github.com/pkgforge-dev/Xsnow-AppImage)                                                                  |
 [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage)                                              |
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
