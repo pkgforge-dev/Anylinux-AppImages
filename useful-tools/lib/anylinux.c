@@ -23,6 +23,8 @@
 #endif
 #include <dlfcn.h>
 #include <fnmatch.h>
+#include <limits.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,6 +59,43 @@ static void spoof_argv0(int argc, char **argv) {
 		argv[0] = (char *)new_argv0;
 		unsetenv("OVERRIDE_ARGV0");
 	}
+}
+
+// Fix host locale issues; mirrors the locale-check logic previously in AppRun-generic
+__attribute__((constructor))
+static void init_locale(void) {
+	if (setlocale(LC_ALL, "")) {
+		DEBUG_PRINT("Host locale is valid\n");
+		return;
+	}
+	DEBUG_PRINT("Host locale is broken; attempting to fix\n");
+
+	// set LOCPATH to our bundled locales
+	const char *appdir = getenv("APPDIR");
+	if (appdir && *appdir) {
+		char lcdir[PATH_MAX];
+		snprintf(lcdir, sizeof(lcdir), "%s/shared/lib/locale", appdir);
+		setenv("LOCPATH", lcdir, 1);
+		if (setlocale(LC_ALL, "")) {
+			DEBUG_PRINT("Locale fixed via LOCPATH to bundled locales\n");
+			return;
+		}
+	}
+
+	// Fallback chain: try progressively simpler locales
+	const char *fallbacks[] = { "en_US.UTF-8", "C.UTF-8", "C", NULL };
+	const char **fb;
+	for (fb = fallbacks; *fb; fb++) {
+		DEBUG_PRINT("Trying LC_ALL=%s\n", *fb);
+		setenv("LC_ALL", *fb, 1);
+		if (setlocale(LC_ALL, "")) {
+			DEBUG_PRINT("Locale fixed via fallback to LC_ALL=%s\n", *fb);
+			return;
+		}
+	}
+
+	// Should never reach here since "C" always works, but be safe
+	DEBUG_PRINT("All locale fallbacks exhausted, this is impossible!\n");
 }
 
 // Redirect bindtextdomain calls to our locale, TEXTDOMAINDIR is set by sharun
@@ -154,6 +193,7 @@ static const char* vars_to_unset[] = {
 	"LIBGL_DRIVERS_PATH",
 	"LIBHEIF_PLUGIN_PATH",
 	"LIBVA_DRIVERS_PATH",
+	"LOCPATH",
 	"MAGIC",
 	"MAGICK_CODER_FILTER_PATH",
 	"MAGICK_CODER_MODULE_PATH",
