@@ -87,7 +87,7 @@ static void init_locale(void) {
 	}
 
 	if (setlocale(LC_ALL, "")) {
-		DEBUG_PRINT("Locale fixed via LOCPATH\n");
+		DEBUG_PRINT("Locale fixed via LOCPATH to bundled locales\n");
 		return;
 	}
 
@@ -98,13 +98,13 @@ static void init_locale(void) {
 		DEBUG_PRINT("Trying LC_ALL=%s\n", *fb);
 		setenv("LC_ALL", *fb, 1);
 		if (setlocale(LC_ALL, "")) {
-			DEBUG_PRINT("Locale fixed with LC_ALL=%s\n", *fb);
+			DEBUG_PRINT("Locale fixed via fallback to LC_ALL=%s\n", *fb);
 			return;
 		}
 	}
 
 	// Should never reach here since "C" always works, but be safe
-	DEBUG_PRINT("All locale fallbacks exhausted\n");
+	DEBUG_PRINT("All locale fallbacks exhausted, this is impossible!\n");
 }
 
 // Redirect bindtextdomain calls to our locale, TEXTDOMAINDIR is set by sharun
