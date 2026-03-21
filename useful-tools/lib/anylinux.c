@@ -23,10 +23,13 @@
 #endif
 #include <dlfcn.h>
 #include <fnmatch.h>
+#include <limits.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -57,6 +60,51 @@ static void spoof_argv0(int argc, char **argv) {
 		argv[0] = (char *)new_argv0;
 		unsetenv("OVERRIDE_ARGV0");
 	}
+}
+
+// Fix host locale issues; mirrors the locale-check logic previously in AppRun-generic
+__attribute__((constructor))
+static void init_locale(void) {
+	// If locale is already valid, nothing to do
+	if (setlocale(LC_ALL, "")) {
+		DEBUG_PRINT("Locale is valid\n");
+		return;
+	}
+	DEBUG_PRINT("Host locale is broken; attempting to fix\n");
+
+	// Try setting LOCPATH to our bundled locales if the directory exists
+	const char *appdir = getenv("APPDIR");
+	if (appdir && *appdir) {
+		char lcdir[PATH_MAX];
+		int n = snprintf(lcdir, sizeof(lcdir), "%s/shared/lib/locale", appdir);
+		if (n > 0 && n < (int)sizeof(lcdir)) {
+			struct stat st;
+			if (stat(lcdir, &st) == 0 && S_ISDIR(st.st_mode)) {
+				DEBUG_PRINT("Setting LOCPATH to %s\n", lcdir);
+				setenv("LOCPATH", lcdir, 1);
+			}
+		}
+	}
+
+	if (setlocale(LC_ALL, "")) {
+		DEBUG_PRINT("Locale fixed via LOCPATH\n");
+		return;
+	}
+
+	// Fallback chain: try progressively simpler locales
+	const char *fallbacks[] = { "en_US.UTF-8", "C.UTF-8", "C", NULL };
+	const char **fb;
+	for (fb = fallbacks; *fb; fb++) {
+		DEBUG_PRINT("Trying LC_ALL=%s\n", *fb);
+		setenv("LC_ALL", *fb, 1);
+		if (setlocale(LC_ALL, "")) {
+			DEBUG_PRINT("Locale fixed with LC_ALL=%s\n", *fb);
+			return;
+		}
+	}
+
+	// Should never reach here since "C" always works, but be safe
+	DEBUG_PRINT("All locale fallbacks exhausted\n");
 }
 
 // Redirect bindtextdomain calls to our locale, TEXTDOMAINDIR is set by sharun

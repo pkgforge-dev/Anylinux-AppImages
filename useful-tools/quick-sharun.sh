@@ -46,7 +46,6 @@ DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
 
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
 LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
-LOCALE_CHECK=${LOCALE_CHECK:-1}
 
 DEPENDENCIES="
 	awk
@@ -1224,25 +1223,6 @@ _add_gtk_class_fix() {
 	_echo "* gtk-class-fix.so successfully added!"
 }
 
-_add_locale_check() {
-	loc_check_bin="$APPDIR"/bin/locale-check
-	if [ "$LOCALE_CHECK" != 1 ] || [ -x "$loc_check_bin" ]; then
-		return 0
-	fi
-
-	cat <<-'EOF' > "$APPDIR"/.locale-check.c
-	#include <locale.h>
-	int main(void) { return setlocale(LC_ALL, "") ? 0 : 1; }
-	EOF
-	if cc -Os -static -o "$loc_check_bin" "$APPDIR"/.locale-check.c; then
-		chmod +x "$loc_check_bin"
-		_echo "* locale-check successfully added!"
-	else
-		_err_msg "Failed to build locale-check!"
-		exit 1
-	fi
-}
-
 _check_always_software() {
 	if [ "$ALWAYS_SOFTWARE" != 1 ]; then
 		return 0
@@ -2373,7 +2353,6 @@ _check_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
-_add_locale_check
 _deploy_datadir
 _deploy_locale
 _check_window_class
