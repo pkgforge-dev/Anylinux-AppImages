@@ -90,6 +90,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Dr. Robotnik's Ring Racers](https://github.com/pkgforge-dev/Dr-Robotniks-Ring-Racers-AppImage)                          |
 [dRally](https://github.com/pkgforge-dev/dRally-AppImage)                                                                |
 [Drum Machine](https://github.com/pkgforge-dev/Drum-Machine-AppImage)                                                    |
+[DuckStation-GPL](https://github.com/pkgforge-dev/DuckStation-GPL-AppImage-Enhanced)                                     |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
 [ECWolf](https://github.com/pkgforge-dev/ECWolf-AppImage)                                                                |
@@ -113,6 +114,9 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
+[Geargrafx](https://github.com/pkgforge-dev/Geargrafx-AppImage)                                                          |
+[Gearlynx](https://github.com/pkgforge-dev/Gearlynx-AppImage)                                                            |
+[Gearsystem](https://github.com/pkgforge-dev/Gearsystem-AppImage)                                                        |
 [Ghostship](https://github.com/pkgforge-dev/Ghostship-AppImage-Enhanced)                                                 |
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
 [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)                                        |
