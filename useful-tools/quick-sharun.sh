@@ -1667,6 +1667,15 @@ _fix_cpython_ldconfig_mess() {
 	chmod +x "$ldconfig"
 
 	_echo "* patched cpython /sbin/ldconfig for _ldconfig wrapper"
+
+	# pysdl is even more broken
+	set -- "$APPDIR"/shared/lib/python*/site-packages/sdl3/__init__.py
+	[ -f "$1" ] || return 0
+	sed -i \
+	  -e 's|if os.path.exists(path) and SDL|if SDL|' \
+	  -e 's|binaryMap\[module\] =.*|binaryMap[module] = ctypes.CDLL(path)|' \
+	  "$1"
+	_echo "* fixed pysdl broken mess... this may not work always!"
 }
 
 _add_path_mapping_hardcoded() {
