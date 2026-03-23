@@ -19,6 +19,7 @@ TMPDIR=${TMPDIR:-/tmp}
 APPDIR=${APPDIR:-$PWD/AppDir}
 APPENV=$APPDIR/.env
 DIRICON=$APPDIR/.DirIcon
+DST_LIB_DIR=$APPDIR/shared/lib
 MAIN_BIN=${MAIN_BIN##*/}
 
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
@@ -358,6 +359,7 @@ _sanity_check() {
 		fi
 	fi
 
+	unset LIB32
 	if [ -z "$LIB_DIR" ]; then
 		if [ -d "/usr/lib/$APPIMAGE_ARCH-linux-gnu" ]; then
 			LIB_DIR="/usr/lib/$APPIMAGE_ARCH-linux-gnu"
@@ -368,6 +370,13 @@ _sanity_check() {
 			_err_msg "set the LIB_DIR variable to where you have libraries"
 			exit 1
 		fi
+	elif [ "$LIB_DIR" = /usr/lib32 ] || [ "$LIB_DIR" = /usr/lib/i386-linux-gnu ]; then
+		LIB32=1
+	fi
+
+	if [ "$LIB32" = 1 ]; then
+		DST_LIB_DIR=$APPDIR/shared/lib32
+		_err_msg "WARNING: 32bit deployment is experimental!"
 	fi
 }
 
@@ -1127,7 +1136,7 @@ _handle_bins_scripts() {
 	# GST_PLUGIN_SYSTEM_PATH
 	# GST_PLUGIN_SYSTEM_PATH_1_0
 	# GST_PLUGIN_SCANNER
-	set -- "$APPDIR"/shared/lib/gstreamer-*
+	set -- "$DST_LIB_DIR"/gstreamer-*
 	if [ -d "$1" ]; then
 		gstlibdir="$1"
 		set -- "$APPDIR"/shared/bin/gst-*
@@ -1139,8 +1148,8 @@ _handle_bins_scripts() {
 	fi
 
 	if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
-		src_res=/usr/share/"$QT_DIR"/resources
-		dst_res="$APPDIR"/shared/lib/"$QT_DIR"/resources
+		src_res=/usr/share/$QT_DIR/resources
+		dst_res=$DST_LIB_DIR/$QT_DIR/resources
 		if [ -d "$src_res" ] && [ ! -d "$dst_res" ]; then
 			mkdir -p "${dst_res%/*}"
 			cp -r "$src_res" "$dst_res"
@@ -1166,15 +1175,20 @@ _handle_bins_scripts() {
 }
 
 _add_anylinux_lib() {
+	cfile=$APPDIR/.anylinux.c
+	target=$DST_LIB_DIR/anylinux.so
+
 	if [ "$ANYLINUX_LIB" != 1 ]; then
 		return 0
-	fi
-
-	if [ ! -f "$APPDIR"/shared/lib/anylinux.so ]; then
+	elif [ ! -f "$target" ]; then
 		_echo "* Building anylinux.so..."
-		_download "$APPDIR"/.anylinux.c "$ANYLINUX_LIB_SOURCE"
-		cc -shared -fPIC -O2 \
-		  "$APPDIR"/.anylinux.c -o "$APPDIR"/shared/lib/anylinux.so
+		_download "$cfile" "$ANYLINUX_LIB_SOURCE"
+
+		set -- -shared -fPIC -O2 "$cfile" -o "$target"
+		if [ "$LIB32" = 1 ]; then
+			set -- -m32 "$@"
+		fi
+		cc "$@"
 	fi
 
 	if ! grep -q 'anylinux.so' "$APPDIR"/.preload 2>/dev/null; then
@@ -1197,25 +1211,32 @@ _add_anylinux_lib() {
 }
 
 _add_gtk_class_fix() {
+	cfile=$APPDIR/.gtk-class-fix.c
+	target=$DST_LIB_DIR/gtk-class-fix.so
+
 	if [ "$GTK_CLASS_FIX" != 1 ]; then
 		return 0
-	elif [ ! -f "$APPDIR"/*.desktop ]; then
+	elif [ ! -f "$DESKTOP_ENTRY" ]; then
 		_err_msg "ERROR: Using GTK_CLASS_FIX requires a desktop entry in $APPDIR"
+		exit 1
 	fi
 
 	_echo "* Building gtk-class-fix.so"
-	_download "$APPDIR"/.gtk-class-fix.c "$GTK_CLASS_FIX_SOURCE"
-	cc -shared -fPIC -O2 "$APPDIR"/.gtk-class-fix.c \
-		-o "$APPDIR"/shared/lib/gtk-class-fix.so -ldl
+	_download "$cfile" "$GTK_CLASS_FIX_SOURCE"
+
+	set -- -shared -fPIC -O2 "$cfile" -o "$target" -ldl
+	if [ "$LIB32" = 1 ]; then
+		set -- -m32 "$@"
+	fi
+	cc "$@"
 
 	# _check_window_class will make sure StartupWMClass is added to desktop entry
-
 	# for this to work in wayland, the class needs to have one dot in its name
-	if ! grep -q 'StartupWMClass=.*\..*' "$APPDIR"/*.desktop; then
-		sed -i -e 's/\(StartupWMClass=.*\)/\1.anylinux/' "$APPDIR"/*.desktop
+	if ! grep -q 'StartupWMClass=.*\..*' "$DESKTOP_ENTRY"; then
+		sed -i -e 's/\(StartupWMClass=.*\)/\1.anylinux/' "$DESKTOP_ENTRY"
 	fi
 
-	class=$(awk -F'=| ' '/^StartupWMClass=/{print $2; exit}' "$APPDIR"/*.desktop)
+	class=$(awk -F'=| ' '/^StartupWMClass=/{print $2; exit}' "$DESKTOP_ENTRY")
 
 	echo "GTK_WINDOW_CLASS=$class"  >> "$APPDIR"/.env
 	echo "gtk-class-fix.so"         >> "$APPDIR"/.preload
@@ -1226,7 +1247,7 @@ _check_always_software() {
 	if [ "$ALWAYS_SOFTWARE" != 1 ]; then
 		return 0
 	fi
-	set -- "$APPDIR"/shared/lib/libgallium-*.so*
+	set -- "$DST_LIB_DIR"/libgallium-*.so*
 	if [ -f "$1" ]; then
 		_err_msg "ALWAYS_SOFTWARE was enabled but mesa was deployed!"
 		_err_msg "Likely this application needs hardware acceleration."
@@ -1283,7 +1304,7 @@ _map_paths_ld_preload_open() {
 	# format new line entries in PATH_MAPPING into comma separated
 	# entries for sharun, pathmap accepts new lines in the variable
 	# but the .env library used by sharun does not
-	if [ -n "$PATH_MAPPING" ] && [ ! -f "$APPDIR"/shared/lib/path-mapping.so ]; then
+	if [ -n "$PATH_MAPPING" ] && [ ! -f "$DST_LIB_DIR"/path-mapping.so ]; then
 		PATH_MAPPING=$(echo "$PATH_MAPPING"   \
 			| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//; s/^,*//'
 		)
@@ -1302,7 +1323,7 @@ _map_paths_ld_preload_open() {
 			make all
 		)
 
-		mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$APPDIR"/shared/lib
+		mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$DST_LIB_DIR"
 		echo "path-mapping.so" >> "$APPDIR"/.preload
 		echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPENV"
 		_echo "* PATH_MAPPING successfully added!"
@@ -1325,9 +1346,9 @@ _map_paths_binary_patch() {
 		_echo "* Patching files listed in PATH_MAPPING_HARDCODED..."
 		# only search for files to patch in the lib and bin dirs
 		path1="$APPDIR"/shared/bin
-		path2="$APPDIR"/lib
+		path2=$DST_LIB_DIR
 		for f do
-			file=$(find -L "$path1" "$path2" -type f -name "$f")
+			file=$(find -L "$path1"/ "$path2"/ -type f -name "$f")
 			if [ -n "$file" ]; then
 				for found in $file; do
 					_patch_away_usr_bin_dir   "$found" || :
@@ -1611,7 +1632,7 @@ _fix_cpython_ldconfig_mess() {
 	# we will patch /sbin/ldconfig for _ldconfig to avoid conflicts, see:
 	# https://github.com/pkgforge-dev/ghostty-appimage/issues/122
 
-	set -- "$APPDIR"/shared/lib/python*/ctypes/util.py
+	set -- "$DST_LIB_DIR"/python*/ctypes/util.py
 	ldconfig="$APPDIR"/bin/_ldconfig
 	if [ -x "$ldconfig" ]; then
 		return 0
@@ -1647,7 +1668,7 @@ _fix_cpython_ldconfig_mess() {
 	        *)       arch=x86-64;;
 	    esac
 
-	    for f in "$APPDIR"/shared/lib/*.so* "$APPDIR"/shared/lib/*/*.so*; do
+	    for f in "$APPDIR"/shared/lib*/*.so* "$APPDIR"/shared/lib*/*/*.so*; do
 	        echo "	${f##*/} (libc6,$arch) => $f"
 	    done
 
@@ -1669,7 +1690,7 @@ _fix_cpython_ldconfig_mess() {
 	_echo "* patched cpython /sbin/ldconfig for _ldconfig wrapper"
 
 	# pysdl is even more broken
-	set -- "$APPDIR"/shared/lib/python*/site-packages/sdl3/__init__.py
+	set -- "$DST_LIB_DIR"/python*/site-packages/sdl3/__init__.py
 	[ -f "$1" ] || return 0
 	sed -i \
 	  -e 's|if os.path.exists(path) and SDL|if SDL|' \
@@ -1752,7 +1773,7 @@ _patch_away_usr_share_dir() {
 
 _check_hardcoded_lib_dirs() {
 	# check for hardcoded path to any other possibly bundled library dir
-	set -- "$APPDIR"/shared/lib/*
+	set -- "$DST_LIB_DIR"/*
 	for d do
 		[ -d "$d" ] || continue
 		d=${d##*/}
@@ -1780,7 +1801,7 @@ _check_hardcoded_lib_dirs() {
 				;;
 		esac
 
-		for f in "$APPDIR"/shared/lib/*.so* "$APPDIR"/shared/bin/*; do
+		for f in "$DST_LIB_DIR"/*.so* "$APPDIR"/shared/bin/*; do
 			if [ ! -f "$f" ]; then
 				continue
 			elif grep -aoq -m 1 "$LIB_DIR"/"$d" "$f"; then
@@ -1832,7 +1853,7 @@ _check_hardcoded_data_dirs() {
 				;;
 		esac
 
-		for f in "$APPDIR"/shared/lib/*.so* "$APPDIR"/shared/bin/*; do
+		for f in "$DST_LIB_DIR"/*.so* "$APPDIR"/shared/bin/*; do
 			if [ ! -f "$f" ]; then
 				continue
 			elif grep -aoq -m 1 /usr/share/"$d" "$f"; then
@@ -1871,14 +1892,14 @@ _post_deployment_steps() {
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		set -- "$LIB_DIR"/python*
 		if [ -d "$1" ]; then
-			cp -r "$1" "$APPDIR"/shared/lib
+			cp -r "$1" "$DST_LIB_DIR"
 		else
 			_err_msg "ERROR: Cannot find python installation in $LIB_DIR"
 			exit 1
 		fi
 		if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
 			(
-				cd "$APPDIR"/shared/lib/"${1##*/}"
+				cd "$DST_LIB_DIR"/"${1##*/}"
 				find ./ -type f -name '*.a' -delete || :
 				for f in $(find ./ -type f -name '*.pyc' -print); do
 					case "$f" in
@@ -1931,7 +1952,7 @@ _post_deployment_steps() {
 		fi
 	fi
 	if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
-		mkdir -p "$APPDIR"/shared/lib  "$APPDIR"/etc
+		mkdir -p "$DST_LIB_DIR"  "$APPDIR"/etc
 		cp -rv /etc/ImageMagick-* "$APPDIR"/etc
 
 		# we can copy /usr/share/ImageMagick to the AppDir and set MAGICK_CONFIGURE_PATH
@@ -1954,6 +1975,8 @@ _post_deployment_steps() {
 		# we can still make this relocatable by setting these other env variables
 		# which will always work even when not compiled with MAGICK_HOME support
 		(
+			# This method will not work with 32bit imagemagick
+			# TODO: Add proper logic for this in lib4bin
 			cd "$APPDIR"
 			set -- shared/lib/ImageMagick-*/modules*/coders
 			if [ -d "$1" ]; then
@@ -1967,7 +1990,6 @@ _post_deployment_steps() {
 				# we will still be set both just in case
 				echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
 				echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-
 			fi
 			set -- etc/ImageMagick*
 			if [ -d "$1" ]; then
@@ -1979,15 +2001,15 @@ _post_deployment_steps() {
 	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		gegldir=$(echo "$LIB_DIR"/gegl-*)
-		dst_gegldir="$APPDIR"/shared/lib/"${gegldir##*/}"
+		dst_gegldir=$DST_LIB_DIR/${gegldir##*/}
 		if [ -d "$gegldir" ] && [ -d "$dst_gegldir" ]; then
 			cp "$gegldir"/*.json "$dst_gegldir"
 			_echo "* Copied gegl json files"
 		fi
 	fi
 	if [ "$DEPLOY_QT" = 1 ]; then
-		src_trans=/usr/share/"$QT_DIR"/translations
-		dst_trans="$APPDIR"/shared/lib/"$QT_DIR"/translations
+		src_trans=/usr/share/$QT_DIR/translations
+		dst_trans=$DST_LIB_DIR/$QT_DIR/translations
 		if [ -d "$src_trans" ] && [ ! -d "$dst_trans" ]; then
 			mkdir -p "${dst_trans%/*}"
 			cp -r "$src_trans" "$dst_trans"
@@ -2017,7 +2039,7 @@ _post_deployment_steps() {
 
 _handle_nested_bins() {
 	# wrap any executable in lib with sharun
-	for b in $(find "$APPDIR"/shared/lib/ -type f ! -name '*.so*'); do
+	for b in $(find "$DST_LIB_DIR"/ -type f ! -name '*.so*'); do
 		if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
 			rm -f "$b"
 			ln "$APPDIR"/sharun "$b"
@@ -2373,10 +2395,10 @@ _echo "------------------------------------------------------------"
 echo ""
 
 set -- \
-	"$APPDIR"/shared/lib/*.so*       \
-	"$APPDIR"/shared/lib/*/*.so*     \
-	"$APPDIR"/shared/lib/*/*/*.so*   \
-	"$APPDIR"/shared/lib/*/*/*/*.so*
+	"$DST_LIB_DIR"/*.so*       \
+	"$DST_LIB_DIR"/*/*.so*     \
+	"$DST_LIB_DIR"/*/*/*.so*   \
+	"$DST_LIB_DIR"/*/*/*/*.so*
 
 for lib do case "$lib" in
 	*libgegl*)
@@ -2477,7 +2499,7 @@ for lib do case "$lib" in
 		# SDL may be bundled without libdecor since it maybe missing from the CI runner
 		# or the application makes of GTK/Qt + SDL, in which case we do not need libdecor
 		# at all, make sure SDL does not attempt to load libdecor in these cases
-		if [ -f "$APPDIR"/shared/lib/libdecor-0.so.0 ]; then
+		if [ -f "$DST_LIB_DIR"/libdecor-0.so.0 ]; then
 			continue
 		elif grep -aoq -m 1 'libdecor-0.so.0' "$lib"; then
 			sed -i -e 's|libdecor-0.so.0|fuck-gnome.so.X|g' "$lib"
@@ -2569,16 +2591,24 @@ chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null 
 
 # always make sure that AppDir/lib exists, sometimes lib4bin does not make it
 # https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
-if [ ! -d "$APPDIR"/lib ] && [ -d "$APPDIR"/shared/lib ]; then
-	ln -s shared/lib "$APPDIR"/lib
-fi
+for d in lib lib32; do
+	dir=$APPDIR/shared/$d
+	symlink=$APPDIR/$d
+	if [ ! -d "$symlink" ] && [ -d "$dir" ]; then
+		ln -s shared/"$d" "$symlink"
+	fi
+done
 
 # deploy directories
 while read -r d; do
 	if [ -d "$d" ]; then
 		case "$d" in
 			"$LIB_DIR"/*)
-				dst_path="$APPDIR"/lib/"${d##*$LIB_DIR/}"
+				if [ "$LIB32" = 1 ]; then
+					dst_path="$APPDIR"/lib32/"${d##*$LIB_DIR/}"
+				else
+					dst_path="$APPDIR"/lib/"${d##*$LIB_DIR/}"
+				fi
 				;;
 			*/share/*)
 				dst_path="$APPDIR"/share/"${d##*/share/}"
@@ -2588,6 +2618,9 @@ while read -r d; do
 				;;
 			*/lib/*)
 				dst_path="$APPDIR"/lib/"${d##*/lib/}"
+				;;
+			*/lib32/*)
+				dst_path="$APPDIR"/lib32/"${d##*/lib32/}"
 				;;
 			*)
 				_err_msg "Skipping deployment of $d"
@@ -2643,7 +2676,7 @@ ffmpeg and in that case this is not an issue.
 ------------------------------------------------------------
 ------------------------------------------------------------
 "
-set -- "$APPDIR"/shared/lib/libjack.so*
+set -- "$DST_LIB_DIR"/libjack.so*
 if [ -f "$1" ]; then
 	if ! ldd "$1" | grep -q 'libpipewire'; then
 		_err_msg "$libjackwarning"
@@ -2651,9 +2684,9 @@ if [ -f "$1" ]; then
 fi
 
 # also warn when several common qt theme plugins are missing, we only do this for qt6
-if [ -d "$APPDIR"/shared/lib/qt6 ]; then
+if [ -d "$DST_LIB_DIR"/qt6 ]; then
 	for p in kvantum qtlxqt qt6ct; do
-		set -- "$APPDIR"/shared/lib/qt*/plugins/*/*$p*
+		set -- "$DST_LIB_DIR"/qt6/plugins/*/*$p*
 		if [ ! -f "$1" ]; then
 			_err_msg "------------------------------------------------------------"
 			_err_msg "WARNING: Qt was deployed but there is no $p plugin!"
