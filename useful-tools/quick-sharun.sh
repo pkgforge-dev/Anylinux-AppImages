@@ -32,8 +32,8 @@ DWARFS_CMD=${DWARFS_CMD:-$TMPDIR/mkdwarfs}
 RUNTIME=${RUNTIME:-$TMPDIR/uruntime}
 DWARFSPROF=${DWARFSPROF:-$APPDIR/.dwarfsprofile}
 OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
-URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.6/uruntime-appimage-dwarfs-lite-$APPIMAGE_ARCH}
-DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$APPIMAGE_ARCH}
+URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.7/uruntime-appimage-dwarfs-lite-$APPIMAGE_ARCH}
+DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.15.1/dwarfs-universal-0.15.1-Linux-$APPIMAGE_ARCH}
 
 ANYLINUX_LIB=${ANYLINUX_LIB:-1}
 ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
