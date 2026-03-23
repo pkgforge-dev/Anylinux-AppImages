@@ -2611,7 +2611,7 @@ while read -r d; do
 				dst_path="$APPDIR"/lib/"${d##*/lib/}"
 				;;
 			*/lib32/*)
-				dst_path="$APPDIR"/lib32/"${d##*/lib/}"
+				dst_path="$APPDIR"/lib32/"${d##*/lib32/}"
 				;;
 			*)
 				_err_msg "Skipping deployment of $d"
