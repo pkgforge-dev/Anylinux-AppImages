@@ -129,6 +129,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [GoldenDict-ng](https://github.com/pkgforge-dev/GoldenDict-ng-AppImage)                                                  |
 [Gopher64](https://github.com/pkgforge-dev/Gopher64-AppImage)                                                            |
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
+~[GPU-T](https://github.com/pkgforge-dev/GPU-T-AppImage)~ - [Upstreamed](https://github.com/lseurttyuu/GPU-T/releases)   |
 [Gradia](https://github.com/pkgforge-dev/Gradia-AppImage)                                                                |
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
 [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
