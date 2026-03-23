@@ -49,6 +49,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage)                                                  |
 [Augustus](https://github.com/pkgforge-dev/Augustus-AppImage-Enhanced)                                                   |
 [Authenticator](https://github.com/pkgforge-dev/Authenticator-AppImage)                                                  |
+[Awakened POE Trade](https://github.com/pkgforge-dev/Awakened-POE-Trade-AppImage-Enhanced)                               |
 [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
 [BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage)                                                      |
 [BasiliskII](https://github.com/pkgforge-dev/BasiliskII-AppImage-Enhanced)                                               |
