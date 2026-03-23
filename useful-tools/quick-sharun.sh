@@ -2587,12 +2587,13 @@ chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null 
 
 # always make sure that AppDir/lib exists, sometimes lib4bin does not make it
 # https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
-if [ ! -d "$APPDIR"/lib ] && [ -d "$DST_LIB_DIR" ]; then
-	ln -s shared/lib "$APPDIR"/lib
-fi
-if [ "$LIB32" = 1 ] && [ ! -d "$APPDIR"/lib32 ] && [ -d "$DST_LIB_DIR" ]; then
-	ln -s shared/lib32 "$APPDIR"/lib32
-fi
+for d in lib lib32; do
+	dir=$APPDIR/shared/$d
+	symlink=$APPDIR/$d
+	if [ ! -d "$symlink" ] && [ -d "$dir" ]; then
+		ln -s shared/"$d" "$symlink"
+	fi
+done
 
 # deploy directories
 while read -r d; do
