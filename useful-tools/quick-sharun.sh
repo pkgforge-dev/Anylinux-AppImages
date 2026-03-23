@@ -376,7 +376,7 @@ _sanity_check() {
 
 	if [ "$LIB32" = 1 ]; then
 		DST_LIB_DIR=$APPDIR/shared/lib32
-		_err_msg "WARMING: 32bit deployment is experimental!"
+		_err_msg "WARNING: 32bit deployment is experimental!"
 	fi
 }
 
