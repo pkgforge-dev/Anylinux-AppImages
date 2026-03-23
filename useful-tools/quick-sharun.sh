@@ -1972,6 +1972,8 @@ _post_deployment_steps() {
 		# we can still make this relocatable by setting these other env variables
 		# which will always work even when not compiled with MAGICK_HOME support
 		(
+			# This method will not work with 32bit imagemagick
+			# TODO: Add proper logic for this in lib4bin
 			cd "$APPDIR"
 			set -- shared/lib/ImageMagick-*/modules*/coders
 			if [ -d "$1" ]; then
@@ -1985,7 +1987,6 @@ _post_deployment_steps() {
 				# we will still be set both just in case
 				echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
 				echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-
 			fi
 			set -- etc/ImageMagick*
 			if [ -d "$1" ]; then
@@ -2600,7 +2601,11 @@ while read -r d; do
 	if [ -d "$d" ]; then
 		case "$d" in
 			"$LIB_DIR"/*)
-				dst_path="$APPDIR"/lib/"${d##*$LIB_DIR/}"
+				if [ "$LIB32" = 1 ]; then
+					dst_path="$APPDIR"/lib32/"${d##*$LIB_DIR/}"
+				else
+					dst_path="$APPDIR"/lib/"${d##*$LIB_DIR/}"
+				fi
 				;;
 			*/share/*)
 				dst_path="$APPDIR"/share/"${d##*/share/}"
