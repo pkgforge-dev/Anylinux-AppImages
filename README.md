@@ -249,6 +249,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage)                                                    |
 [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
 [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
+[Super Mario War](https://github.com/pkgforge-dev/Supermariowar-AppImage)                                                |
 [Supermodel](https://github.com/pkgforge-dev/Supermodel-AppImage)                                                        |
 [SuperTux](https://github.com/pkgforge-dev/SuperTux-AppImage-Enhanced)                                                   |
 [SuperTuxKart](https://github.com/pkgforge-dev/SuperTuxKart-AppImage-Enhanced)                                           |
