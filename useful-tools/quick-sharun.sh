@@ -1178,19 +1178,22 @@ _add_anylinux_lib() {
 	cfile=$APPDIR/.anylinux.c
 	target=$DST_LIB_DIR/anylinux.so
 
-	if [ "$ANYLINUX_LIB" != 1 ] || [ -f "$target" ]; then
+	if [ "$ANYLINUX_LIB" != 1 ]; then
 		return 0
+	elif [ ! -f "$target" ]; then
+		_echo "* Building anylinux.so..."
+		_download "$cfile" "$ANYLINUX_LIB_SOURCE"
+
+		set -- -shared -fPIC -O2 "$cfile" -o "$target"
+		if [ "$LIB32" = 1 ]; then
+			set -- -m32 "$@"
+		fi
+		cc "$@"
 	fi
 
-	_echo "* Building anylinux.so..."
-	_download "$cfile" "$ANYLINUX_LIB_SOURCE"
-
-	set -- -shared -fPIC -O2 "$cfile" -o "$target"
-	if [ "$LIB32" = 1 ]; then
-		set -- -m32 "$@"
+	if ! grep -q 'anylinux.so' "$APPDIR"/.preload 2>/dev/null; then
+		echo "anylinux.so" >> "$APPDIR"/.preload
 	fi
-	cc "$@"
-	echo "anylinux.so" >> "$APPDIR"/.preload
 
 	# remove xdg-open wrapper not needed when the lib is in use
 	# we still need to have a wrapper for gio-launch-desktop though
