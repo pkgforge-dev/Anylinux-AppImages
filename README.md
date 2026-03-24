@@ -136,6 +136,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
 [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
 [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
+[Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced)                                       |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
