@@ -287,6 +287,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage)                                              |
 [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced)                                             |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
+[xeyes](https://github.com/pkgforge-dev/xeyes-AppImage)                                                                  |
 [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
 [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage)                                                                |
 [xournalpp](https://github.com/pkgforge-dev/xournalpp-AppImage-Enhanced)                                                 |
