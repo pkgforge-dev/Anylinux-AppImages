@@ -646,8 +646,14 @@ _determine_what_to_deploy() {
 }
 
 _make_deployment_array() {
-	# always deploy minimal amount of gconv
-	if [ -d "$LIB_DIR"/gconv ]; then
+	if [ "$DEPLOY_CLI_TOOL" = 1 ]; then
+		DEPLOY_GCONV=0
+		DEPLOY_COMMON_LIBS=0
+	else
+		DEPLOY_GCONV=${DEPLOY_GCONV:-1}
+		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
+	fi
+	if [ -d "$DEPLOY_GCONV" = 1 ]; then
 		_echo "* Deploying minimal gconv"
 		set -- "$@" \
 			"$LIB_DIR"/gconv/UTF*.so*     \
