@@ -29,7 +29,7 @@ UPDATE_MSG="${UPDATE_MSG:-A new version of $APPNAME is available. Do you wish to
 POST_UPDATE_GOOD="$APPNAME updated successfully!"
 POST_UPDATE_BAD="ERROR: Something went wrong updating $APPNAME"
 DO_NOT_ASK="Do you wish to disable update checking and not see this message again?"
-APPIMAGEUPDATETOOL_LINK="${APPIMAGEUPDATETOOL_LINK:-https://github.com/AppImageCommunity/AppImageUpdate/releases/download/continuous/appimageupdatetool-$APPIMAGE_ARCH.AppImage}"
+APPIMAGEUPDATETOOL_LINK="${APPIMAGEUPDATETOOL_LINK:-https://github.com/pkgforge-dev/AppImageUpdate/releases/latest/download/appimageupdate-$APPIMAGE_ARCH-linux}"
 
 # check for other appimage managers
 # skip appimaged/appimagelauncher because they cannot integrate DWARFS appimages
