@@ -651,7 +651,6 @@ _make_deployment_array() {
 		DEPLOY_COMMON_LIBS=0
 	else
 		DEPLOY_GCONV=${DEPLOY_GCONV:-1}
-		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 	fi
 	if [ -d "$DEPLOY_GCONV" = 1 ]; then
 		_echo "* Deploying minimal gconv"
