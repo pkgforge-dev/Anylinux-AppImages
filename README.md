@@ -55,6 +55,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [BasiliskII](https://github.com/pkgforge-dev/BasiliskII-AppImage-Enhanced)                                               |
 [BibleTime](https://github.com/pkgforge-dev/BibleTime-AppImage)                                                          |
 [Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
+[Bulky](https://github.com/pkgforge-dev/Bulky-AppImage)                                                                  |
 [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage)                                                        |
 [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage)                                                        |
 [CatacombGL](https://github.com/pkgforge-dev/CatacombGL-AppImage)                                                        |
