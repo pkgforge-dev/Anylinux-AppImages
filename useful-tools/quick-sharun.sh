@@ -652,7 +652,7 @@ _make_deployment_array() {
 	else
 		DEPLOY_GCONV=${DEPLOY_GCONV:-1}
 	fi
-	if [ -d "$DEPLOY_GCONV" = 1 ]; then
+	if [ "$DEPLOY_GCONV" = 1 ]; then
 		_echo "* Deploying minimal gconv"
 		set -- "$@" \
 			"$LIB_DIR"/gconv/UTF*.so*     \
