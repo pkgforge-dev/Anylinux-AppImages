@@ -264,6 +264,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
 [TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage)                                                            |
 [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
+[Trelby](https://github.com/pkgforge-dev/Trelby-AppImage)                                                                |
 [Tutanota Desktop](https://github.com/pkgforge-dev/Tutanota-Desktop-AppImage-Enhanced)                                   |
 [Tux Football](https://github.com/pkgforge-dev/Tux-Football-AppImage)                                                    |
 [Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage)                                                              |
