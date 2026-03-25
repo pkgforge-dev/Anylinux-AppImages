@@ -646,13 +646,14 @@ _determine_what_to_deploy() {
 }
 
 _make_deployment_array() {
-	if [ "$DEPLOY_CLI_TOOL" = 1 ]; then
-		DEPLOY_GCONV=0
-		DEPLOY_COMMON_LIBS=0
-	else
-		DEPLOY_GCONV=${DEPLOY_GCONV:-1}
-	fi
-	if [ "$DEPLOY_GCONV" = 1 ]; then
+	# gconv is always deployed, removing it only saves ~30 KiB
+	# in the final appimage size and not worth the hassle
+	# It also causes hard to spot issues when needed and not present
+	#
+	# https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20
+	# https://github.com/pkgforge-dev/Anylinux-AppImages/pull/410
+	#
+	if [ -d "$LIB_DIR"/gconv ]; then
 		_echo "* Deploying minimal gconv"
 		set -- "$@" \
 			"$LIB_DIR"/gconv/UTF*.so*     \
