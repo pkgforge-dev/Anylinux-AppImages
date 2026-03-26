@@ -1044,6 +1044,7 @@ _make_deployment_array() {
 			$(find "$DOTNET_DIR"/shared -type f -name '*.so*' -print)
 		cp -r "$DOTNET_DIR"/shared "$APPDIR"/bin
 		cp -r "$DOTNET_DIR"/host   "$APPDIR"/bin
+		echo 'DOTNET_ROOT=${SHARUN_DIR}/bin' >> "$APPENV"
 	fi
 	# these are needed by several toolkits
 	if [ "$DEPLOY_COMMON_LIBS" = 1 ]; then
