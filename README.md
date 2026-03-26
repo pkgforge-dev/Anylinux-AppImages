@@ -237,6 +237,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
 [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
+[Simitone](https://github.com/pkgforge-dev/Simitone-AppImage)                                                            |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced)                                                       |
 [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced)                                                             |
 [Sonic 3 A.I.R.](https://github.com/pkgforge-dev/Sonic-3-AIR-AppImage)                                                   |
