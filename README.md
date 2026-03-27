@@ -163,6 +163,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage)                                                          |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
+[ManiaDrive](https://github.com/pkgforge-dev/ManiaDrive-AppImage)                                                        |
 [MarioKart64Recomp](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage)                                          |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
 [melonDS](https://github.com/pkgforge-dev/melonDS-AppImage-Enhanced)                                                     |
@@ -236,6 +237,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
 [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
+[Simitone](https://github.com/pkgforge-dev/Simitone-AppImage)                                                            |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced)                                                       |
 [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced)                                                             |
 [Sonic 3 A.I.R.](https://github.com/pkgforge-dev/Sonic-3-AIR-AppImage)                                                   |
