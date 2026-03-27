@@ -216,6 +216,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
 [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
+[Readest](https://github.com/pkgforge-dev/Readest-AppImage-Enhanced)                                                     |
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
 [REDRIVER2](https://github.com/pkgforge-dev/REDRIVER2-AppImage)                                                          |
