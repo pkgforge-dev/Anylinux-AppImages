@@ -170,6 +170,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [MESA](https://github.com/pkgforge-dev/MESA-AppImage)                                                                    |
 [mGBA](https://github.com/pkgforge-dev/mGBA-AppImage-Enhanced)                                                           |
 [Mini-vMac](https://github.com/pkgforge-dev/Mini-vMac-AppImage)                                                          |
+[Mixxx](https://github.com/pkgforge-dev/Mixxx-AppImage)                                                                  |
 [Mousai](https://github.com/pkgforge-dev/Mousai-AppImage)                                                                |
 [mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
 [NBlood](https://github.com/pkgforge-dev/NBlood-AppImage)                                                                |
@@ -213,6 +214,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
 [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
+[QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
