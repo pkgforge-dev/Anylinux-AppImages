@@ -2068,7 +2068,7 @@ _handle_nested_bins() {
 # desktop entry, 99.99% of the time this is not wanted, so we have to error that
 _check_main_bin() {
 	if [ -z "$MAIN_BIN" ]; then
-		MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$DESKTOP_ENTRY")
+		MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$DESKTOP_ENTRY" | tr -d "\"'")
 		MAIN_BIN=${MAIN_BIN##*/}
 		case "$MAIN_BIN" in
 			env|sh|bash)
