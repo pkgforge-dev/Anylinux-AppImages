@@ -91,7 +91,7 @@ This is a general failure of linux that there is no standard path to the certifi
 
 # Horrible - WebKit
 
-WebKit is hardcoded to load some binaries in `/usr/lib` which makes no sense and there is no way to override this location other than recompiling with a [debug flag](https://github.com/WebKit/WebKit/blob/378d33fcfd7109660e72d4215bce53b9e64c5082/Source/WebKit/Shared/glib/ProcessExecutablePathGLib.cpp#L478) to expose a variable wtf. Sometimes it just dies depending on the OpenGL version you have, and with Nvidia you often have to set `WEBKIT_DISABLE_DMABUF_RENDERER=1` and `WEBKIT_DISABLE_COMPOSITING_MODE=1`. Hopefully tauri will be able to replace it with servo in the future, because this is just bad...
+WebKit is hardcoded to load some binaries in `/usr/lib` which makes no sense and there is no way to override this location other than recompiling with a [debug flag](https://github.com/WebKit/WebKit/blob/378d33fcfd7109660e72d4215bce53b9e64c5082/Source/WebKit/Shared/glib/ProcessExecutablePathGLib.cpp#L478) to expose a variable wtf. Sometimes it just dies depending on the OpenGL version you have, and with Nvidia you often have to set `WEBKIT_DISABLE_DMABUF_RENDERER=1` and `WEBKIT_DISABLE_COMPOSITING_MODE=1` to the point that projects like opencode do this by default always. Hopefully tauri will be able to replace it with servo in the future, because this is just bad... [1](https://github.com/tauri-apps/tauri/issues/9394) [2](https://github.com/anomalyco/opencode/blob/f736116967f5b57d89978e51961f2e78eedb443b/packages/desktop/src-tauri/src/main.rs#L35)
 
 # Horrible - jack2
 
