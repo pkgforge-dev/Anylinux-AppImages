@@ -214,6 +214,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage)                                                        |
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
 [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
+[QEMU](https://github.com/pkgforge-dev/QEMU-AppImage)                                                                    |
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
 [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
