@@ -229,6 +229,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
 [ROLLER](https://github.com/pkgforge-dev/ROLLER-AppImage)                                                                |
+[rquickshare](https://github.com/pkgforge-dev/rquickshare-AppImage-Enhanced)                                             |
 [RSDKv3](https://github.com/pkgforge-dev/RSDKv3-AppImage)                                                                |
 [RSDKv4](https://github.com/pkgforge-dev/RSDKv4-AppImage)                                                                |
 [Ruffle](https://github.com/pkgforge-dev/Ruffle-AppImage)                                                                |
