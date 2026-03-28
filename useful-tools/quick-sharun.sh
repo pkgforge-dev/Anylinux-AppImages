@@ -2042,6 +2042,12 @@ _post_deployment_steps() {
 		cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
 		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
+
+	# TODO upstream to sharun
+	f=$APPDIR/share/alsa/alsa.conf
+	if [ -f "$f" ]; then
+		sed -i -e 's|"/etc/alsa/conf.d"|"/etc/alsa/conf.d"\n\t\t\t{ @func concat strings [ { @func getenv vars [ SHARUN_DIR ] default "" } "/share/alsa/alsa.conf.d" ] }|' "$f"
+	fi
 }
 
 _handle_nested_bins() {
