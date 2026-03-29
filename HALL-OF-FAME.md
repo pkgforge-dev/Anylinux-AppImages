@@ -33,9 +33,11 @@ These are relocatable always, in fact distros often need to put the application 
 
 Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently MESA now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files. **And the icd files support relative library locations to the icd file itself** 👀
 
-# Excellent - pipewire
+# Good - pipewire
 
-Needs `PIPEWIRE_MODULE_DIR` and `SPA_PLUGIN_DIR` to be made relocatable. Otherwise perfect for deployment, it does have some performance issues but with pipewire-jack though.
+Needs `PIPEWIRE_MODULE_DIR` and `SPA_PLUGIN_DIR` to be made relocatable, it does have some performance issues but with pipewire-jack though.
+
+Pipewire depends on configuration files usually in `/usr/share/pipewire`, it doesn't check `XDG_DATA_DIRS`, which means we have to set `PIPEWIRE_CONFIG_DIR` when `/usr/share/pipewire` is not present. Which causes pipewire stop loading user configuration files in `XDG_CONFIG_HOME` which is problematic.
 
 # Good - Qt
 
