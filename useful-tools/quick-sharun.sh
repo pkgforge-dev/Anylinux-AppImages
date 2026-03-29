@@ -2048,6 +2048,17 @@ _post_deployment_steps() {
 	if [ -f "$f" ]; then
 		sed -i -e 's|"/etc/alsa/conf.d"|"/etc/alsa/conf.d"\n\t\t\t{ @func concat strings [ { @func getenv vars [ SHARUN_DIR ] default "" } "/share/alsa/alsa.conf.d" ] }|' "$f"
 	fi
+
+	if [ -d "$APPDIR"/shared/lib/pipewire-0.3 ] && [ -d /usr/share/pipewire ]; then
+		cp -r /usr/share/pipewire "$APPDIR"/share
+		cat <<-'EOF' > "$APPDIR"/bin/pipewire-config.src.hook
+		#!/bin/false
+		_pipewire_dir=$APPDIR/share/pipewire
+		if [ ! -d /usr/share/pipewire ] && [ -d "$_pipewire_dir" ]; then
+			export PIPEWIRE_CONFIG_DIR="$_pipewire_dir"
+		fi
+		EOF
+	fi
 }
 
 _handle_nested_bins() {
