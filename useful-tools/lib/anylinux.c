@@ -200,6 +200,7 @@ static const char* vars_to_unset[] = {
 	"MAGICK_CONFIGURE_PATH",
 	"MAGICK_HOME",
 	"PERLLIB",
+	"PIPEWIRE_CONFIG_DIR",
 	"PIPEWIRE_MODULE_DIR",
 	"PYTHONHOME",
 	"QT_PLUGIN_PATH",
