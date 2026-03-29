@@ -219,6 +219,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
 [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
+[Quickgui](https://github.com/pkgforge-dev/Quickgui-AppImage)                                                            |
 [Quickshell](https://github.com/pkgforge-dev/Quickshell-AppImage)                                                        |
 [Readest](https://github.com/pkgforge-dev/Readest-AppImage-Enhanced)                                                     |
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
