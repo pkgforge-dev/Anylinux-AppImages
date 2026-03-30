@@ -20,7 +20,7 @@ _info_msg() {
 
 git() {
 	count=0
-	while [ "$count" -lt 6 ]; do
+	while [ "$count" -lt 10 ]; do
 		if command git "$@"; then
 			return 0
 		else
@@ -28,12 +28,12 @@ git() {
 			sleep 12
 			count=$(( count + 1 ))
 		fi
-		if [ "$count" = 5 ]; then
+		if [ "$count" = 9 ]; then
 			# wait 2 minutes before one last attempt
 			sleep 120
 		fi
 	done
-	>&2 echo "ERROR: 'git $*' Failed 5 times!"
+	>&2 echo "ERROR: 'git $*' Failed 10 times!"
 	exit 1
 }
 
