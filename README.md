@@ -191,6 +191,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced)                                                   |
 [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage)                                                            |
 [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage)                                                            |
+[OpenLoco](https://github.com/pkgforge-dev/OpenLoco-AppImage)                                                            |
 [openMSX](https://github.com/pkgforge-dev/openMSX-AppImage)                                                              |
 [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced)                                                   |
 [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage)                                                          |
