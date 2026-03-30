@@ -25,8 +25,12 @@ git() {
 			return 0
 		else
 			>&2 echo "ERROR: 'git $*' failed! Trying again..."
-			sleep 10
+			sleep 7
 			count=$(( count + 1 ))
+		fi
+		if [ "$count" = 4 ]; then
+			# wait 1 minute before one last attempt
+			sleep 60
 		fi
 	done
 	>&2 echo "ERROR: 'git $*' Failed 5 times!"
