@@ -60,7 +60,7 @@ jobs:
             if (daily < 0) daily = 0
             print $1 ": " daily
           }
-          ' /tmp/repos.stats.prev ./.github/repos.stats > ./.github/repos.stats.diff
+          ' /tmp/repos.stats.prev ./.github/repos.stats | sort -rnk2 > ./.github/repos.stats.diff
 
           TOTAL=$(awk -F':' '{sum += $2} END {print sum}' ./.github/repos.stats)
 
