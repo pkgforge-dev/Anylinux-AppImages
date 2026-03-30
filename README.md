@@ -143,6 +143,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
+[innoextract](https://github.com/pkgforge-dev/innoextract-AppImage)                                                      |
 [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
 [Iris](https://github.com/pkgforge-dev/Iris-AppImage-Enhanced)                                                           |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
