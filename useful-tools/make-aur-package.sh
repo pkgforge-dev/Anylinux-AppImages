@@ -18,6 +18,21 @@ _info_msg() {
 	printf "$g%s$o\n" "$l" "${*:-$l}" "$l"
 }
 
+git() {
+	count=0
+	while [ "$count" -lt 5 ]; do
+		if command git "$@"; then
+			return 0
+		else
+			>&2 echo "ERROR: 'git $*' failed! Trying again..."
+			sleep 5
+			count=$(( count + 1 ))
+		fi
+	done
+	>&2 echo "ERROR: 'git $*' Failed 5 times!"
+	exit 1
+}
+
 _prepare() {
 	for d in base-devel git; do
 		if ! pacman -Q "$d" 2>/dev/null; then
