@@ -25,7 +25,7 @@ git() {
 			return 0
 		else
 			>&2 echo "ERROR: 'git $*' failed! Trying again..."
-			sleep 5
+			sleep 10
 			count=$(( count + 1 ))
 		fi
 	done
