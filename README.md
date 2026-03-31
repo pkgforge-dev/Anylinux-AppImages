@@ -221,6 +221,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
 [QEMU](https://github.com/pkgforge-dev/QEMU-AppImage)                                                                    |
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
+[Qmmp](https://github.com/pkgforge-dev/Qmmp-AppImage)                                                                    |
 [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
 [Quickshell](https://github.com/pkgforge-dev/Quickshell-AppImage)                                                        |
