@@ -40,11 +40,13 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage)                                                            |
 [Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage)                                                          |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
+[Amarok](https://github.com/pkgforge-dev/Amarok-AppImage)                                                                |
 [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage)                                                  |
 [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
 [anki](https://github.com/pkgforge-dev/anki-AppImage)                                                                    |
 [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)                                        |
 [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)                                                            |
+[Audacious](https://github.com/pkgforge-dev/Audacious-AppImage)                                                          |
 [Audacity](https://github.com/pkgforge-dev/Audacity-AppImage-Enhanced)                                                   |
 [Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage)                                                  |
 [Augustus](https://github.com/pkgforge-dev/Augustus-AppImage-Enhanced)                                                   |
@@ -143,6 +145,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
 [Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
+[innoextract](https://github.com/pkgforge-dev/innoextract-AppImage)                                                      |
 [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
 [Iris](https://github.com/pkgforge-dev/Iris-AppImage-Enhanced)                                                           |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
@@ -191,6 +194,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced)                                                   |
 [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage)                                                            |
 [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage)                                                            |
+[OpenLoco](https://github.com/pkgforge-dev/OpenLoco-AppImage)                                                            |
 [openMSX](https://github.com/pkgforge-dev/openMSX-AppImage)                                                              |
 [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced)                                                   |
 [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage)                                                          |
