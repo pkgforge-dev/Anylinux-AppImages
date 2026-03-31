@@ -142,6 +142,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
 [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
 [Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced)                                       |
+[HP-15C](https://github.com/pkgforge-dev/HP-15C-Simulator-AppImage)                                                       |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
@@ -230,6 +231,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
 [REDRIVER2](https://github.com/pkgforge-dev/REDRIVER2-AppImage)                                                          |
+[RenPy](https://github.com/pkgforge-dev/RenPy-AppImage)                                                                  |
 [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
 [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
 [Riseup-VPN](https://github.com/pkgforge-dev/Riseup-VPN-AppImage)                                                        |
