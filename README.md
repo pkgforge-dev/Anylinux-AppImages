@@ -40,11 +40,13 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage)                                                            |
 [Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage)                                                          |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
+[Amarok](https://github.com/pkgforge-dev/Amarok-AppImage)                                                                |
 [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage)                                                  |
 [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
 [anki](https://github.com/pkgforge-dev/anki-AppImage)                                                                    |
 [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)                                        |
 [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)                                                            |
+[Audacious](https://github.com/pkgforge-dev/Audacious-AppImage)                                                          |
 [Audacity](https://github.com/pkgforge-dev/Audacity-AppImage-Enhanced)                                                   |
 [Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage)                                                  |
 [Augustus](https://github.com/pkgforge-dev/Augustus-AppImage-Enhanced)                                                   |
