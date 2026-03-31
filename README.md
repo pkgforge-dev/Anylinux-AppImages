@@ -118,6 +118,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage)                                                            |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
+[GCstar](https://github.com/pkgforge-dev/GCstar-AppImage)                                                                |
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
 [Gearboy](https://github.com/pkgforge-dev/Gearboy-AppImage)                                                              |
 [Gearcoleco](https://github.com/pkgforge-dev/Gearcoleco-AppImage)                                                        |
