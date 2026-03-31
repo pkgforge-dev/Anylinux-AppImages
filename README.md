@@ -115,6 +115,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced)                                                     |
 [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage)                                                    |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
+[fooyin](https://github.com/pkgforge-dev/fooyin-AppImage)                                                                |
 [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage)                                                            |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
@@ -247,6 +248,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced)                                                   |
 [RVGL](https://github.com/pkgforge-dev/RVGL-AppImage)                                                                    |
 [Sanicball](https://github.com/pkgforge-dev/Sanicball-AppImage)                                                          |
+[Sayonara-Player](https://github.com/pkgforge-dev/Sayonara-Player-AppImage-Enhanced)                                     |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
 [ScummVM](https://github.com/pkgforge-dev/ScummVM-AppImage)                                                              |
 [SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage)                                                                |
