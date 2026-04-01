@@ -1025,6 +1025,7 @@ _make_deployment_array() {
 	if [ "$DEPLOY_GHOSTSCRIPT" = 1 ]; then
 		_echo "* Deploying ghostscript"
 		set -- "$@" "$LIB_DIR"/libgs.so*
+		if b=$(command -v gs); then set -- "$@" "$b"; fi
 	fi
 	if [ "$DEPLOY_P11KIT" = 1 ]; then
 		_echo "* Deploying p11kit"
