@@ -1,0 +1,60 @@
+name: Check outdated repos
+concurrency:
+  group: outdated-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Check outdated repos
+        run: |
+          CUTOFF=$(date -d "60 days ago" +%s)
+          OUTDATED_FILE="./.github/outdated.repos"
+          > "$OUTDATED_FILE"
+
+          while IFS= read -r line; do
+            REPO=$(echo "$line" | awk -F': ' '{print $1}')
+            [ -z "$REPO" ] && continue
+
+            RELEASE_DATE=$(wget -q \
+              --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/pkgforge-dev/$REPO/releases/latest" -O - \
+              | jq -r '.published_at // ""')
+
+            if [ -z "$RELEASE_DATE" ] || [ "$RELEASE_DATE" = "null" ]; then
+              >&2 echo "WARNING: no stable release found for $REPO"
+              echo "$REPO" >> "$OUTDATED_FILE"
+              continue
+            fi
+
+            RELEASE_TS=$(date -d "$RELEASE_DATE" +%s)
+            if [ "$RELEASE_TS" -lt "$CUTOFF" ]; then
+              echo "$REPO" >> "$OUTDATED_FILE"
+            fi
+          done < ./.github/repos.stats
+
+          sort -u -o "$OUTDATED_FILE" "$OUTDATED_FILE"
+          echo "Outdated repos:"
+          cat "$OUTDATED_FILE"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ./.github/outdated.repos
+          git commit -m "outdated repos auto-commit" || echo "No changes to commit"
+          git push origin HEAD:${{ github.event.repository.default_branch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
