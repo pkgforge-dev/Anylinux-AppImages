@@ -2025,7 +2025,7 @@ _post_deployment_steps() {
 			rm -f "$dst_trans"/linguist*.qm
 		fi
 		if [ -f "$TMPDIR"/libqgtk3.so ]; then
-			d="$APPDIR"/shared/lib/"$QT_DIR"/plugins/platformthemes
+			d=$DST_LIB_DIR/$QT_DIR/plugins/platformthemes
 			mkdir -p "$d"
 			mv "$TMPDIR"/libqgtk3.so "$d"
 			"$APPDIR"/sharun -g 2>/dev/null || :
