@@ -617,6 +617,9 @@ _determine_what_to_deploy() {
 				*libheif.so*)
 					DEPLOY_LIBHEIF=${DEPLOY_LIBHEIF:-1}
 					;;
+				*libgs.so*)
+					DEPLOY_GHOSTSCRIPT=${DEPLOY_GHOSTSCRIPT:-1}
+					;;
 				*libp11-kit.so*)
 					DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 					;;
@@ -1018,6 +1021,11 @@ _make_deployment_array() {
 				*libavcodec.so*)  set -- "$@" "$heifdir"/*ffmpeg*.so*;;
 			esac
 		done
+	fi
+	if [ "$DEPLOY_GHOSTSCRIPT" = 1 ]; then
+		_echo "* Deploying ghostscript"
+		set -- "$@" "$LIB_DIR"/libgs.so*
+		if b=$(command -v gs); then set -- "$@" "$b"; fi
 	fi
 	if [ "$DEPLOY_P11KIT" = 1 ]; then
 		_echo "* Deploying p11kit"
@@ -2006,6 +2014,23 @@ _post_deployment_steps() {
 
 		_echo "* Copied ImageMagick directories"
 	fi
+	if [ "$DEPLOY_GHOSTSCRIPT" = 1 ]; then
+		src_gsdir=/usr/share/ghostscript
+		dst_gsdir=$APPDIR/share/ghostscript
+		if [ -d "$src_gsdir" ] && [ ! -d "$dst_gsdir" ]; then
+			cp -r "$src_gsdir" "$APPDIR"/share
+			# TODO: upstream to sharun
+			(
+				cd "$dst_gsdir"
+				d=$(echo ./*/Resource/Init)
+				if [ -d "$d" ]; then
+					echo "GS_LIB=\${SHARUN_DIR}/share/ghostscript/${d#./}" >> "$APPENV"
+				else
+					echo 'GS_LIB=${SHARUN_DIR}/share/ghostscript/Resource/Init' >> "$APPENV"
+				fi
+			)
+		fi
+	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		gegldir=$(echo "$LIB_DIR"/gegl-*)
 		dst_gegldir=$DST_LIB_DIR/${gegldir##*/}
@@ -2025,7 +2050,7 @@ _post_deployment_steps() {
 			rm -f "$dst_trans"/linguist*.qm
 		fi
 		if [ -f "$TMPDIR"/libqgtk3.so ]; then
-			d="$APPDIR"/lib/"$QT_DIR"/plugins/platformthemes
+			d=$DST_LIB_DIR/$QT_DIR/plugins/platformthemes
 			mkdir -p "$d"
 			mv "$TMPDIR"/libqgtk3.so "$d"
 			"$APPDIR"/sharun -g 2>/dev/null || :
