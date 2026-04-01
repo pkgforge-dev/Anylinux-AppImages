@@ -300,6 +300,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage)                                                  |
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
 [Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
+[Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced)                                       |
 [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage)                                                          |
 [WebCord](https://github.com/pkgforge-dev/WebCord-AppImage-Enhanced)                                                     |
 [WhatsDesk](https://github.com/pkgforge-dev/WhatsDesk-AppImage)                                                          |
