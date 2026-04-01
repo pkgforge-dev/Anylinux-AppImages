@@ -176,6 +176,7 @@ static const char* vars_to_unset[] = {
 	"GIO_MODULE_DIR",
 	"GI_TYPELIB_PATH",
 	"GSETTINGS_SCHEMA_DIR",
+	"GS_LIB",
 	"GST_PLUGIN_PATH",
 	"GST_PLUGIN_SCANNER",
 	"GST_PLUGIN_SYSTEM_PATH",
