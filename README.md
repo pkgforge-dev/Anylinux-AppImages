@@ -210,6 +210,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage)                                                    |
 [Phantom-Satellite](https://github.com/pkgforge-dev/Phantom-Satellite-AppImage)                                          |
 [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage)                                            |
+[Piglit](https://github.com/pkgforge-dev/Piglit-AppImage)                                                                |
 [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
 [Play!](https://github.com/pkgforge-dev/Play-AppImage-Enhanced)                                                          |
