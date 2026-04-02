@@ -115,6 +115,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced)                                                     |
 [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage)                                                    |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
+[fooyin](https://github.com/pkgforge-dev/fooyin-AppImage)                                                                |
 [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage)                                                            |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage)                                                        |
@@ -143,6 +144,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
 [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
 [Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced)                                       |
+[HP-15C](https://github.com/pkgforge-dev/HP-15C-Simulator-AppImage)                                                      |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
@@ -224,6 +226,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
 [QEMU](https://github.com/pkgforge-dev/QEMU-AppImage)                                                                    |
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
+[Qmmp](https://github.com/pkgforge-dev/Qmmp-AppImage)                                                                    |
 [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
 [Quickshell](https://github.com/pkgforge-dev/Quickshell-AppImage)                                                        |
@@ -246,6 +249,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced)                                                   |
 [RVGL](https://github.com/pkgforge-dev/RVGL-AppImage)                                                                    |
 [Sanicball](https://github.com/pkgforge-dev/Sanicball-AppImage)                                                          |
+[Sayonara-Player](https://github.com/pkgforge-dev/Sayonara-Player-AppImage-Enhanced)                                     |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
 [ScummVM](https://github.com/pkgforge-dev/ScummVM-AppImage)                                                              |
 [SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage)                                                                |
@@ -297,6 +301,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage)                                                  |
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
 [Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
+[Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced)                                       |
 [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage)                                                          |
 [WebCord](https://github.com/pkgforge-dev/WebCord-AppImage-Enhanced)                                                     |
 [WhatsDesk](https://github.com/pkgforge-dev/WhatsDesk-AppImage)                                                          |
