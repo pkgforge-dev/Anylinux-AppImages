@@ -233,7 +233,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
 [REDRIVER2](https://github.com/pkgforge-dev/REDRIVER2-AppImage)                                                          |
-[RenPy](https://github.com/pkgforge-dev/RenPy-AppImage)                                                                  |
 [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
 [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
 [Riseup-VPN](https://github.com/pkgforge-dev/Riseup-VPN-AppImage)                                                        |
