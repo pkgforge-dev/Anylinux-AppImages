@@ -207,6 +207,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
 [PCSX-Redux](https://github.com/pkgforge-dev/PCSX-Redux-AppImage-Enhanced)                                               |
 [PCSX2](https://github.com/pkgforge-dev/PCSX2-AppImage-Enhanced)                                                         |
+[PDF Tricks](https://github.com/pkgforge-dev/PDF-Tricks-AppImage)                                                        |
 [Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage)                                                    |
 [Phantom-Satellite](https://github.com/pkgforge-dev/Phantom-Satellite-AppImage)                                          |
 [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage)                                            |
