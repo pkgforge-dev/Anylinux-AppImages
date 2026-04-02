@@ -71,6 +71,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage)                                            |
+[CopyQ](https://github.com/pkgforge-dev/CopyQ-AppImage)                                                                  |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
 [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage)                                                      |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
