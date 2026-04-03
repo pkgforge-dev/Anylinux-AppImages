@@ -310,6 +310,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage)                                                          |
 [WebCord](https://github.com/pkgforge-dev/WebCord-AppImage-Enhanced)                                                     |
 [WhatsDesk](https://github.com/pkgforge-dev/WhatsDesk-AppImage)                                                          |
+[WhatSie](https://github.com/pkgforge-dev/WhatSie-AppImage)                                                              |
 [wine](https://github.com/pkgforge-dev/wine-AppImage)                                                                    |
 [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage)                                              |
 [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced)                                             |
