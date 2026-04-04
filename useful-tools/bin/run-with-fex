@@ -1,0 +1,15 @@
+#!/bin/sh
+
+_get_fex_appimage() {
+	>&2 echo 'function not implemented'
+	>&2 echo 'install FEX and make sure it is in your PATH'
+	exit 1
+}
+
+if FEXBIN=$(command -v FEX 1>/dev/null); then
+	:
+else
+	_get_fex_appimage
+fi
+
+set -- "$FEXBIN" "$@"
