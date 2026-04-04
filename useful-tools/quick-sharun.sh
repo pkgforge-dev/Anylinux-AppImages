@@ -2172,6 +2172,26 @@ _make_static_bin() (
 	_echo "------------------------------------------------------------"
 )
 
+_make_aarch64_appimage() {
+	if [ "$APPIMAGE_ARCH" != 'x86_64' ]; then
+		_err_msg "This option is meant to be used on x86_64 systems only"
+		_err_msg "Just use --make-appimage if you are on a aarch64 runner"
+		exit 1
+	fi
+	_echo "------------------------------------------------------------"
+	_echo "Making aarch64 AppImage..."
+	_echo "------------------------------------------------------------"
+	ARM_RUNTIME=${ARM_RUNTIME:-$TMPDIR/uruntime-aarch64}
+	ARM_URUNTIME_LINK=$(echo $URUNTIME_LINK | sed 's|x86_64|aarch64|g')
+	_echo "Downloading uruntime from $ARM_URUNTIME_LINK"
+	_download "$ARM_RUNTIME" "$ARM_URUNTIME_LINK"
+	chmod +x "$ARM_RUNTIME"
+	# TAGET_APPIMAGE makes the uruntime perform operations on a different
+	# appimage rather than on itself, this is very useful for us here
+	export TARGET_APPIMAGE="$ARM_RUNTIME"
+	ARCH=aarch64
+}
+
 _make_appimage() {
 	_echo "------------------------------------------------------------"
 	_echo "Making AppImage..."
@@ -2304,13 +2324,14 @@ _make_appimage() {
 	_echo "Making AppImage..."
 	_echo "------------------------------------------------------------"
 
+	HEADER=${TARGET_APPIMAGE:-$RUNTIME}
 	set -- \
 		--force               \
 		--set-owner 0         \
 		--set-group 0         \
 		--no-history          \
 		--no-create-timestamp \
-		--header "$RUNTIME"   \
+		--header "$HEADER"    \
 		--input  "$APPDIR"
 
 	if [ "$OPTIMIZE_LAUNCH" = 1 ]; then
@@ -2383,6 +2404,10 @@ case "$1" in
 		_help_msg
 		;;
 	--make-appimage)
+		_make_appimage
+		;;
+	--make-aarch64-appimage)
+		_make_aarch64_appimage
 		_make_appimage
 		;;
 	--test)
