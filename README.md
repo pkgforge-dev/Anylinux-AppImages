@@ -42,6 +42,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage)                                                          |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
 [Amarok](https://github.com/pkgforge-dev/Amarok-AppImage)                                                                |
+[Amiberry](https://github.com/pkgforge-dev/Amiberry-AppImage)                                                            |
 [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage)                                                  |
 [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
 [anki](https://github.com/pkgforge-dev/anki-AppImage)                                                                    |
