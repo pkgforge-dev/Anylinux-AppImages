@@ -307,6 +307,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Viber](https://github.com/pkgforge-dev/Viber-AppImage-Enhanced)                                                         |
 [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage)                                                  |
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
+[vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage)                                                    |
 [Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
 [Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced)                                       |
 [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage)                                                          |
