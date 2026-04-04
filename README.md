@@ -71,6 +71,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage)                                            |
+[CopyQ](https://github.com/pkgforge-dev/CopyQ-AppImage)                                                                  |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
 [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage)                                                      |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
@@ -115,6 +116,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced)                                                     |
 [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage)                                                    |
 [foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
+[fooyin](https://github.com/pkgforge-dev/fooyin-AppImage)                                                                |
 [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage)                                                            |
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage)                                                        |
@@ -140,9 +142,11 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [Gradia](https://github.com/pkgforge-dev/Gradia-AppImage)                                                                |
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
+[gThumb](https://github.com/pkgforge-dev/gThumb-AppImage)                                                                |
 [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
 [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
 [Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced)                                       |
+[HP-15C](https://github.com/pkgforge-dev/HP-15C-Simulator-AppImage)                                                      |
 [htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
 [Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
 [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
@@ -207,6 +211,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
 [PCSX-Redux](https://github.com/pkgforge-dev/PCSX-Redux-AppImage-Enhanced)                                               |
 [PCSX2](https://github.com/pkgforge-dev/PCSX2-AppImage-Enhanced)                                                         |
+[PDF Arranger](https://github.com/pkgforge-dev/PDF-Arranger-AppImage)                                                    |
 [PDF Tricks](https://github.com/pkgforge-dev/PDF-Tricks-AppImage)                                                        |
 [Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage)                                                    |
 [Phantom-Satellite](https://github.com/pkgforge-dev/Phantom-Satellite-AppImage)                                          |
@@ -225,6 +230,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
 [QEMU](https://github.com/pkgforge-dev/QEMU-AppImage)                                                                    |
 [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
+[Qmmp](https://github.com/pkgforge-dev/Qmmp-AppImage)                                                                    |
+[QMPlay2](https://github.com/pkgforge-dev/QMPlay2-AppImage-Enhanced)                                                     |
 [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
 [Quickshell](https://github.com/pkgforge-dev/Quickshell-AppImage)                                                        |
@@ -247,11 +254,14 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced)                                                   |
 [RVGL](https://github.com/pkgforge-dev/RVGL-AppImage)                                                                    |
 [Sanicball](https://github.com/pkgforge-dev/Sanicball-AppImage)                                                          |
+[Satty](https://github.com/pkgforge-dev/Satty-AppImage)                                                                  |
+[Sayonara-Player](https://github.com/pkgforge-dev/Sayonara-Player-AppImage-Enhanced)                                     |
 [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
 [ScummVM](https://github.com/pkgforge-dev/ScummVM-AppImage)                                                              |
 [SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage)                                                                |
 [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
 [servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
+[Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage)                                                            |
 [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage)                                                            |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced)                                                       |
@@ -298,9 +308,11 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage)                                                  |
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
 [Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
+[Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced)                                       |
 [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage)                                                          |
 [WebCord](https://github.com/pkgforge-dev/WebCord-AppImage-Enhanced)                                                     |
 [WhatsDesk](https://github.com/pkgforge-dev/WhatsDesk-AppImage)                                                          |
+[WhatSie](https://github.com/pkgforge-dev/WhatSie-AppImage)                                                              |
 [wine](https://github.com/pkgforge-dev/wine-AppImage)                                                                    |
 [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage)                                              |
 [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced)                                             |
