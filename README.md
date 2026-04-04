@@ -212,6 +212,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [PCSX-Redux](https://github.com/pkgforge-dev/PCSX-Redux-AppImage-Enhanced)                                               |
 [PCSX2](https://github.com/pkgforge-dev/PCSX2-AppImage-Enhanced)                                                         |
 [PDF Arranger](https://github.com/pkgforge-dev/PDF-Arranger-AppImage)                                                    |
+[PDF Tricks](https://github.com/pkgforge-dev/PDF-Tricks-AppImage)                                                        |
 [Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage)                                                    |
 [Phantom-Satellite](https://github.com/pkgforge-dev/Phantom-Satellite-AppImage)                                          |
 [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage)                                            |
@@ -306,6 +307,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Viber](https://github.com/pkgforge-dev/Viber-AppImage-Enhanced)                                                         |
 [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage)                                                  |
 [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
+[vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage)                                                    |
 [Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
 [Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced)                                       |
 [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage)                                                          |
@@ -323,6 +325,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Xsnow](https://github.com/pkgforge-dev/Xsnow-AppImage)                                                                  |
 [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage)                                              |
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
+[yt-dlp](https://github.com/pkgforge-dev/yt-dlp-AppImage)                                                                |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
 [Zelda64Recomp](https://github.com/pkgforge-dev/Zelda64Recomp-AppImage)                                                  |
 [Zen Browser](https://github.com/pkgforge-dev/Zen-Browser-AppImage-Enhanced)                                             |
