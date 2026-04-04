@@ -324,6 +324,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Xsnow](https://github.com/pkgforge-dev/Xsnow-AppImage)                                                                  |
 [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage)                                              |
 [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
+[yt-dlp](https://github.com/pkgforge-dev/yt-dlp-AppImage)                                                                |
 [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
 [Zelda64Recomp](https://github.com/pkgforge-dev/Zelda64Recomp-AppImage)                                                  |
 [Zen Browser](https://github.com/pkgforge-dev/Zen-Browser-AppImage-Enhanced)                                             |
