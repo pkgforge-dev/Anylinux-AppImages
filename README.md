@@ -37,6 +37,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [12to11](https://github.com/pkgforge-dev/12to11-AppImage)                                                                |
 [86Box](https://github.com/pkgforge-dev/86box-AppImage-Enhanced)                                                         |
 [AAAAXY](https://github.com/pkgforge-dev/AAAAXY-AppImage-Enhanced)                                                       |
+[Abaddon](https://github.com/pkgforge-dev/Abaddon-AppImage)                                                              |
 [Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage)                                                            |
 [Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage)                                                          |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
@@ -221,6 +222,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
 [Play!](https://github.com/pkgforge-dev/Play-AppImage-Enhanced)                                                          |
 [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)                                                          |
+[Plus42](https://github.com/pkgforge-dev/Plus42-AppImage)                                                                |
 [PokeMMO](https://github.com/pkgforge-dev/PokeMMO-AppImage)                                                              |
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
@@ -241,6 +243,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [REDRIVER2](https://github.com/pkgforge-dev/REDRIVER2-AppImage)                                                          |
 [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
 [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
+[Rigs-of-Rods](https://github.com/pkgforge-dev/Rigs-of-Rods-AppImage)                                                    |
 [Riseup-VPN](https://github.com/pkgforge-dev/Riseup-VPN-AppImage)                                                        |
 [Ristretto](https://github.com/pkgforge-dev/Ristretto-AppImage)                                                          |
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
