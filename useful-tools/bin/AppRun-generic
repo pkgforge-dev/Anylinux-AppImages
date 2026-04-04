@@ -71,6 +71,12 @@ else
 	TO_LAUNCH="$APPDIR"/bin/"$MAIN_BIN"
 fi
 
+set -- "$TO_LAUNCH" "$@"
+
+if [ -f "$APPDIR"/bin/run-with-fex ]; then
+	. "$APPDIR"/bin/run-with-fex
+fi
+
 # If LD_DEBUG=libs is set outside the AppImage the output is not helpful
 # because it will include the libs of sh, grep, cat, etc from the hooks
 # with this var we can set LD_DEBUG=libs for the bundled application only
@@ -80,8 +86,8 @@ if [ "$APPIMAGE_DEBUG" = 1 ]; then
 	export VK_LOADER_DEBUG=all
 	export LC_ALL=C
 	export SHARUN_PRINTENV=1
-	"$TO_LAUNCH" "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
+	"$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
 	>&2 echo "Debug log at: '$PWD/${APPIMAGE##*/}-debug.log'"
 else
-	exec "$TO_LAUNCH" "$@"
+	exec "$@"
 fi
