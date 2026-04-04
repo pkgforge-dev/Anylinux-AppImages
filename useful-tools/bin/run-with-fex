@@ -6,7 +6,7 @@ _get_fex_appimage() {
 	exit 1
 }
 
-if FEXBIN=$(command -v FEX 1>/dev/null); then
+if FEXBIN=$(command -v FEX); then
 	:
 else
 	_get_fex_appimage
