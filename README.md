@@ -42,6 +42,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage)                                                          |
 [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
 [Amarok](https://github.com/pkgforge-dev/Amarok-AppImage)                                                                |
+[Amiberry](https://github.com/pkgforge-dev/Amiberry-AppImage)                                                            |
 [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage)                                                  |
 [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
 [anki](https://github.com/pkgforge-dev/anki-AppImage)                                                                    |
@@ -207,6 +208,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage)                                                          |
 [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage)                                                              |
 [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage)                                                |
+[OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage/releases)                                                 |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
 [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
@@ -268,6 +270,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage)                                                            |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced)                                                       |
+[SongRec](https://github.com/pkgforge-dev/SongRec-AppImage)                                                              |
 [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced)                                                             |
 [Sonic 3 A.I.R.](https://github.com/pkgforge-dev/Sonic-3-AIR-AppImage)                                                   |
 [Sonic-Mania-Decompilation](https://github.com/pkgforge-dev/Sonic-Mania-Decompilation-AppImage)                          |
