@@ -178,6 +178,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
 [ManiaDrive](https://github.com/pkgforge-dev/ManiaDrive-AppImage)                                                        |
 [MarioKart64Recomp](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage)                                          |
+[Media Downloader](https://github.com/pkgforge-dev/Media-Downloader-AppImage)                                            |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
 [melonDS](https://github.com/pkgforge-dev/melonDS-AppImage-Enhanced)                                                     |
 [MESA](https://github.com/pkgforge-dev/MESA-AppImage)                                                                    |
