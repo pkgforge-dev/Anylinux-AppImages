@@ -2193,6 +2193,7 @@ _make_aarch64_appimage() {
 	# TARGET_APPIMAGE makes the uruntime perform operations on a different
 	# appimage rather than on itself, this is very useful for us here
 	export TARGET_APPIMAGE="$ARM_RUNTIME"
+	APPIMAGE_ARCH=aarch64
 	ARCH=aarch64
 }
 
