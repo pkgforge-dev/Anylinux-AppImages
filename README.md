@@ -172,6 +172,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [lba2-classic-community](https://github.com/pkgforge-dev/lba2-classic-community-AppImage)                                |
 [Libation](https://github.com/pkgforge-dev/Libation-AppImage)                                                            |
 [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage)                                                            |
+[LightZone](https://github.com/pkgforge-dev/LightZone-AppImage)                                                          |
 [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage)                                                          |
 [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage)                                                          |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
