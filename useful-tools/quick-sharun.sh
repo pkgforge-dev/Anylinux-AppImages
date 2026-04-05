@@ -2186,7 +2186,7 @@ _make_aarch64_appimage() {
 	_echo "* Added run-with-fex wrapper"
 	_echo "------------------------------------------------------------"
 	ARM_RUNTIME=${ARM_RUNTIME:-$TMPDIR/uruntime-aarch64}
-	ARM_URUNTIME_LINK=$(echo $URUNTIME_LINK | sed 's|x86_64|aarch64|g')
+	ARM_URUNTIME_LINK=$(echo "$URUNTIME_LINK" | sed 's|x86_64|aarch64|g')
 	_echo "Downloading uruntime from $ARM_URUNTIME_LINK"
 	_download "$ARM_RUNTIME" "$ARM_URUNTIME_LINK"
 	chmod +x "$ARM_RUNTIME"
@@ -2216,6 +2216,9 @@ _make_appimage() {
 	_get_desktop
 	_get_icon
 	_sort_env_file
+
+	# This is the runtime that gets appended to the filesystem
+	HEADER=${TARGET_APPIMAGE:-$RUNTIME}
 
 	_echo "------------------------------------------------------------"
 	if [ -z "$UPINFO" ]; then
@@ -2304,7 +2307,7 @@ _make_appimage() {
 		_echo "------------------------------------------------------------"
 		_echo "Setting runtime to always keep the mount point..."
 		_echo "------------------------------------------------------------"
-		sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=0|' "$RUNTIME"
+		sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=0|' "$HEADER"
 	fi
 
 	if [ -n "$UPINFO" ]; then
@@ -2328,7 +2331,6 @@ _make_appimage() {
 	_echo "Making AppImage..."
 	_echo "------------------------------------------------------------"
 
-	HEADER=${TARGET_APPIMAGE:-$RUNTIME}
 	set -- \
 		--force               \
 		--set-owner 0         \
