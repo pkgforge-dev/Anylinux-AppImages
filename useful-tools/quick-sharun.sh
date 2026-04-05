@@ -41,6 +41,7 @@ GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
 NOTIFY_SOURCE=${NOTIFY_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/notify}
 APPRUN_SOURCE=${APPRUN_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/AppRun-generic}
+RUNFEX_SOURCE=${RUNFEX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/run-with-fex}
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
@@ -2180,6 +2181,9 @@ _make_aarch64_appimage() {
 	fi
 	_echo "------------------------------------------------------------"
 	_echo "Making aarch64 AppImage..."
+	_echo "------------------------------------------------------------"
+	_download "$hook_dst"/run-with-fex "$NOTIFY_SOURCE"
+	_echo "* Added run-with-fex wrapper"
 	_echo "------------------------------------------------------------"
 	ARM_RUNTIME=${ARM_RUNTIME:-$TMPDIR/uruntime-aarch64}
 	ARM_URUNTIME_LINK=$(echo $URUNTIME_LINK | sed 's|x86_64|aarch64|g')
