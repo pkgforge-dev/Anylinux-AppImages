@@ -2190,7 +2190,7 @@ _make_aarch64_appimage() {
 	_echo "Downloading uruntime from $ARM_URUNTIME_LINK"
 	_download "$ARM_RUNTIME" "$ARM_URUNTIME_LINK"
 	chmod +x "$ARM_RUNTIME"
-	# TAGET_APPIMAGE makes the uruntime perform operations on a different
+	# TARGET_APPIMAGE makes the uruntime perform operations on a different
 	# appimage rather than on itself, this is very useful for us here
 	export TARGET_APPIMAGE="$ARM_RUNTIME"
 	ARCH=aarch64
