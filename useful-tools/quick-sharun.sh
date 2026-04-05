@@ -2182,7 +2182,7 @@ _make_aarch64_appimage() {
 	_echo "------------------------------------------------------------"
 	_echo "Making aarch64 AppImage..."
 	_echo "------------------------------------------------------------"
-	_download "$hook_dst"/run-with-fex "$RUNFEX_SOURCE"
+	_download "$APPDIR"/bin/run-with-fex "$RUNFEX_SOURCE"
 	_echo "* Added run-with-fex wrapper"
 	_echo "------------------------------------------------------------"
 	ARM_RUNTIME=${ARM_RUNTIME:-$TMPDIR/uruntime-aarch64}
