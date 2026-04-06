@@ -41,6 +41,7 @@ GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
 NOTIFY_SOURCE=${NOTIFY_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/notify}
 APPRUN_SOURCE=${APPRUN_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/AppRun-generic}
+RUNFEX_SOURCE=${RUNFEX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/run-with-fex}
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
@@ -2172,6 +2173,30 @@ _make_static_bin() (
 	_echo "------------------------------------------------------------"
 )
 
+_make_aarch64_appimage() {
+	if [ "$APPIMAGE_ARCH" != 'x86_64' ]; then
+		_err_msg "This option is meant to be used on x86_64 systems only"
+		_err_msg "Just use --make-appimage if you are on a aarch64 runner"
+		exit 1
+	fi
+	_echo "------------------------------------------------------------"
+	_echo "Making aarch64 AppImage..."
+	_echo "------------------------------------------------------------"
+	_download "$APPDIR"/bin/run-with-fex "$RUNFEX_SOURCE"
+	_echo "* Added run-with-fex wrapper"
+	_echo "------------------------------------------------------------"
+	ARM_RUNTIME=${ARM_RUNTIME:-$TMPDIR/uruntime-aarch64}
+	ARM_URUNTIME_LINK=$(echo "$URUNTIME_LINK" | sed 's|x86_64|aarch64|g')
+	_echo "Downloading uruntime from $ARM_URUNTIME_LINK"
+	_download "$ARM_RUNTIME" "$ARM_URUNTIME_LINK"
+	chmod +x "$ARM_RUNTIME"
+	# TARGET_APPIMAGE makes the uruntime perform operations on a different
+	# appimage rather than on itself, this is very useful for us here
+	export TARGET_APPIMAGE="$ARM_RUNTIME"
+	APPIMAGE_ARCH=aarch64
+	ARCH=aarch64
+}
+
 _make_appimage() {
 	_echo "------------------------------------------------------------"
 	_echo "Making AppImage..."
@@ -2192,6 +2217,9 @@ _make_appimage() {
 	_get_desktop
 	_get_icon
 	_sort_env_file
+
+	# This is the runtime that gets appended to the filesystem
+	HEADER=${TARGET_APPIMAGE:-$RUNTIME}
 
 	_echo "------------------------------------------------------------"
 	if [ -z "$UPINFO" ]; then
@@ -2280,7 +2308,7 @@ _make_appimage() {
 		_echo "------------------------------------------------------------"
 		_echo "Setting runtime to always keep the mount point..."
 		_echo "------------------------------------------------------------"
-		sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=0|' "$RUNTIME"
+		sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=0|' "$HEADER"
 	fi
 
 	if [ -n "$UPINFO" ]; then
@@ -2310,7 +2338,7 @@ _make_appimage() {
 		--set-group 0         \
 		--no-history          \
 		--no-create-timestamp \
-		--header "$RUNTIME"   \
+		--header "$HEADER"    \
 		--input  "$APPDIR"
 
 	if [ "$OPTIMIZE_LAUNCH" = 1 ]; then
@@ -2383,6 +2411,10 @@ case "$1" in
 		_help_msg
 		;;
 	--make-appimage)
+		_make_appimage
+		;;
+	--make-aarch64-appimage)
+		_make_aarch64_appimage
 		_make_appimage
 		;;
 	--test)
