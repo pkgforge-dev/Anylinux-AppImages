@@ -193,6 +193,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage)                                                              |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
+[NP2kai](https://github.com/pkgforge-dev/Neko-Project-II-Kai-AppImage)                                                   |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
 [Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced)                                             |
 [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced)                                           |
