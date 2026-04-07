@@ -71,6 +71,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
 [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage)                                                             |
 [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
+[CollaboraOffice](https://github.com/pkgforge-dev/CollaboraOffice-AppImage)                                                          |
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage)                                            |
 [CopyQ](https://github.com/pkgforge-dev/CopyQ-AppImage)                                                                  |
