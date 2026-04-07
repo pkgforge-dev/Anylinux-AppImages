@@ -1705,15 +1705,6 @@ _fix_cpython_ldconfig_mess() {
 
 	_echo "* patched cpython /sbin/ldconfig for _ldconfig wrapper"
 
-	# pysdl is even more broken
-	set -- "$DST_LIB_DIR"/python*/site-packages/sdl3/__init__.py
-	[ -f "$1" ] || return 0
-	sed -i \
-	  -e 's|if os.path.exists(path) and SDL|if SDL|' \
-	  -e 's|binaryMap\[module\] =.*|binaryMap[module] = ctypes.CDLL(path)|' \
-	  "$1"
-	_echo "* fixed pysdl broken mess... this may not work always!"
-
 	# This python library ships a certificate with no way to override!
 	# https://github.com/certifi/python-certifi/issues/271
 	# https://github.com/certifi/python-certifi/issues/200
@@ -1726,6 +1717,15 @@ _fix_cpython_ldconfig_mess() {
 		rm -f "$1"
 		cp "$c" "$1"
 	fi
+
+	# pysdl is even more broken
+	set -- "$DST_LIB_DIR"/python*/site-packages/sdl3/__init__.py
+	[ -f "$1" ] || return 0
+	sed -i \
+	  -e 's|if os.path.exists(path) and SDL|if SDL|' \
+	  -e 's|binaryMap\[module\] =.*|binaryMap[module] = ctypes.CDLL(path)|' \
+	  "$1"
+	_echo "* fixed pysdl broken mess... this may not work always!"
 }
 
 _add_path_mapping_hardcoded() {
