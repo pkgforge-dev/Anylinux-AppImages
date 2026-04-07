@@ -253,6 +253,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Ristretto](https://github.com/pkgforge-dev/Ristretto-AppImage)                                                          |
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
+[RocksnDiamonds](https://github.com/pkgforge-dev/RocksnDiamonds-AppImage)                                                |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
 [ROLLER](https://github.com/pkgforge-dev/ROLLER-AppImage)                                                                |
 [rquickshare](https://github.com/pkgforge-dev/rquickshare-AppImage-Enhanced)                                             |
