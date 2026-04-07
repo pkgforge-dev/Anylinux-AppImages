@@ -275,6 +275,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage)                                                            |
 [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage)                                                            |
+[Simutrans](https://github.com/pkgforge-dev/Simutrans-AppImage)                                                          |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced)                                                       |
 [SongRec](https://github.com/pkgforge-dev/SongRec-AppImage)                                                              |
 [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced)                                                             |
