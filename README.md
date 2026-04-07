@@ -193,6 +193,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage)                                                              |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
+[NP2kai](https://github.com/pkgforge-dev/Neko-Project-II-Kai-AppImage)                                                   |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
 [Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced)                                             |
 [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced)                                           |
@@ -229,6 +230,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [PokeMMO](https://github.com/pkgforge-dev/PokeMMO-AppImage)                                                              |
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
+[Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage)                                                            |
 [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
 [Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage)                                                        |
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
@@ -240,6 +242,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
 [Quickshell](https://github.com/pkgforge-dev/Quickshell-AppImage)                                                        |
+[Raptor](https://github.com/pkgforge-dev/Raptor-AppImage)                                                                |
 [Readest](https://github.com/pkgforge-dev/Readest-AppImage-Enhanced)                                                     |
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
@@ -251,6 +254,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Ristretto](https://github.com/pkgforge-dev/Ristretto-AppImage)                                                          |
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
+[RocksnDiamonds](https://github.com/pkgforge-dev/RocksnDiamonds-AppImage)                                                |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
 [ROLLER](https://github.com/pkgforge-dev/ROLLER-AppImage)                                                                |
 [rquickshare](https://github.com/pkgforge-dev/rquickshare-AppImage-Enhanced)                                             |
