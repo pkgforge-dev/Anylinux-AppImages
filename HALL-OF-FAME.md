@@ -117,7 +117,7 @@ Where do I even start?
 
 At least more recently they are looking into adding [svg support into GTK4](https://www.phoronix.com/news/GTK-4.22-Native-SVG), which hopefully means they will get rid of the gdk-pixbuf and glycin dependency.
 
-# Garbage - Python
+# Utter Garbage - Python
 
 * Applications break horribly with the sightless version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215)
 * cpython running `/sbin/ldconfig -p` to find libraries, super broken. [1](https://github.com/python/cpython/issues/112417) [2](https://github.com/python/cpython/issues/142020) [3](https://github.com/python/cpython/issues/142020#issuecomment-3590632764)
@@ -125,3 +125,4 @@ At least more recently they are looking into adding [svg support into GTK4](http
 * Builds randomly began to fail **on the same python uv version** and had to use [this to it](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage/commit/e6a5601eeb7a3c4013b9452ca9c01eda7c5ec9e0)
 * python apps are often written with a ton of hardcoded paths, **even more than GTK apps**, so a lot of manual patches are needed to fix them. This is the result of a language that suggests containers to work.
 * Good luck figuring the dependencies of python apps, you often run into missing undeclared dependencies [1](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/256#issuecomment-3797407784) [2](https://github.com/pkgforge-dev/blender-AppImage/issues/5#issuecomment-3815841765)
+* Totally broken libraries that the developers refuse to fix [1](https://github.com/certifi/python-certifi/issues/200) [2](https://github.com/certifi/python-certifi/issues/271)

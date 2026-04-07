@@ -1713,6 +1713,19 @@ _fix_cpython_ldconfig_mess() {
 	  -e 's|binaryMap\[module\] =.*|binaryMap[module] = ctypes.CDLL(path)|' \
 	  "$1"
 	_echo "* fixed pysdl broken mess... this may not work always!"
+
+	# This python library ships a certificate with no way to override!
+	# https://github.com/certifi/python-certifi/issues/271
+	# https://github.com/certifi/python-certifi/issues/200
+	#
+	# some distros replace it with a symlink to the host certs, we have to
+	# make sure to ship the actual certificate since there is no override...
+	#
+	set -- "$DST_LIB_DIR"/python*/site-packages/certifi/cacert.pem
+	if [ -L "$1" ] && c=$(readlink -f "$1"); then
+		rm -f "$1"
+		cp "$c" "$1"
+	fi
 }
 
 _add_path_mapping_hardcoded() {
