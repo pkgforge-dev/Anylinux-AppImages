@@ -332,6 +332,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [wine](https://github.com/pkgforge-dev/wine-AppImage)                                                                    |
 [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage)                                              |
 [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced)                                             |
+[xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced)                                                           |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
 [xeyes](https://github.com/pkgforge-dev/xeyes-AppImage)                                                                  |
 [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
