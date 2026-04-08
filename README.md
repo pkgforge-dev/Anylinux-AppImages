@@ -147,6 +147,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
 [gThumb](https://github.com/pkgforge-dev/gThumb-AppImage)                                                                |
 [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
+[Haruna](https://github.com/pkgforge-dev/Haruna-AppImage)                                                                |
 [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
 [Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced)                                       |
 [HP-15C](https://github.com/pkgforge-dev/HP-15C-Simulator-AppImage)                                                      |
