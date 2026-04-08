@@ -147,6 +147,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
 [gThumb](https://github.com/pkgforge-dev/gThumb-AppImage)                                                                |
 [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
+[Haruna](https://github.com/pkgforge-dev/Haruna-AppImage)                                                                |
 [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
 [Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced)                                       |
 [HP-15C](https://github.com/pkgforge-dev/HP-15C-Simulator-AppImage)                                                      |
@@ -275,6 +276,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage)                                                            |
 [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage)                                                            |
+[Simutrans](https://github.com/pkgforge-dev/Simutrans-AppImage)                                                          |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced)                                                       |
 [SongRec](https://github.com/pkgforge-dev/SongRec-AppImage)                                                              |
 [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced)                                                             |
@@ -330,6 +332,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [wine](https://github.com/pkgforge-dev/wine-AppImage)                                                                    |
 [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage)                                              |
 [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced)                                             |
+[xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced)                                                           |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
 [xeyes](https://github.com/pkgforge-dev/xeyes-AppImage)                                                                  |
 [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
