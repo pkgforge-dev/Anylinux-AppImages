@@ -158,6 +158,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [innoextract](https://github.com/pkgforge-dev/innoextract-AppImage)                                                      |
 [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
 [Iris](https://github.com/pkgforge-dev/Iris-AppImage-Enhanced)                                                           |
+[IRPF2026](https://github.com/pkgforge-dev/IRPF2026-AppImage)                                                            |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
 [ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage)                                                            |
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
