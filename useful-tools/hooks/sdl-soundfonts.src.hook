@@ -17,14 +17,23 @@ _download() {
 }
 
 _get_soundfont() (
-	if notify -dq "$_sound_font_msg"; then
+	if [ -f "$_denyfile" ]; then
+		return 1
+	elif notify -dq "$_sound_font_msg"; then
 		_dst=$_user_data_dir/soundfonts
 		mkdir -p "$_dst"/.tmp
 		cd "$_dst"/.tmp
-		_download ./tmp.tar.gz "$_sound_font_src"
-		tar xvf ./tmp.tar.gz
-		mv -v ./*/*.sf2 "$_dst"
-		rm -rf "$_dst"/.tmp
+		if _download ./tmp.tar.gz "$_sound_font_src"; then
+			tar xvf ./tmp.tar.gz
+			mv -v ./*/*.sf2 "$_dst"
+			rm -rf "$_dst"/.tmp
+		else
+			notify -de 'Something went wrong downloading SoundFont'
+			return 1
+		fi
+	else
+		mkdir -p "${_denyfile%/*}"
+		:> "$_denyfile"
 	fi
 )
 
@@ -49,13 +58,11 @@ _find_soundfont() {
 
 	if [ -n "$SDL_SOUNDFONTS" ]; then
 		export SDL_SOUNDFONTS
-	else
-		if _get_soundfont; then
-			_find_soundfont
-		else
-			notify -de 'Something went wrong downloading SoundFont'
-		fi
+	elif _get_soundfont; then
+		_find_soundfont
 	fi
 }
 
-_find_soundfont
+if [ -z "$SDL_SOUNDFONTS" ]; then
+	_find_soundfont
+fi
