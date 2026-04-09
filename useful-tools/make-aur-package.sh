@@ -148,7 +148,14 @@ _local_pkgbuild() {
 
 _configure_arch() {
 	if ! grep -q "arch=.*$ARCH" ./PKGBUILD; then
-		sed -i -e "s|x86_64|$ARCH|" ./PKGBUILD
+		# We can't just replace x86_64 for aarch64
+		# because that breaks stuff like 'source_x86_64'
+		sed -i \
+			-e "s|(x86_64|($ARCH|"       \
+			-e "s| x86_64| $ARCH|"       \
+			-e "s|'x86_64'|'$ARCH'|"     \
+			-e "s|\"x86_64\"|\"$ARCH\"|" \
+			./PKGBUILD
 	fi
 }
 
