@@ -5,7 +5,7 @@
 # On aarch64 device drivers are all over the place and often they ship with
 # modifications not upstreamed to mesa, so we need to allow the host vulkan
 
-TMPDIR=${TMPDIR:-/tmp}
+_vulkan_hook_dir=${TMPDIR:-/tmp}/.vulkan-hook
 
 if [ "$APPIMAGE_ARCH" = 'aarch64' ]; then
 	export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
@@ -58,16 +58,11 @@ _nvidia_check || :
 # used by the dynamic linker that expands to locations like lib and lib32
 # the problem here is that debian  has lib/x86_64-linux-gnu instead
 # so we need to check and patch '$LIB' for the real path to the lib instead
-_VULKAN_HOOK_DIR="$TMPDIR"/.vulkan-hook
 _check_vulkan_json_path() (
-	implicit_dir="$_VULKAN_HOOK_DIR"/vulkan/implicit_layer.d
-	explicit_dir="$_VULKAN_HOOK_DIR"/vulkan/explicit_layer.d
+	implicit_dir=$_vulkan_hook_dir/vulkan/implicit_layer.d
+	explicit_dir=$_vulkan_hook_dir/vulkan/explicit_layer.d
 
-	for dep in grep sed mkdir; do
-		if ! command -v "$dep" 1>/dev/null; then
-			return 1
-		fi
-	done
+	is_cmd grep sed mkdir || return 1
 
 	for f in /usr/share/vulkan/explicit_layer.d/*; do
 		if [ -f "$f" ] && layer_path=$(grep -o '"/usr.*$LIB.*"' "$f"); then
@@ -102,8 +97,8 @@ _check_vulkan_json_path() (
 	done
 )
 
-if _check_vulkan_json_path && [ -d "$_VULKAN_HOOK_DIR" ]; then
-	export XDG_CONFIG_DIRS="$_VULKAN_HOOK_DIR:${XDG_CONFIG_DIRS:-/etc/xdg}"
+if _check_vulkan_json_path && [ -d "$_vulkan_hook_dir" ]; then
+	export XDG_CONFIG_DIRS="$_vulkan_hook_dir:${XDG_CONFIG_DIRS:-/etc/xdg}"
 fi
 
 _use_host_mesa() {
@@ -111,9 +106,9 @@ _use_host_mesa() {
 	>&2 echo "WARNING: Forcing host mesa drivers"
 	>&2 echo "=================================="
 
-	HOST_MESA_DIR=${HOST_MESA_DIR:-$TMPDIR/.HOST_MESA}
+	_host_mesa=${_host_mesa:-${TMPDIR:-/tmp}/.HOST_MESA}
 
-	if [ ! -d "$HOST_MESA_DIR" ]; then
+	if [ ! -d "$_host_mesa" ]; then
 		# check for a directory that contains dri
 		libdirs="
 			/usr/lib/$APPIMAGE_ARCH-linux-gnu/dri
@@ -122,7 +117,7 @@ _use_host_mesa() {
 		"
 		while read -r d; do
 			if [ -d "$d" ]; then
-				HOST_LIB_DIR=${HOST_LIB_DIR:-${d%/dri}}
+				_host_lib_dir=${_host_lib_dir:-${d%/dri}}
 				break
 			fi
 		done <<-EOF
@@ -130,22 +125,22 @@ _use_host_mesa() {
 		EOF
 
 		# We need to only expose the host mesa drivers and nothing else
-		if [ ! -d "$HOST_LIB_DIR" ]; then
+		if [ ! -d "$_host_lib_dir" ]; then
 			>&2 echo "ERROR: Could not find host mesa installation"
-			>&2 echo "Set HOST_LIB_DIR to that location"
+			>&2 echo "Set _host_lib_dir to that location"
 			return 1
 		fi
-		mkdir -p "$HOST_MESA_DIR"
-		ln -sf "$HOST_LIB_DIR"/libEGL_mesa.so*     "$HOST_MESA_DIR" || :
-		ln -sf "$HOST_LIB_DIR"/libGLX_mesa.so*     "$HOST_MESA_DIR" || :
-		ln -sf "$HOST_LIB_DIR"/libGLX_indirect.so* "$HOST_MESA_DIR" || :
-		ln -sf "$HOST_LIB_DIR"/libgallium*.so*     "$HOST_MESA_DIR" || :
-		ln -sf "$HOST_LIB_DIR"/libgbm*.so*         "$HOST_MESA_DIR" || :
-		ln -sf "$HOST_LIB_DIR"/dri                 "$HOST_MESA_DIR" || :
-		ln -sf "$HOST_LIB_DIR"/gbm                 "$HOST_MESA_DIR" || :
+		mkdir -p "$_host_mesa"
+		ln -sf "$_host_lib_dir"/libEGL_mesa.so*     "$_host_mesa" || :
+		ln -sf "$_host_lib_dir"/libGLX_mesa.so*     "$_host_mesa" || :
+		ln -sf "$_host_lib_dir"/libGLX_indirect.so* "$_host_mesa" || :
+		ln -sf "$_host_lib_dir"/libgallium*.so*     "$_host_mesa" || :
+		ln -sf "$_host_lib_dir"/libgbm*.so*         "$_host_mesa" || :
+		ln -sf "$_host_lib_dir"/dri                 "$_host_mesa" || :
+		ln -sf "$_host_lib_dir"/gbm                 "$_host_mesa" || :
 	fi
 
-	if [ -d "$HOST_MESA_DIR" ]; then
+	if [ -d "$_host_mesa" ]; then
 		return 0
 	else
 		return 1
@@ -153,7 +148,7 @@ _use_host_mesa() {
 }
 
 if [ "$FORCE_HOST_MESA_DRIVERS_THIS_IS_EXPERIMENTAL_KEK" = 1 ] && _use_host_mesa; then
-	export SHARUN_EXTRA_LIBRARY_PATH="$HOST_MESA_DIR:$SHARUN_EXTRA_LIBRARY_PATH"
+	export SHARUN_EXTRA_LIBRARY_PATH="$_host_mesa:$SHARUN_EXTRA_LIBRARY_PATH"
 	export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
 fi
 
@@ -181,7 +176,7 @@ _start_virtualization() {
 		return 1
 	fi
 
-	socket="$TMPDIR"/virgl.socket
+	socket=${TMPDIR:-/tmp}/virgl.socket
 	virgl_test_server --venus --use-gles --socket-path "$socket" --rendernode "$gpu" &
 
 	export VTEST_SOCKET_NAME="$socket"

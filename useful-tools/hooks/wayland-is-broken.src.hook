@@ -1,4 +1,4 @@
-#!/bin/false
+#!/bin/sh
 
 # add this hook if the application you are using has known issues with wayland
 # note that you need to check that indeed wayland is broken before adding this

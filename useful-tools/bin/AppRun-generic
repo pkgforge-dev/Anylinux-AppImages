@@ -19,12 +19,6 @@ export HOSTPATH="$PATH"
 export PATH="$APPDIR/bin:$PATH"
 export APPDIR
 
-export HOST_HOME="${REAL_HOME:-$HOME}"
-export HOST_XDG_CONFIG_HOME="${REAL_XDG_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOST_HOME/.config}}"
-export HOST_XDG_DATA_HOME="${REAL_XDG_DATA_HOME:-${XDG_DATA_HOME:-$HOST_HOME/.local/share}}"
-export HOST_XDG_CACHE_HOME="${REAL_XDG_CACHE_HOME:-${XDG_CACHE_HOME:-$HOST_HOME/.cache}}"
-export HOST_XDG_STATE_HOME="${REAL_XDG_STATE_HOME:-${XDG_STATE_HOME:-$HOST_HOME/.local/state}}"
-
 # Allow users to set env variables for specific AppImage
 # This feature only works with the uruntime
 if [ "$1" = '--appimage-add-env' ]; then
@@ -36,24 +30,13 @@ if [ "$1" = '--appimage-add-env' ]; then
 	exit 0
 fi
 
-# additional scripts can be placed in the top level bin dir
-# those with a name that ends up .hook will be executed in the current shell
-# those that end with .bg.hook will be executed in the background
-# and those that end with .src.hook will be sourced in the AppRun
-for hook in "$APPDIR"/bin/*.hook; do
-	[ -x "$hook" ] || continue
-	case "$hook" in
-		*.src.hook) continue ;;
-		*.bg.hook)  "$hook" &;;
-		*.hook)     "$hook"  ;;
-	esac
-done
-
-# source hooks need to run last
-for hook in "$APPDIR"/bin/*.src.hook; do
+if [ -f "$APPDIR"/hooks/common-hook-functions.sh ]; then
+	. "$APPDIR"/hooks/common-hook-functions.sh
+	for hook in "$APPDIR"/hooks/*.hook; do
 	[ -e "$hook" ] || continue
-	. "$hook"
-done
+		. "$hook"
+	done
+fi
 
 # always unset ARGVO to avoid causing issues to child processes that use zsh
 # We do it after running the hooks since some hooks need it

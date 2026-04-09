@@ -1,29 +1,57 @@
 #!/bin/sh
 
-export HOST_HOME="${REAL_HOME:-$HOME}"
-export HOST_XDG_CONFIG_HOME="${REAL_XDG_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOST_HOME/.config}}"
-export HOST_XDG_DATA_HOME="${REAL_XDG_DATA_HOME:-${XDG_DATA_HOME:-$HOST_HOME/.local/share}}"
-export HOST_XDG_CACHE_HOME="${REAL_XDG_CACHE_HOME:-${XDG_CACHE_HOME:-$HOST_HOME/.cache}}"
-export HOST_XDG_STATE_HOME="${REAL_XDG_STATE_HOME:-${XDG_STATE_HOME:-$HOST_HOME/.local/state}}"
+set -e
+
+HOST_HOME=${REAL_HOME:-$HOME}
+HOST_XDG_CONFIG_HOME=${REAL_XDG_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOST_HOME/.config}}
+HOST_XDG_DATA_HOME=${REAL_XDG_DATA_HOME:-${XDG_DATA_HOME:-$HOST_HOME/.local/share}}
+HOST_XDG_CACHE_HOME=${REAL_XDG_CACHE_HOME:-${XDG_CACHE_HOME:-$HOST_HOME/.cache}}
+HOST_XDG_STATE_HOME=${REAL_XDG_STATE_HOME:-${XDG_STATE_HOME:-$HOST_HOME/.local/state}}
+
+export HOST_HOME HOST_XDG_CONFIG_HOME HOST_XDG_DATA_HOME HOST_XDG_CACHE_HOME HOST_XDG_STATE_HOME
+
+BINDIR=${XDG_BIN_HOME:-~/.local/bin}
+DATADIR=${XDG_DATA_HOME:-~/.local/share}
+CONFIGDIR=${XDG_CONFIG_HOME:-~/.config}
+CACHEDIR=${XDG_CACHE_HOME:-~/.cache}
+STATEDIR=${XDG_STATE_HOME:-~/.local/state}
+
+APPLICATION_NAME=${APPIMAGE##*/}
 
 err_msg(){
 	>&2 printf '\033[1;31m%s\033[0m\n' " $*"
 }
 
 is_cmd() {
-	for cmd do
-		command -v "$cmd" 1>/dev/null || return 1
-	done
+	if [ "$1" --any ]; then
+		shift
+		for cmd do
+			if command -v "$cmd" 1>/dev/null; then
+				return 0
+			fi
+		done
+		return 1
+	else
+		for cmd do
+			command -v "$cmd" 1>/dev/null || return 1
+		done
+	fi
 	return 0
 }
 
 run_gui_sudo() {
+	_sudocmd=""
 	if   _sudocmd=$(command -v pkexec);    then :
 	elif _sudocmd=$(command -v lxqt-sudo); then :
 	elif _sudocmd=$(command -v run0);      then set -- --via-shell "$@"
+	fi
+	if [ "$1" = --check ]; then
+		[ -n "$_sudocmd" ] || return 1
 	else
-		err_msg "We need 'pkexec' or 'lxqt-sudo' or 'run0' to perform this operation"
-		return 1
+		if [ -z "$_sudocmd" ]; then
+			err_msg "We need 'pkexec' or 'lxqt-sudo' or 'run0' to perform this operation"
+			return 1
+		fi
 	fi
 	"$_sudocmd" "$@"
 }
