@@ -124,6 +124,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage)                                                        |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
+[GCAP2025](https://github.com/pkgforge-dev/GCAP2025-AppImage)                                                            |
+[GCAP2026](https://github.com/pkgforge-dev/GCAP2026-AppImage)                                                            |
 [GCstar](https://github.com/pkgforge-dev/GCstar-AppImage)                                                                |
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
 [Gearboy](https://github.com/pkgforge-dev/Gearboy-AppImage)                                                              |
@@ -158,9 +160,11 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [innoextract](https://github.com/pkgforge-dev/innoextract-AppImage)                                                      |
 [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
 [Iris](https://github.com/pkgforge-dev/Iris-AppImage-Enhanced)                                                           |
+[IRPF2025](https://github.com/pkgforge-dev/IRPF2025-AppImage)                                                            |
 [IRPF2026](https://github.com/pkgforge-dev/IRPF2026-AppImage)                                                            |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
 [ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage)                                                            |
+[ITR2025](https://github.com/pkgforge-dev/ITR2025-AppImage)                                                              |
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
