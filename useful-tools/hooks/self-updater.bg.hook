@@ -7,7 +7,8 @@ set -e
 _desktop_entry=$(set -- "$APPDIR"/*.desktop; echo "${1##*/}")
 _desktop_entry=${_desktop_entry%.desktop}
 _updater_policy_dir=${UPDATE_POLICY_CONFIGDIR:-$HOST_XDG_CONFIG_HOME/auto-updates-policy}
-_updater_policy_file=$_updater_policy_dir/$entry-update-setting
+_updater_policy_file=${_updater_policy_dir}/${_desktop_entry}-update-setting
+_updater_appname=${APPIMAGE##*/}
 
 APPIMAGEUPDATETOOL_LINK=${APPIMAGEUPDATETOOL_LINK:-https://github.com/AppImageCommunity/AppImageUpdate/releases/download/continuous/appimageupdatetool-$APPIMAGE_ARCH.AppImage}
 
@@ -62,17 +63,20 @@ _check_for_update() {
 	set -e
 	# exit code >1 likely indicates the app was not correctly packaged
 	case "$r" in
-		0) >&2 echo " $APPNAME is up to date"; return 1;;
-		1) >&2 echo " $APPNAME update is available"; return 0;;
-		*) >&2 echo " $APPNAME update check failed"; return 1;;
+		0) >&2 echo " $_updater_appname is up to date"; return 1;;
+		1) >&2 echo " $_updater_appname update is available"; return 0;;
+		*) >&2 echo " $_updater_appname update check failed"; return 1;;
 	esac
 }
 
 _update() {
-	if appimageupdatetool -Or "$APPIMAGE"; then
-		notify "$APPNAME updated successfully!"
-	else
-		notify -de "Something went wrong updating $APPNAME"
+	_updater_perform_update_msg="A new version of $_updater_appname is available. Do you wish to update?"
+	if notify -dq "$_updater_perform_update_msg"; then
+		if appimageupdatetool -Or "$APPIMAGE"; then
+			notify "$_updater_appname updated successfully!"
+		else
+			notify -de "Something went wrong updating $_updater_appname"
+		fi
 	fi
 }
 
@@ -86,16 +90,21 @@ _make_configfile() {
 }
 
 _enable_update_checking() {
-	echo "1" > "$_updater_policy_file"
+	if notify -dq "Allow $_updater_appname to check for updates?"; then
+		_get_appimageupdatetool
+		echo "1" > "$_updater_policy_file"
+	fi
 }
 
 _disable_update_checking() {
-	echo "0" > "$_updater_policy_file"
+	if notify -dq "Do you wish to disable update checks and not see this message again?"; then
+		echo "0" > "$_updater_policy_file"
+	fi
 }
 
 
 run_updater() {
-	_updater_sanity_check 1>/dev/null
+	_updater_sanity_check
 	_make_configfile
 
 	read -r _status < "$_updater_policy_file"
@@ -104,25 +113,13 @@ run_updater() {
 		>&2 echo "self updates disabled by $_updater_policy_file"
 		return 0
 	elif [ "$_status" = 1 ]; then
-		if ! _get_appimageupdatetool; then
-			if notify -dq "$DO_NOT_ASK"; then
-				_disable_update_checking
-			fi
-		elif _check_for_update; then
-			if notify -dq "A new version of $APPNAME is available. Do you wish to update?"; then
-				_update
-			elif notify -dq "Do you wish to disable update checking and not see this message again?"; then
-				_disable_update_checking
-			fi
+		_get_appimageupdatetool || _disable_update_checking
+		if _check_for_update; then
+			_update || _disable_update_checking
 		fi
 	else
 		sleep 5
-		if notify -dq "Allow $APPNAME to check for updates?"; then
-			_get_appimageupdatetool
-			_enable_update_checking
-		else
-			_disable_update_checking
-		fi
+		_enable_update_checking || _disable_update_checking
 	fi
 }
 
