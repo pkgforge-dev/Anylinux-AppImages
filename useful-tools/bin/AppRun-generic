@@ -30,9 +30,9 @@ if [ "$1" = '--appimage-add-env' ]; then
 	exit 0
 fi
 
-if [ -f "$APPDIR"/hooks/common-hook-functions.sh ]; then
-	. "$APPDIR"/hooks/common-hook-functions.sh
-	for hook in "$APPDIR"/hooks/*.hook; do
+if [ -f "$APPDIR"/bin/anylinux-hook-functions.sh ]; then
+	. "$APPDIR"/bin/anylinux-hook-functions.sh
+	for hook in "$APPDIR"/bin/*.hook; do
 	[ -e "$hook" ] || continue
 		. "$hook"
 	done
