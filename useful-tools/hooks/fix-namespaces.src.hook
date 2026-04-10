@@ -44,12 +44,12 @@ _check_userns() {
 }
 
 _is_apparmor() {
-	sysctl -a | grep -q -m 1 'kernel.apparmor_restrict_unprivileged_userns.*1' || return 1
+	sysctl -a | grep -q -m 1 'kernel.apparmor_restrict_unprivileged_userns.*1'
 
 }
 
 _is_secureblue() {
-	ujust | grep -q -m 1 'set-unconfined-userns' || return 1
+	ujust | grep -q -m 1 'set-unconfined-userns'
 }
 
 _fix_userns() {
