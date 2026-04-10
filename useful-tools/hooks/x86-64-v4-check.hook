@@ -4,7 +4,7 @@
 # see https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels
 # this way the user is aware and we don't waste time debugging nonsense
 
-if [ -r /proc/cpuinfo ]; then
+if [ "$APPIMAGE_ARCH" = 'x86_64' ] && [ -r /proc/cpuinfo ]; then
 	v4cpu=0
 	while IFS= read -r line; do
 		case "$line" in

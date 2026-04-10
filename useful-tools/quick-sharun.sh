@@ -2993,9 +2993,6 @@ if [ -n "$ADD_HOOKS" ]; then
 	for hook do
 		if [ -f "$hook_dst"/"$hook" ]; then
 			continue
-		elif [ "$APPIMAGE_ARCH" != 'x86_64' ] \
-		  && echo "$hook" | grep -q 'x86.*64'; then
-			continue # do not add x86-64 hooks in other arches
 		elif _download "$hook_dst"/"$hook" "$HOOKSRC"/"$hook"; then
 			_echo "* Added $hook"
 		else
@@ -3004,14 +3001,12 @@ if [ -n "$ADD_HOOKS" ]; then
 			exit 1
 		fi
 	done
-
-	# Add AppRun.lib which provides functions for hooks
-	_add_hooks_library
 fi
 
+_add_hooks_library
 _add_apprun
 
-chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null || :
+chmod +x "$APPDIR"/AppRun || :
 
 # always make sure that AppDir/lib exists, sometimes lib4bin does not make it
 # https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
