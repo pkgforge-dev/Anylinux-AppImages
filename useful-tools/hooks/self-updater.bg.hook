@@ -104,6 +104,7 @@ _disable_update_checking() {
 
 
 run_updater() {
+	export PATH="$PATH:$BINDIR"
 	_updater_sanity_check
 	_make_configfile
 
