@@ -97,57 +97,6 @@ if _check_vulkan_json_path && [ -d "$_vulkan_hook_dir" ]; then
 	export XDG_CONFIG_DIRS="$_vulkan_hook_dir:${XDG_CONFIG_DIRS:-/etc/xdg}"
 fi
 
-_use_host_mesa() {
-	>&2 echo "=================================="
-	>&2 echo "WARNING: Forcing host mesa drivers"
-	>&2 echo "=================================="
-
-	HOST_MESA_DIR=${HOST_MESA_DIR:-${TMPDIR:-/tmp}/.HOST_MESA}
-
-	if [ ! -d "$HOST_MESA_DIR" ]; then
-		# check for a directory that contains dri
-		libdirs="
-			/usr/lib/$APPIMAGE_ARCH-linux-gnu/dri
-			/usr/lib64/dri
-			/usr/lib/dri
-		"
-		while read -r d; do
-			if [ -d "$d" ]; then
-				_host_lib_dir=${_host_lib_dir:-${d%/dri}}
-				break
-			fi
-		done <<-EOF
-		$libdirs
-		EOF
-
-		# We need to only expose the host mesa drivers and nothing else
-		if [ ! -d "$_host_lib_dir" ]; then
-			>&2 echo "ERROR: Could not find host mesa installation"
-			>&2 echo "Set _host_lib_dir to that location"
-			return 1
-		fi
-		mkdir -p "$HOST_MESA_DIR"
-		ln -sf "$_host_lib_dir"/libEGL_mesa.so*     "$HOST_MESA_DIR" || :
-		ln -sf "$_host_lib_dir"/libGLX_mesa.so*     "$HOST_MESA_DIR" || :
-		ln -sf "$_host_lib_dir"/libGLX_indirect.so* "$HOST_MESA_DIR" || :
-		ln -sf "$_host_lib_dir"/libgallium*.so*     "$HOST_MESA_DIR" || :
-		ln -sf "$_host_lib_dir"/libgbm*.so*         "$HOST_MESA_DIR" || :
-		ln -sf "$_host_lib_dir"/dri                 "$HOST_MESA_DIR" || :
-		ln -sf "$_host_lib_dir"/gbm                 "$HOST_MESA_DIR" || :
-	fi
-
-	if [ -d "$HOST_MESA_DIR" ]; then
-		return 0
-	else
-		return 1
-	fi
-}
-
-if [ "$FORCE_HOST_MESA_DRIVERS_THIS_IS_EXPERIMENTAL_KEK" = 1 ] && _use_host_mesa; then
-	export SHARUN_EXTRA_LIBRARY_PATH="$HOST_MESA_DIR:$SHARUN_EXTRA_LIBRARY_PATH"
-	export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
-fi
-
 _start_virtualization() {
 	set -- /dev/dri/render*
 	gpu=$1
