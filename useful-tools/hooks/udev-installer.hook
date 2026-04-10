@@ -12,7 +12,7 @@ set -e
 # user to be in a group, in that case you will need to change this script
 
 _disable_udev=$CACHEDIR/.${APPIMAGE##*/}-udev-check-disabled
-_udev_install_msg="${APPIMAGE##*/} needs udev rules in order to work. Do you wish to install them?}"
+_udev_install_msg="${APPIMAGE##*/} needs udev rules in order to work. Do you wish to install them?"
 
 # make sure we have the needed deps
 _udev_installer_check() {
