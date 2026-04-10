@@ -308,6 +308,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [tachoparser](https://github.com/pkgforge-dev/tachoparser-AppImage)                                                      |
 [Tagger](https://github.com/pkgforge-dev/Tagger-AppImage)                                                                |
 [Taisei Project](https://github.com/pkgforge-dev/Taisei-Project-AppImage)                                                |
+[Tokodon](https://github.com/pkgforge-dev/Tokodon-AppImage)                                                              |
 [Taradino](https://github.com/pkgforge-dev/Taradino-AppImage)                                                            |
 [Tauon](https://github.com/pkgforge-dev/Tauon-AppImage)                                                                  |
 [Telegram](https://github.com/pkgforge-dev/Telegram-AppImage)                                                            |
