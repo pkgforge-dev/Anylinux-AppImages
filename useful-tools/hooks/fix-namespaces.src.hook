@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # Script that disables unbuntu's nonsense of restricting namespaces
 # This is mostly needed by web browsers and electorn apps
 # Also if you have an application that uses bubblewrap internally

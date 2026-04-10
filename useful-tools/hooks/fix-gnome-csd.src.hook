@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # GNOME in their infinite wisdom decided that applications must provide their
 # own window decorations on wayland, as result we would need to bundle
 # 7 MiB of garbage in the AppImage just to "fix" this nonsense

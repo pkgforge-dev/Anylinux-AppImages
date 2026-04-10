@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # Normally we bundle qt6ct to allow custom theming so this hook is not needed
 # WARNING: The '-stylesheet' flag is NOT supported by all Qt apps!
 # So verify that it works before using this hook!

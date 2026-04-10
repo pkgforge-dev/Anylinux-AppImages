@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # hook that checks several potential issues vulkan related
 
 # On aarch64 device drivers are all over the place and often they ship with

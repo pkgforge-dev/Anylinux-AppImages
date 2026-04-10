@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # Use this hook for applications that require yt-dlp
 
 _ytdlp_dir=${XDG_BIN_HOME:-~/.local/bin}

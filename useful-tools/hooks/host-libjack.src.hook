@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # this hook allows attempting to use the host libjack.so
 # jack has a big issue that clients and servers need to be using the same
 # libjack.so to guarantee functionality

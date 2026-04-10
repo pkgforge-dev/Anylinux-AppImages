@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # Helper script in POSIX shell to install udev rules
 
 # checks if the bundled udev rules are installed, checks in multiple places

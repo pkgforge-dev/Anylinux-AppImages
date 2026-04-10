@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # add this hook if your application was compiled for x86-64-v4
 # see https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels
 # this way the user is aware and we don't waste time debugging nonsense

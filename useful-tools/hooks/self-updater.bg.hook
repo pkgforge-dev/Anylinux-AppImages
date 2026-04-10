@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # Helper script in POSIX shell to self update appimages in place
 # depends on appimageupdatetool which will be downloaded if not available
 
