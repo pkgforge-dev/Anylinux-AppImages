@@ -4,11 +4,8 @@
 # This is mostly needed by web browsers and electorn apps
 # Also if you have an application that uses bubblewrap internally
 
-CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-LOCKFILEPATH="$CACHEDIR"/.disable-namespaces-check
-
-INFO_MESSAGE_BASE="
-Disabled unprivileged user-namespaces detected
+_userns_check_msg="
+unprivileged user-namespaces are disabled!
 
 Unprivileged user-namespaces are required to use this application.
 
@@ -18,30 +15,26 @@ Unprivileged user-namespaces are safe and a vital part of the security model of 
 
 For more details, see: https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/fix-namespaces.md#why
 "
-
-INFO_MESSAGE_WITHOUT_FIX="$INFO_MESSAGE_BASE
+_userns_check_msg_no_fix="$_userns_check_msg
 We do not have an automated way to enable unprivileged user-namespaces for your Linux distribution at the moment, so you will have to enable those manually.
 "
-
-INFO_MESSAGE_FIX="$INFO_MESSAGE_BASE
+_userns_check_msg_with_fix="$_userns_check_msg
 To fix this issue, I will need a permission to disable this restriction, like all the other Linux distributions do and several Ubuntu forks had to undo.
 "
-
-INFO_MESSAGE_FIX_APPARMOR="$INFO_MESSAGE_FIX
+_userns_check_msg_apparmor="$_userns_check_msg_with_fix
 If you later wish to undo this change, remove: '/etc/sysctl.d/20-fix-namespaces.conf'
 and then run 'sysctl -w kernel.apparmor_restrict_unprivileged_userns=1' or reboot.
 "
-
-INFO_MESSAGE_FIX_SECUREBLUE="$INFO_MESSAGE_FIX
+_userns_check_msg_secureblue="$_userns_check_msg_with_fix
 If you later wish to undo this change, run this command: 'ujust set-unconfined-userns off'.
 Changes are immediate, there is no need to reboot.
 "
 
-DO_NOT_ASK="Do you wish to not see this message again about unprivileged user-namespaces?"
+_disable_namespace_check=$CACHEDIR/.disable-namespaces-check
 
 # do not bother if unshare or /bin/true are missing
 _sanity_check() {
-	if command -v /bin/true && unshare --help 2>&1 | grep -q -- '--user'; then
+	if is_cmd /bin/true /bin/sh && unshare --help 2>&1 | grep -q -- '--user'; then
 		return 0
 	fi
 	return 1
@@ -52,7 +45,7 @@ _check_usernamespaces_work() {
 }
 
 _is_apparmor() {
-	if [ -d /etc/sysctl.d ] && command -v sysctl && command -v pkexec; then
+	if [ -d /etc/sysctl.d ] && is_cmd sysctl; then
 		if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
 			return 0
 		fi
@@ -61,18 +54,16 @@ _is_apparmor() {
 }
 
 _is_secureblue() {
-	if command -v ujust; then
-		if ujust | grep -q set-unconfined-userns; then
-			return 0
-		fi
+	if ujust | grep -q set-unconfined-userns; then
+		return 0
 	fi
 	return 1
 }
 
 _fix_usernamespaces() {
-	if _is_apparmor 1>/dev/null; then
-		if notify --display-question "$INFO_MESSAGE_FIX_APPARMOR"; then
-			pkexec /bin/sh -c "
+	if _is_apparmor; then
+		if notify -dq "$_userns_check_msg_apparmor"; then
+			run_gui_sudo /bin/sh -c "
 			  echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
 			  | tee /etc/sysctl.d/20-fix-namespaces.conf
 			  sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
@@ -80,30 +71,38 @@ _fix_usernamespaces() {
 		else
 			return 1
 		fi
-	elif _is_secureblue 1>/dev/null; then
-		if notify --display-question "$INFO_MESSAGE_FIX_SECUREBLUE"; then
+	elif _is_secureblue; then
+		if notify -dq "$_userns_check_msg_secureblue"; then
 			ujust set-unconfined-userns on
 		else
 			return 1
 		fi
 	else
-		notify --display-info "$INFO_MESSAGE_WITHOUT_FIX"
+		notify -di "$_userns_check_msg_no_fix"
+		return 1
 	fi
 }
 
 _do_not_ask_again() {
-	mkdir -p "$CACHEDIR"
-	echo "delete me to enable again" > "$LOCKFILEPATH"
+	if notify -dq "Do you wish to not see this message again?"; then
+		mkdir -p "$CACHEDIR"
+		:> "$_disable_namespace_check"
+	fi
 }
 
-if [ -f "$LOCKFILEPATH" ]; then
-	exit 0
-elif ! _sanity_check 1>/dev/null; then
-	exit 0
-elif _check_usernamespaces_work 1>/dev/null; then
-	exit 0
-elif _fix_usernamespaces; then
-	exit 0
-elif notify --display-question "$DO_NOT_ASK"; then
-	_do_not_ask_again
-fi
+check_and_fix_userns() {
+	if [ -f "$_disable_namespace_check" ]; then
+		return 0
+	elif ! _sanity_check 1>/dev/null; then
+		return 0
+	elif _check_usernamespaces_work 1>/dev/null; then
+		return 0
+	elif _fix_usernamespaces; then
+		return 0
+	else
+		_do_not_ask_again
+	fi
+}
+
+check_and_fix_userns || :
+
