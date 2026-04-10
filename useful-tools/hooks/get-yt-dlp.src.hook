@@ -2,20 +2,19 @@
 set -e
 # Use this hook for applications that require yt-dlp
 
-_ytdlp_dir=${XDG_BIN_HOME:-~/.local/bin}
-_denyfile=${XDG_CACHE_HOME:-~/.cache}/.no-ytdlp-${APPIMAGE##*/}
-PATH=$PATH:$_ytdlp_dir
+_denyfile=$CACHEDIR/.no-ytdlp-${APPIMAGE##*/}
+PATH=$PATH:$BINDIR
 export PATH
 
 _yt_dlp_message="${APPIMAGE##*/} needs yt-dlp to play online videos, but yt-dlp is not installed on your system. Do you want to download and install it now? You can also install it using your distro’s package manager."
 
 _get_ytdlp() {
-	mkdir -p "$_ytdlp_dir"
+	mkdir -p "$BINDIR"
 	_ytdlp_link=$(download - https://api.github.com/repos/pkgforge-dev/yt-dlp-AppImage/releases \
 	  | sed 's/[()",{} ]/\n/g' | grep -oi "https.*$APPIMAGE_ARCH.*AppImage$" | head -1)
 	>&2 echo "Downloading '$_ytdlp_link'..."
-	download "$_ytdlp_dir"/yt-dlp "$_ytdlp_link"
-	chmod +x "$_ytdlp_dir"/yt-dlp
+	download "$BINDIR"/yt-dlp "$_ytdlp_link"
+	chmod +x "$BINDIR"/yt-dlp
 }
 
 
