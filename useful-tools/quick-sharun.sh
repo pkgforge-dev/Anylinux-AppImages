@@ -2228,20 +2228,20 @@ _add_hooks_library() {
 	}
 
 	run_gui_sudo() {
-	        _sudocmd=""
-	        if   _sudocmd=$(command -v pkexec);    then :
+	        if   [ "$(id -u)" = 0 ];               then _sudocmd=""
+	        elif _sudocmd=$(command -v pkexec);    then :
 	        elif _sudocmd=$(command -v lxqt-sudo); then :
 	        elif _sudocmd=$(command -v run0);      then set -- --via-shell "$@"
 	        fi
 	        if [ "$1" = --check ]; then
-	                [ -n "$_sudocmd" ] || return 1
+	                [ -n "$_sudocmd" ] || [ "$(id -u)" = 0 ] || return 1
 	        else
-	                if [ -z "$_sudocmd" ]; then
+	                if [ -z "$_sudocmd" ] || [ "$(id -u)" != 0 ]; then
 	                        err_msg "We need 'pkexec' or 'lxqt-sudo' or 'run0' to perform this operation"
 	                        return 1
 	                fi
 	        fi
-	        "$_sudocmd" "$@"
+	        $_sudocmd "$@"
 	}
 
 	download() {
