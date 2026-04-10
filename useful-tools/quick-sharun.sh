@@ -2211,7 +2211,7 @@ _add_hooks_library() {
 	}
 
 	is_cmd() {
-	        if [ "$1" --any ]; then
+	        if [ "$1" = '--any' ]; then
 	                shift
 	                for cmd do
 	                        if command -v "$cmd" 1>/dev/null; then
