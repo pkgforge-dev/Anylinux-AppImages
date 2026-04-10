@@ -32,21 +32,20 @@ Changes are immediate, there is no need to reboot.
 
 _disable_namespace_check=$CACHEDIR/.disable-namespaces-check
 
-# do not bother if unshare or /bin/true are missing
-_sanity_check() {
-	if is_cmd /bin/true /bin/sh && unshare --help 2>&1 | grep -q -- '--user'; then
-		return 0
-	fi
-	return 1
+_is_userns_possible() {
+	unshare --help 2>&1 | grep -q -- '--user'
+	# userns need kernel major 4 or higher
+	_kernel_ver=$(uname -r)
+	[ ${_kernel_ver%%.*} -gt 4 ]
 }
 
-_check_usernamespaces_work() {
+_check_userns() {
 	unshare -Urm /bin/true
 }
 
 _is_apparmor() {
 	if [ -d /etc/sysctl.d ] && is_cmd sysctl; then
-		if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+		if[ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
 			return 0
 		fi
 	fi
@@ -60,7 +59,7 @@ _is_secureblue() {
 	return 1
 }
 
-_fix_usernamespaces() {
+_fix_userns() {
 	if _is_apparmor; then
 		if notify -dq "$_userns_check_msg_apparmor"; then
 			run_gui_sudo /bin/sh -c "
@@ -68,19 +67,17 @@ _fix_usernamespaces() {
 			  | tee /etc/sysctl.d/20-fix-namespaces.conf
 			  sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 			"
-		else
-			return 1
+			return 0
 		fi
 	elif _is_secureblue; then
 		if notify -dq "$_userns_check_msg_secureblue"; then
 			ujust set-unconfined-userns on
-		else
-			return 1
+			return 0
 		fi
 	else
 		notify -di "$_userns_check_msg_no_fix"
-		return 1
 	fi
+	return 1
 }
 
 _do_not_ask_again() {
@@ -91,16 +88,8 @@ _do_not_ask_again() {
 }
 
 check_and_fix_userns() {
-	if [ -f "$_disable_namespace_check" ]; then
-		return 0
-	elif ! _sanity_check 1>/dev/null; then
-		return 0
-	elif _check_usernamespaces_work 1>/dev/null; then
-		return 0
-	elif _fix_usernamespaces; then
-		return 0
-	else
-		_do_not_ask_again
+	if [ ! -f "$_disable_namespace_check" ] && _is_userns_possible; then
+		_check_userns || _fix_userns || _do_not_ask_again
 	fi
 }
 
