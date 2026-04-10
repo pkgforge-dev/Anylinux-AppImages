@@ -2248,7 +2248,7 @@ _add_hooks_library() {
 	        if   _download_cmd=$(command -v wget); then set -- -O "$@"
 	        elif _download_cmd=$(command -v curl); then set -- -Lo "$@"
 	        else
-	                err_msg "We need 'wget' or 'curl' or 'aria2c' to download $1"
+	                err_msg "We need 'wget' or 'curl' to download $1"
 	                return 1
 	        fi
 	        log=${TMPDIR:-/tmp}/._download.log
