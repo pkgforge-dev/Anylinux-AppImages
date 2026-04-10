@@ -1,29 +1,20 @@
-#!/bin/false
-
+#!/bin/sh
+set -e
 # Use this hook for applications that require yt-dlp
-  
-_ytdlp_dir=${XDG_BIN_HOME:-~/.local/bin}
-_denyfile=${XDG_CACHE_HOME:-~/.cache}/.no-ytdlp-${APPIMAGE##*/}
-PATH=$PATH:$_ytdlp_dir
+
+_denyfile=$CACHEDIR/.no-ytdlp-${APPIMAGE##*/}
+PATH=$PATH:$BINDIR
 export PATH
 
 _yt_dlp_message="${APPIMAGE##*/} needs yt-dlp to play online videos, but yt-dlp is not installed on your system. Do you want to download and install it now? You can also install it using your distro’s package manager."
 
-_download() {
-	if   _download_cmd=$(command -v wget); then set -- -qO "$@"
-	elif _download_cmd=$(command -v curl); then set -- -Lso "$@"
-	else >&2 echo "ERROR: We need wget or curl to download $1"; return 1
-	fi
-	"$_download_cmd" "$@"
-}
-
 _get_ytdlp() {
-	mkdir -p "$_ytdlp_dir"
-	_ytdlp_link=$(_download - https://api.github.com/repos/pkgforge-dev/yt-dlp-AppImage/releases \
+	mkdir -p "$BINDIR"
+	_ytdlp_link=$(download - https://api.github.com/repos/pkgforge-dev/yt-dlp-AppImage/releases \
 	  | sed 's/[()",{} ]/\n/g' | grep -oi "https.*$APPIMAGE_ARCH.*AppImage$" | head -1)
 	>&2 echo "Downloading '$_ytdlp_link'..."
-	_download "$_ytdlp_dir"/yt-dlp "$_ytdlp_link"
-	chmod +x "$_ytdlp_dir"/yt-dlp
+	download "$BINDIR"/yt-dlp "$_ytdlp_link"
+	chmod +x "$BINDIR"/yt-dlp
 }
 
 
@@ -31,7 +22,7 @@ if ! command -v yt-dlp 1>/dev/null && [ ! -f "$_denyfile" ]; then
 	if notify -dq "$_yt_dlp_message"; then
 		_get_ytdlp || notify -de 'Something went wrong downloading yt-dlp'
 	else
-		mkdir -p "${_denyfile%/*}"
+		mkdir -p "$CACHEDIR"
 		:> "$_denyfile"
 	fi
 fi

@@ -1,57 +1,20 @@
 #!/bin/sh
-
+set -e
 # Helper script in POSIX shell to self update appimages in place
-
 # depends on appimageupdatetool which will be downloaded if not available
 
-# simply make sure you have your AppRun call this script before starting the
-# main application, that is all that's needed.
 
-# you can set the var UPDATE_MSG to change the displayed update message
+_desktop_entry=$(set -- "$APPDIR"/*.desktop; echo "${1##*/}")
+_desktop_entry=${_desktop_entry%.desktop}
+_updater_policy_dir=${UPDATE_POLICY_CONFIGDIR:-$HOST_XDG_CONFIG_HOME/auto-updates-policy}
+_updater_policy_file=${_updater_policy_dir}/${_desktop_entry}-update-setting
+_updater_appname=${APPIMAGE##*/}
 
-# this script should be ran in the background as it can take a few
-# seconds to check for update
-
-set -e
-
-set -- "$APPDIR"/*.desktop
-entry=${1##*/}
-entry=${entry%.desktop}
-UPDATE_POLICY_DIR=${UPDATE_POLICY_CONFIGDIR:-$HOST_XDG_CONFIG_HOME/auto-updates-policy}
-UPDATE_POLICY_FILE=$UPDATE_POLICY_DIR/$entry-update-setting
-APPNAME=${APPIMAGE##*/}
-
-BINDIR=${XDG_BIN_HOME:-$HOME/.local/bin}
-PATH="$PATH:$BINDIR"
-
-WELCOME_MSG=${WELCOME_MSG:-Allow $APPNAME to check for updates? NOTE: We will download appimageupdatetool in $BINDIR if not available}
-UPDATE_MSG="${UPDATE_MSG:-A new version of $APPNAME is available. Do you wish to update?}"
-POST_UPDATE_GOOD="$APPNAME updated successfully!"
-POST_UPDATE_BAD="ERROR: Something went wrong updating $APPNAME"
-DO_NOT_ASK="Do you wish to disable update checking and not see this message again?"
-APPIMAGEUPDATETOOL_LINK="${APPIMAGEUPDATETOOL_LINK:-https://github.com/AppImageCommunity/AppImageUpdate/releases/download/continuous/appimageupdatetool-$APPIMAGE_ARCH.AppImage}"
-
-# check for other appimage managers
-# skip appimaged/appimagelauncher because they cannot integrate DWARFS appimages
-# we also do not check for gearlever because with gearlever the user
-# has to be manually giving urls to update appimages which is terrible
-# it is also not able to do delta updates at the time of writting this
-_is_another_updater_here() {
-	if [ "$DO_NOT_CHECK_FOR_OTHER_APPIMAGE_MANAGERS" != 1 ]; then
-		if command -v am            \
-		  || command -v appman      \
-		  || command -v app-manager \
-		  || command -v dbin        \
-		  || command -v soar; then
-			return 0
-		fi
-	fi
-	return 1
-}
+APPIMAGEUPDATETOOL_LINK=${APPIMAGEUPDATETOOL_LINK:-https://github.com/AppImageCommunity/AppImageUpdate/releases/download/continuous/appimageupdatetool-$APPIMAGE_ARCH.AppImage}
 
 # make sure we can update the thing
-_sanity_check() {
-	if [ -f "$UPDATE_POLICY_DIR"/no_updatecheck ] \
+_updater_sanity_check() {
+	if [ -f "$_updater_policy_dir"/no_updatecheck ] \
 	  || [ -f "$HOST_XDG_DATA_HOME"/appimagekit/no_updatecheck ]; then
 		return 1
 	elif [ "$DISABLE_AUTO_UPDATES" = 1 ]; then
@@ -59,125 +22,107 @@ _sanity_check() {
 	elif [ -z "$APPIMAGE" ] || [ -z "$APPDIR" ]; then
 		return 1
 	elif [ ! -w "$APPIMAGE" ]; then
-		>&2 echo "We cannot to overwrite $APPIMAGE due to lack of permissions"
-		>&2 echo "This usually happens when the appimage is placed in /usr/bin"
-		>&2 echo "or similar locations that need elevated rights to replace"
 		return 1
-	elif ! command -v notify; then
-		return 1
-	elif _is_another_updater_here; then
-		return 1
-	elif [ ! -d "$UPDATE_POLICY_DIR" ]; then
-		mkdir -p "$UPDATE_POLICY_DIR"
+	elif [ "$DO_NOT_CHECK_FOR_OTHER_APPIMAGE_MANAGERS" != 1 ]; then
+		# check for other appimage managers
+		# skip appimaged/appimagelauncher because they cannot integrate DWARFS appimages
+		# we also do not check for gearlever because with gearlever the user
+		# has to be manually giving urls to update appimages which is terrible
+		# it is also not able to do delta updates at the time of writting this
+		if is_cmd --any am appman app-manager dbin soar; then
+			return 1
+		fi
 	fi
-}
 
-_download() {
-	url="$2"
-	dest="$1"
-	if ! notify -dq "Do you wish to download '$url' in '$dest'?"; then
-		return 1
-	elif command -v wget 1>/dev/null; then
-		DOWNLOAD_CMD="wget"
-		set -- -qO "$@"
-	elif command -v curl 1>/dev/null; then
-		DOWNLOAD_CMD="curl"
-		set -- -Lso "$@"
-	else
-		>&2 echo "ERROR: We need wget or curl to download ${dest##*/}"
-		notify -ne "We need wget or curl to download ${dest##*/}"
-		exit 1
-	fi
-	if ! "$DOWNLOAD_CMD" "$@"; then
-		>&2 echo "Something went wrong during download!"
-		notify -ne "Something went wrong during download!"
-		exit 1
+	if [ ! -d "$_updater_policy_dir" ]; then
+		mkdir -p "$_updater_policy_dir"
 	fi
 }
 
 _get_appimageupdatetool() {
-	if command -v appimageupdatetool 1>/dev/null; then
+	if is_cmd appimageupdatetool; then
 		return 0
 	fi
-	mkdir -p "$BINDIR"
-	if _download "$BINDIR"/appimageupdatetool "$APPIMAGEUPDATETOOL_LINK"; then
-		chmod +x "$BINDIR"/appimageupdatetool
-	else
-		return 1
+
+	if notify -dq "We require 'AppImageUpdate'. Do you wish to download it?"; then
+		mkdir -p "$BINDIR"
+		if download "$BINDIR"/appimageupdatetool "$APPIMAGEUPDATETOOL_LINK"; then
+			chmod +x "$BINDIR"/appimageupdatetool
+			return 0
+		else
+			notify -dq "Something went wrong downloading appimageupdatetool"
+		fi
 	fi
+	return 1
 }
 
-_check_update() {
+_check_for_update() {
 	set +e
 	appimageupdatetool -j "$APPIMAGE"
-	status=$?
+	r=$?
 	set -e
 	# exit code >1 likely indicates the app was not correctly packaged
-	case "$status" in
-		0) >&2 echo " $APPNAME is up to date"; return 1;;
-		1) >&2 echo " $APPNAME update is available"; return 0;;
-		*) >&2 echo " $APPNAME update check failed"; exit 0;;
+	case "$r" in
+		0) >&2 echo " $_updater_appname is up to date"; return 1;;
+		1) >&2 echo " $_updater_appname update is available"; return 0;;
+		*) >&2 echo " $_updater_appname update check failed"; return 1;;
 	esac
 }
 
 _update() {
-	if appimageupdatetool -Or "$APPIMAGE"; then
-		>&2 echo "$POST_UPDATE_GOOD"
-		notify "$POST_UPDATE_GOOD" 2>/dev/null || true
-	else
-		>&2 echo "$POST_UPDATE_BAD"
-		notify "$POST_UPDATE_BAD" 2>/dev/null || true
+	_updater_perform_update_msg="A new version of $_updater_appname is available. Do you wish to update?"
+	if notify -dq "$_updater_perform_update_msg"; then
+		if appimageupdatetool -Or "$APPIMAGE"; then
+			notify "$_updater_appname updated successfully!"
+		else
+			notify -de "Something went wrong updating $_updater_appname"
+		fi
 	fi
-
 }
 
 _make_configfile() {
-	if [ ! -f "$UPDATE_POLICY_FILE" ]; then
-		echo "2" > "$UPDATE_POLICY_FILE"
+	if [ ! -f "$_updater_policy_file" ]; then
+		echo "2" > "$_updater_policy_file"
 		# do not ask the first time we are launched
 		# because that just annoys people
-		exit 0
+		return 1
 	fi
 }
 
 _enable_update_checking() {
-	echo "1" > "$UPDATE_POLICY_FILE"
+	if notify -dq "Allow $_updater_appname to check for updates?"; then
+		_get_appimageupdatetool
+		echo "1" > "$_updater_policy_file"
+	fi
 }
 
 _disable_update_checking() {
-	echo "0" > "$UPDATE_POLICY_FILE"
+	if notify -dq "Do you wish to disable update checks and not see this message again?"; then
+		echo "0" > "$_updater_policy_file"
+	fi
 }
 
-# if check fails exit without error so that the app can still launch
-_sanity_check 1>/dev/null || exit 0
 
-# Make the configfile if it does not exist
-_make_configfile
+run_updater() {
+	export PATH="$PATH:$BINDIR"
+	_updater_sanity_check
+	_make_configfile
 
-# Now read the file and determine what to do
-read -r STATUS < "$UPDATE_POLICY_FILE"
-if [ "$STATUS" = 0 ]; then
-	>&2 echo "self updates disabled by $UPDATE_POLICY_FILE"
-	exit 0
-elif [ "$STATUS" = 1 ]; then
-	if ! _get_appimageupdatetool; then
-		if notify -dq "$DO_NOT_ASK"; then
-			_disable_update_checking
+	read -r _status < "$_updater_policy_file"
+
+	if [ "$_status" = 0 ]; then
+		>&2 echo "self updates disabled by $_updater_policy_file"
+		return 0
+	elif [ "$_status" = 1 ]; then
+		_get_appimageupdatetool || _disable_update_checking
+		if _check_for_update; then
+			_update || _disable_update_checking
 		fi
-	elif _check_update; then
-		if notify -dq "$UPDATE_MSG"; then
-			_update
-		elif notify -dq "$DO_NOT_ASK"; then
-			_disable_update_checking
-		fi
-	fi
-else
-	# wait 5 seconds before asking for the first time
-	sleep 5
-	if notify -dq "$WELCOME_MSG"; then
-		_enable_update_checking
-		_get_appimageupdatetool
 	else
-		_disable_update_checking
+		sleep 5
+		_enable_update_checking || _disable_update_checking
 	fi
-fi
+}
+
+
+run_updater &
