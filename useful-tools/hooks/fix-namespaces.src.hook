@@ -44,23 +44,16 @@ _check_userns() {
 }
 
 _is_apparmor() {
-	if [ -d /etc/sysctl.d ] && is_cmd sysctl; then
-		if[ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
-			return 0
-		fi
-	fi
-	return 1
+	sysctl -a | grep -q -m 1 'kernel.apparmor_restrict_unprivileged_userns.*1' || return 1
+
 }
 
 _is_secureblue() {
-	if ujust | grep -q set-unconfined-userns; then
-		return 0
-	fi
-	return 1
+	ujust | grep -q -m 1 'set-unconfined-userns' || return 1
 }
 
 _fix_userns() {
-	if _is_apparmor; then
+	if _is_apparmor 2>/dev/null; then
 		if notify -dq "$_userns_check_msg_apparmor"; then
 			run_gui_sudo /bin/sh -c "
 			  echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
@@ -69,7 +62,7 @@ _fix_userns() {
 			"
 			return 0
 		fi
-	elif _is_secureblue; then
+	elif _is_secureblue 2>/dev/null; then
 		if notify -dq "$_userns_check_msg_secureblue"; then
 			ujust set-unconfined-userns on
 			return 0
