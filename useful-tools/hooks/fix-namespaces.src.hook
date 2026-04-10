@@ -36,7 +36,7 @@ _is_userns_possible() {
 	unshare --help 2>&1 | grep -q -- '--user'
 	# userns need kernel major 4 or higher
 	_kernel_ver=$(uname -r)
-	[ ${_kernel_ver%%.*} -gt 4 ]
+	[ ${_kernel_ver%%.*} -ge 4 ]
 }
 
 _check_userns() {

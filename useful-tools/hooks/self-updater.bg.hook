@@ -49,7 +49,7 @@ _get_appimageupdatetool() {
 			chmod +x "$BINDIR"/appimageupdatetool
 			return 0
 		else
-			notify -dq "Something went wrong downoading appimageupdatetool"
+			notify -dq "Something went wrong downloading appimageupdatetool"
 		fi
 	fi
 	return 1
