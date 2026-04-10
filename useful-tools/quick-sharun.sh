@@ -62,7 +62,7 @@ DEPENDENCIES="
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
-PATH_MAPPING_SCRIPT="$APPDIR"/bin/path-mapping-hardcoded.src.hook
+PATH_MAPPING_SCRIPT="$APPDIR"/bin/01-path-mapping-hardcoded.src.hook
 
 if [ -f "$PATH_MAPPING_SCRIPT" ]; then
 	while IFS= read -r line; do
@@ -1272,7 +1272,7 @@ _check_always_software() {
 }
 
 _add_p11kit_cert_hook() {
-	cert_check="$APPDIR"/bin/check-ca-certs.src.hook
+	cert_check="$APPDIR"/bin/01-check-ca-certs.src.hook
 	if [ -f "$cert_check" ]; then
 		return 0
 	fi
@@ -1730,7 +1730,6 @@ _add_path_mapping_hardcoded() {
 	if [ -f "$PATH_MAPPING_SCRIPT" ]; then
 		return 0
 	fi
-	mkdir -p "${PATH_MAPPING_SCRIPT%/*}"
 	cat <<-'EOF' > "$PATH_MAPPING_SCRIPT"
 	#!/bin/sh
 
@@ -2084,7 +2083,7 @@ _post_deployment_steps() {
 
 	if [ -d "$APPDIR"/shared/lib/pipewire-0.3 ] && [ -d /usr/share/pipewire ]; then
 		cp -r /usr/share/pipewire "$APPDIR"/share
-		cat <<-'EOF' > "$APPDIR"/bin/pipewire-config.src.hook
+		cat <<-'EOF' > "$APPDIR"/bin/01-pipewire-config.src.hook
 		#!/bin/false
 		_pipewire_dir=$APPDIR/share/pipewire
 		if [ ! -d /usr/share/pipewire ] && [ -d "$_pipewire_dir" ]; then
@@ -2138,7 +2137,7 @@ _add_apprun() {
 	if [ -f "$APPDIR"/AppRun.lib ]; then
 	        . "$APPDIR"/AppRun.lib
 	        for hook in "$APPDIR"/bin/*.hook; do
-	        [ -e "$hook" ] || continue
+	            [ -e "$hook" ] || continue
 	            . "$hook"
 	        done
 	fi
