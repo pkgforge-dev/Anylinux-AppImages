@@ -11,17 +11,13 @@ if [ "$APPIMAGE_ARCH" = 'aarch64' ]; then
 	export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
 fi
 
-_err_msg(){
-	>&2 printf '\033[1;31m%s\033[0m\n' " $*"
-}
-
 _nvidia_check() (
 	# wtf makes this file? I cannot find any info related to it!
 	nonsense=/usr/share/vulkan/icd.d/nvidia_icd.json_inactive
 	if [ -f "$nonsense" ]; then
-		_err_msg ""
-		_err_msg "WARNING: Nvidia vulkan driver disabled by '$nonsense'"
-		_err_msg ""
+		err_msg ""
+		err_msg "WARNING: Nvidia vulkan driver disabled by '$nonsense'"
+		err_msg ""
 		return 1
 	fi
 
@@ -31,21 +27,21 @@ _nvidia_check() (
 	# no nvidia vulkan driver installed on their system.
 	set -- /usr/share/glvnd/egl_vendor.d/10_nvidia.json /usr/share/vulkan/icd.d/*nvidia*.json
 	if [ -f "$1" ] && [ ! -f "$2" ]; then
-		_err_msg ""
-		_err_msg "============================================================"
-		_err_msg ""
-		_err_msg "YOU HAVE AN INCOMPLETE NVIDIA DRIVER INSTALLATION!"
-		_err_msg ""
-		_err_msg "There is no nvidia vulkan loader at: /usr/share/vulkan/icd.d"
-		_err_msg "This usually happens when you are using a distro that splits"
-		_err_msg "the nvidia driver into several packages such as debian"
-		_err_msg "Run 'sudo apt install nvidia-vulkan-icd' to fix this issue"
-		_err_msg ""
-		_err_msg "MAKE SURE YOUR VULKAN DRIVER WORKS BEFORE REPORTING BUGS"
-		_err_msg "You can check that by testing with vkcube"
-		_err_msg ""
-		_err_msg "============================================================"
-		_err_msg ""
+		err_msg ""
+		err_msg "============================================================"
+		err_msg ""
+		err_msg "YOU HAVE AN INCOMPLETE NVIDIA DRIVER INSTALLATION!"
+		err_msg ""
+		err_msg "There is no nvidia vulkan loader at: /usr/share/vulkan/icd.d"
+		err_msg "This usually happens when you are using a distro that splits"
+		err_msg "the nvidia driver into several packages such as debian"
+		err_msg "Run 'sudo apt install nvidia-vulkan-icd' to fix this issue"
+		err_msg ""
+		err_msg "MAKE SURE YOUR VULKAN DRIVER WORKS BEFORE REPORTING BUGS"
+		err_msg "You can check that by testing with vkcube"
+		err_msg ""
+		err_msg "============================================================"
+		err_msg ""
 	elif [ -f "$1" ] || [ -f "$2" ]; then
 		return 0
 	fi
@@ -106,9 +102,9 @@ _use_host_mesa() {
 	>&2 echo "WARNING: Forcing host mesa drivers"
 	>&2 echo "=================================="
 
-	_host_mesa=${_host_mesa:-${TMPDIR:-/tmp}/.HOST_MESA}
+	HOST_MESA_DIR=${HOST_MESA_DIR:-${TMPDIR:-/tmp}/.HOST_MESA}
 
-	if [ ! -d "$_host_mesa" ]; then
+	if [ ! -d "$HOST_MESA_DIR" ]; then
 		# check for a directory that contains dri
 		libdirs="
 			/usr/lib/$APPIMAGE_ARCH-linux-gnu/dri
@@ -130,17 +126,17 @@ _use_host_mesa() {
 			>&2 echo "Set _host_lib_dir to that location"
 			return 1
 		fi
-		mkdir -p "$_host_mesa"
-		ln -sf "$_host_lib_dir"/libEGL_mesa.so*     "$_host_mesa" || :
-		ln -sf "$_host_lib_dir"/libGLX_mesa.so*     "$_host_mesa" || :
-		ln -sf "$_host_lib_dir"/libGLX_indirect.so* "$_host_mesa" || :
-		ln -sf "$_host_lib_dir"/libgallium*.so*     "$_host_mesa" || :
-		ln -sf "$_host_lib_dir"/libgbm*.so*         "$_host_mesa" || :
-		ln -sf "$_host_lib_dir"/dri                 "$_host_mesa" || :
-		ln -sf "$_host_lib_dir"/gbm                 "$_host_mesa" || :
+		mkdir -p "$HOST_MESA_DIR"
+		ln -sf "$_host_lib_dir"/libEGL_mesa.so*     "$HOST_MESA_DIR" || :
+		ln -sf "$_host_lib_dir"/libGLX_mesa.so*     "$HOST_MESA_DIR" || :
+		ln -sf "$_host_lib_dir"/libGLX_indirect.so* "$HOST_MESA_DIR" || :
+		ln -sf "$_host_lib_dir"/libgallium*.so*     "$HOST_MESA_DIR" || :
+		ln -sf "$_host_lib_dir"/libgbm*.so*         "$HOST_MESA_DIR" || :
+		ln -sf "$_host_lib_dir"/dri                 "$HOST_MESA_DIR" || :
+		ln -sf "$_host_lib_dir"/gbm                 "$HOST_MESA_DIR" || :
 	fi
 
-	if [ -d "$_host_mesa" ]; then
+	if [ -d "$HOST_MESA_DIR" ]; then
 		return 0
 	else
 		return 1
@@ -148,7 +144,7 @@ _use_host_mesa() {
 }
 
 if [ "$FORCE_HOST_MESA_DRIVERS_THIS_IS_EXPERIMENTAL_KEK" = 1 ] && _use_host_mesa; then
-	export SHARUN_EXTRA_LIBRARY_PATH="$_host_mesa:$SHARUN_EXTRA_LIBRARY_PATH"
+	export SHARUN_EXTRA_LIBRARY_PATH="$HOST_MESA_DIR:$SHARUN_EXTRA_LIBRARY_PATH"
 	export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
 fi
 
@@ -163,16 +159,16 @@ _start_virtualization() {
 	mesa_icd=$1
 
 	if ! command -v virgl_test_server 1>/dev/null; then
-		_err_msg "ERROR: No virgl_test_server binary found!"
+		err_msg "ERROR: No virgl_test_server binary found!"
 		return 1
 	elif [ ! -e "$gpu" ]; then
-		_err_msg "ERROR: There is no gpu in this system!"
+		err_msg "ERROR: There is no gpu in this system!"
 		return 1
 	elif [ ! -e "$virtio_icd" ]; then
-		_err_msg "ERROR: Vulkan virtio was not bundled! Cannot continue."
+		err_msg "ERROR: Vulkan virtio was not bundled! Cannot continue."
 		return 1
 	elif [ ! -e "$mesa_icd" ]; then
-		_err_msg "ERROR: Mesa gallium was not bundled! Cannot continue."
+		err_msg "ERROR: Mesa gallium was not bundled! Cannot continue."
 		return 1
 	fi
 
