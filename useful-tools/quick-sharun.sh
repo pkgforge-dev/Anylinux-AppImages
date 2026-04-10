@@ -40,7 +40,6 @@ ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkg
 GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
 NOTIFY_SOURCE=${NOTIFY_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/notify}
-APPRUN_SOURCE=${APPRUN_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/AppRun-generic}
 RUNFEX_SOURCE=${RUNFEX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/run-with-fex}
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
@@ -2100,6 +2099,96 @@ _post_deployment_steps() {
 	fi
 }
 
+_add_apprun() {
+	if [ -f "$APPDIR"/AppRun ]; then
+		return 0
+	fi
+
+	cat <<-'EOF' > "$APPDIR"/AppRun
+	#!/bin/sh
+
+	# Example AppRun for using the hooks of this repository.
+	# NOTE: It is meant to be used with sharun which uses a top level bin dir
+
+	if [ "$APPRUN_DEBUG" = 1 ]; then
+	        set -x
+	fi
+
+	set -e
+
+	APPDIR=$(cd "${0%/*}" && echo "$PWD")
+	MAIN_BIN=@MAIN_BIN@
+	BIN="${ARGV0:-$0}"
+	BIN="${BIN##*/}"
+
+	unset ARGV0
+
+	export APPIMAGE_ARCH=@APPIMAGE_ARCH@
+	export HOSTPATH=$PATH
+	export PATH=$APPDIR/bin:$PATH
+	export APPDIR PATH
+
+	# Allow users to set env variables for specific AppImage
+	# This feature only works with the uruntime
+	if [ "$1" = '--appimage-add-env' ]; then
+	        shift
+	        for v do
+	            echo "$v" >> "$APPIMAGE".env
+	            >&2 echo "Added '$v' to $APPIMAGE.env"
+	        done
+	        exit 0
+	fi
+
+	if [ -f "$APPDIR"/AppRun.lib ]; then
+	        . "$APPDIR"/AppRun.lib
+	        for hook in "$APPDIR"/bin/*.hook; do
+	        [ -e "$hook" ] || continue
+	            . "$hook"
+	        done
+	fi
+
+	# Check if BIN (ARGV0) matches a binary, fallback to $1, then binary in .desktop
+	if [ -f "$APPDIR"/bin/"$BIN" ]; then
+	        TO_LAUNCH=$APPDIR/bin/$BIN
+	elif [ -f "$APPDIR"/bin/"$1" ]; then
+	        TO_LAUNCH=$APPDIR/bin/$1
+	        shift
+	else
+	        TO_LAUNCH=$APPDIR/bin/$MAIN_BIN
+	fi
+
+	set -- "$TO_LAUNCH" "$@"
+
+	if [ -f "$APPDIR"/bin/run-with-fex ]; then
+	        . "$APPDIR"/bin/run-with-fex
+	fi
+
+	# If LD_DEBUG=libs is set outside the AppImage the output is not helpful
+	# because it will include the libs of sh, grep, cat, etc from the hooks
+	# with this var we can set LD_DEBUG=libs for the bundled application only
+	if [ "$APPIMAGE_DEBUG" = 1 ]; then
+	        cat /etc/os-release >"$PWD"/"${APPIMAGE##*/}"-debug.log || :
+	        export LD_DEBUG=libs
+	        export VK_LOADER_DEBUG=all
+	        export LC_ALL=C
+	        export SHARUN_PRINTENV=1
+	        "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
+	        >&2 echo "Debug log at: '$PWD/${APPIMAGE##*/}-debug.log'"
+	else
+	        exec "$@"
+	fi
+	EOF
+
+	chmod +x "$APPDIR"/AppRun
+
+	sed -i \
+		-e "s|@MAIN_BIN@|$MAIN_BIN|"  \
+		-e "s|@APPIMAGE_ARCH@|$APPIMAGE_ARCH|" \
+		"$APPDIR"/AppRun
+
+	_echo "* Added AppRun"
+}
+
 _handle_nested_bins() {
 	# wrap any executable in lib with sharun
 	for b in $(find "$DST_LIB_DIR"/ -type f ! -name '*.so*'); do
@@ -2670,16 +2759,7 @@ if [ -n "$ADD_HOOKS" ]; then
 	_echo "* Added notify wrapper"
 fi
 
-if [ ! -f "$APPDIR"/AppRun ]; then
-	_download "$APPDIR"/AppRun "$APPRUN_SOURCE"
-	_echo "* Added ${APPRUN_SOURCE##*/}"
-fi
-
-# Set APPIMAGE_ARCH and MAIN_BIN in AppRun
-sed -i \
-	-e "s|@MAIN_BIN@|$MAIN_BIN|"  \
-	-e "s|@APPIMAGE_ARCH@|$APPIMAGE_ARCH|" \
-	"$APPDIR"/AppRun
+_add_apprun
 
 chmod +x "$APPDIR"/AppRun "$APPDIR"/bin/*.hook "$APPDIR"/bin/notify 2>/dev/null || :
 

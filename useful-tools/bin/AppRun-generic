@@ -1,76 +1,72 @@
-#!/bin/sh
+	#!/bin/sh
 
-# Example AppRun for using the hooks of this repository.
-# NOTE: It is meant to be used with sharun which uses a top level bin dir
+	# Example AppRun for using the hooks of this repository.
+	# NOTE: It is meant to be used with sharun which uses a top level bin dir
 
-if [ "$APPRUN_DEBUG" = 1 ]; then
-	set -x
-fi
+	if [ "$APPRUN_DEBUG" = 1 ]; then
+	    set -x
+	fi
 
-set -e
+	set -e
 
-APPDIR="$(cd "${0%/*}" && echo "$PWD")"
-MAIN_BIN=@MAIN_BIN@
-BIN="${ARGV0:-$0}"
-BIN="${BIN##*/}"
+	APPDIR=$(cd "${0%/*}" && echo "$PWD")
+	MAIN_BIN=@MAIN_BIN@
+	BIN="${ARGV0:-$0}"
+	BIN="${BIN##*/}"
 
-export APPIMAGE_ARCH=@APPIMAGE_ARCH@
-export HOSTPATH="$PATH"
-export PATH="$APPDIR/bin:$PATH"
-export APPDIR
+	unset ARGV0
 
-# Allow users to set env variables for specific AppImage
-# This feature only works with the uruntime
-if [ "$1" = '--appimage-add-env' ]; then
-	shift
-	for v do
-		echo "$v" >> "$APPIMAGE".env
-		>&2 echo "Added '$v' to $APPIMAGE.env"
-	done
-	exit 0
-fi
+	export APPIMAGE_ARCH=@APPIMAGE_ARCH@
+	export HOSTPATH=$PATH
+	export PATH=$APPDIR/bin:$PATH
+	export APPDIR PATH
 
-if [ -f "$APPDIR"/bin/anylinux-hook-functions.sh ]; then
-	. "$APPDIR"/bin/anylinux-hook-functions.sh
-	for hook in "$APPDIR"/bin/*.hook; do
-	[ -e "$hook" ] || continue
-		. "$hook"
-	done
-fi
+	# Allow users to set env variables for specific AppImage
+	# This feature only works with the uruntime
+	if [ "$1" = '--appimage-add-env' ]; then
+	    shift
+	    for v do
+	        echo "$v" >> "$APPIMAGE".env
+	        >&2 echo "Added '$v' to $APPIMAGE.env"
+	    done
+	    exit 0
+	fi
 
-# always unset ARGVO to avoid causing issues to child processes that use zsh
-# We do it after running the hooks since some hooks need it
-# we also save the original value of the var to ARG0 which does not conflict
-export ARG0="$ARGV0"
-unset ARGV0
+	if [ -f "$APPDIR"/AppRun.lib ]; then
+	    . "$APPDIR"/AppRun.lib
+	    for hook in "$APPDIR"/bin/*.hook; do
+	    [ -e "$hook" ] || continue
+	        . "$hook"
+	    done
+	fi
 
-# Check if BIN (ARGV0) matches a binary, fallback to $1, then binary in .desktop
-if [ -f "$APPDIR"/bin/"$BIN" ]; then
-	TO_LAUNCH="$APPDIR"/bin/"$BIN"
-elif [ -f "$APPDIR"/bin/"$1" ]; then
-	TO_LAUNCH="$APPDIR"/bin/"$1"
-	shift
-else
-	TO_LAUNCH="$APPDIR"/bin/"$MAIN_BIN"
-fi
+	# Check if BIN (ARGV0) matches a binary, fallback to $1, then binary in .desktop
+	if [ -f "$APPDIR"/bin/"$BIN" ]; then
+	    TO_LAUNCH=$APPDIR/bin/$BIN
+	elif [ -f "$APPDIR"/bin/"$1" ]; then
+	    TO_LAUNCH=$APPDIR/bin/$1
+	    shift
+	else
+	    TO_LAUNCH=$APPDIR/bin/$MAIN_BIN
+	fi
 
-set -- "$TO_LAUNCH" "$@"
+	set -- "$TO_LAUNCH" "$@"
 
-if [ -f "$APPDIR"/bin/run-with-fex ]; then
-	. "$APPDIR"/bin/run-with-fex
-fi
+	if [ -f "$APPDIR"/bin/run-with-fex ]; then
+	    . "$APPDIR"/bin/run-with-fex
+	fi
 
-# If LD_DEBUG=libs is set outside the AppImage the output is not helpful
-# because it will include the libs of sh, grep, cat, etc from the hooks
-# with this var we can set LD_DEBUG=libs for the bundled application only
-if [ "$APPIMAGE_DEBUG" = 1 ]; then
-	cat /etc/os-release >"$PWD"/"${APPIMAGE##*/}"-debug.log || :
-	export LD_DEBUG=libs
-	export VK_LOADER_DEBUG=all
-	export LC_ALL=C
-	export SHARUN_PRINTENV=1
-	"$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
-	>&2 echo "Debug log at: '$PWD/${APPIMAGE##*/}-debug.log'"
-else
-	exec "$@"
-fi
+	# If LD_DEBUG=libs is set outside the AppImage the output is not helpful
+	# because it will include the libs of sh, grep, cat, etc from the hooks
+	# with this var we can set LD_DEBUG=libs for the bundled application only
+	if [ "$APPIMAGE_DEBUG" = 1 ]; then
+	    cat /etc/os-release >"$PWD"/"${APPIMAGE##*/}"-debug.log || :
+	    export LD_DEBUG=libs
+	    export VK_LOADER_DEBUG=all
+	    export LC_ALL=C
+	    export SHARUN_PRINTENV=1
+	    "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
+	    >&2 echo "Debug log at: '$PWD/${APPIMAGE##*/}-debug.log'"
+	else
+	    exec "$@"
+	fi
