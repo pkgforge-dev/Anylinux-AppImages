@@ -16,6 +16,7 @@ jobs:
     name: "${{ matrix.script }} (${{ matrix.arch }})"
     runs-on: ${{ matrix.runs-on }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - arch: x86_64
@@ -74,7 +75,7 @@ jobs:
           path: dist
 
   release:
-    if: ${{ github.ref_name == 'main' }}
+    if: ${{ github.ref_name == 'main' && needs.build.result == 'success' }}
     needs: [build]
     permissions: write-all
     runs-on: ubuntu-latest
