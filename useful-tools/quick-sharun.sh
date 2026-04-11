@@ -2991,7 +2991,7 @@ if [ -n "$ADD_HOOKS" ]; then
 	IFS="$old_ifs"
 	hook_dst="$APPDIR"/bin
 	for hook do
-		# hooks use to be executed differently depending on the suffix
+		# hooks used to be executed differently depending on the suffix
 		# this was dropped and now all hooks are sourced
 		# remove old suffixes so that we don't break existing scripts
 		hook=${hook%.bg.hook}
