@@ -242,7 +242,7 @@ _help_msg() {
 	  EXAMPLES:
 	  DEPLOY_OPENGL=1 ./quick-sharun.sh /path/to/myapp
 	  DESKTOP=/path/to/app.desktop ICON=/path/to/icon.png ./quick-sharun.sh /path/to/myapp
-	  ADD_HOOKS="self-updater.bg.hook:fix-namespaces.hook" ./quick-sharun.sh /path/to/myapp
+	  ADD_HOOKS="self-updater.hook:fix-namespaces.hook" ./quick-sharun.sh /path/to/myapp
 
 	  SEE ALSO:
 	  sharun  (https://github.com/VHSgunzo/sharun)
@@ -2991,6 +2991,16 @@ if [ -n "$ADD_HOOKS" ]; then
 	IFS="$old_ifs"
 	hook_dst="$APPDIR"/bin
 	for hook do
+		# hooks use to be executed differently depending on the suffix
+		# this was dropped and now all hooks are sourced
+		# remove old suffixes so that we don't break existing scripts
+		hook=${hook%.bg.hook}
+		hook=${hook%.src.hook}
+		# also remove .hook before adding it again
+		# this allows declaring a hook without the suffix in ADD_HOOKS
+		hook=${hook%.hook}
+		hook=${hook}.hook
+
 		if [ -f "$hook_dst"/"$hook" ]; then
 			continue
 		elif _download "$hook_dst"/"$hook" "$HOOKSRC"/"$hook"; then

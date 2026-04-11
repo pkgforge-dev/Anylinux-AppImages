@@ -131,18 +131,18 @@ chmod +x ./get-debloated-pkgs.sh
 Hooks are scripts that solve common problems automatically. Add them using the `ADD_HOOKS` variable:
 
 ```bash
-export ADD_HOOKS="self-updater.bg.hook:fix-namespaces.hook"
+export ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
 ./quick-sharun /usr/bin/myapp
 ```
 
 **Available hooks:**
 
-- **`self-updater.bg.hook`** - Makes the AppImage self-updatable using appimageupdatetool
+- **`self-updater.hook`** - Makes the AppImage self-updatable using appimageupdatetool
 - **`fix-namespaces.hook`** - Fixes namespace restrictions for apps that need them (web browsers and electron apps mostly)
 - **`udev-installer.hook`** - Prompts the user to install bundled udev rules when needed
-- **`vulkan-check.src.hook`** - Checks and fixes several common issues that might affect vulkan and hardware acceleration in general
+- **`vulkan-check.hook`** - Checks and fixes several common issues that might affect vulkan and hardware acceleration in general
 - **`x86-64-v3-check.hook`** - Checks for x86-64-v3 CPU support for applications that need it.
-- **`host-libjack.src.hook`** - Uses host's JACK library when possible for performance gains, see the comments in the script for more details why this is needed.
+- **`host-libjack.hook`** - Uses host's JACK library when possible for performance gains, see the comments in the script for more details why this is needed.
 
 See all hooks in [`useful-tools/hooks/`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/hooks)
 
