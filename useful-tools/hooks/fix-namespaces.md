@@ -23,11 +23,11 @@ The script has several checks to prevent false positives, but if they happen ple
 
 # Why
 
-Starting with ubuntu24.04 they decided to limit the usage of namepsaces.
+Starting with ubuntu24.04 they decided to limit the usage of namespaces.
 
-namespaces are a very important feature of the kernel that allows us to make a "fakeroot" where we then bind/remove access to the real root. Essentially this allows us to isolate an application to its own little enviroment.
+namespaces are a very important feature of the kernel that allows us to make a "fakeroot" where we then bind/remove access to the real root. Essentially this allows us to isolate an application to its own little environment.
 
-Before their common usage what was done to isolate applications was using SUID binaries like firejail, this has the downside that if there is an exploit in the binary it can be used for privelege escalation, something that firejail had many issues with.
+Before their common usage what was done to isolate applications was using SUID binaries like firejail, this has the downside that if there is an exploit in the binary it can be used for privilege escalation, something that firejail had many issues with.
 
 Today pretty much all applications use namespaces for their own sandboxing or for sandboxing other apps, more importantly it is used by both chrome/firefox and all electron apps for their internal sandbox.
 
