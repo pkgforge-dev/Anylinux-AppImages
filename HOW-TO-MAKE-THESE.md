@@ -164,20 +164,20 @@ See all hooks in [`useful-tools/hooks/`](https://github.com/pkgforge-dev/Anylinu
 ### *Available environment variables*
 
 **Basic configuration:**
-- `APPDIR` - Where to build the AppDir (default: `$PWD/AppDir`)
-- `ICON` - Path to application icon
+- `APPDIR`  - Where to build the AppDir (default: `$PWD/AppDir`)
+- `ICON`    - Path to application icon
 - `DESKTOP` - Path to .desktop file
 - `OUTPATH` - Where to save the AppImage (default: `$PWD`)
 - `OUTNAME` - Name of the output AppImage file; if not set, the name from the `.desktop` file is used
 
 **Deployment options:**
-- `DEPLOY_OPENGL=1` - Bundles OpenGL libraries (mesa); detected automatically in most cases
-- `DEPLOY_VULKAN=1` - Bundles Vulkan libraries (mesa); detected automatically in most cases
-- `DEPLOY_PYTHON=1` / `DEPLOY_SYS_PYTHON=1` - Bundles the system Python installation
-- `DEPLOY_LOCALE=1` - Deploys locale files (default: enabled)
-- `ANYLINUX_LIB=1` - Bundles the anylinux compatibility shim (default: enabled); provides broader distro compatibility
-- `GTK_CLASS_FIX=1` - Bundles a small shim that fixes the WM_CLASS for GTK apps (default: disabled)
-- `OPTIMIZE_LAUNCH=1` - Enables launch-time optimizations for DwarFS AppImages (default: disabled)
+- `DEPLOY_OPENGL=1`   - Bundles OpenGL libraries (mesa). Enabled automatically in most cases.
+- `DEPLOY_VULKAN=1`   - Bundles Vulkan libraries (mesa). Enabled automatically in most cases.
+- `DEPLOY_PYTHON=1`   - Bundles the system Python installation (default: disabled).
+- `DEPLOY_LOCALE=1`   - Deploys locale files (default: enabled).
+- `ANYLINUX_LIB=1`    - Preoads library that fixes several common issues that affect AppImage.
+- `GTK_CLASS_FIX=1`   - Bundles a small shim that fixes the WM_CLASS for GTK apps (default: disabled).
+- `OPTIMIZE_LAUNCH=1` - Speeds up launch time of AppImage using a DWARFS profile image (default: disabled), This is very similar to PGO optimizations in compilers. You often do not need to enable this since DWARFS on its own is many times faster than SquashFS, to the point that launch times a near identical to those of native applications +-300ms on a system with a 2016 CPU.
 
 **Library handling:**
 - `STRACE_MODE=1` - Uses strace to find dynamically loaded libraries (default: enabled)
