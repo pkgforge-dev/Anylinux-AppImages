@@ -135,14 +135,22 @@ export ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
 ./quick-sharun /usr/bin/myapp
 ```
 
+Hooks that end in `.bg.hook` run in the background and do not block the application from starting.
+
 **Available hooks:**
 
 - **`self-updater.hook`** - Makes the AppImage self-updatable using appimageupdatetool
 - **`fix-namespaces.hook`** - Fixes namespace restrictions for apps that need them (web browsers and electron apps mostly)
+- **`fix-gnome-csd.hook`** - Uses host libdecor plugins to provide window decorations on GNOME Wayland without bundling the library
 - **`udev-installer.hook`** - Prompts the user to install bundled udev rules when needed
-- **`vulkan-check.hook`** - Checks and fixes several common issues that might affect vulkan and hardware acceleration in general
-- **`x86-64-v3-check.hook`** - Checks for x86-64-v3 CPU support for applications that need it.
-- **`host-libjack.hook`** - Uses host's JACK library when possible for performance gains, see the comments in the script for more details why this is needed.
+- **`vulkan-check.hook`** - Checks and fixes several common issues that might affect Vulkan and hardware acceleration in general
+- **`x86-64-v3-check.hook`** - Checks for x86-64-v3 CPU support for applications that need it
+- **`x86-64-v4-check.hook`** - Checks for x86-64-v4 CPU support for applications that need it
+- **`host-libjack.hook`** - Uses the host JACK library when possible for performance gains; see the script comments for details
+- **`wayland-is-broken.hook`** - Forces X11 fallback for applications with known Wayland issues
+- **`sdl-soundfonts.hook`** - Downloads and installs a SoundFont (FluidR3) when the application needs one
+- **`get-yt-dlp.hook`** - Downloads yt-dlp when the application requires it to play online videos
+- **`qt-theme.hook`** - Applies a custom Qt stylesheet via `APPIMAGE_QT_THEME` or a `.stylesheet` sidecar file
 
 See all hooks in [`useful-tools/hooks/`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/hooks)
 
@@ -160,20 +168,24 @@ See all hooks in [`useful-tools/hooks/`](https://github.com/pkgforge-dev/Anylinu
 - `ICON` - Path to application icon
 - `DESKTOP` - Path to .desktop file
 - `OUTPATH` - Where to save the AppImage (default: `$PWD`)
-- `OUTNAME` - Name of the output AppImage file, if not set the name in the .desktop file will be used
+- `OUTNAME` - Name of the output AppImage file; if not set, the name from the `.desktop` file is used
 
 **Deployment options:**
-- `DEPLOY_OPENGL=1` - Bundles OpenGL libraries (mesa) (should happen automatically)
-- `DEPLOY_VULKAN=1` - Bundles Vulkan libraries (mesa) (should happen automatically)
-- `DEPLOY_PYTHON=1` - Bundles system Python installation.
+- `DEPLOY_OPENGL=1` - Bundles OpenGL libraries (mesa); detected automatically in most cases
+- `DEPLOY_VULKAN=1` - Bundles Vulkan libraries (mesa); detected automatically in most cases
+- `DEPLOY_PYTHON=1` / `DEPLOY_SYS_PYTHON=1` - Bundles the system Python installation
 - `DEPLOY_LOCALE=1` - Deploys locale files (default: enabled)
+- `ANYLINUX_LIB=1` - Bundles the anylinux compatibility shim (default: enabled); provides broader distro compatibility
+- `GTK_CLASS_FIX=1` - Bundles a small shim that fixes the WM_CLASS for GTK apps (default: disabled)
+- `OPTIMIZE_LAUNCH=1` - Enables launch-time optimizations for DwarFS AppImages (default: disabled)
 
 **Library handling:**
 - `STRACE_MODE=1` - Uses strace to find dynamically loaded libraries (default: enabled)
-- `STRIP=1` - Strips debug symbols to reduce size (default: enabled unless NO_STRIP is set)
+- `STRIP=1` - Strips debug symbols to reduce size (default: enabled unless `NO_STRIP` is set)
+- `DEBLOAT_LOCALE=1` - Removes unneeded locale files to reduce size (default: enabled)
 
 **Hooks:**
-- `ADD_HOOKS="hook1.hook:hook2.hook"` - Colon-separated list of hooks to add
+- `ADD_HOOKS="hook1.hook:hook2.hook"` - Colon-separated list of hooks to add; hooks ending in `.bg.hook` run in the background
 
 -----------------------------------
 
@@ -405,9 +417,12 @@ Goes without saying that sharun handles all of this already on its own.
 See the ready-to-use demo scripts in [`useful-tools/demo/`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/demo):
 
 * [vkcube + glxgears](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/vkcube-glxgears-appimage.sh) - Bundles OpenGL and Vulkan test binaries
+* [zink vkcube + glxgears](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/zink-vkcube-glxgears-appimage.sh) - Same as above but using the Zink OpenGL-on-Vulkan driver
 * [gtk3-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk3-demo-appimage.sh) - Simple GTK3 application
 * [gtk4-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-appimage.sh) - Simple GTK4 application
+* [gtk4-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-onlysoftware-appimage.sh) - GTK4 demo using software-only rendering (no GPU required)
 * [qt6-dbus-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-appimage.sh) - Qt6 application with D-Bus
+* [qt6-dbus-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-onlysoftware-appimage.sh) - Qt6 demo using software-only rendering (no GPU required)
 
 ### Real-world examples
 

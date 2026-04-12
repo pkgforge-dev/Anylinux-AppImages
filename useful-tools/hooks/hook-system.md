@@ -1,5 +1,24 @@
 The following functions and env variables are always available for hooks to use:
 
+# Available hooks
+
+| Hook | Description |
+|------|-------------|
+| `self-updater.hook` | Makes the AppImage self-updatable using appimageupdatetool |
+| `fix-namespaces.hook` | Fixes unprivileged user namespace restrictions (Ubuntu/Debian 24.04+) |
+| `fix-gnome-csd.hook` | Uses host libdecor plugins for window decorations on GNOME Wayland |
+| `udev-installer.hook` | Prompts the user to install bundled udev rules when needed |
+| `vulkan-check.hook` | Checks and fixes common Vulkan and hardware acceleration issues |
+| `x86-64-v3-check.hook` | Warns the user if their CPU does not support x86-64-v3 |
+| `x86-64-v4-check.hook` | Warns the user if their CPU does not support x86-64-v4 |
+| `host-libjack.hook` | Uses the host JACK library instead of the bundled one for better performance |
+| `wayland-is-broken.hook` | Forces X11 fallback for applications with known Wayland issues |
+| `sdl-soundfonts.hook` | Downloads and installs a SoundFont (FluidR3) when the application needs one |
+| `get-yt-dlp.hook` | Downloads yt-dlp when the application requires it to play online videos |
+| `qt-theme.hook` | Applies a custom Qt stylesheet via `APPIMAGE_QT_THEME` or a `.stylesheet` sidecar file |
+
+Hooks that end in `.bg.hook` run in the background and do not block the application from starting.
+
 # Functions
 
 - `notify`  - Show messages and notifications with various tools like kdialog, yad, zenity, notify-send and more.
@@ -19,8 +38,8 @@ The following functions and env variables are always available for hooks to use:
 
 - `download` - USAGE: `download </path/to/dst-file> <url>`
    This tool will attempt to use `wget` or `curl` to download, if neither command is available it will return 1 with an error message to stderr.
-- `is_cmd` - Checks if the given arguments are a valid command in `PATH`, this function does not print anything to stdout or stderr. t
-    This functions accepts mutliple arguments to check. Example: `is_cmd cat grep mkdir`
+- `is_cmd` - Checks if the given arguments are a valid command in `PATH`, this function does not print anything to stdout or stderr.
+    This function accepts multiple arguments to check. Example: `is_cmd cat grep mkdir`
     If argument is a valid command it returns 0, else returns 1.
     If multiple arguments are given and one is missing, it still returns 1.
     You can pass the `--any` flag as first argument if you want to know if one of many arguments is available.
