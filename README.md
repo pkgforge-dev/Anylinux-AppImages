@@ -249,6 +249,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [QMPlay2](https://github.com/pkgforge-dev/QMPlay2-AppImage-Enhanced)                                                     |
 [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
+[QuantumLauncher](https://github.com/pkgforge-dev/QuantumLauncher-AppImage-Enhanced)                                     |
 [Quickshell](https://github.com/pkgforge-dev/Quickshell-AppImage)                                                        |
 [Raptor](https://github.com/pkgforge-dev/Raptor-AppImage)                                                                |
 [Readest](https://github.com/pkgforge-dev/Readest-AppImage-Enhanced)                                                     |
