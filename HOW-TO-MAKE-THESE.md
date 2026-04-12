@@ -135,7 +135,7 @@ export ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
 ./quick-sharun /usr/bin/myapp
 ```
 
-Hooks that end in `.bg.hook` run in the background and do not block the application from starting.
+All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only kept for compatibility, so new examples should use plain `.hook` names.
 
 **Available hooks:**
 
@@ -185,7 +185,7 @@ See all hooks in [`useful-tools/hooks/`](https://github.com/pkgforge-dev/Anylinu
 - `DEBLOAT_LOCALE=1` - Removes unneeded locale files to reduce size (default: enabled)
 
 **Hooks:**
-- `ADD_HOOKS="hook1.hook:hook2.hook"` - Colon-separated list of hooks to add; hooks ending in `.bg.hook` run in the background
+- `ADD_HOOKS="hook1.hook:hook2.hook"` - Colon-separated list of hooks to add; hooks are sourced by `AppRun`
 
 -----------------------------------
 

@@ -6,7 +6,7 @@
 # for example set DEPLOY_OPENGL=1 to force opengl to be deployed
 
 # Set ADD_HOOKS var to deploy the several hooks of this repository
-# Example: ADD_HOOKS="self-updater.bg.hook:fix-namespaces.hook" ./quick-sharun.sh
+# Example: ADD_HOOKS="self-updater.hook:fix-namespaces.hook" ./quick-sharun.sh
 # Using the hooks automatically downloads a generic AppRun if no AppRun is present
 
 # Set DESKTOP and ICON to the path of top level .desktop and icon to deploy them

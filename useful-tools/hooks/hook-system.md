@@ -17,7 +17,7 @@ The following functions and env variables are always available for hooks to use:
 | `get-yt-dlp.hook` | Downloads yt-dlp when the application requires it to play online videos |
 | `qt-theme.hook` | Applies a custom Qt stylesheet via `APPIMAGE_QT_THEME` or a `.stylesheet` sidecar file |
 
-Hooks that end in `.bg.hook` run in the background and do not block the application from starting.
+Hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only normalized for compatibility, so new examples should use plain `.hook` names.
 
 # Functions
 
@@ -73,5 +73,4 @@ Hooks that end in `.bg.hook` run in the background and do not block the applicat
 * `HOST_XDG_DATA_HOME`   - Original value of `XDG_DATA_HOME` ignoring AppImage portable data.
 * `HOST_XDG_CACHE_HOME`  - Original value of `XDG_CACHE_HOME` ignoring AppImage portable cache.
 * `HOST_XDG_STATE_HOME`  - (Do not rely on this variable since the uruntime does provide AppImage portable state).
-
 
