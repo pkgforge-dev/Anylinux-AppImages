@@ -164,11 +164,11 @@ See all hooks in [`useful-tools/hooks/`](https://github.com/pkgforge-dev/Anylinu
 ### *Available environment variables*
 
 **Basic configuration:**
-- `APPDIR`  - Where to build the AppDir (default: `$PWD/AppDir`)
-- `ICON`    - Path to application icon
-- `DESKTOP` - Path to .desktop file
-- `OUTPATH` - Where to save the AppImage (default: `$PWD`)
-- `OUTNAME` - Name of the output AppImage file; if not set, the name from the `.desktop` file is used
+- `APPDIR`  - Where to build the AppDir (default: `$PWD/AppDir`).
+- `ICON`    - Path to application icon.
+- `DESKTOP` - Path to .desktop file.
+- `OUTPATH` - Where to save the AppImage (default: `$PWD`).
+- `OUTNAME` - Name of the output AppImage file. If not set the name from the `.desktop` file is used.
 
 **Deployment options:**
 - `DEPLOY_OPENGL=1`   - Bundles OpenGL libraries (mesa). Enabled automatically in most cases.
