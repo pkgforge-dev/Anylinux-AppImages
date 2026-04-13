@@ -149,7 +149,7 @@ All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook
 - `DEPLOY_VULKAN=1`   - Bundles Vulkan libraries (mesa). Enabled automatically in most cases.
 - `DEPLOY_PYTHON=1`   - Bundles the system Python installation (default: disabled).
 - `DEPLOY_LOCALE=1`   - Deploys locale files (default: enabled).
-- `ANYLINUX_LIB=1`    - Preloads library that fixes several common issues that affect AppImage.
+- `ANYLINUX_LIB=1`    - Preloads library that fixes several common issues that affect AppImage (default: enabled).
 - `GTK_CLASS_FIX=1`   - Bundles a small shim that fixes the WM_CLASS for GTK apps (default: disabled).
 - `OPTIMIZE_LAUNCH=1` - Speeds up AppImage launch time using a DWARFS profile image (default: disabled). This is very similar to PGO optimizations in compilers. You often do not need to enable this, since DWARFS on its own is many times faster than SquashFS. In many cases, launch times are near-identical to those of native applications (±300 ms on a system with a 2016 CPU).
 - `STRACE_MODE=1` - Uses strace to find dynamically loaded libraries (default: enabled)
