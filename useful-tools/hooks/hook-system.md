@@ -48,7 +48,7 @@ Additional hooks can be placed in `$APPDIR/bin` and will be used automatically.
     If multiple arguments are given and one is missing, it still returns 1.
     You can pass the `--any` flag as first argument if you want to know if one of many arguments is available.
     Example: `is_cmd --any wget curl` will only return 1 if both `wget` and `curl` are not available.
-- `run_gui_sudo` - This functions performs the given argument as root using an available tool to ask to elevate rights.
+- `run_gui_sudo` - This function performs the given argument as root using an available tool to ask to elevate rights.
    If the user is already root, it then directly performs the operation without any of the tools it checks for.
    It checks and uses the following commands:
 ```
@@ -57,7 +57,7 @@ Additional hooks can be placed in `$APPDIR/bin` and will be used automatically.
    run0
 ```
    If none of these tools are available, it returns 1 with an error message to stderr.
-   You can use `run_gui_sudo --check` to know beforehand if it is possible to run this function, it will return 1 if none of the tools are available and the user is no root.
+   You can use `run_gui_sudo --check` to know beforehand if it is possible to run this function, it will return 1 if none of the tools are available and the user is not root.
 - `err_msg` - Prints what is given to stderr in red color. Example: `err_msg "Failed to get current time!"`
 
 # Variables

@@ -43,7 +43,7 @@ Pipewire depends on configuration files usually in `/usr/share/pipewire`, it doe
 
 Qt is very easy to make relocatable, it supports a `qt.conf` file that accepts relative paths which prevents using the env variable `QT_PLUGIN_PATH` which is very problematic for child processes, Qt also looks into `XDG_DATA_DIRS` and several other locations to find its translation files, QtWebEngine is super easy to deploy as well.
 
-The only reason it is not excellent is because deploying QML is a bit complicated since the .qml files have to deployed along with the libraries and determining which ones to add is a mess. Right now we just add all of qml when deploying qml as result of this.
+The only reason it is not excellent is because deploying QML is a bit complicated since the .qml files have to be deployed along with the libraries and determining which ones to add is a mess. Right now we just add all of qml when deploying qml as result of this.
 
 Qt also often links to libicudata (30 MiB lib) even though the vast majority of applications do not need this, thankfully it can be disabled at compile time, but ideally this should be dlopened instead when needed.
 
