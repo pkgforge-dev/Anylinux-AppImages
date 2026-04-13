@@ -389,9 +389,9 @@ See the ready-to-use demo scripts in [`useful-tools/demo/`](https://github.com/p
 * [zink vkcube + glxgears](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/zink-vkcube-glxgears-appimage.sh) - Same as above but using the Zink OpenGL-on-Vulkan driver
 * [gtk3-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk3-demo-appimage.sh) - Simple GTK3 application
 * [gtk4-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-appimage.sh) - Simple GTK4 application
-* [gtk4-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-onlysoftware-appimage.sh) - GTK4 demo using software-only rendering (no GPU required)
+* [gtk4-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-onlysoftware-appimage.sh) - GTK4 demo using software-only rendering
 * [qt6-dbus-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-appimage.sh) - Qt6 application with D-Bus
-* [qt6-dbus-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-onlysoftware-appimage.sh) - Qt6 demo using software-only rendering (no GPU required)
+* [qt6-dbus-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-onlysoftware-appimage.sh) - Qt6 demo using software-only rendering
 
 ### Real-world examples
 
