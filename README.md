@@ -27,6 +27,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 - [How to make these](HOW-TO-MAKE-THESE.md)
 - [Hall of fame/shame](HALL-OF-FAME.md)
 - [Size comparison](disk-usage-vs-flatpak.md)
+- [Build tools and scripts](useful-tools/)
 
 <!-- APPS_LIST_START -->
 
