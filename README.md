@@ -243,6 +243,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 [Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage)                                                            |
 [PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced)                                         |
+[Ptyxis](https://github.com/pkgforge-dev/Ptyxis-AppImage)                                                                |
 [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
 [Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage)                                                        |
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
