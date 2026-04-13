@@ -12,8 +12,7 @@ title: How To Make These
   - [Prerequisites](#prerequisites)
   - [Basic workflow](#basic-workflow)
   - [Step-by-step example](#step-by-step-example)
-  - [Using hooks](#using-hooks)
-  - [Available environment variables](#available-environment-variables)
+  - [Configurable environment variables](#configurable-environment-variables)
 - [Understanding the approach](#understanding-the-approach)
   - [The problem](#the-problem)
   - [The solution](#the-solution)
@@ -126,26 +125,6 @@ chmod +x ./get-debloated-pkgs.sh
 
 -----------------------------------
 
-### *Using hooks*
-
-Hooks are scripts that solve common problems automatically. Add them using the `ADD_HOOKS` variable:
-
-```bash
-export ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
-./quick-sharun /usr/bin/myapp
-```
-
-All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only kept for compatibility, so new examples should use plain `.hook` names.
-
-**More info in** [`useful-tools/hooks/hook-system.md`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/hooks/hook-system.md)
-
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
------------------------------------
-
 ### *Configurable environment variables*
 
 **Basic configuration:**
@@ -155,6 +134,16 @@ All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook
 - `OUTPATH` - Where to save the AppImage (default: `$PWD`).
 - `OUTNAME` - Name of the output AppImage file. If not set the name from the `.desktop` file is used.
 
+**Hooks:**
+
+Hooks are scripts that solve common problems automatically. Add them using the `ADD_HOOKS` variable, each entry being colon separated:
+
+```sh
+ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
+```
+
+All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only kept for compatibility, so new examples should use plain `.hook` names. **More info in** [`useful-tools/hooks/hook-system.md`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/hooks/hook-system.md)
+
 **Deployment options:**
 - `DEPLOY_OPENGL=1`   - Bundles OpenGL libraries (mesa). Enabled automatically in most cases.
 - `DEPLOY_VULKAN=1`   - Bundles Vulkan libraries (mesa). Enabled automatically in most cases.
@@ -163,14 +152,9 @@ All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook
 - `ANYLINUX_LIB=1`    - Preoads library that fixes several common issues that affect AppImage.
 - `GTK_CLASS_FIX=1`   - Bundles a small shim that fixes the WM_CLASS for GTK apps (default: disabled).
 - `OPTIMIZE_LAUNCH=1` - Speeds up launch time of AppImage using a DWARFS profile image (default: disabled), This is very similar to PGO optimizations in compilers. You often do not need to enable this since DWARFS on its own is many times faster than SquashFS, to the point that launch times a near identical to those of native applications +-300ms on a system with a 2016 CPU.
-
-**Library handling:**
 - `STRACE_MODE=1` - Uses strace to find dynamically loaded libraries (default: enabled)
 - `STRIP=1` - Strips debug symbols to reduce size (default: enabled unless `NO_STRIP` is set)
 - `DEBLOAT_LOCALE=1` - Removes unneeded locale files to reduce size (default: enabled)
-
-**Hooks:**
-- `ADD_HOOKS="hook1.hook:hook2.hook"` - Colon-separated list of hooks to add; hooks are sourced by `AppRun`
 
 -----------------------------------
 
