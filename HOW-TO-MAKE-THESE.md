@@ -137,22 +137,7 @@ export ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
 
 All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only kept for compatibility, so new examples should use plain `.hook` names.
 
-**Available hooks:**
-
-- **`self-updater.hook`** - Makes the AppImage self-updatable using appimageupdatetool
-- **`fix-namespaces.hook`** - Fixes namespace restrictions for apps that need them (web browsers and electron apps mostly)
-- **`fix-gnome-csd.hook`** - Uses host libdecor plugins to provide window decorations on GNOME Wayland without bundling the library
-- **`udev-installer.hook`** - Prompts the user to install bundled udev rules when needed
-- **`vulkan-check.hook`** - Checks and fixes several common issues that might affect Vulkan and hardware acceleration in general
-- **`x86-64-v3-check.hook`** - Checks for x86-64-v3 CPU support for applications that need it
-- **`x86-64-v4-check.hook`** - Checks for x86-64-v4 CPU support for applications that need it
-- **`host-libjack.hook`** - Uses the host JACK library when possible for performance gains; see the script comments for details
-- **`wayland-is-broken.hook`** - Forces X11 fallback for applications with known Wayland issues
-- **`sdl-soundfonts.hook`** - Downloads and installs a SoundFont (FluidR3) when the application needs one
-- **`get-yt-dlp.hook`** - Downloads yt-dlp when the application requires it to play online videos
-- **`qt-theme.hook`** - Applies a custom Qt stylesheet via `APPIMAGE_QT_THEME` or a `.stylesheet` sidecar file
-
-See all hooks in [`useful-tools/hooks/`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/hooks)
+**More info in** [`useful-tools/hooks/hook-system.md`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/hooks/hook-system.md)
 
 -----------------------------------
 
@@ -161,7 +146,7 @@ See all hooks in [`useful-tools/hooks/`](https://github.com/pkgforge-dev/Anylinu
 
 -----------------------------------
 
-### *Available environment variables*
+### *Configurable environment variables*
 
 **Basic configuration:**
 - `APPDIR`  - Where to build the AppDir (default: `$PWD/AppDir`).
