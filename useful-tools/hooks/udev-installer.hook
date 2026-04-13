@@ -16,7 +16,9 @@ _udev_install_msg="${APPIMAGE##*/} needs udev rules in order to work. Do you wis
 
 # make sure we have the needed deps
 _udev_installer_check() {
-	if [ -f "$_disable_udev" ] || [ -z "$APPDIR" ] || [ -z "$APPIMAGE" ]; then
+	if [ "$CI" = 'true' ]; then
+		return 1
+	elif [ -f "$_disable_udev" ] || [ -z "$APPDIR" ] || [ -z "$APPIMAGE" ]; then
 		return 1
 	elif ! is_cmd cp mkdir; then
 		return 1
