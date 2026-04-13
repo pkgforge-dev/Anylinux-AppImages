@@ -57,7 +57,7 @@ This would have been horrible a few years ago, but libdecor has really done a lo
 
 # Good - ffmpeg
 
-We do not have to do anything to make this relocatable, it just works™, However ffmpeg directly links to a ton of libraries, which means a lot of bloat often gets added, thankfully this can be mitigated by building ffmpeg with those options disabled, but ideally ffmpeg should dlopen the libraries when needed, there is no need to link and load libx265 because your music players uses ffmpeg, just no...
+We do not have to do anything to make this relocatable, it just works™, However ffmpeg directly links to a ton of libraries, which means a lot of bloat often gets added, thankfully this can be mitigated by building ffmpeg with those options disabled, but ideally ffmpeg should dlopen the libraries when needed, there is no need to link and load libx265 because your music player uses ffmpeg, just no...
 
 # Good - NVIDIA ??
 
