@@ -142,7 +142,7 @@ Hooks are scripts that solve common problems automatically. Add them using the `
 ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
 ```
 
-All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only kept for compatibility, so new examples should use plain `.hook` names. **More info in** [`useful-tools/hooks/hook-system.md`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/hooks/hook-system.md)
+All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only kept for compatibility, so new examples should use plain `.hook` names. **More info in** [hook-system.md](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/hooks/hook-system.md)
 
 **Deployment options:**
 - `DEPLOY_OPENGL=1`   - Bundles OpenGL libraries (mesa). Enabled automatically in most cases.

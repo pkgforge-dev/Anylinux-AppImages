@@ -65,6 +65,7 @@ Additional hooks can be placed in `$APPDIR/bin` and will be used automatically.
 * `APPIMAGE_ARCH` - Architecture of the running AppImage, equivalent to the output of `uname -m`, example: `x86_64`.
 * `HOSTPATH`      - The original value of `PATH` before `$APPDIR/bin` is added to `PATH`.
 * `APPDIR`        - The directory where the `AppRun` is located. **We guarantee this variable to be set even when the AppImage is extracted.**
+* `ARG0`          - Equivalent to `ARGV0` in the [AppImage runtime](https://docs.appimage.org/packaging-guide/environment-variables.html#id2). We always unset `ARGV0` because **it causes a ton of issues** [1](https://github.com/AppImage/AppImageKit/issues/852) [2](https://github.com/pkgforge-dev/ghostty-appimage/issues/20).
 
 * `BINDIR`    - Value of `XDG_BIN_HOME` or if not set; `~/.local/bin`.
 * `DATADIR`   - Value of `XDG_DATA_HOME` or if not set; `~/.local/share`.

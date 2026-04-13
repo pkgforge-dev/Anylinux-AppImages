@@ -2113,15 +2113,14 @@ _add_apprun() {
 
 	APPDIR=$(cd "${0%/*}" && echo "$PWD")
 	MAIN_BIN=@MAIN_BIN@
-	BIN="${ARGV0:-$0}"
-	BIN="${BIN##*/}"
+	ARG0="${ARGV0:-$0}"
 
 	unset ARGV0
 
 	export APPIMAGE_ARCH=@APPIMAGE_ARCH@
 	export HOSTPATH=$PATH
 	export PATH=$APPDIR/bin:$PATH
-	export APPDIR PATH
+	export ARG0 APPDIR PATH
 
 	# Allow users to set env variables for specific AppImage
 	# This feature only works with the uruntime
@@ -2142,9 +2141,9 @@ _add_apprun() {
 	        done
 	fi
 
-	# Check if BIN (ARGV0) matches a binary, fallback to $1, then binary in .desktop
-	if [ -f "$APPDIR"/bin/"$BIN" ]; then
-	        TO_LAUNCH=$APPDIR/bin/$BIN
+	# Check if ARG0 matches a binary, fallback to $1, then binary in .desktop
+	if [ -f "$APPDIR"/bin/"${ARG0##*/}" ]; then
+	        TO_LAUNCH=$APPDIR/bin/${ARG0##*/}
 	elif [ -f "$APPDIR"/bin/"$1" ]; then
 	        TO_LAUNCH=$APPDIR/bin/$1
 	        shift
