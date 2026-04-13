@@ -239,6 +239,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Plus42](https://github.com/pkgforge-dev/Plus42-AppImage)                                                                |
 [PokeMMO](https://github.com/pkgforge-dev/PokeMMO-AppImage)                                                              |
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
+[POSTAL](https://github.com/pkgforge-dev/POSTAL-AppImage)                                                                |
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
 [Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage)                                                            |
 [PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced)                                         |
