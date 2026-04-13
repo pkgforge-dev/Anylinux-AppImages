@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 # this hook allows attempting to use the host libjack.so
 # jack has a big issue that clients and servers need to be using the same
 # libjack.so to guarantee functionality
@@ -51,9 +51,9 @@ if [ "$USE_HOST_LIBJACK" = 1 ]; then
 	if _find_host_libjack; then
 		export SHARUN_EXTRA_LIBRARY_PATH="${HOST_LIBJACK_DIR}${SHARUN_EXTRA_LIBRARY_PATH:+:$SHARUN_EXTRA_LIBRARY_PATH}"
 	else
-		>&2 echo ""
-		>&2 echo "host-libjack: ERROR: libjack.so not found on this system"
-		>&2 echo "or it is pipewire-jack, which is not useful here. Aborting..."
-		>&2 echo ""
+		err_msg ""
+		err_msg "host-libjack: ERROR: libjack.so not found on this system"
+		err_msg "or it is pipewire-jack, which is not useful here. Aborting..."
+		err_msg ""
 	fi
 fi

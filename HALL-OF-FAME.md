@@ -41,9 +41,9 @@ Pipewire depends on configuration files usually in `/usr/share/pipewire`, it doe
 
 # Good - Qt
 
-Qt is very easy to make relocable, it supports a `qt.conf` file that accepts relative paths which prevents using the env variable `QT_PLUGIN_PATH` which is very problematic for child processes, Qt also looks into `XDG_DATA_DIRS` and several other locations to find its translation files, QtWebEgnine is super easy to dewploy as well.
+Qt is very easy to make relocatable, it supports a `qt.conf` file that accepts relative paths which prevents using the env variable `QT_PLUGIN_PATH` which is very problematic for child processes, Qt also looks into `XDG_DATA_DIRS` and several other locations to find its translation files, QtWebEngine is super easy to deploy as well.
 
-The only reason it is not excellent is becuase deploying QML is a bit complicated since the .qml files have to deployed along with the libraries and determining which ones to add is a mess. Right now we just add all of qml when deployign qml as result of this.
+The only reason it is not excellent is because deploying QML is a bit complicated since the .qml files have to be deployed along with the libraries and determining which ones to add is a mess. Right now we just add all of qml when deploying qml as result of this.
 
 Qt also often links to libicudata (30 MiB lib) even though the vast majority of applications do not need this, thankfully it can be disabled at compile time, but ideally this should be dlopened instead when needed.
 
@@ -57,7 +57,7 @@ This would have been horrible a few years ago, but libdecor has really done a lo
 
 # Good - ffmpeg
 
-We do not have to do anything to make this relocatable, it just works™, However ffmpeg directly links to a ton of libraries, which means a lot of bloat often gets added, thankfully this can be mitigated by buidling ffmpeg with those options disabled, but ideally ffmpeg should dlopen the libraries when needed, there is no need to link and load libx265 because your music players uses ffmpeg, just no...
+We do not have to do anything to make this relocatable, it just works™, However ffmpeg directly links to a ton of libraries, which means a lot of bloat often gets added, thankfully this can be mitigated by building ffmpeg with those options disabled, but ideally ffmpeg should dlopen the libraries when needed, there is no need to link and load libx265 because your music player uses ffmpeg, just no...
 
 # Good - NVIDIA ??
 
@@ -67,7 +67,7 @@ I still see this idea on relying on host libraries as flawed, who knows what wil
 
 # Mediocre - LLVM
 
-Easy to deploy but it is insanely bloated, to the point that [Valve had to make ACO for MESA](https://www.forbes.com/sites/jasonevangelho/2019/07/11/valves-latest-linux-gaming-work-is-boosting-amd-vulkan-performance-by-up-to-44-percent/) and [zig is moving away from it](https://github.com/ziglang/zig/issues/16270), you can build smaller versions of LLVM by limiting the targets with `-DLLVM_TARGETS_TO_BUILD` but this still results in a **60 MIB** libray and it [breaks compilers](https://github.com/pkgforge-dev/alacritty-AppImage/blob/19b437f7ec5ac737bf7abe15a8225744a3ea4e7a/get-dependencies.sh#L26) in the processes, and it rare cases it still breaks the binary that links to it for some reason so you have to ship the massive version with all the targets...
+Easy to deploy but it is insanely bloated, to the point that [Valve had to make ACO for MESA](https://www.forbes.com/sites/jasonevangelho/2019/07/11/valves-latest-linux-gaming-work-is-boosting-amd-vulkan-performance-by-up-to-44-percent/) and [zig is moving away from it](https://github.com/ziglang/zig/issues/16270), you can build smaller versions of LLVM by limiting the targets with `-DLLVM_TARGETS_TO_BUILD` but this still results in a **60 MiB** library and it [breaks compilers](https://github.com/pkgforge-dev/alacritty-AppImage/blob/19b437f7ec5ac737bf7abe15a8225744a3ea4e7a/get-dependencies.sh#L26) in the process, and in rare cases it still breaks the binary that links to it for some reason so you have to ship the massive version with all the targets...
 
 # Bad - alsa
 
@@ -75,7 +75,7 @@ alsa doesn't check `XDG_DATA_DIRS` to find its data directory, we have to set `A
 
 # Bad - GLIBC
 
-glibc supports the `LOCPATH` env varaible but this doesn't work with locale archives, This problem affects NixOS and they have to [patch](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/libraries/glibc/nix-locale-archive.patch) it so that locale-archives can be made relocatable. We also have to set `GCONV_PATH` and good luck figuring out which gconv plugin your app exactly needs, and when the plugin is missing there is no error about it, [it is just totally random what happens](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20)
+glibc supports the `LOCPATH` env variable but this doesn't work with locale archives, This problem affects NixOS and they have to [patch](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/libraries/glibc/nix-locale-archive.patch) it so that locale-archives can be made relocatable. We also have to set `GCONV_PATH` and good luck figuring out which gconv plugin your app exactly needs, and when the plugin is missing there is no error about it, [it is just totally random what happens](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20)
 
 # Bad - Gstreamer
 
@@ -117,7 +117,7 @@ Where do I even start?
 
 At least more recently they are looking into adding [svg support into GTK4](https://www.phoronix.com/news/GTK-4.22-Native-SVG), which hopefully means they will get rid of the gdk-pixbuf and glycin dependency.
 
-# Garbage - Python
+# Utter Garbage - Python
 
 * Applications break horribly with the sightless version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215)
 * cpython running `/sbin/ldconfig -p` to find libraries, super broken. [1](https://github.com/python/cpython/issues/112417) [2](https://github.com/python/cpython/issues/142020) [3](https://github.com/python/cpython/issues/142020#issuecomment-3590632764)
@@ -125,3 +125,4 @@ At least more recently they are looking into adding [svg support into GTK4](http
 * Builds randomly began to fail **on the same python uv version** and had to use [this to it](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage/commit/e6a5601eeb7a3c4013b9452ca9c01eda7c5ec9e0)
 * python apps are often written with a ton of hardcoded paths, **even more than GTK apps**, so a lot of manual patches are needed to fix them. This is the result of a language that suggests containers to work.
 * Good luck figuring the dependencies of python apps, you often run into missing undeclared dependencies [1](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/256#issuecomment-3797407784) [2](https://github.com/pkgforge-dev/blender-AppImage/issues/5#issuecomment-3815841765)
+* Totally broken libraries that the developers refuse to fix [1](https://github.com/certifi/python-certifi/issues/200) [2](https://github.com/certifi/python-certifi/issues/271)

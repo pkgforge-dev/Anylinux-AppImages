@@ -27,6 +27,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 - [How to make these](HOW-TO-MAKE-THESE.md)
 - [Hall of fame/shame](HALL-OF-FAME.md)
 - [Size comparison](disk-usage-vs-flatpak.md)
+- [Build tools and scripts](useful-tools/)
 
 <!-- APPS_LIST_START -->
 
@@ -71,10 +72,12 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
 [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage)                                                             |
 [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
+[CollaboraOffice](https://github.com/pkgforge-dev/CollaboraOffice-AppImage)                                              |
 [Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
 [Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage)                                            |
 [CopyQ](https://github.com/pkgforge-dev/CopyQ-AppImage)                                                                  |
 [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
+[Crispy Doom](https://github.com/pkgforge-dev/Crispy-Doom-AppImage)                                                      |
 [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage)                                                      |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
 [Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage)                                                            |
@@ -123,6 +126,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
 [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage)                                                        |
 [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
+[GCAP2025](https://github.com/pkgforge-dev/GCAP2025-AppImage)                                                            |
+[GCAP2026](https://github.com/pkgforge-dev/GCAP2026-AppImage)                                                            |
 [GCstar](https://github.com/pkgforge-dev/GCstar-AppImage)                                                                |
 [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
 [Gearboy](https://github.com/pkgforge-dev/Gearboy-AppImage)                                                              |
@@ -143,9 +148,11 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Gopher64](https://github.com/pkgforge-dev/Gopher64-AppImage)                                                            |
 [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
 [Gradia](https://github.com/pkgforge-dev/Gradia-AppImage)                                                                |
+[Gram](https://github.com/pkgforge-dev/Gram-AppImage-Enhanced)                                                           |
 [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
 [gThumb](https://github.com/pkgforge-dev/gThumb-AppImage)                                                                |
 [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
+[Haruna](https://github.com/pkgforge-dev/Haruna-AppImage)                                                                |
 [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
 [Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced)                                       |
 [HP-15C](https://github.com/pkgforge-dev/HP-15C-Simulator-AppImage)                                                      |
@@ -156,8 +163,11 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [innoextract](https://github.com/pkgforge-dev/innoextract-AppImage)                                                      |
 [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
 [Iris](https://github.com/pkgforge-dev/Iris-AppImage-Enhanced)                                                           |
+[IRPF2025](https://github.com/pkgforge-dev/IRPF2025-AppImage)                                                            |
+[IRPF2026](https://github.com/pkgforge-dev/IRPF2026-AppImage)                                                            |
 [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
 [ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage)                                                            |
+[ITR2025](https://github.com/pkgforge-dev/ITR2025-AppImage)                                                              |
 [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
 [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
 [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
@@ -193,6 +203,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
 [NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage)                                                              |
 [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
+[NP2kai](https://github.com/pkgforge-dev/Neko-Project-II-Kai-AppImage)                                                   |
 [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
 [Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced)                                             |
 [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced)                                           |
@@ -228,7 +239,10 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Plus42](https://github.com/pkgforge-dev/Plus42-AppImage)                                                                |
 [PokeMMO](https://github.com/pkgforge-dev/PokeMMO-AppImage)                                                              |
 [polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
+[POSTAL](https://github.com/pkgforge-dev/POSTAL-AppImage)                                                                |
 ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
+[Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage)                                                            |
+[PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced)                                         |
 [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
 [Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage)                                                        |
 [qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
@@ -239,7 +253,9 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [QMPlay2](https://github.com/pkgforge-dev/QMPlay2-AppImage-Enhanced)                                                     |
 [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
 [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
+[QuantumLauncher](https://github.com/pkgforge-dev/QuantumLauncher-AppImage-Enhanced)                                     |
 [Quickshell](https://github.com/pkgforge-dev/Quickshell-AppImage)                                                        |
+[Raptor](https://github.com/pkgforge-dev/Raptor-AppImage)                                                                |
 [Readest](https://github.com/pkgforge-dev/Readest-AppImage-Enhanced)                                                     |
 [Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
 [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
@@ -251,6 +267,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Ristretto](https://github.com/pkgforge-dev/Ristretto-AppImage)                                                          |
 [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
 [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
+[RocksnDiamonds](https://github.com/pkgforge-dev/RocksnDiamonds-AppImage)                                                |
 [rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
 [ROLLER](https://github.com/pkgforge-dev/ROLLER-AppImage)                                                                |
 [rquickshare](https://github.com/pkgforge-dev/rquickshare-AppImage-Enhanced)                                             |
@@ -270,6 +287,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage)                                                            |
 [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage)                                                            |
+[Simutrans](https://github.com/pkgforge-dev/Simutrans-AppImage)                                                          |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced)                                                       |
 [SongRec](https://github.com/pkgforge-dev/SongRec-AppImage)                                                              |
 [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced)                                                             |
@@ -296,6 +314,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [tachoparser](https://github.com/pkgforge-dev/tachoparser-AppImage)                                                      |
 [Tagger](https://github.com/pkgforge-dev/Tagger-AppImage)                                                                |
 [Taisei Project](https://github.com/pkgforge-dev/Taisei-Project-AppImage)                                                |
+[Tokodon](https://github.com/pkgforge-dev/Tokodon-AppImage)                                                              |
 [Taradino](https://github.com/pkgforge-dev/Taradino-AppImage)                                                            |
 [Tauon](https://github.com/pkgforge-dev/Tauon-AppImage)                                                                  |
 [Telegram](https://github.com/pkgforge-dev/Telegram-AppImage)                                                            |
@@ -325,6 +344,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [wine](https://github.com/pkgforge-dev/wine-AppImage)                                                                    |
 [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage)                                              |
 [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced)                                             |
+[xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced)                                                           |
 [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
 [xeyes](https://github.com/pkgforge-dev/xeyes-AppImage)                                                                  |
 [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
