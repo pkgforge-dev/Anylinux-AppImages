@@ -2098,7 +2098,7 @@ _add_apprun() {
 	if [ -f "$f" ]; then
 		return 0
 	fi
-
+	_echo "Adding '$f'..."
 	cat <<-'EOF' > "$f"
 	#!/bin/sh
 
@@ -2188,6 +2188,7 @@ _add_hooks_library() {
 	if [ -f "$f" ]; then
 		return 0
 	fi
+	_echo "Adding '$f'..."
 	cat <<-'EOF' > "$f"
 	#!/bin/sh
 
