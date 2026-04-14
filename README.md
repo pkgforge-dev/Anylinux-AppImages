@@ -184,6 +184,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage)                                                            |
 [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage)                                                          |
 [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage)                                                          |
+[Luanti](https://github.com/pkgforge-dev/Luanti-AppImage)                                                                |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
 [MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
 [ManiaDrive](https://github.com/pkgforge-dev/ManiaDrive-AppImage)                                                        |
