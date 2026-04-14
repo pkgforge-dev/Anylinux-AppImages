@@ -2235,6 +2235,7 @@ _add_hooks_library() {
 	        fi
 	        if [ "$1" = --check ]; then
 	                [ -n "$_sudocmd" ] || [ "$(id -u)" = 0 ] || return 1
+	                return 0
 	        else
 	                if [ -z "$_sudocmd" ] || [ "$(id -u)" != 0 ]; then
 	                        err_msg "We need 'pkexec' or 'lxqt-sudo' or 'run0' to perform this operation"
