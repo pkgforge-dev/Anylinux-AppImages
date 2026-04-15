@@ -2688,6 +2688,7 @@ _make_appimage() {
 
 	set -- \
 		--force               \
+		--order=path          \
 		--set-owner 0         \
 		--set-group 0         \
 		--no-history          \
