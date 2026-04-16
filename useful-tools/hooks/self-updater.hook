@@ -77,6 +77,8 @@ _update() {
 		else
 			notify -de "Something went wrong updating $_updater_appname"
 		fi
+	else
+		return 1
 	fi
 }
 
