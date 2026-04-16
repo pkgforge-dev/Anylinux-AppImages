@@ -51,11 +51,7 @@ _is_rule_already_installed() {
 	done
 
 	# bundled udev rules are already installed if the array is empty
-	if [ -z "$1" ]; then
-		return 0
-	else
-		return 1
-	fi
+	[ -n "$1" ] || return 1
 }
 
 _install_udev() {
@@ -79,8 +75,8 @@ _install_udev() {
 }
 
 install_udev_rules() {
-	_udev_installer_check
-	_is_rule_already_installed
+	_udev_installer_check || return 0
+	_is_rule_already_installed || return 0
 	if notify --display-question "$_udev_install_msg"; then
 		_install_udev
 	else
