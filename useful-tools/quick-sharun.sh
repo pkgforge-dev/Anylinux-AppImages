@@ -3053,6 +3053,10 @@ while read -r d; do
 			*/lib32/*)
 				dst_path="$APPDIR"/lib32/"${d##*/lib32/}"
 				;;
+			"$APPDIR"/*)
+				_err_msg "Skipping deployment of $d (already in '$APPDIR')"
+				continue
+				;;
 			*)
 				_err_msg "Skipping deployment of $d"
 				_err_msg "Valid directories to deploy are:"
