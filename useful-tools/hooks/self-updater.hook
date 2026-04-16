@@ -93,6 +93,8 @@ _enable_update_checking() {
 	if notify -dq "Allow $_updater_appname to check for updates?"; then
 		_get_appimageupdatetool
 		echo "1" > "$_updater_policy_file"
+	else
+		return 1
 	fi
 }
 
