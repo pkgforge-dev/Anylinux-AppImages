@@ -91,10 +91,10 @@ _make_configfile() {
 
 _enable_update_checking() {
 	if notify -dq "Allow $_updater_appname to check for updates?"; then
-		_get_appimageupdatetool
 		echo "1" > "$_updater_policy_file"
 	else
-		return 1
+		# disable without asking
+		echo "0" > "$_updater_policy_file"
 	fi
 }
 
@@ -122,7 +122,7 @@ run_updater() {
 		fi
 	else
 		sleep 5
-		_enable_update_checking || _disable_update_checking
+		_enable_update_checking
 	fi
 }
 
