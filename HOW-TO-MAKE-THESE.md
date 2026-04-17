@@ -3,11 +3,14 @@ layout: default
 title: How To Make These
 ---
 
-# How to make truly portable AppImages that work on any linux system.
+# How to make truly portable AppImages that work on any linux system
 
 -----------------------------------
-### *Index*
+
+## *Index*
+
 -----------------------------------
+
 - [Quick Start Guide](#quick-start-guide)
   - [Prerequisites](#prerequisites)
   - [Basic workflow](#basic-workflow)
@@ -22,7 +25,6 @@ title: How To Make These
   - [Isn't this very bloated?](#isnt-this-very-bloated)
   - [What about nvidia?](#what-about-nvidia)
 - [Examples and templates](#examples-and-templates)
-
 
 -----------------------------------
 
@@ -40,6 +42,7 @@ title: How To Make These
 ### *Prerequisites*
 
 You'll need:
+
 - A Linux system (preferably Arch Linux for building)
 - Basic shell scripting knowledge
 - The application you want to package (very preferably installed to /usr)
@@ -62,6 +65,7 @@ Creating an AppImage with quick-sharun involves these steps:
 5. **Generate the AppImage** with `--make-appimage` flag
 
 That's it! The script will:
+
 - Detect and bundle all required libraries (including those that are dlopened)
 - Create a portable AppImage that works everywhere
 
@@ -128,6 +132,7 @@ chmod +x ./get-debloated-pkgs.sh
 ### *Configurable environment variables*
 
 **Basic configuration:**
+
 - `APPDIR`  - Where to build the AppDir (default: `$PWD/AppDir`).
 - `ICON`    - Path to application icon.
 - `DESKTOP` - Path to .desktop file.
@@ -145,6 +150,7 @@ ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
 All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only kept for compatibility, so new examples should use plain `.hook` names. **More info in** [hook-system.md](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/hooks/hook-system.md)
 
 **Deployment options:**
+
 - `DEPLOY_OPENGL=1`   - Bundles OpenGL libraries (mesa). Enabled automatically in most cases.
 - `DEPLOY_VULKAN=1`   - Bundles Vulkan libraries (mesa). Enabled automatically in most cases.
 - `DEPLOY_PYTHON=1`   - Bundles the system Python installation (default: disabled).
@@ -180,9 +186,9 @@ For a long time the suggested practice to make AppImages has been to bundle most
 
 This approach has two big issues:
 
-* It forces the developer to build on an old version of glibc to guarantee that the application works on most linux distros being used, because glibc sucks. This is specially problematic if your application needs something new like QT6 or GTK4 which is not available on such old distros.
+- It forces the developer to build on an old version of glibc to guarantee that the application works on most linux distros being used, because glibc sucks. This is specially problematic if your application needs something new like QT6 or GTK4 which is not available on such old distros.
 
-* It also means the application cannot work on musl libc systems.
+- It also means the application cannot work on musl libc systems.
 
 And the future stability isn't that great either, because glibc still sometimes breaks userspace with updates.
 
@@ -195,12 +201,11 @@ And the future stability isn't that great either, because glibc still sometimes 
 
 ### *The solution*
 
-* ~~Lets use a container~~ ❌ nope that has a bunch of limitations and weird quirks, [very bloated](https://imgur.com/a/appimage-vs-flatpak-size-comparison-QH1dPyb) and depends on unprivileged user-namespaces [which you cannot even rely on...](https://github.com/linuxmint/mint22-beta/issues/82). It's worth adding that there are some cases where containers are really the only viable option, especially with applications that depend on both 32 and 64 bit libs, in which doing this without a container is going to be a lot of pain, but yeah, always leave this as a last resort method.
+- ~~Lets use a container~~ ❌ nope that has a bunch of limitations and weird quirks, [very bloated](https://imgur.com/a/appimage-vs-flatpak-size-comparison-QH1dPyb) and depends on unprivileged user-namespaces [which you cannot even rely on...](https://github.com/linuxmint/mint22-beta/issues/82). It's worth adding that there are some cases where containers are really the only viable option, especially with applications that depend on both 32 and 64 bit libs, in which doing this without a container is going to be a lot of pain, but yeah, always leave this as a last resort method.
 
-* Compile statically! Sure, that works, go and compile all of kdenlive statically and get back to me once you get it done.
+- Compile statically! Sure, that works, go and compile all of kdenlive statically and get back to me once you get it done.
 
-* Bundle every library the application needs and don't rely on the host libc. ✅
-
+- Bundle every library the application needs and don't rely on the host libc. ✅
 
 This is the solution, truly portable application bundles that have everything they need.
 
@@ -223,8 +228,7 @@ Since we are going to bundle our own libc, it means we cannot use the host dynam
 
 Instead we have to run the dynamic linker first, and then give it the binary we want to launch, which is possible, so our `AppRun` will look like this instead:
 
-
-```
+```shell
 #!/bin/sh
 CURRENTDIR="$(readlink -f "$(dirname "$0")")"
 
@@ -233,31 +237,30 @@ exec "$CURRENTDIR"/ld-linux-x86-64.so.2 "$CURRENTDIR"/bin/app "$@"
 
 However this has a small issue that `/proc/self/exe` will be `ld-linux-x86-64.so.2` instead of the name of the binary we launched. For most applications, this isn't an issue, but when it is an issue, it is quite a big one. **Sharun fixes this problem** (see below), so we will continue with this approach to explain the rest.
 
-
-2. Second issue to overcome:
+1. Second issue to overcome:
 
 Now that we have our own dynamic linker, how do we tell it that we can to use all the libraries we have in our own `lib` directory?
 
-* `LD_LIBRARY_PATH` ❌ Nope, terrible idea. **NEVER USE THIS VARIABLE**, it causes a lot of headaches because it is inherited by child processes, which means everything being launched by our application will try to use our libraries, and this causes insanely broken behaviours that are hard to catch. [For example](https://github.com/zen-browser/desktop/issues/2748), this issue lasted several months and no one had an idea what was going on until I [removed](https://github.com/zen-browser/desktop/pull/6156/files) the usage of `LD_LIBRARY_PATH`, which the application didn't even need to have it set in this case. Also see: [LD_LIBRARY_PATH – or: How to get yourself into trouble!](https://www.hpc.dtu.dk/?page_id=1180)
+- `LD_LIBRARY_PATH` ❌ Nope, terrible idea. **NEVER USE THIS VARIABLE**, it causes a lot of headaches because it is inherited by child processes, which means everything being launched by our application will try to use our libraries, and this causes insanely broken behaviours that are hard to catch. [For example](https://github.com/zen-browser/desktop/issues/2748), this issue lasted several months and no one had an idea what was going on until I [removed](https://github.com/zen-browser/desktop/pull/6156/files) the usage of `LD_LIBRARY_PATH`, which the application didn't even need to have it set in this case. Also see: [LD_LIBRARY_PATH – or: How to get yourself into trouble!](https://www.hpc.dtu.dk/?page_id=1180)
 
-* Lets set our rpath to be `$ORIGIN/path/to/libs`, totally valid! ☑️ However, a lot of the times, this is not done at compile time and instead it is done with `patchelf` in runtime. While doing it is fine 99% of the time, that 1% when it breaks something, it is very hard to catch what went wrong.
+- Lets set our rpath to be `$ORIGIN/path/to/libs`, totally valid! ☑️ However, a lot of the times, this is not done at compile time and instead it is done with `patchelf` in runtime. While doing it is fine 99% of the time, that 1% when it breaks something, it is very hard to catch what went wrong.
 
-* Tell the dynamic linker to use our bundled libraries directly ✅ This is not well known, but the dynamic linker supports the `--library-path` flag, which behaves very similar to `LD_LIBRARY_PATH` without being a variable that gets inherited by other processes. It is the perfect solution we just needed, so our `AppRun` example will now look like this:
+- Tell the dynamic linker to use our bundled libraries directly ✅ This is not well known, but the dynamic linker supports the `--library-path` flag, which behaves very similar to `LD_LIBRARY_PATH` without being a variable that gets inherited by other processes. It is the perfect solution we just needed, so our `AppRun` example will now look like this:
 
- ```
+ ```shell
 #!/bin/sh
 CURRENTDIR="$(readlink -f "$(dirname "$0")")"
 
 exec "$CURRENTDIR"/ld-linux-x86-64.so.2 \
-	--library-path "$CURRENTDIR"/lib \
-	"$CURRENTDIR"/bin/app "$@"
+ --library-path "$CURRENTDIR"/lib \
+ "$CURRENTDIR"/bin/app "$@"
 ```
 
 We need to bundle the libraries and dynamic linker and we are **almost** good to go! However, to be fully ready, we need to fix the following issues below… **Bundling all the needed libraries isn't as easy as just running `ldd` + `cp`**, so we need some more robust solution. Sharun handles this automatically (see below).
 
-3. Third issue to overcome:
+1. Third issue to overcome:
 
-Lets make our application relocatable. Thankfully this is already possible with almost all applications, I often see developers adding exceptions to their applications to make them portable, **but they are rarely needed at all**, because we already have the **XDG Base dir specification** that helps a ton here: https://specifications.freedesktop.org/basedir-spec/latest/
+Lets make our application relocatable. Thankfully this is already possible with almost all applications, I often see developers adding exceptions to their applications to make them portable, **but they are rarely needed at all**, because we already have the **XDG Base dir specification** that helps a ton here: <https://specifications.freedesktop.org/basedir-spec/latest/>
 
 Instead of hardcoding your application to look for files in `/usr/share`, you need to check `XDG_DATA_DIRS`, which very likely your application already does since common libraries already follow the specification.
 
@@ -265,22 +268,21 @@ Then in our `AppRun` we include our `share` directory in `XDG_DATA_DIRS`, issue 
 
 Same way, the dependencies we bundle will almost always have means to make relocatable any support plugin/support file they need, just to give a few examples:
 
-* `PERLLIB` for perl
+- `PERLLIB` for perl
 
-* `GCONV_PATH` for glibc
+- `GCONV_PATH` for glibc
 
-* Qt has `QT_PLUGIN_PATH`, but it also has a different method to be relocatable by making a `qt.conf` file next to our qt app binary. **This is much better because this variable has similar issues to** `LD_LIBRARY_PATH`
+- Qt has `QT_PLUGIN_PATH`, but it also has a different method to be relocatable by making a `qt.conf` file next to our qt app binary. **This is much better because this variable has similar issues to** `LD_LIBRARY_PATH`
 
-* `PIPEWIRE_MODULE_DIR` and `SPA_PLUGIN_DIR` for pipewire.
+- `PIPEWIRE_MODULE_DIR` and `SPA_PLUGIN_DIR` for pipewire.
 
-* `VK_DRIVER_FILES` and `__EGL_VENDOR_LIBRARY_DIRS` for mesa (vulkan and opengl) 💪
+- `VK_DRIVER_FILES` and `__EGL_VENDOR_LIBRARY_DIRS` for mesa (vulkan and opengl) 💪
 
 And many many more!
 
 But isn't this a lot of work to find and set all the env variables that my application needs? **Yes it is**
 
-
-4. Fourth issue to overcome, I don't want to do any of this that's a lot of work.
+1. Fourth issue to overcome, I don't want to do any of this that's a lot of work.
 
 -----------------------------------
 
@@ -293,20 +295,19 @@ But isn't this a lot of work to find and set all the env variables that my appli
 
 There is a solution for this, made by @VHSGunzo called sharun:
 
-https://github.com/VHSgunzo/sharun
+<https://github.com/VHSgunzo/sharun>
 
-* sharun is able to find all the libraries that your application needs, **including those that are dlopened**. It turns out that a lot of applications depend on dlopened libraries; those are the libraries that you cannot easily find with just `ldd`. Sharun uses a deployment script called `lib4bin` that has the strace mode; **that mode makes `lib4bin` open the application with strace to check all the dlopened libraries and then bundle them.**
+- sharun is able to find all the libraries that your application needs, **including those that are dlopened**. It turns out that a lot of applications depend on dlopened libraries; those are the libraries that you cannot easily find with just `ldd`. Sharun uses a deployment script called `lib4bin` that has the strace mode; **that mode makes `lib4bin` open the application with strace to check all the dlopened libraries and then bundle them.**
 
-* sharun also detects and sets a ton of [env variables](https://github.com/VHSgunzo/sharun?tab=readme-ov-file#environment-variables-that-are-set-if-sharun-finds-a-directory-or-file.) that the application needs to work.
+- sharun also detects and sets a ton of [env variables](https://github.com/VHSgunzo/sharun?tab=readme-ov-file#environment-variables-that-are-set-if-sharun-finds-a-directory-or-file.) that the application needs to work.
 
-* it also fixes the issue of  `/proc/self/exe` being `ld-linux-x86-64.so.2` 👀 For this issue, what it does is it places all the shared libraries and binaries in `shared/{lib,bin}` and then hardlinks itself to the `bin` directory of our `AppDir`; then when you call `bin/app`, it automatically calls the bundled dynamic linker and runs the binary with the name of the hardlink, while giving the path to our bundled libraries with `--library-path`
+- it also fixes the issue of  `/proc/self/exe` being `ld-linux-x86-64.so.2` 👀 For this issue, what it does is it places all the shared libraries and binaries in `shared/{lib,bin}` and then hardlinks itself to the `bin` directory of our `AppDir`; then when you call `bin/app`, it automatically calls the bundled dynamic linker and runs the binary with the name of the hardlink, while giving the path to our bundled libraries with `--library-path`
 
-* sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it, **this means we no longer depend on the host shell to get our application to launch.**
+- sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it, **this means we no longer depend on the host shell to get our application to launch.**
 
-* sharun is not just for the AppImages, you can also use it anywhere you need to make any sort of application portable. You can even make pseudo-static binaries from existing dynamic binaries, which sharun does with the help of wrappe.
+- sharun is not just for the AppImages, you can also use it anywhere you need to make any sort of application portable. You can even make pseudo-static binaries from existing dynamic binaries, which sharun does with the help of wrappe.
 
-* sharun even has hooks to fix applications that aren't relocatable, like webkit2gtk which is hardcoded to look for some binaries in `/usr/lib`, it fixes this with patching all automatically for you.
-
+- sharun even has hooks to fix applications that aren't relocatable, like webkit2gtk which is hardcoded to look for some binaries in `/usr/lib`, it fixes this with patching all automatically for you.
 
 Any application made with sharun ends up being able to work **on any linux distro**, be it ubuntu 14.04, musl distros and even directly in NixOS without any wrapper (non FHS environment).
 
@@ -329,7 +330,7 @@ Not really, if your application isn't hardware accelerated, bundling all the lib
 
 For applications that are hardware accelerated, there is the problem that mesa links to `libLLVM.so`, which is a huge +130 MiB library that's used for a lot of things. Distros by default build it with support for the following:
 
-```
+```shell
 AArch64
 AMDGPU
 ARM
@@ -353,7 +354,7 @@ XCore
 
 When for most applications you only need llvm to support AMDGPU and X86/AArch64.
 
-We already make such version of llvm here: https://github.com/pkgforge-dev/archlinux-pkgs-debloated which reduces the size of libLLVM.so down to 66 MiB.
+We already make such version of llvm here: <https://github.com/pkgforge-dev/archlinux-pkgs-debloated> which reduces the size of libLLVM.so down to 66 MiB.
 
 Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results a **50 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things.
 
@@ -385,23 +386,23 @@ Goes without saying that sharun handles all of this already on its own.
 
 See the ready-to-use demo scripts in [`useful-tools/demo/`](https://github.com/pkgforge-dev/Anylinux-AppImages/tree/main/useful-tools/demo):
 
-* [vkcube + glxgears](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/vkcube-glxgears-appimage.sh) - Bundles OpenGL and Vulkan test binaries
-* [zink vkcube + glxgears](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/zink-vkcube-glxgears-appimage.sh) - Same as above but using the Zink OpenGL-on-Vulkan driver
-* [gtk3-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk3-demo-appimage.sh) - Simple GTK3 application
-* [gtk4-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-appimage.sh) - Simple GTK4 application
-* [gtk4-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-onlysoftware-appimage.sh) - GTK4 demo using software-only rendering
-* [qt6-dbus-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-appimage.sh) - Qt6 application with D-Bus
-* [qt6-dbus-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-onlysoftware-appimage.sh) - Qt6 demo using software-only rendering
+- [vkcube + glxgears](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/vkcube-glxgears-appimage.sh) - Bundles OpenGL and Vulkan test binaries
+- [zink vkcube + glxgears](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/zink-vkcube-glxgears-appimage.sh) - Same as above but using the Zink OpenGL-on-Vulkan driver
+- [gtk3-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk3-demo-appimage.sh) - Simple GTK3 application
+- [gtk4-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-appimage.sh) - Simple GTK4 application
+- [gtk4-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-onlysoftware-appimage.sh) - GTK4 demo using software-only rendering
+- [qt6-dbus-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-appimage.sh) - Qt6 application with D-Bus
+- [qt6-dbus-demo (software rendering)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-onlysoftware-appimage.sh) - Qt6 demo using software-only rendering
 
 ### Real-world examples
 
 Browse through our production AppImage repositories for more complex examples:
 
-* [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage/blob/7e3171f1b2a6138cb27a7309c1e386435ea1fe12/cromite-appimage.sh#L38-L59) - Chromium-based browser
-* [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/blob/d2e97d16ebce1f421187b9887767e6660ac57dcb/azahar-appimage.sh#L73-L97) - Nintendo 3DS emulator
-* [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage/blob/97fb70cc3b2885753116f43d3f64106cae2227d1/scrcpy-appimage.sh#L11-L43) - Android screen mirroring
-* [See all AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/README.md#applications)
-* **[And our template that greatly simplifies this!](https://github.com/pkgforge-dev/TEMPLATE-AppImage)**
+- [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage/blob/7e3171f1b2a6138cb27a7309c1e386435ea1fe12/cromite-appimage.sh#L38-L59) - Chromium-based browser
+- [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/blob/d2e97d16ebce1f421187b9887767e6660ac57dcb/azahar-appimage.sh#L73-L97) - Nintendo 3DS emulator
+- [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage/blob/97fb70cc3b2885753116f43d3f64106cae2227d1/scrcpy-appimage.sh#L11-L43) - Android screen mirroring
+- [See all AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/README.md#applications)
+- **[And our template that greatly simplifies this!](https://github.com/pkgforge-dev/TEMPLATE-AppImage)**
 
 -----------------------------------
 
