@@ -224,6 +224,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage)                                                              |
 [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage)                                                |
 [OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage)                                                          |
+[OrcaSlicer](https://github.com/pkgforge-dev/OrcaSlicer-AppImage-Enhanced)                                               |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
 [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
