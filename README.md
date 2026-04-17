@@ -14,8 +14,8 @@ Most of the AppImages are made with [sharun](https://github.com/VHSgunzo/sharun)
 
 The uruntime [automatically falls back to using namespaces](https://github.com/VHSgunzo/uruntime?tab=readme-ov-file#built-in-configuration) if FUSE is not available at all, and if namespaces are not possible it falls back to extract and run, so we **truly have 0 requirements:**
 
-| Format                  | Requirements                                                                                                                                                                                                 |
-|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Format | Requirements |
+| --- | --- |
 | Traditional AppImages (made by linuxdeploy or similar tools) | **Hard dependency on glibc** (rarely works on distros older than 4 years), also has a soft dependency on **FUSE** since the user has to manually extract when FUSE is unavailable, they also need an FHS compliant system to work. |
 | Flatpak| **Hard dependency on bubblewrap and FUSE**. Must be supported by your distribution or be manually built and installed systemwide which requires elevated rights. |
 | Snap | Similar requirements to flatpak minus bubblewrap, has a **hard dependency on systemd**. |
@@ -33,339 +33,339 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 
 ---
 
-| Applications                                                                                                             |
-| ------------------------------------------------------------------------------------------------------------------------ |
-[12to11](https://github.com/pkgforge-dev/12to11-AppImage)                                                                |
-[86Box](https://github.com/pkgforge-dev/86box-AppImage-Enhanced)                                                         |
-[AAAAXY](https://github.com/pkgforge-dev/AAAAXY-AppImage-Enhanced)                                                       |
-[Abaddon](https://github.com/pkgforge-dev/Abaddon-AppImage)                                                              |
-[Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage)                                                            |
-[Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage)                                                          |
-[alacritty](https://github.com/pkgforge-dev/alacritty-AppImage)                                                          |
-[Amarok](https://github.com/pkgforge-dev/Amarok-AppImage)                                                                |
-[Amiberry](https://github.com/pkgforge-dev/Amiberry-AppImage)                                                            |
-[Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage)                                                  |
-[Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage)                          |
-[anki](https://github.com/pkgforge-dev/anki-AppImage)                                                                    |
-[AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)                                        |
-[ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)                                                            |
-[Audacious](https://github.com/pkgforge-dev/Audacious-AppImage)                                                          |
-[Audacity](https://github.com/pkgforge-dev/Audacity-AppImage-Enhanced)                                                   |
-[Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage)                                                  |
-[Augustus](https://github.com/pkgforge-dev/Augustus-AppImage-Enhanced)                                                   |
-[Authenticator](https://github.com/pkgforge-dev/Authenticator-AppImage)                                                  |
-[Awakened POE Trade](https://github.com/pkgforge-dev/Awakened-POE-Trade-AppImage-Enhanced)                               |
-[Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced)                                                       |
-[BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage)                                                      |
-[BasiliskII](https://github.com/pkgforge-dev/BasiliskII-AppImage-Enhanced)                                               |
-[BibleTime](https://github.com/pkgforge-dev/BibleTime-AppImage)                                                          |
-[Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
-[Bulky](https://github.com/pkgforge-dev/Bulky-AppImage)                                                                  |
-[Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage)                                                        |
-[Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage)                                                        |
-[CatacombGL](https://github.com/pkgforge-dev/CatacombGL-AppImage)                                                        |
-[C-Dogs_SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage)                                                         |
-[Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced)                                                           |
-[Citron](https://github.com/pkgforge-dev/Citron-AppImage)                                                                |
-[Clapper](https://github.com/pkgforge-dev/Clapper-AppImage)                                                              |
-[ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage)                                                        |
-[Clementine](https://github.com/pkgforge-dev/Clementine-AppImage)                                                        |
-[Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage)                                                             |
-[ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage)                                                        |
-[CollaboraOffice](https://github.com/pkgforge-dev/CollaboraOffice-AppImage)                                              |
-[Collision](https://github.com/pkgforge-dev/Collision-AppImage)                                                          |
-[Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage)                                            |
-[CopyQ](https://github.com/pkgforge-dev/CopyQ-AppImage)                                                                  |
-[CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage)                                                            |
-[Crispy Doom](https://github.com/pkgforge-dev/Crispy-Doom-AppImage)                                                      |
-[CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage)                                                      |
-[Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
-[Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage)                                                            |
-[Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
-[cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
-[D1X-Rebirth](https://github.com/pkgforge-dev/D1X-Rebirth-AppImage)                                                      |
-[D2X-Rebirth](https://github.com/pkgforge-dev/D2X-Rebirth-AppImage)                                                      |
-[Daggerfall-Unity](https://github.com/pkgforge-dev/Daggerfall-Unity-AppImage)                                            |
-[DarkPlaces](https://github.com/pkgforge-dev/DarkPlaces-AppImage)                                                        |
-[DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage)                                                            |
-[Defold](https://github.com/pkgforge-dev/Defold-AppImage)                                                                |
-[DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage)                                                              |
-[dethrace](https://github.com/pkgforge-dev/dethrace-AppImage)                                                            |
-[DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced)                                             |
-[dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage)                                                                |
-[Discord](https://github.com/pkgforge-dev/Discord-AppImage)                                                              |
-[DNZHRecomp](https://github.com/pkgforge-dev/DNZHRecomp-AppImage)                                                        |
-[Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage)                                                      |
-[DOOM64EXUltra](https://github.com/pkgforge-dev/DOOM64EXUltra-AppImage)                                                  |
-[DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage)                                                            |
-[Dr. Robotnik's Ring Racers](https://github.com/pkgforge-dev/Dr-Robotniks-Ring-Racers-AppImage)                          |
-[dRally](https://github.com/pkgforge-dev/dRally-AppImage)                                                                |
-[Drum Machine](https://github.com/pkgforge-dev/Drum-Machine-AppImage)                                                    |
-[DuckStation-GPL](https://github.com/pkgforge-dev/DuckStation-GPL-AppImage-Enhanced)                                     |
-[dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
-[EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
-[ECWolf](https://github.com/pkgforge-dev/ECWolf-AppImage)                                                                |
-[EDuke32](https://github.com/pkgforge-dev/EDuke32-AppImage)                                                              |
-[Elastic](https://github.com/pkgforge-dev/Elastic-AppImage)                                                              |
-[Element Desktop](https://github.com/pkgforge-dev/Element-Desktop-AppImage)                                              |
-[ePSXe](https://github.com/pkgforge-dev/ePSXe-AppImage)                                                                  |
-[ET Legacy](https://github.com/pkgforge-dev/ETLegacy-AppImage)                                                           |
-[Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage)                                          |
-[ExtremeTuxRacer](https://github.com/pkgforge-dev/ExtremeTuxRacer-AppImage)                                              |
-[Exult](https://github.com/pkgforge-dev/Exult-AppImage)                                                                  |
-[Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage)                                                        |
-[Fabother-World](https://github.com/pkgforge-dev/Fabother-World-AppImage)                                                |
-[FeatherPad](https://github.com/pkgforge-dev/FeatherPad-AppImage)                                                        |
-[FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage)                                                                |
-[Filelight](https://github.com/pkgforge-dev/Filelight-AppImage)                                                          |
-[Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced)                                                     |
-[Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage)                                                    |
-[foot](https://github.com/pkgforge-dev/foot-AppImage)                                                                    |
-[fooyin](https://github.com/pkgforge-dev/fooyin-AppImage)                                                                |
-[FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage)                                                            |
-[Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage)                                                          |
-[Galculator](https://github.com/pkgforge-dev/Galculator-AppImage)                                                        |
-[Gapless](https://github.com/pkgforge-dev/Gapless-AppImage)                                                              |
-[GCAP2025](https://github.com/pkgforge-dev/GCAP2025-AppImage)                                                            |
-[GCAP2026](https://github.com/pkgforge-dev/GCAP2026-AppImage)                                                            |
-[GCstar](https://github.com/pkgforge-dev/GCstar-AppImage)                                                                |
-[Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage)                                                        |
-[Gearboy](https://github.com/pkgforge-dev/Gearboy-AppImage)                                                              |
-[Gearcoleco](https://github.com/pkgforge-dev/Gearcoleco-AppImage)                                                        |
-[Geargrafx](https://github.com/pkgforge-dev/Geargrafx-AppImage)                                                          |
-[Gearlynx](https://github.com/pkgforge-dev/Gearlynx-AppImage)                                                            |
-[Gearsystem](https://github.com/pkgforge-dev/Gearsystem-AppImage)                                                        |
-[Ghostship](https://github.com/pkgforge-dev/Ghostship-AppImage-Enhanced)                                                 |
-[Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
-[GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)                                        |
-[Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage)                                            |
-[Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage)                                                |
-[Gnome System Monitor](https://github.com/pkgforge-dev/Gnome-System-Monitor-AppImage)                                    |
-[Gnome Text Editor](https://github.com/pkgforge-dev/Gnome-Text-Editor-AppImage)                                          |
-[GNU FreeDink](https://github.com/pkgforge-dev/GNU-FreeDink-AppImage)                                                    |
-[Godot](https://github.com/pkgforge-dev/Godot-AppImage)                                                                  |
-[GoldenDict-ng](https://github.com/pkgforge-dev/GoldenDict-ng-AppImage)                                                  |
-[Gopher64](https://github.com/pkgforge-dev/Gopher64-AppImage)                                                            |
-[gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage)                                      |
-[Gradia](https://github.com/pkgforge-dev/Gradia-AppImage)                                                                |
-[Gram](https://github.com/pkgforge-dev/Gram-AppImage-Enhanced)                                                           |
-[Graphs](https://github.com/pkgforge-dev/Graphs-AppImage)                                                                |
-[gThumb](https://github.com/pkgforge-dev/gThumb-AppImage)                                                                |
-[Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage)                                                            |
-[Haruna](https://github.com/pkgforge-dev/Haruna-AppImage)                                                                |
-[Hatari](https://github.com/pkgforge-dev/Hatari-AppImage)                                                                |
-[Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced)                                       |
-[HP-15C](https://github.com/pkgforge-dev/HP-15C-Simulator-AppImage)                                                      |
-[htop](https://github.com/pkgforge-dev/htop-AppImage)                                                                    |
-[Identity](https://github.com/pkgforge-dev/Identity-AppImage)                                                            |
-[ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage)                                                      |
-[Impression](https://github.com/pkgforge-dev/Impression-AppImage)                                                        |
-[innoextract](https://github.com/pkgforge-dev/innoextract-AppImage)                                                      |
-[ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage)                                                            |
-[Iris](https://github.com/pkgforge-dev/Iris-AppImage-Enhanced)                                                           |
-[IRPF2025](https://github.com/pkgforge-dev/IRPF2025-AppImage)                                                            |
-[IRPF2026](https://github.com/pkgforge-dev/IRPF2026-AppImage)                                                            |
-[isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced)                                         |
-[ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage)                                                            |
-[ITR2025](https://github.com/pkgforge-dev/ITR2025-AppImage)                                                              |
-[kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage)                                                            |
-[kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage)                                                        |
-[kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced)                                                   |
-[KeePassXC](https://github.com/pkgforge-dev/KeePassXC-AppImage-Enhanced)                                                 |
-[Kega Fusion](https://github.com/pkgforge-dev/Kega-Fusion-AppImage)                                                      |
-[Keypunch](https://github.com/pkgforge-dev/Keypunch-AppImage)                                                            |
-[KiCad](https://github.com/pkgforge-dev/KiCad-AppImage)                                                                  |
-[Kid3](https://github.com/pkgforge-dev/Kid3-AppImage)                                                                    |
-[Knights](https://github.com/pkgforge-dev/Knights-AppImage)                                                              |
-[Kronos](https://github.com/pkgforge-dev/Kronos-AppImage)                                                                |
-[Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
-[lba2-classic-community](https://github.com/pkgforge-dev/lba2-classic-community-AppImage)                                |
-[Libation](https://github.com/pkgforge-dev/Libation-AppImage)                                                            |
-[LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage)                                                            |
-[LightZone](https://github.com/pkgforge-dev/LightZone-AppImage)                                                          |
-[LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage)                                                          |
-[LocalSend](https://github.com/pkgforge-dev/localsend-AppImage)                                                          |
-[Luanti](https://github.com/pkgforge-dev/Luanti-AppImage)                                                                |
-[Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
-[MAME](https://github.com/pkgforge-dev/MAME-AppImage)                                                                    |
-[ManiaDrive](https://github.com/pkgforge-dev/ManiaDrive-AppImage)                                                        |
-[MarioKart64Recomp](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage)                                          |
-[Media Downloader](https://github.com/pkgforge-dev/Media-Downloader-AppImage)                                            |
-[Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
-[melonDS](https://github.com/pkgforge-dev/melonDS-AppImage-Enhanced)                                                     |
-[MESA](https://github.com/pkgforge-dev/MESA-AppImage)                                                                    |
-[mGBA](https://github.com/pkgforge-dev/mGBA-AppImage-Enhanced)                                                           |
-[Mini-vMac](https://github.com/pkgforge-dev/Mini-vMac-AppImage)                                                          |
-[Mixxx](https://github.com/pkgforge-dev/Mixxx-AppImage)                                                                  |
-[Mousai](https://github.com/pkgforge-dev/Mousai-AppImage)                                                                |
-[mpv](https://github.com/pkgforge-dev/mpv-AppImage)                                                                      |
-[NBlood](https://github.com/pkgforge-dev/NBlood-AppImage)                                                                |
-[Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage)                                                            |
-[Neverball](https://github.com/pkgforge-dev/Neverball-AppImage)                                                          |
-[NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage)                                                          |
-[NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage)                                                              |
-[Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage)                                                                |
-[NP2kai](https://github.com/pkgforge-dev/Neko-Project-II-Kai-AppImage)                                                   |
-[NSZ](https://github.com/pkgforge-dev/NSZ-AppImage)                                                                      |
-[Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced)                                             |
-[NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced)                                           |
-[OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
-[Odamex](https://github.com/pkgforge-dev/Odamex-AppImage)                                                                |
-[Obsidian](https://github.com/pkgforge-dev/Obsidian-AppImage-Enhanced)                                                   |
-[okteta](https://github.com/pkgforge-dev/okteta-AppImage)                                                                |
-[OpenClaw](https://github.com/pkgforge-dev/OpenClaw-AppImage)                                                            |
-[opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced)                                                   |
-[OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage)                                                            |
-[OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage)                                                            |
-[OpenLoco](https://github.com/pkgforge-dev/OpenLoco-AppImage)                                                            |
-[openMSX](https://github.com/pkgforge-dev/openMSX-AppImage)                                                              |
-[OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced)                                                   |
-[OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage)                                                          |
-[OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage)                                                              |
-[OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage)                                                |
-[OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage)                                                          |
-[OrcaSlicer](https://github.com/pkgforge-dev/OrcaSlicer-AppImage-Enhanced)                                               |
-[Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
-[pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
-[PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
-[PCSX-Redux](https://github.com/pkgforge-dev/PCSX-Redux-AppImage-Enhanced)                                               |
-[PCSX2](https://github.com/pkgforge-dev/PCSX2-AppImage-Enhanced)                                                         |
-[PDF Arranger](https://github.com/pkgforge-dev/PDF-Arranger-AppImage)                                                    |
-[PDF Tricks](https://github.com/pkgforge-dev/PDF-Tricks-AppImage)                                                        |
-[Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage)                                                    |
-[Phantom-Satellite](https://github.com/pkgforge-dev/Phantom-Satellite-AppImage)                                          |
-[phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage)                                            |
-[Piglit](https://github.com/pkgforge-dev/Piglit-AppImage)                                                                |
-[Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
-[Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
-[Play!](https://github.com/pkgforge-dev/Play-AppImage-Enhanced)                                                          |
-[playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)                                                          |
-[Plus42](https://github.com/pkgforge-dev/Plus42-AppImage)                                                                |
-[PokeMMO](https://github.com/pkgforge-dev/PokeMMO-AppImage)                                                              |
-[polybar](https://github.com/pkgforge-dev/polybar-AppImage)                                                              |
-[POSTAL](https://github.com/pkgforge-dev/POSTAL-AppImage)                                                                |
-~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
-[Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage)                                                            |
-[PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced)                                         |
-[Ptyxis](https://github.com/pkgforge-dev/Ptyxis-AppImage)                                                                |
-[puddletag](https://github.com/pkgforge-dev/puddletag-AppImage)                                                          |
-[Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage)                                                        |
-[qarma](https://github.com/pkgforge-dev/qarma-AppImage)                                                                  |
-[QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage)                                                    |
-[QEMU](https://github.com/pkgforge-dev/QEMU-AppImage)                                                                    |
-[Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage)                                                                  |
-[Qmmp](https://github.com/pkgforge-dev/Qmmp-AppImage)                                                                    |
-[QMPlay2](https://github.com/pkgforge-dev/QMPlay2-AppImage-Enhanced)                                                     |
-[QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage)                                                          |
-[QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage)                                                          |
-[QuantumLauncher](https://github.com/pkgforge-dev/QuantumLauncher-AppImage-Enhanced)                                     |
-[Quickshell](https://github.com/pkgforge-dev/Quickshell-AppImage)                                                        |
-[Raptor](https://github.com/pkgforge-dev/Raptor-AppImage)                                                                |
-[Readest](https://github.com/pkgforge-dev/Readest-AppImage-Enhanced)                                                     |
-[Reco](https://github.com/pkgforge-dev/Reco-AppImage)                                                                    |
-[Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage)                                                            |
-[REDRIVER2](https://github.com/pkgforge-dev/REDRIVER2-AppImage)                                                          |
-[Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage)                                                              |
-[RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage)                                                      |
-[Rigs-of-Rods](https://github.com/pkgforge-dev/Rigs-of-Rods-AppImage)                                                    |
-[Riseup-VPN](https://github.com/pkgforge-dev/Riseup-VPN-AppImage)                                                        |
-[Ristretto](https://github.com/pkgforge-dev/Ristretto-AppImage)                                                          |
-[RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced)                                                             |
-[Rnote](https://github.com/pkgforge-dev/Rnote-AppImage)                                                                  |
-[RocksnDiamonds](https://github.com/pkgforge-dev/RocksnDiamonds-AppImage)                                                |
-[rofi](https://github.com/pkgforge-dev/rofi-AppImage)                                                                    |
-[ROLLER](https://github.com/pkgforge-dev/ROLLER-AppImage)                                                                |
-[rquickshare](https://github.com/pkgforge-dev/rquickshare-AppImage-Enhanced)                                             |
-[RSDKv3](https://github.com/pkgforge-dev/RSDKv3-AppImage)                                                                |
-[RSDKv4](https://github.com/pkgforge-dev/RSDKv4-AppImage)                                                                |
-[Ruffle](https://github.com/pkgforge-dev/Ruffle-AppImage)                                                                |
-[RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced)                                                   |
-[RVGL](https://github.com/pkgforge-dev/RVGL-AppImage)                                                                    |
-[Sanicball](https://github.com/pkgforge-dev/Sanicball-AppImage)                                                          |
-[Satty](https://github.com/pkgforge-dev/Satty-AppImage)                                                                  |
-[Sayonara-Player](https://github.com/pkgforge-dev/Sayonara-Player-AppImage-Enhanced)                                     |
-[scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage)                                                                |
-[ScummVM](https://github.com/pkgforge-dev/ScummVM-AppImage)                                                              |
-[SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage)                                                                |
-[Secrets](https://github.com/pkgforge-dev/Secrets-AppImage)                                                              |
-[servo](https://github.com/pkgforge-dev/servo-AppImage)                                                                  |
-[Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage)                                                            |
-[Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
-[Simitone](https://github.com/pkgforge-dev/Simitone-AppImage)                                                            |
-[Simutrans](https://github.com/pkgforge-dev/Simutrans-AppImage)                                                          |
-[Slack](https://github.com/pkgforge-dev/Slack-AppImage)                                                                  |
-[Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced)                                                       |
-[SongRec](https://github.com/pkgforge-dev/SongRec-AppImage)                                                              |
-[soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced)                                                             |
-[Sonic 3 A.I.R.](https://github.com/pkgforge-dev/Sonic-3-AIR-AppImage)                                                   |
-[Sonic-Mania-Decompilation](https://github.com/pkgforge-dev/Sonic-Mania-Decompilation-AppImage)                          |
-[Sonic Robo Blast 2](https://github.com/pkgforge-dev/SRB2-AppImage)                                                      |
-[sound-space-plus](https://github.com/pkgforge-dev/sound-space-plus-AppImage)                                            |
-[spacecadetpinball](https://github.com/pkgforge-dev/spacecadetpinball-AppImage)                                          |
-[SpaghettiKart](https://github.com/pkgforge-dev/SpaghettiKart-AppImage-Enhanced)                                         |
-[SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage)                                                      |
-[SRB2Kart](https://github.com/pkgforge-dev/SRB2Kart-AppImage)                                                            |
-[st](https://github.com/pkgforge-dev/st-AppImage)                                                                        |
-[Starfox64Recomp](https://github.com/pkgforge-dev/Starfox64Recomp-AppImage)                                              |
-[Stella](https://github.com/pkgforge-dev/Stella-AppImage)                                                                |
-[stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage)                                                    |
-[strawberry](https://github.com/pkgforge-dev/strawberry-AppImage)                                                        |
-[Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage)                                                              |
-[Super Mario War](https://github.com/pkgforge-dev/Supermariowar-AppImage)                                                |
-[Supermodel](https://github.com/pkgforge-dev/Supermodel-AppImage)                                                        |
-[SuperTux](https://github.com/pkgforge-dev/SuperTux-AppImage-Enhanced)                                                   |
-[SuperTuxKart](https://github.com/pkgforge-dev/SuperTuxKart-AppImage-Enhanced)                                           |
-[sView](https://github.com/pkgforge-dev/sView-AppImage)                                                                  |
-[system-monitoring-center](https://github.com/pkgforge-dev/system-monitoring-center-AppImage)                            |
-[tachoparser](https://github.com/pkgforge-dev/tachoparser-AppImage)                                                      |
-[Tagger](https://github.com/pkgforge-dev/Tagger-AppImage)                                                                |
-[Taisei Project](https://github.com/pkgforge-dev/Taisei-Project-AppImage)                                                |
-[Tokodon](https://github.com/pkgforge-dev/Tokodon-AppImage)                                                              |
-[Taradino](https://github.com/pkgforge-dev/Taradino-AppImage)                                                            |
-[Tauon](https://github.com/pkgforge-dev/Tauon-AppImage)                                                                  |
-[Telegram](https://github.com/pkgforge-dev/Telegram-AppImage)                                                            |
-[Torzu](https://github.com/pkgforge-dev/Torzu-AppImage)                                                                  |
-[TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage)                                                            |
-[transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage)                                              |
-[Trelby](https://github.com/pkgforge-dev/Trelby-AppImage)                                                                |
-[Tutanota Desktop](https://github.com/pkgforge-dev/Tutanota-Desktop-AppImage-Enhanced)                                   |
-[Tux Football](https://github.com/pkgforge-dev/Tux-Football-AppImage)                                                    |
-[Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage)                                                              |
-[uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage)                                                                |
-[UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage)                                                            |
-[UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage)                                              |
-[Varia](https://github.com/pkgforge-dev/Varia-AppImage)                                                                  |
-[vcmi](https://github.com/pkgforge-dev/vcmi-AppImage)                                                                    |
-[VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage)                                                          |
-[Viber](https://github.com/pkgforge-dev/Viber-AppImage-Enhanced)                                                         |
-[Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage)                                                  |
-[virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage)                                                    |
-[vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage)                                                    |
-[Warp](https://github.com/pkgforge-dev/Warp-AppImage)                                                                    |
-[Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced)                                       |
-[Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage)                                                          |
-[WebCord](https://github.com/pkgforge-dev/WebCord-AppImage-Enhanced)                                                     |
-[WhatsDesk](https://github.com/pkgforge-dev/WhatsDesk-AppImage)                                                          |
-[WhatSie](https://github.com/pkgforge-dev/WhatSie-AppImage)                                                              |
-[wine](https://github.com/pkgforge-dev/wine-AppImage)                                                                    |
-[wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage)                                              |
-[Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced)                                             |
-[xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced)                                                           |
-[xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage)                                                    |
-[xeyes](https://github.com/pkgforge-dev/xeyes-AppImage)                                                                  |
-[Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage)                                                                |
-[xoreos](https://github.com/pkgforge-dev/xoreos-AppImage)                                                                |
-[xournalpp](https://github.com/pkgforge-dev/xournalpp-AppImage-Enhanced)                                                 |
-[Xsnow](https://github.com/pkgforge-dev/Xsnow-AppImage)                                                                  |
-[Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage)                                              |
-[Ymir](https://github.com/pkgforge-dev/Ymir-AppImage)                                                                    |
-[yt-dlp](https://github.com/pkgforge-dev/yt-dlp-AppImage)                                                                |
-[ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced)                                                       |
-[Zelda64Recomp](https://github.com/pkgforge-dev/Zelda64Recomp-AppImage)                                                  |
-[Zen Browser](https://github.com/pkgforge-dev/Zen-Browser-AppImage-Enhanced)                                             |
-[Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage)                                                           |
-[Zod-Engine](https://github.com/pkgforge-dev/Zod-Engine-AppImage)                                                        |
-[ZSNES](https://github.com/pkgforge-dev/ZSNES-AppImage)                                                                  |
+| Applications |
+| --- | --- |
+| [12to11](https://github.com/pkgforge-dev/12to11-AppImage) |
+| [86Box](https://github.com/pkgforge-dev/86box-AppImage-Enhanced) |
+| [AAAAXY](https://github.com/pkgforge-dev/AAAAXY-AppImage-Enhanced) |
+| [Abaddon](https://github.com/pkgforge-dev/Abaddon-AppImage) |
+| [Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage) |
+| [Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage) |
+| [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage) |
+| [Amarok](https://github.com/pkgforge-dev/Amarok-AppImage) |
+| [Amiberry](https://github.com/pkgforge-dev/Amiberry-AppImage) |
+| [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage) |
+| [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage) |
+| [anki](https://github.com/pkgforge-dev/anki-AppImage) |
+| [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition) |
+| [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage) |
+| [Audacious](https://github.com/pkgforge-dev/Audacious-AppImage) |
+| [Audacity](https://github.com/pkgforge-dev/Audacity-AppImage-Enhanced) |
+| [Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage) |
+| [Augustus](https://github.com/pkgforge-dev/Augustus-AppImage-Enhanced) |
+| [Authenticator](https://github.com/pkgforge-dev/Authenticator-AppImage) |
+| [Awakened POE Trade](https://github.com/pkgforge-dev/Awakened-POE-Trade-AppImage-Enhanced) |
+| [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced) |
+| [BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage) |
+| [BasiliskII](https://github.com/pkgforge-dev/BasiliskII-AppImage-Enhanced) |
+| [BibleTime](https://github.com/pkgforge-dev/BibleTime-AppImage) |
+| [Blender](https://github.com/pkgforge-dev/Blender-AppImage) |
+| [Bulky](https://github.com/pkgforge-dev/Bulky-AppImage) |
+| [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage) |
+| [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage) |
+| [CatacombGL](https://github.com/pkgforge-dev/CatacombGL-AppImage) |
+| [C-Dogs_SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage) |
+| [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
+| [Citron](https://github.com/pkgforge-dev/Citron-AppImage) |
+| [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
+| [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage) |
+| [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage) |
+| [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage) |
+| [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage) |
+| [CollaboraOffice](https://github.com/pkgforge-dev/CollaboraOffice-AppImage) |
+| [Collision](https://github.com/pkgforge-dev/Collision-AppImage) |
+| [Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage) |
+| [CopyQ](https://github.com/pkgforge-dev/CopyQ-AppImage) |
+| [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage) |
+| [Crispy Doom](https://github.com/pkgforge-dev/Crispy-Doom-AppImage) |
+| [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage) |
+| [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage) |
+| [Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage) |
+| [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced) |
+| [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage) |
+| [D1X-Rebirth](https://github.com/pkgforge-dev/D1X-Rebirth-AppImage) |
+| [D2X-Rebirth](https://github.com/pkgforge-dev/D2X-Rebirth-AppImage) |
+| [Daggerfall-Unity](https://github.com/pkgforge-dev/Daggerfall-Unity-AppImage) |
+| [DarkPlaces](https://github.com/pkgforge-dev/DarkPlaces-AppImage) |
+| [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage) |
+| [Defold](https://github.com/pkgforge-dev/Defold-AppImage) |
+| [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage) |
+| [dethrace](https://github.com/pkgforge-dev/dethrace-AppImage) |
+| [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced) |
+| [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage) |
+| [Discord](https://github.com/pkgforge-dev/Discord-AppImage) |
+| [DNZHRecomp](https://github.com/pkgforge-dev/DNZHRecomp-AppImage) |
+| [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage) |
+| [DOOM64EXUltra](https://github.com/pkgforge-dev/DOOM64EXUltra-AppImage) |
+| [DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage) |
+| [Dr. Robotnik's Ring Racers](https://github.com/pkgforge-dev/Dr-Robotniks-Ring-Racers-AppImage) |
+| [dRally](https://github.com/pkgforge-dev/dRally-AppImage) |
+| [Drum Machine](https://github.com/pkgforge-dev/Drum-Machine-AppImage) |
+| [DuckStation-GPL](https://github.com/pkgforge-dev/DuckStation-GPL-AppImage-Enhanced) |
+| [dunst](https://github.com/pkgforge-dev/dunst-AppImage) |
+| [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage) |
+| [ECWolf](https://github.com/pkgforge-dev/ECWolf-AppImage) |
+| [EDuke32](https://github.com/pkgforge-dev/EDuke32-AppImage) |
+| [Elastic](https://github.com/pkgforge-dev/Elastic-AppImage) |
+| [Element Desktop](https://github.com/pkgforge-dev/Element-Desktop-AppImage) |
+| [ePSXe](https://github.com/pkgforge-dev/ePSXe-AppImage) |
+| [ET Legacy](https://github.com/pkgforge-dev/ETLegacy-AppImage) |
+| [Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage) |
+| [ExtremeTuxRacer](https://github.com/pkgforge-dev/ExtremeTuxRacer-AppImage) |
+| [Exult](https://github.com/pkgforge-dev/Exult-AppImage) |
+| [Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage) |
+| [Fabother-World](https://github.com/pkgforge-dev/Fabother-World-AppImage) |
+| [FeatherPad](https://github.com/pkgforge-dev/FeatherPad-AppImage) |
+| [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage) |
+| [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage) |
+| [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced) |
+| [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage) |
+| [foot](https://github.com/pkgforge-dev/foot-AppImage) |
+| [fooyin](https://github.com/pkgforge-dev/fooyin-AppImage) |
+| [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage) |
+| [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage) |
+| [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage) |
+| [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage) |
+| [GCAP2025](https://github.com/pkgforge-dev/GCAP2025-AppImage) |
+| [GCAP2026](https://github.com/pkgforge-dev/GCAP2026-AppImage) |
+| [GCstar](https://github.com/pkgforge-dev/GCstar-AppImage) |
+| [Gear Lever](https://github.com/pkgforge-dev/Gear-Lever-AppImage) |
+| [Gearboy](https://github.com/pkgforge-dev/Gearboy-AppImage) |
+| [Gearcoleco](https://github.com/pkgforge-dev/Gearcoleco-AppImage) |
+| [Geargrafx](https://github.com/pkgforge-dev/Geargrafx-AppImage) |
+| [Gearlynx](https://github.com/pkgforge-dev/Gearlynx-AppImage) |
+| [Gearsystem](https://github.com/pkgforge-dev/Gearsystem-AppImage) |
+| [Ghostship](https://github.com/pkgforge-dev/Ghostship-AppImage-Enhanced) |
+| [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage) |
+| [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage) |
+| [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage) |
+| [Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage) |
+| [Gnome System Monitor](https://github.com/pkgforge-dev/Gnome-System-Monitor-AppImage) |
+| [Gnome Text Editor](https://github.com/pkgforge-dev/Gnome-Text-Editor-AppImage) |
+| [GNU FreeDink](https://github.com/pkgforge-dev/GNU-FreeDink-AppImage) |
+| [Godot](https://github.com/pkgforge-dev/Godot-AppImage) |
+| [GoldenDict-ng](https://github.com/pkgforge-dev/GoldenDict-ng-AppImage) |
+| [Gopher64](https://github.com/pkgforge-dev/Gopher64-AppImage) |
+| [gpu-screen-recorder](https://github.com/pkgforge-dev/gpu-screen-recorder-AppImage) |
+| [Gradia](https://github.com/pkgforge-dev/Gradia-AppImage) |
+| [Gram](https://github.com/pkgforge-dev/Gram-AppImage-Enhanced) |
+| [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage) |
+| [gThumb](https://github.com/pkgforge-dev/gThumb-AppImage) |
+| [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage) |
+| [Haruna](https://github.com/pkgforge-dev/Haruna-AppImage) |
+| [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage) |
+| [Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced) |
+| [HP-15C](https://github.com/pkgforge-dev/HP-15C-Simulator-AppImage) |
+| [htop](https://github.com/pkgforge-dev/htop-AppImage) |
+| [Identity](https://github.com/pkgforge-dev/Identity-AppImage) |
+| [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage) |
+| [Impression](https://github.com/pkgforge-dev/Impression-AppImage) |
+| [innoextract](https://github.com/pkgforge-dev/innoextract-AppImage) |
+| [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage) |
+| [Iris](https://github.com/pkgforge-dev/Iris-AppImage-Enhanced) |
+| [IRPF2025](https://github.com/pkgforge-dev/IRPF2025-AppImage) |
+| [IRPF2026](https://github.com/pkgforge-dev/IRPF2026-AppImage) |
+| [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced) |
+| [ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage) |
+| [ITR2025](https://github.com/pkgforge-dev/ITR2025-AppImage) |
+| [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage) |
+| [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage) |
+| [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced) |
+| [KeePassXC](https://github.com/pkgforge-dev/KeePassXC-AppImage-Enhanced) |
+| [Kega Fusion](https://github.com/pkgforge-dev/Kega-Fusion-AppImage) |
+| [Keypunch](https://github.com/pkgforge-dev/Keypunch-AppImage) |
+| [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage) |
+| [Kid3](https://github.com/pkgforge-dev/Kid3-AppImage) |
+| [Knights](https://github.com/pkgforge-dev/Knights-AppImage) |
+| [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage) |
+| [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage) |
+| [lba2-classic-community](https://github.com/pkgforge-dev/lba2-classic-community-AppImage) |
+| [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
+| [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
+| [LightZone](https://github.com/pkgforge-dev/LightZone-AppImage) |
+| [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage) |
+| [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage) |
+| [Luanti](https://github.com/pkgforge-dev/Luanti-AppImage) |
+| [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage) |
+| [MAME](https://github.com/pkgforge-dev/MAME-AppImage) |
+| [ManiaDrive](https://github.com/pkgforge-dev/ManiaDrive-AppImage) |
+| [MarioKart64Recomp](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage) |
+| [Media Downloader](https://github.com/pkgforge-dev/Media-Downloader-AppImage) |
+| [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage) |
+| [melonDS](https://github.com/pkgforge-dev/melonDS-AppImage-Enhanced) |
+| [MESA](https://github.com/pkgforge-dev/MESA-AppImage) |
+| [mGBA](https://github.com/pkgforge-dev/mGBA-AppImage-Enhanced) |
+| [Mini-vMac](https://github.com/pkgforge-dev/Mini-vMac-AppImage) |
+| [Mixxx](https://github.com/pkgforge-dev/Mixxx-AppImage) |
+| [Mousai](https://github.com/pkgforge-dev/Mousai-AppImage) |
+| [mpv](https://github.com/pkgforge-dev/mpv-AppImage) |
+| [NBlood](https://github.com/pkgforge-dev/NBlood-AppImage) |
+| [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage) |
+| [Neverball](https://github.com/pkgforge-dev/Neverball-AppImage) |
+| [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage) |
+| [NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage) |
+| [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage) |
+| [NP2kai](https://github.com/pkgforge-dev/Neko-Project-II-Kai-AppImage) |
+| [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage) |
+| [Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced) |
+| [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced) |
+| [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage) |
+| [Odamex](https://github.com/pkgforge-dev/Odamex-AppImage) |
+| [Obsidian](https://github.com/pkgforge-dev/Obsidian-AppImage-Enhanced) |
+| [okteta](https://github.com/pkgforge-dev/okteta-AppImage) |
+| [OpenClaw](https://github.com/pkgforge-dev/OpenClaw-AppImage) |
+| [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced) |
+| [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage) |
+| [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage) |
+| [OpenLoco](https://github.com/pkgforge-dev/OpenLoco-AppImage) |
+| [openMSX](https://github.com/pkgforge-dev/openMSX-AppImage) |
+| [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced) |
+| [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage) |
+| [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage) |
+| [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage) |
+| [OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage) |
+| [OrcaSlicer](https://github.com/pkgforge-dev/OrcaSlicer-AppImage-Enhanced) |
+| [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage) |
+| [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage) |
+| [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage) |
+| [PCSX-Redux](https://github.com/pkgforge-dev/PCSX-Redux-AppImage-Enhanced) |
+| [PCSX2](https://github.com/pkgforge-dev/PCSX2-AppImage-Enhanced) |
+| [PDF Arranger](https://github.com/pkgforge-dev/PDF-Arranger-AppImage) |
+| [PDF Tricks](https://github.com/pkgforge-dev/PDF-Tricks-AppImage) |
+| [Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage) |
+| [Phantom-Satellite](https://github.com/pkgforge-dev/Phantom-Satellite-AppImage) |
+| [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage) |
+| [Piglit](https://github.com/pkgforge-dev/Piglit-AppImage) |
+| [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage) |
+| [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage) |
+| [Play!](https://github.com/pkgforge-dev/Play-AppImage-Enhanced) |
+| [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage) |
+| [Plus42](https://github.com/pkgforge-dev/Plus42-AppImage) |
+| [PokeMMO](https://github.com/pkgforge-dev/PokeMMO-AppImage) |
+| [polybar](https://github.com/pkgforge-dev/polybar-AppImage) |
+| [POSTAL](https://github.com/pkgforge-dev/POSTAL-AppImage) |
+| ~[PPSSPP](https://github.com/pkgforge-dev/PPSSPP-AppImage)~ - | [Upstreamed](https://github.com/hrydgard/ppsspp/releases). |
+| [Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage) |
+| [PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced) |
+| [Ptyxis](https://github.com/pkgforge-dev/Ptyxis-AppImage) |
+| [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage) |
+| [Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage) |
+| [qarma](https://github.com/pkgforge-dev/qarma-AppImage) |
+| [QElectroTech](https://github.com/pkgforge-dev/QElectroTech-AppImage) |
+| [QEMU](https://github.com/pkgforge-dev/QEMU-AppImage) |
+| [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage) |
+| [Qmmp](https://github.com/pkgforge-dev/Qmmp-AppImage) |
+| [QMPlay2](https://github.com/pkgforge-dev/QMPlay2-AppImage-Enhanced) |
+| [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage) |
+| [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage) |
+| [QuantumLauncher](https://github.com/pkgforge-dev/QuantumLauncher-AppImage-Enhanced) |
+| [Quickshell](https://github.com/pkgforge-dev/Quickshell-AppImage) |
+| [Raptor](https://github.com/pkgforge-dev/Raptor-AppImage) |
+| [Readest](https://github.com/pkgforge-dev/Readest-AppImage-Enhanced) |
+| [Reco](https://github.com/pkgforge-dev/Reco-AppImage) |
+| [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage) |
+| [REDRIVER2](https://github.com/pkgforge-dev/REDRIVER2-AppImage) |
+| [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage) |
+| [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage) |
+| [Rigs-of-Rods](https://github.com/pkgforge-dev/Rigs-of-Rods-AppImage) |
+| [Riseup-VPN](https://github.com/pkgforge-dev/Riseup-VPN-AppImage) |
+| [Ristretto](https://github.com/pkgforge-dev/Ristretto-AppImage) |
+| [RMG](https://github.com/pkgforge-dev/RMG-AppImage-Enhanced) |
+| [Rnote](https://github.com/pkgforge-dev/Rnote-AppImage) |
+| [RocksnDiamonds](https://github.com/pkgforge-dev/RocksnDiamonds-AppImage) |
+| [rofi](https://github.com/pkgforge-dev/rofi-AppImage) |
+| [ROLLER](https://github.com/pkgforge-dev/ROLLER-AppImage) |
+| [rquickshare](https://github.com/pkgforge-dev/rquickshare-AppImage-Enhanced) |
+| [RSDKv3](https://github.com/pkgforge-dev/RSDKv3-AppImage) |
+| [RSDKv4](https://github.com/pkgforge-dev/RSDKv4-AppImage) |
+| [Ruffle](https://github.com/pkgforge-dev/Ruffle-AppImage) |
+| [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced) |
+| [RVGL](https://github.com/pkgforge-dev/RVGL-AppImage) |
+| [Sanicball](https://github.com/pkgforge-dev/Sanicball-AppImage) |
+| [Satty](https://github.com/pkgforge-dev/Satty-AppImage) |
+| [Sayonara-Player](https://github.com/pkgforge-dev/Sayonara-Player-AppImage-Enhanced) |
+| [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage) |
+| [ScummVM](https://github.com/pkgforge-dev/ScummVM-AppImage) |
+| [SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage) |
+| [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage) |
+| [servo](https://github.com/pkgforge-dev/servo-AppImage) |
+| [Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage) |
+| [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced) |
+| [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage) |
+| [Simutrans](https://github.com/pkgforge-dev/Simutrans-AppImage) |
+| [Slack](https://github.com/pkgforge-dev/Slack-AppImage) |
+| [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced) |
+| [SongRec](https://github.com/pkgforge-dev/SongRec-AppImage) |
+| [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced) |
+| [Sonic 3 A.I.R.](https://github.com/pkgforge-dev/Sonic-3-AIR-AppImage) |
+| [Sonic-Mania-Decompilation](https://github.com/pkgforge-dev/Sonic-Mania-Decompilation-AppImage) |
+| [Sonic Robo Blast 2](https://github.com/pkgforge-dev/SRB2-AppImage) |
+| [sound-space-plus](https://github.com/pkgforge-dev/sound-space-plus-AppImage) |
+| [spacecadetpinball](https://github.com/pkgforge-dev/spacecadetpinball-AppImage) |
+| [SpaghettiKart](https://github.com/pkgforge-dev/SpaghettiKart-AppImage-Enhanced) |
+| [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage) |
+| [SRB2Kart](https://github.com/pkgforge-dev/SRB2Kart-AppImage) |
+| [st](https://github.com/pkgforge-dev/st-AppImage) |
+| [Starfox64Recomp](https://github.com/pkgforge-dev/Starfox64Recomp-AppImage) |
+| [Stella](https://github.com/pkgforge-dev/Stella-AppImage) |
+| [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage) |
+| [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage) |
+| [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage) |
+| [Super Mario War](https://github.com/pkgforge-dev/Supermariowar-AppImage) |
+| [Supermodel](https://github.com/pkgforge-dev/Supermodel-AppImage) |
+| [SuperTux](https://github.com/pkgforge-dev/SuperTux-AppImage-Enhanced) |
+| [SuperTuxKart](https://github.com/pkgforge-dev/SuperTuxKart-AppImage-Enhanced) |
+| [sView](https://github.com/pkgforge-dev/sView-AppImage) |
+| [system-monitoring-center](https://github.com/pkgforge-dev/system-monitoring-center-AppImage) |
+| [tachoparser](https://github.com/pkgforge-dev/tachoparser-AppImage) |
+| [Tagger](https://github.com/pkgforge-dev/Tagger-AppImage) |
+| [Taisei Project](https://github.com/pkgforge-dev/Taisei-Project-AppImage) |
+| [Tokodon](https://github.com/pkgforge-dev/Tokodon-AppImage) |
+| [Taradino](https://github.com/pkgforge-dev/Taradino-AppImage) |
+| [Tauon](https://github.com/pkgforge-dev/Tauon-AppImage) |
+| [Telegram](https://github.com/pkgforge-dev/Telegram-AppImage) |
+| [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage) |
+| [TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage) |
+| [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage) |
+| [Trelby](https://github.com/pkgforge-dev/Trelby-AppImage) |
+| [Tutanota Desktop](https://github.com/pkgforge-dev/Tutanota-Desktop-AppImage-Enhanced) |
+| [Tux Football](https://github.com/pkgforge-dev/Tux-Football-AppImage) |
+| [Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage) |
+| [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage) |
+| [UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage) |
+| [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage) |
+| [Varia](https://github.com/pkgforge-dev/Varia-AppImage) |
+| [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage) |
+| [VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage) |
+| [Viber](https://github.com/pkgforge-dev/Viber-AppImage-Enhanced) |
+| [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage) |
+| [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage) |
+| [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
+| [Warp](https://github.com/pkgforge-dev/Warp-AppImage) |
+| [Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced) |
+| [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage) |
+| [WebCord](https://github.com/pkgforge-dev/WebCord-AppImage-Enhanced) |
+| [WhatsDesk](https://github.com/pkgforge-dev/WhatsDesk-AppImage) |
+| [WhatSie](https://github.com/pkgforge-dev/WhatSie-AppImage) |
+| [wine](https://github.com/pkgforge-dev/wine-AppImage) |
+| [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage) |
+| [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced) |
+| [xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced) |
+| [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage) |
+| [xeyes](https://github.com/pkgforge-dev/xeyes-AppImage) |
+| [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage) |
+| [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage) |
+| [xournalpp](https://github.com/pkgforge-dev/xournalpp-AppImage-Enhanced) |
+| [Xsnow](https://github.com/pkgforge-dev/Xsnow-AppImage) |
+| [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage) |
+| [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage) |
+| [yt-dlp](https://github.com/pkgforge-dev/yt-dlp-AppImage) |
+| [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced) |
+| [Zelda64Recomp](https://github.com/pkgforge-dev/Zelda64Recomp-AppImage) |
+| [Zen Browser](https://github.com/pkgforge-dev/Zen-Browser-AppImage-Enhanced) |
+| [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage) |
+| [Zod-Engine](https://github.com/pkgforge-dev/Zod-Engine-AppImage) |
+| [ZSNES](https://github.com/pkgforge-dev/ZSNES-AppImage) |
 
 ---
 
