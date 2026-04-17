@@ -211,6 +211,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced)                                           |
 [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage)                                                        |
 [Odamex](https://github.com/pkgforge-dev/Odamex-AppImage)                                                                |
+[Obsidian](https://github.com/pkgforge-dev/Obsidian-AppImage-Enhanced)                                                   |
 [okteta](https://github.com/pkgforge-dev/okteta-AppImage)                                                                |
 [OpenClaw](https://github.com/pkgforge-dev/OpenClaw-AppImage)                                                            |
 [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced)                                                   |
