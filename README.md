@@ -177,6 +177,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage)                                                                  |
 [Kid3](https://github.com/pkgforge-dev/Kid3-AppImage)                                                                    |
 [Knights](https://github.com/pkgforge-dev/Knights-AppImage)                                                              |
+[KPatience](https://github.com/pkgforge-dev/KPatience-AppImage)                                                          |
 [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage)                                                                |
 [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage)                                                            |
 [lba2-classic-community](https://github.com/pkgforge-dev/lba2-classic-community-AppImage)                                |
