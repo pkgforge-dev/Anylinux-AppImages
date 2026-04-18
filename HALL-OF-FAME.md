@@ -6,6 +6,7 @@ title: Hall of Fame
 <div align="center" markdown="1">
 
 # Deploying libraries - Hall of Fame/Shame
+
 We have been deploying applications for over 1 year already, so I thought I would rank how difficult it has been to deal with several common toolkits and libraries.
 
 Inspired by [Dolphin Emulator and OpenGL drivers - Hall of Fame/Shame](https://dolphin-emu.org/blog/2013/09/26/dolphin-emulator-and-opengl-drivers-hall-fameshame/)
