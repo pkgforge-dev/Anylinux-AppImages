@@ -2742,8 +2742,8 @@ _make_appimage() {
 		zsyncmake -u "$OUTNAME" "$OUTPATH"/"$OUTNAME"
 
 		# there is a nasty bug that zsync make places the .zsync file in PWD
-		if [ ! -f "$OUTPATH"/"$OUTNAME".zsync ] && [ -f "$OUTNAME".zsync ]; then
-			mv "$OUTNAME".zsync "$OUTPATH"/"$OUTNAME".zsync
+		if [ ! -f "$OUTPATH"/"$OUTNAME".zsync ] && [ -f ./"$OUTNAME".zsync ]; then
+			mv ./"$OUTNAME".zsync "$OUTPATH"/"$OUTNAME".zsync
 		fi
 	fi
 
