@@ -78,7 +78,7 @@ alsa doesn't check `XDG_DATA_DIRS` to find its data directory, we have to set `A
 
 glibc supports the `LOCPATH` env variable but this doesn't work with locale archives, This problem affects NixOS and they have to [patch](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/libraries/glibc/nix-locale-archive.patch) it so that locale-archives can be made relocatable. We also have to set `GCONV_PATH` and good luck figuring out which gconv plugin your app exactly needs, and when the plugin is missing there is no error about it, [it is just totally random what happens](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20)
 
-# Bad - Gstreamer
+# Bad - GStreamer
 
 It is insane how you can screw up a system that is modular? First it is very difficult to determine what Gstreamer plugin an application needs unless you already know it before hand since you built it, Gstreamer uses something called `gst-plugin-scanner` which opens every single gstreamer plugin on the system, so we cannot easily determine using `strace` what plugin an application needs. It needs 4 env variables to be made relocatable `GST_PLUGIN_PATH`, `GST_PLUGIN_SYSTEM_PATH`, `GST_PLUGIN_SYSTEM_PATH_1_0` (lol?), and `GST_PLUGIN_SCANNER`.
 

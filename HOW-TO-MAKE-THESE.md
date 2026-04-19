@@ -32,11 +32,7 @@ title: How To Make These
 
 **TL;DR:** Use `quick-sharun.sh` to bundle your application with all its dependencies into a truly portable AppImage that works on any Linux system.
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ### *Prerequisites*
@@ -47,11 +43,7 @@ You'll need:
 - Basic shell scripting knowledge
 - The application you want to package (very preferably installed to /usr)
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ### *Basic workflow*
@@ -69,11 +61,7 @@ That's it! The script will:
 - Detect and bundle all required libraries (including those that are dlopened)
 - Create a portable AppImage that works everywhere
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ### *Step-by-step example*
@@ -122,11 +110,7 @@ chmod +x ./get-debloated-pkgs.sh
 ./get-debloated-pkgs.sh --add-common --prefer-nano ffmpeg-mini intel-media-driver-mini
 ```
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ### *Configurable environment variables*
@@ -143,7 +127,7 @@ chmod +x ./get-debloated-pkgs.sh
 
 Hooks are scripts that solve common problems automatically. Add them using the `ADD_HOOKS` variable, each entry being colon separated:
 
-```sh
+```shell
 ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
 ```
 
@@ -162,22 +146,14 @@ All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook
 - `STRIP=1` - Strips debug symbols to reduce size (default: enabled unless `NO_STRIP` is set)
 - `DEBLOAT_LOCALE=1` - Removes unneeded locale files to reduce size (default: enabled)
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ## *Understanding the approach*
 
 This section explains the technical details and philosophy behind these AppImages. If you just want to create AppImages, the [Quick Start Guide](#quick-start-guide) above is all you need.
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ### *The problem*
@@ -192,11 +168,7 @@ This approach has two big issues:
 
 And the future stability isn't that great either, because glibc still sometimes breaks userspace with updates.
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ### *The solution*
@@ -209,16 +181,12 @@ And the future stability isn't that great either, because glibc still sometimes 
 
 This is the solution, truly portable application bundles that have everything they need.
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ### *How does it work?*
 
-**Note:** This section explains the technical implementation details. The `quick-sharun` script and `sharun` tool handle all of this automatically, so you don't need to do any of this manually. This is here for educational purposes.
+> Note: This section explains the technical implementation details. The `quick-sharun` script and `sharun` tool handle all of this automatically, so you don't need to do any of this manually. This is here for educational purposes.
 
 1. First issue to overcome:
 
@@ -237,7 +205,7 @@ exec "$CURRENTDIR"/ld-linux-x86-64.so.2 "$CURRENTDIR"/bin/app "$@"
 
 However this has a small issue that `/proc/self/exe` will be `ld-linux-x86-64.so.2` instead of the name of the binary we launched. For most applications, this isn't an issue, but when it is an issue, it is quite a big one. **Sharun fixes this problem** (see below), so we will continue with this approach to explain the rest.
 
-1. Second issue to overcome:
+2. Second issue to overcome:
 
 Now that we have our own dynamic linker, how do we tell it that we can to use all the libraries we have in our own `lib` directory?
 
@@ -247,18 +215,18 @@ Now that we have our own dynamic linker, how do we tell it that we can to use al
 
 - Tell the dynamic linker to use our bundled libraries directly ✅ This is not well known, but the dynamic linker supports the `--library-path` flag, which behaves very similar to `LD_LIBRARY_PATH` without being a variable that gets inherited by other processes. It is the perfect solution we just needed, so our `AppRun` example will now look like this:
 
- ```shell
+```shell
 #!/bin/sh
 CURRENTDIR="$(readlink -f "$(dirname "$0")")"
 
 exec "$CURRENTDIR"/ld-linux-x86-64.so.2 \
- --library-path "$CURRENTDIR"/lib \
- "$CURRENTDIR"/bin/app "$@"
+  --library-path "$CURRENTDIR"/lib \
+  "$CURRENTDIR"/bin/app "$@"
 ```
 
 We need to bundle the libraries and dynamic linker and we are **almost** good to go! However, to be fully ready, we need to fix the following issues below… **Bundling all the needed libraries isn't as easy as just running `ldd` + `cp`**, so we need some more robust solution. Sharun handles this automatically (see below).
 
-1. Third issue to overcome:
+3. Third issue to overcome:
 
 Lets make our application relocatable. Thankfully this is already possible with almost all applications, I often see developers adding exceptions to their applications to make them portable, **but they are rarely needed at all**, because we already have the **XDG Base dir specification** that helps a ton here: <https://specifications.freedesktop.org/basedir-spec/latest/>
 
@@ -282,13 +250,9 @@ And many many more!
 
 But isn't this a lot of work to find and set all the env variables that my application needs? **Yes it is**
 
-1. Fourth issue to overcome, I don't want to do any of this that's a lot of work.
+4. Fourth issue to overcome, I don't want to do any of this that's a lot of work.
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ### *Sharun*
@@ -311,11 +275,7 @@ There is a solution for this, made by @VHSGunzo called sharun:
 
 Any application made with sharun ends up being able to work **on any linux distro**, be it ubuntu 14.04, musl distros and even directly in NixOS without any wrapper (non FHS environment).
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ## *Further considerations*
@@ -358,11 +318,7 @@ We already make such version of llvm here: <https://github.com/pkgforge-dev/arch
 
 Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results a **50 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things.
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ### *What about nvidia?*
@@ -373,11 +329,7 @@ If you don't have the proprietary nvidia driver, mesa already includes nouveau s
 
 Goes without saying that sharun handles all of this already on its own.
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
 
 ## *Examples and templates*
@@ -404,9 +356,5 @@ Browse through our production AppImage repositories for more complex examples:
 - [See all AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/README.md#applications)
 - **[And our template that greatly simplifies this!](https://github.com/pkgforge-dev/TEMPLATE-AppImage)**
 
------------------------------------
-
-| [Back to Index](#index) |
-| - |
-
+[Back to Index](#index)
 -----------------------------------
