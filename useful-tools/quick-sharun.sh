@@ -2708,14 +2708,23 @@ _make_appimage() {
 		"$DWARFS_CMD" "$@" -C zstd:level=5 -S19 --output "$tmpappimage"
 		chmod +x "$tmpappimage"
 
-		( DWARFS_ANALYSIS_FILE="$DWARFSPROF" xvfb-run -a -- "$tmpappimage" ) &
+		( DWARFS_ANALYSIS_FILE=$TMPDIR/dwarfsprof.tmp xvfb-run -a -- "$tmpappimage" ) &
 		pid=$!
 
 		sleep 10
-		pkill -P "$pid" || true
-		umount "$TMPDIR"/.mount_* || true
-		wait "$pid" || true
-		rm -f "$tmpappimage"
+		pkill -P "$(cat "$TMPDIR"/.mount_*.pid)" || :
+		pkill -P "$pid" || :
+		umount "$TMPDIR"/.mount_* || :
+
+		sleep 5
+		# because sometimes process that makes the dwarfs analysys file hangs
+		# it can write to the DWARFSPROF while the final appimage is being made
+		# this can cause dwarfs to fail durign the generation
+		# So instead what we do is write to a temp file and move to "$DWARFSPROF"
+
+		# make sure to copy to prevent the dwarfs process from writting to the same inode!
+		cp "$TMPDIR"/dwarfsprof.tmp "$DWARFSPROF" || :
+		rm -f "$tmpappimage" "$TMPDIR"/dwarfsprof.tmp
 	fi
 
 	if [ -f "$DWARFSPROF" ]; then

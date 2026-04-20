@@ -59,6 +59,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage)                                                      |
 [BasiliskII](https://github.com/pkgforge-dev/BasiliskII-AppImage-Enhanced)                                               |
 [BibleTime](https://github.com/pkgforge-dev/BibleTime-AppImage)                                                          |
+[Bitwarden](https://github.com/pkgforge-dev/Bitwarden-AppImage-Enhanced)                                                 |
 [Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
 [Bulky](https://github.com/pkgforge-dev/Bulky-AppImage)                                                                  |
 [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage)                                                        |
