@@ -140,6 +140,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Ghostship](https://github.com/pkgforge-dev/Ghostship-AppImage-Enhanced)                                                 |
 [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage)                                                              |
 [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage)                                        |
+[GitHub Desktop](https://github.com/pkgforge-dev/GitHub-Desktop-AppImage-Enhanced)                                       |
 [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage)                                            |
 [Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage)                                                |
 [Gnome System Monitor](https://github.com/pkgforge-dev/Gnome-System-Monitor-AppImage)                                    |
