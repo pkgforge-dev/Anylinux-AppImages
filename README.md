@@ -231,6 +231,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage)                                                          |
 [OrcaSlicer](https://github.com/pkgforge-dev/OrcaSlicer-AppImage-Enhanced)                                               |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
+[Parabolic](https://github.com/pkgforge-dev/Parabolic-AppImage)                                                          |
 [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage)                                                |
 [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage)                                                          |
 [PCSX-Redux](https://github.com/pkgforge-dev/PCSX-Redux-AppImage-Enhanced)                                               |
