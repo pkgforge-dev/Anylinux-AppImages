@@ -229,6 +229,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage)                                                          |
 [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage)                                                              |
 [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage)                                                |
+[OpenXRay](https://github.com/pkgforge-dev/OpenXRay-AppImage)                                                            |
 [OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage)                                                          |
 [OrcaSlicer](https://github.com/pkgforge-dev/OrcaSlicer-AppImage-Enhanced)                                               |
 [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage)                                                          |
