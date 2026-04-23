@@ -105,6 +105,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [DuckStation-GPL](https://github.com/pkgforge-dev/DuckStation-GPL-AppImage-Enhanced)                                     |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
 [Dwarf Fortress](https://github.com/pkgforge-dev/Dwarf-Fortress-AppImage)                                                |
+[Dwarf Fortress Legacy](https://github.com/pkgforge-dev/Dwarf-Fortress-Legacy-AppImage)                                  |
 [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage)                                                              |
 [ECWolf](https://github.com/pkgforge-dev/ECWolf-AppImage)                                                                |
 [EDuke32](https://github.com/pkgforge-dev/EDuke32-AppImage)                                                              |
