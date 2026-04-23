@@ -245,6 +245,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Piglit](https://github.com/pkgforge-dev/Piglit-AppImage)                                                                |
 [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage)                                                                  |
 [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage)                                                      |
+[Planify](https://github.com/pkgforge-dev/Planify-AppImage)                                                              |
 [Play!](https://github.com/pkgforge-dev/Play-AppImage-Enhanced)                                                          |
 [playerctl](https://github.com/pkgforge-dev/playerctl-AppImage)                                                          |
 [Plus42](https://github.com/pkgforge-dev/Plus42-AppImage)                                                                |
