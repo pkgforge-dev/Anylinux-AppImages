@@ -81,6 +81,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Crispy Doom](https://github.com/pkgforge-dev/Crispy-Doom-AppImage)                                                      |
 [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage)                                                      |
 [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage)                                                              |
+[Cubyz](https://github.com/pkgforge-dev/Cubyz-AppImage)                                                                  |
 [Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage)                                                            |
 [Cursor](https://github.com/pkgforge-dev/Cursor-AppImage-enhanced)                                                       |
 [cursor-cli](https://github.com/pkgforge-dev/cursor-cli-AppImage)                                                        |
