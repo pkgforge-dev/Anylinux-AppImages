@@ -191,6 +191,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage)                                                            |
 [LightZone](https://github.com/pkgforge-dev/LightZone-AppImage)                                                          |
 [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage)                                                          |
+[LMMS](https://github.com/pkgforge-dev/LMMS-AppImage)                                                                    |
 [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage)                                                          |
 [Luanti](https://github.com/pkgforge-dev/Luanti-AppImage)                                                                |
 [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage)                                                                |
