@@ -304,6 +304,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage)                                                            |
 [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced)                                                       |
 [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage)                                                            |
+[SimpleX Chat](https://github.com/pkgforge-dev/SimpleX-Chat-AppImage-Enhanced)                                           |
 [Simutrans](https://github.com/pkgforge-dev/Simutrans-AppImage)                                                          |
 [Slack](https://github.com/pkgforge-dev/Slack-AppImage)                                                                  |
 [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced)                                                       |
