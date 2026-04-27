@@ -12,7 +12,7 @@ DwarFS is a lot faster than SquashFS while being smaller at the same time.
 ---
 DwarFS also offers PGO like optimizations, [which allows us to make small appimages that start instantly.](https://github.com/pkgforge-dev/CollaboraOffice-AppImage/pull/1) 
 
-# Why glibc instead of musl?
+# Why bundle glibc instead of musl?
 
 * Using musl would mean any hardware accelerated application will not work with the proprietary nvidia driver.
 * musl runs into performance issues because the default allocator is not great, this even [affected the type2 AppImage runtime](https://github.com/AppImage/type2-runtime/issues/116).
