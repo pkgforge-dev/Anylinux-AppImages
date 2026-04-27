@@ -26,3 +26,12 @@ DwarFS also offers PGO like optimizations, [which allows us to make small appima
 
 We only use musl where it is very useful, that is when making static binaries.
 
+# What is there no `usr` directory in the AppImages?
+
+Because it causes more issues than it solves.
+
+* `/usr` is the typical installation prefix for an application. 
+
+* `$APPDIR/usr` makes no sense, it just casues projects to code exceptions for appimage that do something alone these lines: `getenv(APPDIR)` + `usr` + `xyz`. Instead we make `APPDIR` the installation prefix directly. **This means we can take any application and patch away the `/usr` prefix for `$APPDIR` and make them portable without the need for projects to support AppImage.** Here are some examples where projects checking for `$APPDIR` just made things worse: [1](https://github.com/kem-a/AppManager/issues/41#issuecomment-3905238762) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/330#issuecomment-3939566890)
+
+* **NOTE:** `$APPDIR/shared` is the a internal directory that sharun uses for itself, **you should never copy anything manually there.**
