@@ -49,6 +49,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [anki](https://github.com/pkgforge-dev/anki-AppImage)                                                                    |
 [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition)                                        |
 [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage)                                                            |
+[Asphyxia CORE](https://github.com/pkgforge-dev/Asphyxia-CORE-AppImage)                                                  |
 [Audacious](https://github.com/pkgforge-dev/Audacious-AppImage)                                                          |
 [Audacity](https://github.com/pkgforge-dev/Audacity-AppImage-Enhanced)                                                   |
 [Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage)                                                  |
