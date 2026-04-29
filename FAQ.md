@@ -3,6 +3,34 @@ layout: default
 title: Frequently Asked Questions
 ---
 
+# Is it really any linux?
+
+<details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/Cromite-AppImage">Cromite</a> running in NixOS <b>without any FHS-wrapper</b></summary>
+  <img width="1096" height="671" alt="image" src="https://github.com/user-attachments/assets/a7eac601-3a00-428a-9777-c7b4cdb8a2ba" />
+</details>
+
+<details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/Cromite-AppImage">Cromite</a> running in Ubuntu 14.04</summary>
+  <img width="1426" height="873" alt="image" src="https://github.com/user-attachments/assets/d60d31cc-9efa-4d06-9e75-bccff066f2b7" />
+</details>
+
+<details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/wine-AppImage">WINE</a> running foobar2000 in Ubuntu 14.04</summary>
+  <img width="1426" height="873" alt="image" src="https://github.com/user-attachments/assets/8382a2e4-61fb-45c6-bea7-83d7551ee64c" />
+</details>
+
+<details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/QEMU-AppImage">QEMU</a> running in Ubuntu 12.04</summary>
+  <img width="1025" height="822" alt="image" src="https://github.com/user-attachments/assets/3734afe3-05e3-4d53-9c4a-94b701abc46b" />
+</details>
+
+<details>
+  <summary>Here is <code>aarch64</code> <a href="https://github.com/pkgforge-dev/QEMU-AppImage">Trelby</a> running on <b>32-bit</b> ARM debian 👀</summary>
+  This is possible because this system had a 64bit kernel and CPU, <b>We do not depend on the host userland besides a shell in <code>/bin/sh</code></b>
+  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a76e02d2-8b8b-411c-92e0-07aa9c6c75aa" />
+</details>
+
 # Why DwarFS instead of SquashFS?
 
 DwarFS is a lot faster than SquashFS while being smaller at the same time.
