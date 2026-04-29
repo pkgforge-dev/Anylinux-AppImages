@@ -60,6 +60,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage)                                                      |
 [BasiliskII](https://github.com/pkgforge-dev/BasiliskII-AppImage-Enhanced)                                               |
 [BibleTime](https://github.com/pkgforge-dev/BibleTime-AppImage)                                                          |
+[BigPEmu](https://github.com/pkgforge-dev/BigPEmu-AppImage)                                                              |
 [Bitwarden](https://github.com/pkgforge-dev/Bitwarden-AppImage-Enhanced)                                                 |
 [Blender](https://github.com/pkgforge-dev/Blender-AppImage)                                                              |
 [Bulky](https://github.com/pkgforge-dev/Bulky-AppImage)                                                                  |
@@ -104,6 +105,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage)                                                            |
 [Dr. Robotnik's Ring Racers](https://github.com/pkgforge-dev/Dr-Robotniks-Ring-Racers-AppImage)                          |
 [dRally](https://github.com/pkgforge-dev/dRally-AppImage)                                                                |
+[DREAMM](https://github.com/Link4Electronics/DREAMM-AppImage)                                                            |
 [Drum Machine](https://github.com/pkgforge-dev/Drum-Machine-AppImage)                                                    |
 [DuckStation-GPL](https://github.com/pkgforge-dev/DuckStation-GPL-AppImage-Enhanced)                                     |
 [dunst](https://github.com/pkgforge-dev/dunst-AppImage)                                                                  |
