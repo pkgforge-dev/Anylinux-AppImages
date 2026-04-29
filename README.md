@@ -24,6 +24,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 
 For more useful documentation about Anylinux-AppImages, see the pages below:
 
+- [FAQ](‎FAQ.md)
 - [How to make these](HOW-TO-MAKE-THESE.md)
 - [Hall of fame/shame](HALL-OF-FAME.md)
 - [Size comparison](disk-usage-vs-flatpak.md)
