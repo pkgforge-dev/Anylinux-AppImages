@@ -4,21 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
+  <meta name="color-scheme" content="dark">
   <link rel="stylesheet" href="{{ '/site.css' | relative_url }}">
 </head>
 <body>
   <header>
-    <nav>
+    <nav aria-label="Main navigation">
+      <a href="{{ '/' | relative_url }}"><strong>Anylinux</strong> AppImages</a>
       <ul>
-        <li><strong><a href="{{ '/' | relative_url }}">{{ site.title }}</a></strong></li>
-      </ul>
-      <ul>
-        <li><a href="{{ '/' | relative_url }}">Home</a></li>
-        <li><a href="{{ '/FAQ.html' | relative_url }}">FAQ</a></li>
-        <li><a href="{{ '/HOW-TO-MAKE-THESE.html' | relative_url }}">How to make these</a></li>
-        <li><a href="{{ '/HALL-OF-FAME.html' | relative_url }}">Hall of fame</a></li>
-        <li><a href="{{ '/disk-usage-vs-flatpak.html' | relative_url }}">Disk usage vs Flatpak</a></li>
+        <li><a href="{{ '/' | relative_url }}"{% if page.url == '/' %} aria-current="page"{% endif %}>Home</a></li>
+        <li><a href="{{ '/FAQ.html' | relative_url }}"{% if page.url == '/FAQ.html' %} aria-current="page"{% endif %}>FAQ</a></li>
+        <li><a href="{{ '/HOW-TO-MAKE-THESE.html' | relative_url }}"{% if page.url == '/HOW-TO-MAKE-THESE.html' %} aria-current="page"{% endif %}>Guide</a></li>
+        <li><a href="{{ '/HALL-OF-FAME.html' | relative_url }}"{% if page.url == '/HALL-OF-FAME.html' %} aria-current="page"{% endif %}>Hall of Fame</a></li>
+        <li><a href="{{ '/disk-usage-vs-flatpak.html' | relative_url }}"{% if page.url == '/disk-usage-vs-flatpak.html' %} aria-current="page"{% endif %}>Disk Usage</a></li>
       </ul>
     </nav>
   </header>
