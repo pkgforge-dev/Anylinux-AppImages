@@ -10,6 +10,7 @@ html {
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
+  scroll-padding-top: 5rem;
 }
 
 :root {
@@ -26,7 +27,7 @@ html {
   --code-text: #dfe7ef;
   --radius: 6px;
   --page-width: 1040px;
-  --text-width: 78ch;
+  --text-width: var(--page-width);
 }
 
 body {
@@ -189,6 +190,7 @@ h6 {
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: 0;
+  scroll-margin-top: 5rem;
 }
 
 h1 {
