@@ -34,10 +34,10 @@ title: Frequently Asked Questions
 # How come this only became possible in 2024?
 
 * For application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
-* It turns out it is not possible to have a relative interpreter with executables. 
+* It turns out it is not possible to have a relative dynamic linker with executables. 
 * polyfill glibc attempted to [fix this issue](https://github.com/corsix/polyfill-glibc/blob/main/docs/Command_line_options.md#elf-interpreter---print-interpreter---set-interpreter) with a experimental tool that replaces `PT_INTERP` with `PT_LOAD` and have the payload look for the relative dynamic linker but this never got finished.
-* We can execute the dynamic linker first and pass the binary to it to bypass that limitation, **go-appimage had been doing this since ~2019.**
-* [But that runs into isues with `/proc/self/exe`.](https://github.com/probonopd/go-appimage/issues/49).
+* **We can execute the dynamic linker** first and then pass the binary to launch to bypass this limitation, **go-appimage had been doing this since ~2019.**
+* [But that runs into isues with `/proc/self/exe`](https://github.com/probonopd/go-appimage/issues/49).
 * [sharun](https://github.com/VHSgunzo/sharun) had to be made to fix the `/proc/self/exe` issues.
 * And as far as I know, [brioche had been using the same approach as sharun before it existed as well](https://brioche.dev/blog/portable-dynamically-linked-packages-on-linux/).
 
