@@ -39,7 +39,7 @@ title: Frequently Asked Questions
 * **We can execute the dynamic linker** first and then pass the binary to launch to bypass this limitation, **go-appimage had been doing this since ~2019.**
 * [But that runs into isues with `/proc/self/exe`](https://github.com/probonopd/go-appimage/issues/49).
 * [sharun](https://github.com/VHSgunzo/sharun) had to be made to fix the `/proc/self/exe` issues. And as far as I know, [brioche had been using the same approach before sharun as well](https://brioche.dev/blog/portable-dynamically-linked-packages-on-linux/).
-* Once all the pieces were ready, the next step was changing the way we deploy AppImages and sorting all the bugs that came with that, AppImage was originally made with the idea of relying on the host glibc and a set of libraries that always have to come with the host.
+* Once all the pieces were ready, the next step was changing the way we deploy AppImages and sorting all the bugs that came with that, AppImage was originally made with the idea of relying on the host glibc and a set of libraries that always had to come from the host. 
 
 # Why DwarFS instead of SquashFS?
 
