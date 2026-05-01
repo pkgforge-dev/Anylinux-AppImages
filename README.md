@@ -205,6 +205,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 [MarioKart64Recomp](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage)                                          |
 [Media Downloader](https://github.com/pkgforge-dev/Media-Downloader-AppImage)                                            |
 [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage)                                                            |
+[MegaMan64Recomp](https://github.com/pkgforge-dev/MegaMan64Recomp-AppImage)                                              |
 [melonDS](https://github.com/pkgforge-dev/melonDS-AppImage-Enhanced)                                                     |
 [MESA](https://github.com/pkgforge-dev/MESA-AppImage)                                                                    |
 [mGBA](https://github.com/pkgforge-dev/mGBA-AppImage-Enhanced)                                                           |
