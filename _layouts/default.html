@@ -10,7 +10,9 @@
 <body>
   <header>
     <nav aria-label="Main navigation">
-      <a href="{{ '/' | relative_url }}"><strong>Anylinux</strong> AppImages</a>
+      <a href="{{ '/' | relative_url }}"><strong>Anylinux</strong><span> AppImages</span></a>
+      <input id="nav-toggle" class="nav-toggle" type="checkbox" aria-label="Toggle navigation">
+      <label for="nav-toggle" class="nav-toggle-label">Menu</label>
       <ul>
         <li><a href="{{ '/' | relative_url }}"{% if page.url == '/' %} aria-current="page"{% endif %}>Home</a></li>
         <li><a href="{{ '/FAQ.html' | relative_url }}"{% if page.url == '/FAQ.html' %} aria-current="page"{% endif %}>FAQ</a></li>
