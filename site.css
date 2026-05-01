@@ -113,6 +113,7 @@ nav a {
 }
 
 nav > a {
+  gap: 0.25rem;
   color: var(--text);
   font-size: 0.98rem;
   white-space: nowrap;
