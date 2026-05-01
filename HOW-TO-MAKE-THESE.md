@@ -229,7 +229,7 @@ exec "$CURRENTDIR"/ld-linux-x86-64.so.2 "$CURRENTDIR"/bin/app "$@"
 
 However this has a small issue that `/proc/self/exe` will be `ld-linux-x86-64.so.2` instead of the name of the binary we launched. For most applications, this isn't an issue, but when it is an issue, it is quite a big one. **Sharun fixes this problem** (see below), so we will continue with this approach to explain the rest.
 
-1. Second issue to overcome:
+2. Second issue to overcome:
 
 Now that we have our own dynamic linker, how do we tell it that we can to use all the libraries we have in our own `lib` directory?
 
@@ -250,7 +250,7 @@ exec "$CURRENTDIR"/ld-linux-x86-64.so.2 \
 
 We need to bundle the libraries and dynamic linker and we are **almost** good to go! However, to be fully ready, we need to fix the following issues below… **Bundling all the needed libraries isn't as easy as just running `ldd` + `cp`**, so we need some more robust solution. Sharun handles this automatically (see below).
 
-1. Third issue to overcome:
+3. Third issue to overcome:
 
 Lets make our application relocatable. Thankfully this is already possible with almost all applications, I often see developers adding exceptions to their applications to make them portable, **but they are rarely needed at all**, because we already have the **XDG Base dir specification** that helps a ton here: <https://specifications.freedesktop.org/basedir-spec/latest/>
 
@@ -274,7 +274,7 @@ And many many more!
 
 But isn't this a lot of work to find and set all the env variables that my application needs? **Yes it is**
 
-1. Fourth issue to overcome, I don't want to do any of this that's a lot of work.
+4. Fourth issue to overcome, I don't want to do any of this that's a lot of work.
 
 -----------------------------------
 
