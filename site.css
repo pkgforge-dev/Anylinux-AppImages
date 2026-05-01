@@ -91,6 +91,17 @@ nav .nav-toggle-label {
   display: none;
 }
 
+nav .nav-toggle-icon {
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 nav a {
   display: inline-flex;
   align-items: center;
@@ -521,13 +532,13 @@ div[align="center"] {
 
   body > main,
   body > footer {
-    width: min(calc(100% - 1rem), var(--page-width));
+    width: min(calc(100% - 1.5rem), var(--page-width));
   }
 
   nav {
     position: relative;
     grid-template-columns: minmax(0, 1fr) auto;
-    width: min(calc(100% - 1rem), var(--page-width));
+    width: min(calc(100% - 1.5rem), var(--page-width));
     gap: 0.5rem;
     padding-block: 0.45rem;
   }
@@ -545,7 +556,7 @@ div[align="center"] {
     align-items: center;
     justify-content: center;
     min-height: 2rem;
-    padding: 0 0.75rem;
+    padding: 0 0.7rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--surface);
@@ -598,7 +609,7 @@ div[align="center"] {
   }
 
   main {
-    padding-block: 1.35rem 2.25rem;
+    padding-block: 1.65rem 2.5rem;
   }
 
   h1,
