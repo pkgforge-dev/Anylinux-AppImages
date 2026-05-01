@@ -6,6 +6,7 @@ title: Hall of Fame
 <div align="center" markdown="1">
 
 # Deploying libraries - Hall of Fame/Shame
+
 We have been deploying applications for over 1 year already, so I thought I would rank how difficult it has been to deal with several common toolkits and libraries.
 
 Inspired by [Dolphin Emulator and OpenGL drivers - Hall of Fame/Shame](https://dolphin-emu.org/blog/2013/09/26/dolphin-emulator-and-opengl-drivers-hall-fameshame/)
@@ -17,23 +18,23 @@ Inspired by [Dolphin Emulator and OpenGL drivers - Hall of Fame/Shame](https://d
 Very easy to deploy, SDL does not have excessive dependencies and it is very configurable thru env variables.
 There was only one [problem](https://github.com/libsdl-org/SDL/issues/14887) which SDL fixed quickly once I let them know.
 
-# Excellent - iced and glfw
+# Excellent - iced and GLFW
 
 We haven't had do anything to deploying these without issue, they are just copy and paste pretty much, just bundle OpenGL and vulkan since it can use both. Also since iced is used by rust apps and those compile mostly static it makes them super easy to deploy in general. These two are mentioned together since we haven't deployed that many applications that use these libraries.
 
-# Excellent - Chromium/electron
+# Excellent - Chromium/Electron
 
 These are already very portable on their own and very very easy to deploy as result. The only issue we have encountered is that sometimes these load some binaries as libraries and we have to careful in those cases.
 
-# Excellent - flutter
+# Excellent - Flutter
 
 These are relocatable always, in fact distros often need to put the application in dedicated directory in `/usr/share` or `/usr/lib` since they need a relative `lib` directory next to the binary to work.
 
-# Excellent - MESA
+# Excellent - Mesa
 
-Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently MESA now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files. **And the icd files support relative library locations to the icd file itself** 👀
+Very easy to deploy, plenty of env variables to configure it, lots of build options, more recently Mesa now allows to build the radeon drivers without linking to LLVM which has resulted in a massive decrease of our AppImages as result. Vulkan/OpenGL ICD discovery is also handled automatically and it looks into `XDG_DATA_DIRS` among a ton of other locations to find those files. **And the icd files support relative library locations to the icd file itself** 👀
 
-# Good - pipewire
+# Good - PipeWire
 
 Needs `PIPEWIRE_MODULE_DIR` and `SPA_PLUGIN_DIR` to be made relocatable, it does have some performance issues but with pipewire-jack though.
 
@@ -55,13 +56,13 @@ Surprisingly easy to deploy. We do not need to set environments variable to make
 
 This would have been horrible a few years ago, but libdecor has really done a lot of improve its situation and they want to [improve it more](https://gitlab.freedesktop.org/libdecor/libdecor/-/issues/44), so I will give them credit for that. I still think this library is totally useless, this wouldn't be needed at all if GNOME was so retarded to not provide server side decorations...
 
-# Good - ffmpeg
+# Good - FFmpeg
 
 We do not have to do anything to make this relocatable, it just works™, However ffmpeg directly links to a ton of libraries, which means a lot of bloat often gets added, thankfully this can be mitigated by building ffmpeg with those options disabled, but ideally ffmpeg should dlopen the libraries when needed, there is no need to link and load libx265 because your music player uses ffmpeg, just no...
 
-# Good - NVIDIA ??
+# Good - NVIDIA Drivers??
 
-This is a bit odd but I will mention it, **we never need to bundle the nvidia drivers**, nvidia releases its driver linking to a +10yo version of glibc, that means we can use that driver without issue. [The only issues we have had nvidia specific are distros breaking stuff...](https://github.com/pkgforge-dev/Citron-AppImage/issues/67) and also that we need to make sure some [ancient libs](https://github.com/VHSgunzo/sharun/issues/34) are present lol
+This is a bit odd but I will mention it, **we never need to bundle the NVIDIA drivers**, NVIDIA releases its driver linking to a +10yo version of glibc, that means we can use that driver without issue. [The only issues we have had NVIDIA specific are distros breaking stuff...](https://github.com/pkgforge-dev/Citron-AppImage/issues/67) and also that we need to make sure some [ancient libs](https://github.com/VHSgunzo/sharun/issues/34) are present lol
 
 I still see this idea on relying on host libraries as flawed, who knows what will happen in the future. Also a good chunk of the issues at sharun are issues related to the logic we have to use the nvidia driver, [it has been a pain](https://github.com/VHSgunzo/sharun/issues/90).
 
@@ -69,15 +70,15 @@ I still see this idea on relying on host libraries as flawed, who knows what wil
 
 Easy to deploy but it is insanely bloated, to the point that [Valve had to make ACO for MESA](https://www.forbes.com/sites/jasonevangelho/2019/07/11/valves-latest-linux-gaming-work-is-boosting-amd-vulkan-performance-by-up-to-44-percent/) and [zig is moving away from it](https://github.com/ziglang/zig/issues/16270), you can build smaller versions of LLVM by limiting the targets with `-DLLVM_TARGETS_TO_BUILD` but this still results in a **60 MiB** library and it [breaks compilers](https://github.com/pkgforge-dev/alacritty-AppImage/blob/19b437f7ec5ac737bf7abe15a8225744a3ea4e7a/get-dependencies.sh#L26) in the process, and in rare cases it still breaks the binary that links to it for some reason so you have to ship the massive version with all the targets...
 
-# Bad - alsa
+# Bad - ALSA
 
 alsa doesn't check `XDG_DATA_DIRS` to find its data directory, we have to set `ALSA_CONFIG_PATH` to the configuration file in that directory, which is hardcoded to look into `/usr/share/alsa` anyway lol and fixing that issue is a total mess since the file does not accept relative paths to its location, so you have to get the value of some env variable using what syntax this is, [like this](https://github.com/alsa-project/alsa-lib/blob/5f7fe33002d2d98d84f72e381ec2cccc0d5d3d40/src/conf/alsa.conf#L17-L26)
 
-# Bad - GLIBC
+# Bad - Glibc
 
 glibc supports the `LOCPATH` env variable but this doesn't work with locale archives, This problem affects NixOS and they have to [patch](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/libraries/glibc/nix-locale-archive.patch) it so that locale-archives can be made relocatable. We also have to set `GCONV_PATH` and good luck figuring out which gconv plugin your app exactly needs, and when the plugin is missing there is no error about it, [it is just totally random what happens](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20)
 
-# Bad - Gstreamer
+# Bad - GStreamer
 
 It is insane how you can screw up a system that is modular? First it is very difficult to determine what Gstreamer plugin an application needs unless you already know it before hand since you built it, Gstreamer uses something called `gst-plugin-scanner` which opens every single gstreamer plugin on the system, so we cannot easily determine using `strace` what plugin an application needs. It needs 4 env variables to be made relocatable `GST_PLUGIN_PATH`, `GST_PLUGIN_SYSTEM_PATH`, `GST_PLUGIN_SYSTEM_PATH_1_0` (lol?), and `GST_PLUGIN_SCANNER`.
 
@@ -95,7 +96,7 @@ This is a general failure of linux that there is no standard path to the certifi
 
 WebKit is hardcoded to load some binaries in `/usr/lib` which makes no sense and there is no way to override this location other than recompiling with a [debug flag](https://github.com/WebKit/WebKit/blob/378d33fcfd7109660e72d4215bce53b9e64c5082/Source/WebKit/Shared/glib/ProcessExecutablePathGLib.cpp#L478) to expose a variable wtf. Sometimes it just dies depending on the OpenGL version you have, and with Nvidia you often have to set `WEBKIT_DISABLE_DMABUF_RENDERER=1` and `WEBKIT_DISABLE_COMPOSITING_MODE=1` to the point that projects like opencode do this by default always. Hopefully tauri will be able to replace it with servo in the future, because this is just bad... [1](https://github.com/tauri-apps/tauri/issues/9394) [2](https://github.com/anomalyco/opencode/blob/f736116967f5b57d89978e51961f2e78eedb443b/packages/desktop/src-tauri/src/main.rs#L35)
 
-# Horrible - jack2
+# Horrible - JACK2
 
 **The library needs matching versions between server and client to work** [1](https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/issues/1001#note_323464727)
 
