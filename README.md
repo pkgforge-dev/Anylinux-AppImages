@@ -136,6 +136,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage) |
 | [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage) |
 | [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage) |
+| [gamescope](https://github.com/pkgforge-dev/gamescope-AppImage) |
 | [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage) |
 | [GCAP2025](https://github.com/pkgforge-dev/GCAP2025-AppImage) |
 | [GCAP2026](https://github.com/pkgforge-dev/GCAP2026-AppImage) |
