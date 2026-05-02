@@ -395,4 +395,17 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 
 <!-- APPS_LIST_END -->
 
+| Projects with Anylinux AppImages |
+| --- |
+| [AppManager](https://github.com/kem-a/AppManager) |
+| [Citron Neo](https://github.com/citron-neo) |
+| [Converseen](https://github.com/Faster3ck/Converseen) |
+| [CPU-X](https://github.com/TheTumultuousUnicornOfDarkness/CPU-X) |
+| [Eden](https://git.eden-emu.dev/eden-emu/eden) |
+| [GPU-T](https://github.com/lseurttyuu/GPU-T) |
+| [interstellar](https://github.com/interstellar-app/interstellar) |
+| [PPSSPP](https://github.com/hrydgard/PPSSPP) |
+| [QDash](https://git.crueter.xyz/QFRC/QDash) |
+| [RSS Guard](https://github.com/martinrotter/rssguard) |
+
 Also see [other projects](https://github.com/VHSgunzo/sharun?tab=readme-ov-file#projects-that-use-sharun) that use sharun for more. **Didn't find what you were looking for?** Open an issue here and we will see what we can do.
