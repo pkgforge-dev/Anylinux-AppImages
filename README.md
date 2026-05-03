@@ -362,6 +362,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage) |
 | [VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage) |
 | [Viber](https://github.com/pkgforge-dev/Viber-AppImage-Enhanced) |
+| [VICE](https://github.com/pkgforge-dev/VICE-AppImage) |
 | [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage) |
 | [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage) |
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
