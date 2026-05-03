@@ -106,6 +106,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage) |
 | [DOOM64EXUltra](https://github.com/pkgforge-dev/DOOM64EXUltra-AppImage) |
 | [DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage) |
+| [DOSBox Pure Unleashed](https://github.com/pkgforge-dev/DOSBox-Pure-Unleashed-AppImage) |
 | [Dr. Robotnik's Ring Racers](https://github.com/pkgforge-dev/Dr-Robotniks-Ring-Racers-AppImage) |
 | [dRally](https://github.com/pkgforge-dev/dRally-AppImage) |
 | [DREAMM](https://github.com/pkgforge-dev/DREAMM-AppImage) |
