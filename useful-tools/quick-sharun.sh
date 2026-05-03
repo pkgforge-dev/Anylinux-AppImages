@@ -28,18 +28,15 @@ LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
 OUTPATH=${OUTPATH:-$PWD}
 DWARFS_COMP="${DWARFS_COMP:-zstd:level=22 -S26 -B6}"
-DWARFS_CMD=${DWARFS_CMD:-$TMPDIR/mkdwarfs}
-RUNTIME=${RUNTIME:-$TMPDIR/uruntime}
-DWARFSPROF=${DWARFSPROF:-$APPDIR/.dwarfsprofile}
 OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
-URUNTIME_LINK=${URUNTIME_LINK:-https://github.com/VHSgunzo/uruntime/releases/download/v0.5.7/uruntime-appimage-dwarfs-lite-$APPIMAGE_ARCH}
-DWARFS_LINK=${DWARFS_LINK:-https://github.com/mhx/dwarfs/releases/download/v0.15.1/dwarfs-universal-0.15.1-Linux-$APPIMAGE_ARCH}
+
+APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.1.0/appimagetool-$APPIMAGE_ARCH-linux}
+APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
 
 ANYLINUX_LIB=${ANYLINUX_LIB:-1}
 ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
 GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
-RUNFEX_SOURCE=${RUNFEX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/bin/run-with-fex}
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
@@ -2158,10 +2155,6 @@ _add_apprun() {
 
 	set -- "$TO_LAUNCH" "$@"
 
-	if [ -f "$APPDIR"/bin/run-with-fex ]; then
-	        . "$APPDIR"/bin/run-with-fex
-	fi
-
 	# If LD_DEBUG=libs is set outside the AppImage the output is not helpful
 	# because it will include the libs of sh, grep, cat, etc from the hooks
 	# with this var we can set LD_DEBUG=libs for the bundled application only
@@ -2532,30 +2525,6 @@ _make_static_bin() (
 	_echo "------------------------------------------------------------"
 )
 
-_make_aarch64_appimage() {
-	if [ "$APPIMAGE_ARCH" != 'x86_64' ]; then
-		_err_msg "This option is meant to be used on x86_64 systems only"
-		_err_msg "Just use --make-appimage if you are on a aarch64 runner"
-		exit 1
-	fi
-	_echo "------------------------------------------------------------"
-	_echo "Making aarch64 AppImage..."
-	_echo "------------------------------------------------------------"
-	_download "$APPDIR"/bin/run-with-fex "$RUNFEX_SOURCE"
-	_echo "* Added run-with-fex wrapper"
-	_echo "------------------------------------------------------------"
-	ARM_RUNTIME=${ARM_RUNTIME:-$TMPDIR/uruntime-aarch64}
-	ARM_URUNTIME_LINK=$(echo "$URUNTIME_LINK" | sed 's|x86_64|aarch64|g')
-	_echo "Downloading uruntime from $ARM_URUNTIME_LINK"
-	_download "$ARM_RUNTIME" "$ARM_URUNTIME_LINK"
-	chmod +x "$ARM_RUNTIME"
-	# TARGET_APPIMAGE makes the uruntime perform operations on a different
-	# appimage rather than on itself, this is very useful for us here
-	export TARGET_APPIMAGE="$ARM_RUNTIME"
-	APPIMAGE_ARCH=aarch64
-	ARCH=aarch64
-}
-
 _make_appimage() {
 	_echo "------------------------------------------------------------"
 	_echo "Making AppImage..."
@@ -2568,17 +2537,11 @@ _make_appimage() {
 	elif [ ! -f "$APPDIR"/AppRun ]; then
 		_err_msg "ERROR: No $APPDIR/AppRun file found!"
 		exit 1
-	elif ! command -v zsyncmake 1>/dev/null; then
-		_err_msg "ERROR: Missing dependency zsyncmake"
-		exit 1
 	fi
 	chmod +x "$APPDIR"/AppRun
 	_get_desktop
 	_get_icon
 	_sort_env_file
-
-	# This is the runtime that gets appended to the filesystem
-	HEADER=${TARGET_APPIMAGE:-$RUNTIME}
 
 	_echo "------------------------------------------------------------"
 	if [ -z "$UPINFO" ]; then
@@ -2605,172 +2568,36 @@ _make_appimage() {
 		fi
 	fi
 
-	# get name of app from desktop entry and sanitize it
-	APPNAME="${APPNAME:-$(awk -F'=' '/^Name=/{print $2; exit}' "$DESKTOP_ENTRY")}"
-	APPNAME=$(printf '%s' "$APPNAME" | tr '[:space:]":><*|\?\r\n' '_')
-	APPNAME=${APPNAME%_}
-
-	# check for a ~/version file if VERSION is not set
-	if [ -z "$VERSION" ] && [ -f "$HOME"/version ]; then
-		if ! read -r VERSION < "$HOME"/version; then
-			>&2 echo "ERROR: Failed to read ~/version file! Is it empty?"
-			exit 1
-		fi
-	fi
-	# sanitize VERSION
-	if [ -n "$VERSION" ]; then
-		VERSION=${VERSION#*:} # remove epoch from VERSION
-		VERSION=$(printf '%s' "$VERSION" | tr '[:space:]":><*|\?\r\n' '_')
-		VERSION=${VERSION%_}
-	fi
-
-	# add appimage info to desktop entry, first make sure to remove existing info
-	sed -i \
-		-e '/X-AppImage-Name/d'    \
-		-e '/X-AppImage-Version/d' \
-		-e '/X-AppImage-Arch/d'    \
-		"$DESKTOP_ENTRY"
-	echo ""                                       >> "$DESKTOP_ENTRY"
-	echo "X-AppImage-Name=$APPNAME"               >> "$DESKTOP_ENTRY"
-	echo "X-AppImage-Version=${VERSION:-UNKNOWN}" >> "$DESKTOP_ENTRY"
-	echo "X-AppImage-Arch=$APPIMAGE_ARCH"         >> "$DESKTOP_ENTRY"
-
 	if ! mkdir -p "$OUTPATH"; then
 		_err_msg "ERROR: Cannot create output directory: '$OUTPATH'"
 		exit 1
 	fi
-	if [ -z "$OUTNAME" ]; then
-		if [ -n "$VERSION" ]; then
-			OUTNAME="$APPNAME"-"$VERSION"-anylinux-"$ARCH".AppImage
-		else
-			OUTNAME="$APPNAME"-anylinux-"$ARCH".AppImage
-			>&2 echo "WARNING: VERSION is not set"
-			>&2 echo "WARNING: set it to include it in $OUTNAME"
-		fi
-	fi
 
-	if command -v mkdwarfs 1>/dev/null; then
-		DWARFS_CMD="$(command -v mkdwarfs)"
-	elif [ ! -x "$DWARFS_CMD" ]; then
-		_echo "Downloading dwarfs binary from $DWARFS_LINK"
-		_download "$DWARFS_CMD" "$DWARFS_LINK"
-		chmod +x "$DWARFS_CMD"
-	fi
-
-	if [ ! -x "$RUNTIME" ]; then
-		_echo "Downloading uruntime from $URUNTIME_LINK"
-		_download "$RUNTIME" "$URUNTIME_LINK"
-		chmod +x "$RUNTIME"
-	fi
-
-	if [ "$URUNTIME_PRELOAD" = 1 ]; then
-		_echo "------------------------------------------------------------"
-		_echo "Setting runtime to always keep the mount point..."
-		_echo "------------------------------------------------------------"
-		sed -i -e 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=0|' "$HEADER"
-	fi
-
-	if [ -n "$UPINFO" ]; then
-		_echo "------------------------------------------------------------"
-		_echo "Adding update information \"$UPINFO\" to runtime..."
-		_echo "------------------------------------------------------------"
-		"$RUNTIME" --appimage-addupdinfo "$UPINFO"
-	fi
-
-	if [ -n "$ADD_PERMA_ENV_VARS" ]; then
-		while IFS= read -r VAR; do
-			case "$VAR" in
-				*=*) "$RUNTIME" --appimage-addenvs "$VAR";;
-			esac
-		done <<-EOF
-		$ADD_PERMA_ENV_VARS
-		EOF
+	if [ ! -x "$APPIMAGETOOL" ]; then
+		_echo "Downloading appimagetool from $APPIMAGETOOL_LINK"
+		_download "$APPIMAGETOOL" "$APPIMAGETOOL_LINK"
+		chmod +x "$APPIMAGETOOL"
 	fi
 
 	_echo "------------------------------------------------------------"
 	_echo "Making AppImage..."
 	_echo "------------------------------------------------------------"
 
-	set -- \
-		--force               \
-		--order=path          \
-		--set-owner 0         \
-		--set-group 0         \
-		--no-history          \
-		--no-create-timestamp \
-		--header "$HEADER"    \
-		--input  "$APPDIR"
-
-	if [ "$OPTIMIZE_LAUNCH" = 1 ]; then
-		if ! _is_cmd xvfb-run pkill; then
-			_err_msg "ERROR: OPTIMIZE_LAUNCH requires xvfb-run and pkill"
-			exit 1
-		fi
-
-		tmpappimage="$TMPDIR"/.analyze
-
-		_echo "* Making dwarfs profile optimization at $DWARFSPROF..."
-		"$DWARFS_CMD" "$@" -C zstd:level=5 -S19 --output "$tmpappimage"
-		chmod +x "$tmpappimage"
-
-		( DWARFS_ANALYSIS_FILE=$TMPDIR/dwarfsprof.tmp xvfb-run -a -- "$tmpappimage" ) &
-		pid=$!
-
-		sleep 10
-		pkill -P "$(cat "$TMPDIR"/.mount_*.pid)" || :
-		pkill -P "$pid" || :
-		umount "$TMPDIR"/.mount_* || :
-
-		sleep 5
-		# because sometimes process that makes the dwarfs analysys file hangs
-		# it can write to the DWARFSPROF while the final appimage is being made
-		# this can cause dwarfs to fail durign the generation
-		# So instead what we do is write to a temp file and move to "$DWARFSPROF"
-
-		# make sure to copy to prevent the dwarfs process from writting to the same inode!
-		cp "$TMPDIR"/dwarfsprof.tmp "$DWARFSPROF" || :
-		rm -f "$tmpappimage" "$TMPDIR"/dwarfsprof.tmp
-	fi
-
-	if [ -f "$DWARFSPROF" ]; then
-		_echo "* Using $DWARFSPROF..."
-		sleep 3
-		set -- --categorize=hotness --hotness-list="$DWARFSPROF" "$@"
-	fi
-
-	if ! "$DWARFS_CMD" "$@" -C $DWARFS_COMP --output "$OUTPATH"/"$OUTNAME"; then
-		_err_msg "ERROR: Something went wrong making dwarfs image!"
-		if [ -f "$DWARFSPROF" ]; then
-			_err_msg "Found '$DWARFSPROF' file in '$APPDIR', may be causing issues:"
-			_err_msg "------------------------------------------------------------"
-			>&2 cat "$DWARFSPROF" || :
-			_err_msg "------------------------------------------------------------"
-		fi
+	if ! "$APPIMAGETOOL"; then
+		_err_msg "ERROR: Something went wrong making the AppImage!"
 		exit 1
 	fi
 
-	if [ -n "$UPINFO" ]; then
-		_echo "------------------------------------------------------------"
-		_echo "Making zsync file..."
-		_echo "------------------------------------------------------------"
-		zsyncmake -u "$OUTNAME" "$OUTPATH"/"$OUTNAME"
-
-		# there is a nasty bug that zsync make places the .zsync file in PWD
-		if [ ! -f "$OUTPATH"/"$OUTNAME".zsync ] && [ -f ./"$OUTNAME".zsync ]; then
-			mv ./"$OUTNAME".zsync "$OUTPATH"/"$OUTNAME".zsync
-		fi
+	set -- "$OUTPATH"/*.AppImage
+	if [ ! -f "$1" ]; then
+		_err_msg "ERROR: No AppImage was produced??"
+		exit 1
+	else
+		chmod +x "$1"
 	fi
 
-	chmod +x "$OUTPATH"/"$OUTNAME"
-
-	# make a appinfo file next to the artifact, this can be used for
-	# later getting info when making a github release
-	echo "X-AppImage-Name=$APPNAME"               >  "$OUTPATH"/appinfo
-	echo "X-AppImage-Version=${VERSION:-UNKNOWN}" >> "$OUTPATH"/appinfo
-	echo "X-AppImage-Arch=$APPIMAGE_ARCH"         >> "$OUTPATH"/appinfo
-
 	_echo "------------------------------------------------------------"
-	_echo "All done! AppImage at: $OUTPATH/$OUTNAME"
+	_echo "All done! AppImage at: $1"
 	_echo "------------------------------------------------------------"
 	exit 0
 }
@@ -2780,10 +2607,6 @@ case "$1" in
 		_help_msg
 		;;
 	--make-appimage)
-		_make_appimage
-		;;
-	--make-aarch64-appimage)
-		_make_aarch64_appimage
 		_make_appimage
 		;;
 	--test)
