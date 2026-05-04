@@ -192,6 +192,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage) |
 | [Kid3](https://github.com/pkgforge-dev/Kid3-AppImage) |
 | [Knights](https://github.com/pkgforge-dev/Knights-AppImage) |
+| [KolourPaint](https://github.com/pkgforge-dev/KolourPaint-AppImage) |
 | [KPatience](https://github.com/pkgforge-dev/KPatience-AppImage) |
 | [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage) |
 | [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage) |
@@ -304,6 +305,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Ruffle](https://github.com/pkgforge-dev/Ruffle-AppImage) |
 | [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced) |
 | [RVGL](https://github.com/pkgforge-dev/RVGL-AppImage) |
+| [SACDExtractGUI](https://github.com/pkgforge-dev/SACDExtractGUI-AppImage) |
 | [Sanicball](https://github.com/pkgforge-dev/Sanicball-AppImage) |
 | [Satty](https://github.com/pkgforge-dev/Satty-AppImage) |
 | [Sayonara-Player](https://github.com/pkgforge-dev/Sayonara-Player-AppImage-Enhanced) |
@@ -317,6 +319,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage) |
 | [SimpleX Chat](https://github.com/pkgforge-dev/SimpleX-Chat-AppImage-Enhanced) |
 | [Simutrans](https://github.com/pkgforge-dev/Simutrans-AppImage) |
+| [SkyEmu](https://github.com/pkgforge-dev/SkyEmu-AppImage) |
 | [Slack](https://github.com/pkgforge-dev/Slack-AppImage) |
 | [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced) |
 | [SongRec](https://github.com/pkgforge-dev/SongRec-AppImage) |
