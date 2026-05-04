@@ -30,7 +30,7 @@ OUTPATH=${OUTPATH:-$PWD}
 DWARFS_COMP="${DWARFS_COMP:-zstd:level=22 -S26 -B6}"
 OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
 
-APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.1.0/appimagetool-$APPIMAGE_ARCH-linux}
+APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/latest/download/appimagetool-$APPIMAGE_ARCH-linux}
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
 
 ANYLINUX_LIB=${ANYLINUX_LIB:-1}
