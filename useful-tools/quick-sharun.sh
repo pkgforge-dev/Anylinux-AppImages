@@ -2139,6 +2139,14 @@ _add_apprun() {
 	        exit 0
 	fi
 
+	__fedora_cert=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+	if [ ! -f /etc/ssl/certs/ca-certificates.crt ] && [ -f "$__fedora_cert" ]; then
+	        CURL_CA_BUNDLE=${CURL_CA_BUNDLE:-$__fedora_cert}
+	        REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-$__fedora_cert}
+	        SSL_CERT_FILE=${SSL_CERT_FILE:-$__fedora_cert}
+	        export CURL_CA_BUNDLE REQUESTS_CA_BUNDLE SSL_CERT_FILE
+	fi
+
 	if [ -f "$APPDIR"/AppRun.lib ]; then
 	        . "$APPDIR"/AppRun.lib
 	        for hook in "$APPDIR"/bin/*.hook; do
