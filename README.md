@@ -345,6 +345,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Supermodel](https://github.com/pkgforge-dev/Supermodel-AppImage) |
 | [SuperTux](https://github.com/pkgforge-dev/SuperTux-AppImage-Enhanced) |
 | [SuperTuxKart](https://github.com/pkgforge-dev/SuperTuxKart-AppImage-Enhanced) |
+| [SUPER ZSNES](https://github.com/pkgforge-dev/SUPER-ZSNES-AppImage) |
 | [sView](https://github.com/pkgforge-dev/sView-AppImage) |
 | [system-monitoring-center](https://github.com/pkgforge-dev/system-monitoring-center-AppImage) |
 | [tachoparser](https://github.com/pkgforge-dev/tachoparser-AppImage) |
