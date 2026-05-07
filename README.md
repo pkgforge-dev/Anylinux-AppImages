@@ -340,6 +340,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Stella](https://github.com/pkgforge-dev/Stella-AppImage) |
 | [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage) |
 | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage) |
+| [Streamlink](https://github.com/pkgforge-dev/Streamlink-AppImage) |
 | [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage) |
 | [Super Mario War](https://github.com/pkgforge-dev/Supermariowar-AppImage) |
 | [Supermodel](https://github.com/pkgforge-dev/Supermodel-AppImage) |
