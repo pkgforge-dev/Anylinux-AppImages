@@ -40,6 +40,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [12to11](https://github.com/pkgforge-dev/12to11-AppImage) |
 | [86Box](https://github.com/pkgforge-dev/86box-AppImage-Enhanced) |
 | [AAAAXY](https://github.com/pkgforge-dev/AAAAXY-AppImage-Enhanced) |
+| [Adobe Flash Player](https://github.com/pkgforge-dev/Adobe-Flash-Player-AppImage) |
 | [Abaddon](https://github.com/pkgforge-dev/Abaddon-AppImage) |
 | [Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage) |
 | [Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage) |
