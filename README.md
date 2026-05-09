@@ -199,7 +199,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [KPatience](https://github.com/pkgforge-dev/KPatience-AppImage) |
 | [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage) |
 | [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage) |
-| [lba2-classic-community](https://github.com/pkgforge-dev/lba2-classic-community-AppImage) |
 | [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
 | [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
 | [LightZone](https://github.com/pkgforge-dev/LightZone-AppImage) |
@@ -417,6 +416,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Goverlay](https://github.com/benjamimgois/goverlay) |
 | [GPU-T](https://github.com/lseurttyuu/GPU-T) |
 | [interstellar](https://github.com/interstellar-app/interstellar) |
+| [lba2-classic-community](https://github.com/pkgforge-dev/lba2-classic-community-AppImage) |
 | [PPSSPP](https://github.com/hrydgard/PPSSPP) |
 | [QDash](https://git.crueter.xyz/QFRC/QDash) |
 | [RSS Guard](https://github.com/martinrotter/rssguard) |
