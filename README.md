@@ -416,7 +416,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Goverlay](https://github.com/benjamimgois/goverlay) |
 | [GPU-T](https://github.com/lseurttyuu/GPU-T) |
 | [interstellar](https://github.com/interstellar-app/interstellar) |
-| [lba2-classic-community](https://github.com/pkgforge-dev/lba2-classic-community-AppImage) |
+| [lba2-classic-community](https://github.com/LBALab/lba2-classic-community) |
 | [PPSSPP](https://github.com/hrydgard/PPSSPP) |
 | [QDash](https://git.crueter.xyz/QFRC/QDash) |
 | [RSS Guard](https://github.com/martinrotter/rssguard) |
