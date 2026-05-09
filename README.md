@@ -201,6 +201,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage) |
 | [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
 | [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
+| [LibreWolf](https://github.com/pkgforge-dev/LibreWolf-AppImage-Enhanced) |
 | [LightZone](https://github.com/pkgforge-dev/LightZone-AppImage) |
 | [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage) |
 | [LMMS](https://github.com/pkgforge-dev/LMMS-AppImage) |
