@@ -310,6 +310,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [RustDesk](https://github.com/pkgforge-dev/RustDesk-AppImage-Enhanced) |
 | [RVGL](https://github.com/pkgforge-dev/RVGL-AppImage) |
 | [SACDExtractGUI](https://github.com/pkgforge-dev/SACDExtractGUI-AppImage) |
+| [SameBoy](https://github.com/pkgforge-dev/SameBoy-AppImage) |
 | [Sanicball](https://github.com/pkgforge-dev/Sanicball-AppImage) |
 | [Satty](https://github.com/pkgforge-dev/Satty-AppImage) |
 | [Sayonara-Player](https://github.com/pkgforge-dev/Sayonara-Player-AppImage-Enhanced) |
