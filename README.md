@@ -196,6 +196,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage) |
 | [Kid3](https://github.com/pkgforge-dev/Kid3-AppImage) |
 | [KMahjongg](https://github.com/pkgforge-dev/KMahjongg-AppImage) |
+| [KMines](https://github.com/pkgforge-dev/KMines-AppImage) |
 | [Knights](https://github.com/pkgforge-dev/Knights-AppImage) |
 | [KolourPaint](https://github.com/pkgforge-dev/KolourPaint-AppImage) |
 | [KPatience](https://github.com/pkgforge-dev/KPatience-AppImage) |
