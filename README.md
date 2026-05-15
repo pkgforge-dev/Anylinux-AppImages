@@ -99,6 +99,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [DarkPlaces](https://github.com/pkgforge-dev/DarkPlaces-AppImage) |
 | [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage) |
 | [Defold](https://github.com/pkgforge-dev/Defold-AppImage) |
+| [Denise](https://github.com/pkgforge-dev/Denise-AppImage) |
 | [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage) |
 | [dethrace](https://github.com/pkgforge-dev/dethrace-AppImage) |
 | [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced) |
@@ -186,6 +187,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage) |
 | [ITR2025](https://github.com/pkgforge-dev/ITR2025-AppImage) |
 | [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage) |
+| [KBlocks](https://github.com/pkgforge-dev/KBlocks-AppImage) |
 | [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage) |
 | [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced) |
 | [KeePassXC](https://github.com/pkgforge-dev/KeePassXC-AppImage-Enhanced) |
@@ -194,10 +196,12 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage) |
 | [Kid3](https://github.com/pkgforge-dev/Kid3-AppImage) |
 | [KMahjongg](https://github.com/pkgforge-dev/KMahjongg-AppImage) |
+| [KMines](https://github.com/pkgforge-dev/KMines-AppImage) |
 | [Knights](https://github.com/pkgforge-dev/Knights-AppImage) |
 | [KolourPaint](https://github.com/pkgforge-dev/KolourPaint-AppImage) |
 | [KPatience](https://github.com/pkgforge-dev/KPatience-AppImage) |
 | [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage) |
+| [KStars](https://github.com/pkgforge-dev/KStars-AppImage) |
 | [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage) |
 | [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
 | [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
