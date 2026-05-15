@@ -201,6 +201,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [KolourPaint](https://github.com/pkgforge-dev/KolourPaint-AppImage) |
 | [KPatience](https://github.com/pkgforge-dev/KPatience-AppImage) |
 | [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage) |
+| [KStars](https://github.com/pkgforge-dev/KStars-AppImage) |
 | [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage) |
 | [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
 | [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
