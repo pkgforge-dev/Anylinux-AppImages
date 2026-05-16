@@ -74,6 +74,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [CatacombGL](https://github.com/pkgforge-dev/CatacombGL-AppImage) |
 | [C-Dogs_SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage) |
 | [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
+| [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
 | [Citron](https://github.com/pkgforge-dev/Citron-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
 | [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage) |
@@ -83,6 +84,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [CollaboraOffice](https://github.com/pkgforge-dev/CollaboraOffice-AppImage) |
 | [Collision](https://github.com/pkgforge-dev/Collision-AppImage) |
 | [Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage) |
+| [Constrict](https://github.com/pkgforge-dev/Constrict-AppImage) |
 | [Contour](https://github.com/pkgforge-dev/contour-AppImage) |
 | [CopyQ](https://github.com/pkgforge-dev/CopyQ-AppImage) |
 | [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage) |
@@ -215,6 +217,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [MAME](https://github.com/pkgforge-dev/MAME-AppImage) |
 | [ManiaDrive](https://github.com/pkgforge-dev/ManiaDrive-AppImage) |
 | [MarioKart64Recomp](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage) |
+| [masterkey](https://github.com/pkgforge-dev/masterkey-AppImage) |
 | [Media Downloader](https://github.com/pkgforge-dev/Media-Downloader-AppImage) |
 | [Mednafen](https://github.com/pkgforge-dev/mednafen-appimage) |
 | [MegaMan64Recomp](https://github.com/pkgforge-dev/MegaMan64Recomp-AppImage) |
@@ -355,6 +358,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [SuperTuxKart](https://github.com/pkgforge-dev/SuperTuxKart-AppImage-Enhanced) |
 | [SUPER ZSNES](https://github.com/pkgforge-dev/SUPER-ZSNES-AppImage) |
 | [sView](https://github.com/pkgforge-dev/sView-AppImage) |
+| [swiftynotes](https://github.com/pkgforge-dev/swiftynotes-AppImage) |
 | [system-monitoring-center](https://github.com/pkgforge-dev/system-monitoring-center-AppImage) |
 | [tachoparser](https://github.com/pkgforge-dev/tachoparser-AppImage) |
 | [Tagger](https://github.com/pkgforge-dev/Tagger-AppImage) |
