@@ -10,7 +10,7 @@ _updater_policy_dir=${UPDATE_POLICY_CONFIGDIR:-$HOST_XDG_CONFIG_HOME/auto-update
 _updater_policy_file=${_updater_policy_dir}/${_desktop_entry}-update-setting
 _updater_appname=${APPIMAGE##*/}
 
-APPIMAGEUPDATETOOL_LINK=${APPIMAGEUPDATETOOL_LINK:-https://github.com/AppImageCommunity/AppImageUpdate/releases/download/continuous/appimageupdatetool-$APPIMAGE_ARCH.AppImage}
+APPIMAGEUPDATETOOL_LINK=${APPIMAGEUPDATETOOL_LINK:-https://github.com/pkgforge-dev/AppImageUpdate/releases/latest/download/appimageupdate-$APPIMAGE_ARCH-linux}
 
 # make sure we can update the thing
 _updater_sanity_check() {
