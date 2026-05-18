@@ -828,9 +828,6 @@ _make_deployment_array() {
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 		DEPLOY_VULKAN=${DEPLOY_VULKAN:-1}
 		set -- "$@" \
-			"$LIB_DIR"/libva.so*          \
-			"$LIB_DIR"/libva-drm.so*      \
-			"$LIB_DIR"/libpci.so*         \
 			"$LIB_DIR"/libnss*.so*        \
 			"$LIB_DIR"/libsoftokn3.so*    \
 			"$LIB_DIR"/libfreeblpriv3.so* \
@@ -848,9 +845,17 @@ _make_deployment_array() {
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		set -- "$@" \
-			"$LIB_DIR"/dri/*       \
-			"$LIB_DIR"/vdpau/*     \
-			"$LIB_DIR"/libdrm*.so* \
+			"$LIB_DIR"/dri/*           \
+			"$LIB_DIR"/gbm/*           \
+			"$LIB_DIR"/vdpau/*         \
+			"$LIB_DIR"/libgbm.so*      \
+			"$LIB_DIR"/libvdpau.so*    \
+			"$LIB_DIR"/libpci.so*      \
+			"$LIB_DIR"/libva.so*       \
+			"$LIB_DIR"/libva-*.so*     \
+			"$LIB_DIR"/libdrm*.so*     \
+			"$LIB_DIR"/libxcb-dri*.so* \
+			"$LIB_DIR"/libxcb-glx.so*  \
 			"$LIB_DIR"/libgallium*.so*
 		if [ "$DEPLOY_OPENGL" = 1 ]; then
 			_echo "* Deploying OpenGL"
@@ -1056,8 +1061,6 @@ _make_deployment_array() {
 		set -- "$@" \
 			"$LIB_DIR"/libXi.so*             \
 			"$LIB_DIR"/libXcursor.so*        \
-			"$LIB_DIR"/libxcb-dri*.so*       \
-			"$LIB_DIR"/libxcb-glx.so*        \
 			"$LIB_DIR"/libxcb-ewmh.so*       \
 			"$LIB_DIR"/libxcb-icccm.so*      \
 			"$LIB_DIR"/libxkbcommon.so*      \
