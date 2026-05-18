@@ -72,6 +72,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage) |
 | [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage) |
 | [CatacombGL](https://github.com/pkgforge-dev/CatacombGL-AppImage) |
+| [Catfish](https://github.com/pkgforge-dev/Catfish-AppImage) |
 | [C-Dogs_SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage) |
 | [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
 | [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
@@ -335,6 +336,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [SkyEmu](https://github.com/pkgforge-dev/SkyEmu-AppImage) |
 | [Slack](https://github.com/pkgforge-dev/Slack-AppImage) |
 | [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced) |
+| [Solaar](https://github.com/pkgforge-dev/Solaar-AppImage) |
 | [SongRec](https://github.com/pkgforge-dev/SongRec-AppImage) |
 | [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced) |
 | [Sonic 3 A.I.R.](https://github.com/pkgforge-dev/Sonic-3-AIR-AppImage) |
