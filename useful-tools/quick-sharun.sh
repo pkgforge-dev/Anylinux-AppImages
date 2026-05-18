@@ -848,8 +848,9 @@ _make_deployment_array() {
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
 		set -- "$@" \
-			"$LIB_DIR"/dri/*   \
-			"$LIB_DIR"/vdpau/* \
+			"$LIB_DIR"/dri/*       \
+			"$LIB_DIR"/vdpau/*     \
+			"$LIB_DIR"/libdrm*.so* \
 			"$LIB_DIR"/libgallium*.so*
 		if [ "$DEPLOY_OPENGL" = 1 ]; then
 			_echo "* Deploying OpenGL"
