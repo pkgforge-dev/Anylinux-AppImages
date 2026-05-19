@@ -16,6 +16,9 @@
  *
  * It also overrides bindtextdomain calls to /usr/share/locale to TEXTDOMAINDIR
  * which sharun automatically sets to our bundled locale dir
+ *
+ * It also makes sure $APPDIR/bin is always present in PATH, since apps
+ * may clear their own environ before executing a helper binary
 */
 
 #ifndef _GNU_SOURCE
@@ -59,6 +62,25 @@ static void spoof_argv0(int argc, char **argv) {
 		argv[0] = (char *)new_argv0;
 		unsetenv("OVERRIDE_ARGV0");
 	}
+}
+
+// Capture APPDIR and PATH at load time (before this process clears its own
+// environ). Programs may call clearenv() + set specific vars before execvpe,
+// which strips PATH. Without PATH the executable lookup falls back to
+// glibc's _CS_PATH (/bin:/usr/bin), skipping AppImage bin dirs and failing.
+// Since _CS_PATH is an intra-libcall it can't be overridden via LD_PRELOAD,
+// we save both here and construct a PATH with APPDIR/bin first at exec time.
+static char saved_appdir[PATH_MAX] = "";
+static char saved_path[PATH_MAX] = "";
+
+__attribute__((constructor))
+static void capture_appdir_and_path(void) {
+	const char *a = getenv("APPDIR");
+	if (a)
+		strncpy(saved_appdir, a, sizeof(saved_appdir) - 1);
+	const char *p = getenv("PATH");
+	if (p)
+		strncpy(saved_path, p, sizeof(saved_path) - 1);
 }
 
 // Fix host locale issues; mirrors the locale-check logic previously in AppRun-generic
@@ -339,6 +361,47 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 			}
 		} else
 			DEBUG_PRINT("Internal process; leaving environment unchanged\n");
+	}
+
+	// Ensure PATH is always present at exec time. Process may have already cleared environ.
+	// glibc's execvpe(3) reads PATH via getenv() from the current process's environ,
+	// NOT from the envp parameter — so injecting into envp is not enough. We must also
+	// setenv() in the current process so that the fallback PATH search works correctly.
+	if (saved_appdir[0]) {
+		int has_path = 0;
+		for (size_t i = 0; env[i]; i++) {
+			if (strncmp(env[i], "PATH=", 5) == 0 && env[i][5] != '\0') {
+				has_path = 1;
+				break;
+			}
+		}
+		if (!has_path) {
+			char path_buf[sizeof(saved_appdir) + sizeof(saved_path) + 10];
+			snprintf(path_buf, sizeof(path_buf),
+				 "PATH=%s/bin:%s", saved_appdir,
+				 saved_path[0] ? saved_path : "/usr/bin:/bin");
+
+			// Inject into envp array for execve(2) (which reads from envp)
+			size_t count = 0;
+			while (env[count]) count++;
+
+			char **new_env = calloc(count + 2, sizeof(char*));
+			if (new_env) {
+				for (size_t i = 0; i < count; i++)
+					new_env[i] = strdup(env[i]);
+
+				new_env[count] = strdup(path_buf);
+				new_env[count + 1] = NULL;
+
+				if (env != envp)
+					env_free(env);
+				env = (char* const *)new_env;
+			}
+
+			// Also set into environ so glibc's getenv("PATH") inside execvpe finds it
+			setenv("PATH", path_buf + 5, 1);
+			DEBUG_PRINT("Restored PATH to include APPDIR/bin\n");
+		}
 	}
 
 	DEBUG_PRINT("Calling exec for %s\n", filename);
