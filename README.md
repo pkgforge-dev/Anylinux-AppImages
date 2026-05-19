@@ -78,6 +78,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Citron](https://github.com/pkgforge-dev/Citron-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
 | [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage) |
+| [Claude Code](https://github.com/pkgforge-dev/claude-code-AppImage) |
 | [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage) |
 | [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage) |
 | [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage) |
