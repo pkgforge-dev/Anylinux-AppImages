@@ -11,6 +11,10 @@ if [ "$APPIMAGE_ARCH" = 'aarch64' ]; then
 	export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
 fi
 
+# TODO remove once sharun does this automatically
+XDG_DATA_DIRS=${XDG_DATA_DIRS:+$XDG_DATA_DIRS:}/usr/local/share:/usr/share:/etc
+export XDG_DATA_DIRS
+
 _nvidia_check() (
 	# wtf makes this file? I cannot find any info related to it!
 	nonsense=/usr/share/vulkan/icd.d/nvidia_icd.json_inactive
