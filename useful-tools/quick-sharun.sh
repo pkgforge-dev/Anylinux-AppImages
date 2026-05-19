@@ -1432,6 +1432,7 @@ _deploy_datadir() {
 					applications|\
 					awk         |\
 					bash        |\
+					clang       |\
 					dbus-1      |\
 					defaults    |\
 					doc         |\
@@ -1444,6 +1445,7 @@ _deploy_datadir() {
 					fontconfig  |\
 					git         |\
 					glvnd       |\
+					gtk-doc     |\
 					gvfs        |\
 					help        |\
 					i18n        |\
@@ -1462,6 +1464,7 @@ _deploy_datadir() {
 					qt6         |\
 					qt7         |\
 					ss          |\
+					swift       |\
 					systemd     |\
 					themes      |\
 					vala        |\
