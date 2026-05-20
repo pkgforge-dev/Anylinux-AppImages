@@ -578,6 +578,7 @@ _determine_what_to_deploy() {
 					;;
 				*libglycin*.so*)
 					DEPLOY_GLYCIN=${DEPLOY_GLYCIN:-1}
+					GTK_CLASS_FIX=1
 					;;
 				*libwebkit*gtk*.so*)
 					DEPLOY_WEBKIT2GTK=${DEPLOY_WEBKIT2GTK:-1}
@@ -815,7 +816,6 @@ _make_deployment_array() {
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying glycin"
 		set -- "$@" "$LIB_DIR"/glycin-loaders/*/*
-		_add_bwrap_wrapper
 	fi
 	if [ "$DEPLOY_FLUTTER" = 1 ]; then
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
@@ -1239,6 +1239,9 @@ _add_gtk_class_fix() {
 	elif [ ! -f "$DESKTOP_ENTRY" ]; then
 		_err_msg "ERROR: Using GTK_CLASS_FIX requires a desktop entry in $APPDIR"
 		exit 1
+	elif [ "$ANYLINUX_LIB" != 1 ]; then
+		_err_msg "ERROR: GTK_CLASS_FIX requires ANYLINUX_LIB=1"
+		exit 1
 	fi
 
 	_echo "* Building gtk-class-fix.so"
@@ -1624,13 +1627,15 @@ _add_bwrap_wrapper() {
 	cat <<-'EOF' > "$APPDIR"/bin/bwrap
 	#!/bin/sh
 
-	# AppImages crash when we bundle bwrap required by glycin loaders
-	# This terrible hack makes us able to run the glycin loaders without bwrap
-	# This is because glycin does not canonicalize the path to the glycin binaries
-
 	# With webkit2gtk we get weird cannot find xdg-dbus-proxy errors only
 	# in fedora besides other weird things that happen in other distros
 	# https://github.com/VHSgunzo/sharun/issues/77
+
+	# This issue only started with webkitgtk-6.0. Older versions don't run
+	# into this issue, so better just break the bwrap sandbox than to force
+	# the env variable to disable sandbox in webkit2gtk all versions
+
+	# TODO find a proper fix for the sandbox than this hack
 
 	while :; do case "$1" in
 	        --) shift; break;;
