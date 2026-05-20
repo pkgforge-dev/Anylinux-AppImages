@@ -52,6 +52,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [anki](https://github.com/pkgforge-dev/anki-AppImage) |
 | [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition) |
 | [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage) |
+| [Arx Libertatis](https://github.com/pkgforge-dev/Arx-Libertatis-AppImage) |
 | [Asphyxia CORE](https://github.com/pkgforge-dev/Asphyxia-CORE-AppImage) |
 | [Audacious](https://github.com/pkgforge-dev/Audacious-AppImage) |
 | [Audacity](https://github.com/pkgforge-dev/Audacity-AppImage-Enhanced) |
@@ -205,6 +206,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [KPatience](https://github.com/pkgforge-dev/KPatience-AppImage) |
 | [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage) |
 | [KStars](https://github.com/pkgforge-dev/KStars-AppImage) |
+| [KTorrent](https://github.com/pkgforge-dev/KTorrent-AppImage) |
 | [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage) |
 | [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
 | [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
@@ -328,6 +330,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage) |
 | [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage) |
 | [servo](https://github.com/pkgforge-dev/servo-AppImage) |
+| [Shockolate](https://github.com/pkgforge-dev/Shockolate-AppImage) |
 | [Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage) |
 | [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced) |
 | [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage) |
