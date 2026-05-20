@@ -776,6 +776,7 @@ _make_deployment_array() {
 			DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
 			set -- "$@" "$LIB_DIR"/libnss_mdns*minimal.so*
 			if b=$(command -v bwrap);  then set -- "$@" "$b"; fi
+			if b=$(command -v xdg-dbus-proxy);  then set -- "$@" "$b"; fi
 		fi
 
 		if [ "$DEPLOY_GLIB_NETWORKING" = 1 ]; then
