@@ -2104,7 +2104,8 @@ _add_bwrap_wrapper() {
 	}
 	EOF
 
-	cc -Wall -Wextra -O2 -o "$target" "$cfile"
+	cc -Wall -Wextra -O2 -o "$APPDIR"/shared/bin/"${target##*/}" "$cfile"
+	ln "$APPDIR"/sharun "$target"
 	chmod +x "$target"
 	_echo "* added bwrap wrapper!"
 }
