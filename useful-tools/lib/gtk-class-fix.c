@@ -1,13 +1,17 @@
 /*
- * GTK Window Class Override
- * =========================
+ * GTK Window Class Override + Glycin Sandbox Disable
+ * ===================================================
  *
  * PURPOSE:
  *  GNOME made the window class of applications different between x11 and
  *  wayland, breaking desktop integration of appimages as result.
  *
+ *  Glycin forces sandboxing which fails 100% of the time here because the
+ *  library is horribly written and does not resolve the full path of the
+ *  binaries it passes to bwrap, it does not even check if bwrap is present!
+ *
  * USAGE:
- *  GTK_WINDOW_CLASS=fuck.gnome LD_PRELOAD=./gtk-class-fix.so /path/to/app
+ *   GTK_WINDOW_CLASS=fuck.gnome LD_PRELOAD=./gtk-class-fix.so /path/to/app
  *
  * WARNING:
  *  This was 100% vibed with AI by someone that has no idea about C
@@ -113,6 +117,66 @@ void gdk_window_set_app_id(void *window, const char *app_id) {
 	if (real_gdk_window_set_app_id) {
 		real_gdk_window_set_app_id(window, effective_id(app_id));
 	}
+}
+
+/* ------------------------------------------------------------------ */
+/*  Glycin sandbox disable                                            */
+/* ------------------------------------------------------------------ */
+
+typedef void* (*gly_loader_new_t)(void*);
+typedef void* (*gly_loader_new_for_stream_t)(void*);
+typedef void* (*gly_loader_new_for_bytes_t)(void*);
+typedef void (*gly_loader_set_sandbox_selector_t)(void*, int);
+
+#ifndef GLY_SANDBOX_SELECTOR_NOT_SANDBOXED
+#define GLY_SANDBOX_SELECTOR_NOT_SANDBOXED 3
+#endif
+
+static int gly_init_done = 0;
+static gly_loader_set_sandbox_selector_t real_gly_set_sandbox_selector = NULL;
+
+static void gly_init(void) {
+	if (__atomic_load_n(&gly_init_done, __ATOMIC_ACQUIRE)) return;
+	real_gly_set_sandbox_selector = dlsym(RTLD_NEXT, "gly_loader_set_sandbox_selector");
+	if (!real_gly_set_sandbox_selector)
+		real_gly_set_sandbox_selector = dlsym(RTLD_DEFAULT, "gly_loader_set_sandbox_selector");
+	__atomic_store_n(&gly_init_done, 1, __ATOMIC_RELEASE);
+}
+
+static void force_not_sandboxed(void *loader) {
+	gly_init();
+	if (real_gly_set_sandbox_selector && loader)
+		real_gly_set_sandbox_selector(loader, GLY_SANDBOX_SELECTOR_NOT_SANDBOXED);
+}
+
+static void* get_real_gly(const char *name) {
+	void *sym = dlsym(RTLD_NEXT, name);
+	if (!sym) sym = dlsym(RTLD_DEFAULT, name);
+	return sym;
+}
+
+void* gly_loader_new(void* file) {
+	static gly_loader_new_t real = NULL;
+	if (!real) real = (gly_loader_new_t)get_real_gly("gly_loader_new");
+	void *loader = real ? real(file) : NULL;
+	if (loader) force_not_sandboxed(loader);
+	return loader;
+}
+
+void* gly_loader_new_for_stream(void* stream) {
+	static gly_loader_new_for_stream_t real = NULL;
+	if (!real) real = (gly_loader_new_for_stream_t)get_real_gly("gly_loader_new_for_stream");
+	void *loader = real ? real(stream) : NULL;
+	if (loader) force_not_sandboxed(loader);
+	return loader;
+}
+
+void* gly_loader_new_for_bytes(void* bytes) {
+	static gly_loader_new_for_bytes_t real = NULL;
+	if (!real) real = (gly_loader_new_for_bytes_t)get_real_gly("gly_loader_new_for_bytes");
+	void *loader = real ? real(bytes) : NULL;
+	if (loader) force_not_sandboxed(loader);
+	return loader;
 }
 
 /* ------------------------------------------------------------------ */
