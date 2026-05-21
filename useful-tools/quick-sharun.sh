@@ -1659,6 +1659,7 @@ _add_bwrap_wrapper() {
 	 *   --setenv SHARUN_DIR ...  so child processes know the symlink prefix
 	 *   --setenv APPDIR ...      so the AppDir path survives into the sandbox
 	 *   --setenv PATH ...        so binaries in $APPDIR/bin get executed always
+	 *   --proc /proc             so that sharun can read /proc/self/exe and work
 	 *
 	 * It also rewrites hardcoded command paths (e.g. /usr/bin/xdg-dbus-proxy) to
 	 * their AppDir equivalents when found, so the AppImage's bundled binaries are
@@ -1821,8 +1822,8 @@ _add_bwrap_wrapper() {
 	static int build_injections(const char *appdir, const char *sharun_dir,
 	                            const char *path, char ***out)
 	{
-	    /* Each entry is {flag, name, value}; bind entries use flag="--bind", name=dest, value=dest */
 	    struct { const char *flag, *a, *b; } entries[] = {
+	        { "--proc",   "/proc",    NULL      },  /* sharun needs /proc for /proc/self/exe to resolve symlinks */
 	        { "--bind",   appdir,     appdir     },  /* AppDir visible inside */
 	        { "--bind",   "/tmp",     "/tmp"     },  /* must follow webkit's --tmpfs /tmp */
 	        { "--setenv", "SHARUN_DIR", sharun_dir },
@@ -1831,20 +1832,23 @@ _add_bwrap_wrapper() {
 	    };
 	    int nentries = (int)(sizeof(entries) / sizeof(entries[0]));
 
-	    /* Count how many slots we need (skip entries with NULL values) */
+	    /* Count how many slots we need (skip entries with NULL values for 'a') */
 	    int cap = 0;
-	    for (int i = 0; i < nentries; i++)
-	        if (entries[i].b) cap += 3;
+	    for (int i = 0; i < nentries; i++) {
+	        if (!entries[i].a) continue;
+	        cap += entries[i].b ? 3 : 2;
+	    }
 
 	    char **arr = calloc(cap + 1, sizeof(char *));
 	    if (!arr) return -1;
 
 	    int j = 0;
 	    for (int i = 0; i < nentries; i++) {
-	        if (!entries[i].b) continue;
+	        if (!entries[i].a) continue;
 	        arr[j++] = strdup(entries[i].flag);
 	        arr[j++] = strdup(entries[i].a);
-	        arr[j++] = strdup(entries[i].b);
+	        if (entries[i].b)
+	            arr[j++] = strdup(entries[i].b);
 	    }
 	    arr[j] = NULL;
 	    *out = arr;
@@ -1979,14 +1983,30 @@ _add_bwrap_wrapper() {
 	         * pipe. Items at/after cmd_idx (-- / command / args) go to
 	         * the exec argv instead.
 	         */
-	        int cmd_idx    = find_cmd_idx(fd_args, n);
-	        int total_opt_n = cmd_idx + inject_count;
+	        int cmd_idx = find_cmd_idx(fd_args, n);
+	        int opts_seccomp = 0;
+	        for (int i = 0; i < cmd_idx; i++) {
+	            if (strcmp(fd_args[i], "--seccomp") == 0) {
+	                opts_seccomp++;
+	                i++;
+	            }
+	        }
 
-	        /* Combine original options + injected binds into one array for serialization */
+	        /* Build options array (original options minus --seccomp plus injections) */
+	        int opt_n = cmd_idx - 2 * opts_seccomp;
+	        int total_opt_n = opt_n + inject_count;
 	        char **opt_args = calloc(total_opt_n + 1, sizeof(char *));
 	        if (!opt_args) return 1;
-	        for (int i = 0; i < cmd_idx; i++)      opt_args[i]           = fd_args[i];
-	        for (int i = 0; i < inject_count; i++)  opt_args[cmd_idx + i] = injections[i];
+	        int oi = 0;
+	        for (int i = 0; i < cmd_idx; i++) {
+	            if (strcmp(fd_args[i], "--seccomp") == 0) {
+	                i++; /* skip fd number */
+	                continue;
+	            }
+	            opt_args[oi++] = fd_args[i];
+	        }
+	        for (int i = 0; i < inject_count; i++)
+	            opt_args[oi++] = injections[i];
 	        opt_args[total_opt_n] = NULL;
 
 	        int new_fd = serialize_to_pipe(opt_args, total_opt_n);
@@ -2029,32 +2049,48 @@ _add_bwrap_wrapper() {
 
 	    /* ---- Direct argv path (no --args) ---- */
 
+	    /* Build argv without --seccomp N (this blocks lstat and breaks sharun) */
+	    int st_argc = 0;
+	    char **st_argv = calloc(argc + 1, sizeof(char *));
+	    if (!st_argv) return 1;
+	    st_argv[st_argc++] = argv[0];
+	    for (int i = 1; i < argc; i++) {
+	        if (strcmp(argv[i], "--seccomp") == 0) {
+	            i++; /* skip fd number */
+	            continue;
+	        }
+	        st_argv[st_argc++] = argv[i];
+	    }
+	    st_argv[st_argc] = NULL;
+
 	    /*
-	     * Find where to insert our binds: before "--" or before the first
-	     * non-option argument (the command).
+	     * Find where to insert our binds in the stripped argv:
+	     * before "--" or before the first non-option argument (the command).
 	     */
-	    int insert_at = 1 + find_cmd_idx(argv + 1, argc - 1);
+	    int insert_at = 1 + find_cmd_idx(st_argv + 1, st_argc - 1);
 
 	    /* Build exec argv with injections inserted at insert_at */
-	    int new_argc = argc + inject_count;
+	    int new_argc = st_argc + inject_count;
 	    char **new_argv = calloc(new_argc + 1, sizeof(char *));
 	    if (!new_argv) return 1;
 
 	    new_argv[0] = "bwrap.wrapped";
 	    int j = 1;
-	    for (int i = 1; i < argc; i++) {
+	    for (int i = 1; i < st_argc; i++) {
 	        if (i == insert_at) {
 	            for (int k = 0; k < inject_count; k++)
 	                new_argv[j++] = injections[k];
 	        }
-	        new_argv[j++] = strdup(argv[i]);
+	        new_argv[j++] = strdup(st_argv[i]);
 	    }
 	    /* If no suitable insertion point was found, tack on at the end */
-	    if (insert_at == argc) {
+	    if (insert_at == st_argc) {
 	        for (int k = 0; k < inject_count; k++)
 	            new_argv[j++] = injections[k];
 	    }
 	    new_argv[j] = NULL;
+
+	    free(st_argv);
 
 	    remap_argv_command(new_argv, appdir);
 	    exec_binary(new_argv);
