@@ -196,6 +196,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ITR2025](https://github.com/pkgforge-dev/ITR2025-AppImage) |
 | [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage) |
 | [KBlocks](https://github.com/pkgforge-dev/KBlocks-AppImage) |
+| [KCalc](https://github.com/pkgforge-dev/KCalc-AppImage) |
 | [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage) |
 | [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced) |
 | [KeePassXC](https://github.com/pkgforge-dev/KeePassXC-AppImage-Enhanced) |
