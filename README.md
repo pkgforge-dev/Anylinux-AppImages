@@ -182,6 +182,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [HP-15C](https://github.com/pkgforge-dev/HP-15C-Simulator-AppImage) |
 | [htop](https://github.com/pkgforge-dev/htop-AppImage) |
 | [Identity](https://github.com/pkgforge-dev/Identity-AppImage) |
+| [iloader](https://github.com/pkgforge-dev/iloader-AppImage-Enhanced) |
 | [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage) |
 | [Impression](https://github.com/pkgforge-dev/Impression-AppImage) |
 | [innoextract](https://github.com/pkgforge-dev/innoextract-AppImage) |
