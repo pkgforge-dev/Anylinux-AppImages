@@ -233,6 +233,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Mousai](https://github.com/pkgforge-dev/Mousai-AppImage) |
 | [mpv](https://github.com/pkgforge-dev/mpv-AppImage) |
 | [NBlood](https://github.com/pkgforge-dev/NBlood-AppImage) |
+| [NeoChat](https://github.com/pkgforge-dev/NeoChat-AppImage) |
 | [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage) |
 | [Neverball](https://github.com/pkgforge-dev/Neverball-AppImage) |
 | [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage) |
