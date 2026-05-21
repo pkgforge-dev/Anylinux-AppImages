@@ -353,6 +353,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [spacecadetpinball](https://github.com/pkgforge-dev/spacecadetpinball-AppImage) |
 | [SpaghettiKart](https://github.com/pkgforge-dev/SpaghettiKart-AppImage-Enhanced) |
 | [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage) |
+| [Spek](https://github.com/pkgforge-dev/Spek-AppImage) |
 | [SRB2Kart](https://github.com/pkgforge-dev/SRB2Kart-AppImage) |
 | [st](https://github.com/pkgforge-dev/st-AppImage) |
 | [Starfox64Recomp](https://github.com/pkgforge-dev/Starfox64Recomp-AppImage) |
