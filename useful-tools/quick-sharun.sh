@@ -844,6 +844,9 @@ _make_deployment_array() {
 				fi
 			done
 		fi
+		# electron bundled libs always need to load first
+		# for example libcef.so may need to read a icudtl.dat next to it
+		echo 'SHARUN_EXTRA_LIBRARY_PATH=${SHARUN_DIR}/bin:${SHARUN_EXTRA_LIBRARY_PATH}' >> "$APPENV"
 	fi
 	if [ "$DEPLOY_OPENGL" = 1 ] || [ "$DEPLOY_VULKAN" = 1 ]; then
 		DEPLOY_COMMON_LIBS=${DEPLOY_COMMON_LIBS:-1}
