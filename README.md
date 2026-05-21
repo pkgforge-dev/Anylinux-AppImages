@@ -144,6 +144,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage) |
 | [foot](https://github.com/pkgforge-dev/foot-AppImage) |
 | [fooyin](https://github.com/pkgforge-dev/fooyin-AppImage) |
+| [freac](https://github.com/pkgforge-dev/freac-AppImage-Enhanced) |
 | [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage) |
 | [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage) |
 | [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage) |
