@@ -54,6 +54,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage) |
 | [Arx Libertatis](https://github.com/pkgforge-dev/Arx-Libertatis-AppImage) |
 | [Asphyxia CORE](https://github.com/pkgforge-dev/Asphyxia-CORE-AppImage) |
+| [Asunder](https://github.com/pkgforge-dev/Asunder-AppImage) |
 | [Audacious](https://github.com/pkgforge-dev/Audacious-AppImage) |
 | [Audacity](https://github.com/pkgforge-dev/Audacity-AppImage-Enhanced) |
 | [Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage) |
