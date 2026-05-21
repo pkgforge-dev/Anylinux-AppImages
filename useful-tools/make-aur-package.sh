@@ -195,15 +195,19 @@ _info_msg "Building package..."
 
 # TODO: What do I need to do to not use skippgpcheck?
 # gpg --recv-keys doesn't work
-makepkg -fs --noconfirm --skippgpcheck
+if [ "$SKIPSIGNATURECHECK" = 1 ]; then
+	makepkg -fs --noconfirm --skippgpcheck --skipinteg
+else
+	makepkg -fs --noconfirm --skippgpcheck
+fi
 
 ls -la ./
 
 _info_msg "Installing package..."
 if [ "$OVERWRITE_CONFLICTS" = 1 ]; then
-	yes | pacman -U ./*.pkg.tar.* --overwrite '*'
+	pacman -U --noconfirm ./*.pkg.tar.* --overwrite '*'
 else
-	yes | pacman -U ./*.pkg.tar.*
+	pacman -U --noconfirm ./*.pkg.tar.*
 fi
 
 _info_msg "All done!"
