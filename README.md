@@ -402,6 +402,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [wine](https://github.com/pkgforge-dev/wine-AppImage) |
 | [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage) |
 | [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced) |
+| [xclock](https://github.com/pkgforge-dev/xclock-AppImage) |
 | [xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced) |
 | [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage) |
 | [xeyes](https://github.com/pkgforge-dev/xeyes-AppImage) |
