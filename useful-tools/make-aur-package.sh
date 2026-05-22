@@ -195,7 +195,11 @@ _info_msg "Building package..."
 
 # TODO: What do I need to do to not use skippgpcheck?
 # gpg --recv-keys doesn't work
-makepkg -fs --noconfirm --skippgpcheck
+if [ "$SKIP_INTEGRITY_CHECK" = 1 ]; then
+	makepkg -fs --noconfirm --skippgpcheck --skipinteg
+else
+	makepkg -fs --noconfirm --skippgpcheck
+fi
 
 ls -la ./
 
