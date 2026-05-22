@@ -16,7 +16,6 @@ export OUTNAME=Qt6+dbus-demo-"$ARCH".AppImage
 
 pacman -Syu --noconfirm \
 	base-devel       \
-	curl             \
 	git              \
 	kvantum          \
 	libxcb           \
@@ -27,10 +26,8 @@ pacman -Syu --noconfirm \
 	libxrandr        \
 	libxtst          \
 	lxqt-qtplugin    \
-	mesa-utils       \
 	qt6ct            \
 	qt6-tools        \
-	vulkan-tools     \
 	wget             \
 	xorg-server-xvfb \
 	zsync

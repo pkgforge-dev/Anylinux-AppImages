@@ -24,7 +24,6 @@ export PATH_MAPPING='
 
 pacman -Syu --noconfirm \
 	base-devel       \
-	curl             \
 	git              \
 	libxcb           \
 	libxcursor       \
