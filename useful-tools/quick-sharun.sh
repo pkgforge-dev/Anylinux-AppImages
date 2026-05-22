@@ -565,6 +565,10 @@ _determine_what_to_deploy() {
 					DEPLOY_QT_WEB_ENGINE=${DEPLOY_QT_WEB_ENGINE:-1}
 					DEPLOY_ELECTRON=${DEPLOY_ELECTRON:-1}
 					;;
+				*libgtk-x11-*.so*)
+					DEPLOY_GTK=${DEPLOY_GTK:-1}
+					GTK_DIR=gtk-2.0
+					;;
 				*libgtk-3*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-3.0
