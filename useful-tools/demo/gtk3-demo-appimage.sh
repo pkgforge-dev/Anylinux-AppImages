@@ -15,7 +15,6 @@ export OUTNAME=gtk3-demo-"$ARCH".AppImage
 
 pacman -Syu --noconfirm \
 	base-devel       \
-	curl             \
 	git              \
 	gtk3-demos       \
 	libxcb           \
@@ -25,8 +24,6 @@ pacman -Syu --noconfirm \
 	libxkbcommon-x11 \
 	libxrandr        \
 	libxtst          \
-	mesa-utils       \
-	vulkan-tools     \
 	wget             \
 	xorg-server-xvfb \
 	zsync

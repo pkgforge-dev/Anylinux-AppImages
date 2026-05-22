@@ -17,7 +17,6 @@ export MAIN_BIN=gtk-demo
 
 pacman -Syu --noconfirm \
 	base-devel       \
-	curl             \
 	git              \
 	libxcb           \
 	libxcursor       \
@@ -26,8 +25,6 @@ pacman -Syu --noconfirm \
 	libxkbcommon-x11 \
 	libxrandr        \
 	libxtst          \
-	mesa-utils       \
-	vulkan-tools     \
 	wget             \
 	xorg-server-xvfb \
 	zsync
