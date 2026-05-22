@@ -581,8 +581,19 @@ _determine_what_to_deploy() {
 					DEPLOY_GDK=${DEPLOY_GDK:-1}
 					;;
 				*libglycin*.so*)
-					DEPLOY_GLYCIN=${DEPLOY_GLYCIN:-1}
-					GTK_CLASS_FIX=1
+					# glycin-ng needs no special handling
+					# it works out of the box
+					case " $NEEDED_LIBS " in
+						*"libglycin_ng.so"*)
+							DEPLOY_GLYCIN=0
+							continue
+							;;
+						*)
+							DEPLOY_GLYCIN=${DEPLOY_GLYCIN:-1}
+							GTK_CLASS_FIX=1
+							GNOME_GLYCIN=1
+							;;
+					esac
 					;;
 				*libwebkit*gtk*.so*)
 					DEPLOY_WEBKIT2GTK=${DEPLOY_WEBKIT2GTK:-1}
@@ -820,7 +831,7 @@ _make_deployment_array() {
 			"$LIB_DIR"/libdecor*.so*
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
-		_echo "* Deploying glycin"
+		_echo "* Deploying GNOME glycin"
 		set -- "$@" "$LIB_DIR"/glycin-loaders/*/*
 		if b=$(command -v bwrap);  then set -- "$@" "$b"; fi
 	fi
@@ -3242,7 +3253,9 @@ for lib do case "$lib" in
 		_patch_away_usr_bin_dir "$lib" || :
 		;;
 	*libglycin*.so*)
-		_add_bwrap_wrapper
+		if [ "$GNOME_GLYCIN" = 1 ]; then
+			_add_bwrap_wrapper
+		fi
 		;;
 	*libdecor*.so*)
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
@@ -3453,6 +3466,18 @@ if [ -d "$DST_LIB_DIR"/qt6 ]; then
 			_err_msg "------------------------------------------------------------"
 		fi
 	done
+fi
+
+# suggest people to use glycin-ng instead
+if [ "$GNOME_GLYCIN" = 1 ]; then
+	_err_msg "------------------------------------------------------------"
+	_err_msg "WARNING: GNOME glycin has been deployed!"
+	_echo "There is a much better alternative called glycin-ng, features include:"
+	_echo "* 5 times smaller!"
+	_echo "* No bwrap dependency (uses landlock for sandbox instead)"
+	_echo "* No dbus dependency"
+	_echo "https://github.com/QaidVoid/glycin-ng"
+	_err_msg "------------------------------------------------------------"
 fi
 
 echo ""
