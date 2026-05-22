@@ -48,7 +48,7 @@ echo "Bundling AppImage..."
 echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
-./quick-sharun /usr/bin/gtk-demo*
+./quick-sharun /usr/bin/gtk-demo* /usr/share/gtk-2.0/demo
 
 ./quick-sharun --make-appimage
 
