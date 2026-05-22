@@ -54,6 +54,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage) |
 | [Arx Libertatis](https://github.com/pkgforge-dev/Arx-Libertatis-AppImage) |
 | [Asphyxia CORE](https://github.com/pkgforge-dev/Asphyxia-CORE-AppImage) |
+| [Asunder](https://github.com/pkgforge-dev/Asunder-AppImage) |
 | [Audacious](https://github.com/pkgforge-dev/Audacious-AppImage) |
 | [Audacity](https://github.com/pkgforge-dev/Audacity-AppImage-Enhanced) |
 | [Audio Sharing](https://github.com/pkgforge-dev/Audio-Sharing-AppImage) |
@@ -139,10 +140,12 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [FeatherPad](https://github.com/pkgforge-dev/FeatherPad-AppImage) |
 | [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage) |
 | [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage) |
+| [Flacon](https://github.com/pkgforge-dev/Flacon-AppImage-Enhanced) |
 | [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced) |
 | [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage) |
 | [foot](https://github.com/pkgforge-dev/foot-AppImage) |
 | [fooyin](https://github.com/pkgforge-dev/fooyin-AppImage) |
+| [freac](https://github.com/pkgforge-dev/freac-AppImage-Enhanced) |
 | [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage) |
 | [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage) |
 | [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage) |
@@ -196,6 +199,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ITR2025](https://github.com/pkgforge-dev/ITR2025-AppImage) |
 | [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage) |
 | [KBlocks](https://github.com/pkgforge-dev/KBlocks-AppImage) |
+| [KCalc](https://github.com/pkgforge-dev/KCalc-AppImage) |
 | [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage) |
 | [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced) |
 | [KeePassXC](https://github.com/pkgforge-dev/KeePassXC-AppImage-Enhanced) |
@@ -236,6 +240,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Mousai](https://github.com/pkgforge-dev/Mousai-AppImage) |
 | [mpv](https://github.com/pkgforge-dev/mpv-AppImage) |
 | [NBlood](https://github.com/pkgforge-dev/NBlood-AppImage) |
+| [NeoChat](https://github.com/pkgforge-dev/NeoChat-AppImage) |
 | [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage) |
 | [Neverball](https://github.com/pkgforge-dev/Neverball-AppImage) |
 | [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage) |
@@ -353,6 +358,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [spacecadetpinball](https://github.com/pkgforge-dev/spacecadetpinball-AppImage) |
 | [SpaghettiKart](https://github.com/pkgforge-dev/SpaghettiKart-AppImage-Enhanced) |
 | [SpeedCrunch](https://github.com/pkgforge-dev/SpeedCrunch-AppImage) |
+| [Spek](https://github.com/pkgforge-dev/Spek-AppImage) |
 | [SRB2Kart](https://github.com/pkgforge-dev/SRB2Kart-AppImage) |
 | [st](https://github.com/pkgforge-dev/st-AppImage) |
 | [Starfox64Recomp](https://github.com/pkgforge-dev/Starfox64Recomp-AppImage) |
@@ -404,6 +410,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [wine](https://github.com/pkgforge-dev/wine-AppImage) |
 | [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage) |
 | [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced) |
+| [xclock](https://github.com/pkgforge-dev/xclock-AppImage) |
 | [xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced) |
 | [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage) |
 | [xeyes](https://github.com/pkgforge-dev/xeyes-AppImage) |
