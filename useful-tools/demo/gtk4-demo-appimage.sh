@@ -17,7 +17,6 @@ export GTK_CLASS_FIX=1
 
 pacman -Syu --noconfirm \
 	base-devel       \
-	curl             \
 	git              \
 	gtk4-demos       \
 	libxcb           \
@@ -27,8 +26,6 @@ pacman -Syu --noconfirm \
 	libxkbcommon-x11 \
 	libxrandr        \
 	libxtst          \
-	mesa-utils       \
-	vulkan-tools     \
 	wget             \
 	xorg-server-xvfb \
 	zsync
