@@ -398,6 +398,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Varia](https://github.com/pkgforge-dev/Varia-AppImage) |
 | [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage) |
 | [VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage) |
+| [Vibeprint Studio](https://github.com/pkgforge-dev/Vibeprint-Studio-AppImage) |
 | [Viber](https://github.com/pkgforge-dev/Viber-AppImage-Enhanced) |
 | [VICE](https://github.com/pkgforge-dev/VICE-AppImage) |
 | [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage) |
