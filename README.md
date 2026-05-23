@@ -80,6 +80,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
 | [Citron](https://github.com/pkgforge-dev/Citron-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
+| [ClassicImageViewer](https://github.com/pkgforge-dev/ClassicImageViewer-AppImage-Enhanced) |
 | [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage) |
 | [Claude Code](https://github.com/pkgforge-dev/claude-code-AppImage) |
 | [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage) |
