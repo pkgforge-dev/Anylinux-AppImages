@@ -320,7 +320,7 @@ else
 	SUDOCMD=""
 fi
 
-$SUDOCMD pacman -U --noconfirm "$TMPDIR"/*
+$SUDOCMD pacman -U --noconfirm --ask 4 "$TMPDIR"/*
 
 # the gdk-pixbuf2 package needs to have the loaders.cache regenerated
 if [ -f "$TMPDIR"/gdk-pixbuf2* ] && [ -x /usr/bin/gdk-pixbuf-query-loaders ]; then
