@@ -92,6 +92,14 @@ static void init_locale(void) {
 	}
 	DEBUG_PRINT("Host locale is broken; attempting to fix\n");
 
+	// Check setting LOCPATH to /usr/share/locale first
+	// see: https://github.com/pkgforge-dev/Anylinux-AppImages/issues/615#issuecomment-4533427173
+	setenv("LOCPATH", "/usr/share/locale", 1);
+	if (setlocale(LC_ALL, "")) {
+		DEBUG_PRINT("Locale fixed via LOCPATH to /usr/share/locale\n");
+		return;
+	}
+	
 	// set LOCPATH to our bundled locales
 	const char *appdir = getenv("APPDIR");
 	if (appdir && *appdir) {
