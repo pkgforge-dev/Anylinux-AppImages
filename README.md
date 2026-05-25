@@ -80,6 +80,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
 | [Citron](https://github.com/pkgforge-dev/Citron-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
+| [ClassicImageViewer](https://github.com/pkgforge-dev/ClassicImageViewer-AppImage-Enhanced) |
 | [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage) |
 | [Claude Code](https://github.com/pkgforge-dev/claude-code-AppImage) |
 | [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage) |
@@ -110,6 +111,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [dethrace](https://github.com/pkgforge-dev/dethrace-AppImage) |
 | [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced) |
 | [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage) |
+| [DiffPDF](https://github.com/pkgforge-dev/DiffPDF-AppImage) |
 | [Discord](https://github.com/pkgforge-dev/Discord-AppImage) |
 | [DNZHRecomp](https://github.com/pkgforge-dev/DNZHRecomp-AppImage) |
 | [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage) |
@@ -397,6 +399,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Varia](https://github.com/pkgforge-dev/Varia-AppImage) |
 | [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage) |
 | [VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage) |
+| [Vibeprint Studio](https://github.com/pkgforge-dev/Vibeprint-Studio-AppImage) |
 | [Viber](https://github.com/pkgforge-dev/Viber-AppImage-Enhanced) |
 | [VICE](https://github.com/pkgforge-dev/VICE-AppImage) |
 | [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage) |
