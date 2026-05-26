@@ -596,8 +596,11 @@ _determine_what_to_deploy() {
 							;;
 					esac
 					;;
-				*libwebkit*gtk*.so*)
+				*libwebkit*gtk-*.so*)
 					DEPLOY_WEBKIT2GTK=${DEPLOY_WEBKIT2GTK:-1}
+					_webkit_dirname=$(echo "$lib" \
+					  | grep -o 'webkit2gtk.*.so' | sed "s|\.so.*||")
+					WEBKIT_DIR=${lib%/*}/$_webkit_dirname
 					;;
 				*libsoup-*.so*)
 					DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
@@ -793,6 +796,14 @@ _make_deployment_array() {
 			set -- "$@" "$LIB_DIR"/libnss_mdns*minimal.so*
 			if b=$(command -v bwrap);  then set -- "$@" "$b"; fi
 			if b=$(command -v xdg-dbus-proxy);  then set -- "$@" "$b"; fi
+			if [ ! -d "$WEBKIT_DIR" ]; then
+				_err_msg "Unable to find $WEBKIT_DIR directory"
+				_err_msg "Please set the WEBKIT_DIR variable to its location"
+			fi
+			ADD_DIR="
+				$ADD_DIR
+				$WEBKIT_DIR
+			"
 		fi
 
 		if [ "$DEPLOY_GLIB_NETWORKING" = 1 ]; then
@@ -3207,9 +3218,9 @@ for lib do case "$lib" in
 		fi
 		;;
 	*libglib-*.so*)
-		glibver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
-		src_glib_schema_dir=/usr/share/glib-$glibver/schemas
-		dst_glib_schema_dir=$APPDIR/share/glib-$glibver/schemas
+		_glibver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
+		src_glib_schema_dir=/usr/share/glib-$_glibver/schemas
+		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
 		if [ -d "$src_glib_schema_dir" ] && [ ! -d "$dst_glib_schema_dir" ]; then
 			mkdir -p "$dst_glib_schema_dir"
 			cp -rv "$src_glib_schema_dir"/* "$dst_glib_schema_dir"
@@ -3246,7 +3257,7 @@ for lib do case "$lib" in
 		src_glycin_conf_dir=/usr/share/glycin-loaders
 		dst_glycin_conf_dir=$APPDIR/share/glycin-loaders
 		if [ -d "$src_glycin_conf_dir" ] && [ ! -d "$dst_glycin_conf_dir" ]; then
-			cp -rv "$src_glib_schema_dir" "$dst_glycin_conf_dir"
+			cp -r "$src_glib_schema_dir" "$dst_glycin_conf_dir"
 			sed -i -e 's|/usr/lib.*/||g' "$dst_glycin_conf_dir"/*/*/*.conf
 			_echo "* addded $src_glycin_conf_dir"
 		fi
@@ -3256,7 +3267,7 @@ for lib do case "$lib" in
 		src_gtk_srcview_dir=/usr/share/gtksourceview-$_gtk_srcview_ver
 		dst_gtk_srcview_dir=$APPDIR/share/gtksourceview-$_gtk_srcview_ver
 		if [ -d "$src_gtk_srcview_dir" ] && [ ! -d "$dst_gtk_srcview_dir" ]; then
-			cp -rv "$src_gtk_srcview_dir" "$dst_gtk_srcview_dir"
+			cp -r "$src_gtk_srcview_dir" "$dst_gtk_srcview_dir"
 			_echo "* added $src_gtk_srcview_dir"
 		fi
 		;;
@@ -3276,7 +3287,7 @@ for lib do case "$lib" in
 		src_libhai_dir=/usr/share/libthai
 		dst_libhai_dir=$APPDIR/share/libthai
 		if [ -d "$src_libhai_dir" ] && [ ! -d "$dst_libhai_dir" ]; then
-			cp -vr "$src_libhai_dir" "$dst_libhai_dir"
+			cp -r "$src_libhai_dir" "$dst_libhai_dir"
 			_echo "* added $src_libhai_dir"
 		fi
 		;;
@@ -3284,7 +3295,7 @@ for lib do case "$lib" in
 		src_alsaconf_dir=/usr/share/alsa
 		dst_alsaconf_dir=$APPDIR/share/alsa
 		if [ -d "$src_alsaconf_dir" ] && [ ! -d "$dst_alsaconf_dir" ]; then
-			cp -vr "$src_alsaconf_dir" "$dst_alsaconf_dir"
+			cp -r "$src_alsaconf_dir" "$dst_alsaconf_dir"
 			_echo "* added $src_alsaconf_dir"
 		fi
 		# Adding alsa config dir is not enough, the file is harcoded
@@ -3301,7 +3312,7 @@ for lib do case "$lib" in
 		dst_xkb_dir=$APPDIR/share/X11/xkb
 		if [ -d "$src_xkb_dir" ] && [ ! -d "$dst_xkb_dir" ]; then
 			mkdir -p "$dst_xkb_dir"
-			cp -rv "$src_xkb_dir"/* "$dst_xkb_dir"
+			cp -r "$src_xkb_dir"/* "$dst_xkb_dir"
 			_echo "* added $src_xkb_dir"
 		fi
 
@@ -3310,7 +3321,7 @@ for lib do case "$lib" in
 		dst_xlocale_dir=$APPDIR/share/X11/locale
 		if [ -d "$src_xlocale_dir" ] && [ ! -d "$dst_xlocale_dir" ]; then
 			mkdir -p "$dst_xlocale_dir"
-			cp -rv "$src_xlocale_dir"/* "$dst_xlocale_dir"
+			cp -r "$src_xlocale_dir"/* "$dst_xlocale_dir"
 			_echo "* added $src_xlocale_dir"
 		fi
 		;;
@@ -3318,7 +3329,7 @@ for lib do case "$lib" in
 		src_gbm_backends_dir=$LIB_DIR/gbm
 		dst_gbm_backends_dir=$DST_LIB_DIR/gbm
 		if [ -d "$src_gbm_backends_dir" ] && [ ! -d "$dst_gbm_backends_dir" ]; then
-			cp -vr "$src_gbm_backends_dir" "$dst_gbm_backends_dir"
+			cp -r "$src_gbm_backends_dir" "$dst_gbm_backends_dir"
 			_echo "* added $src_gbm_backends_dir"
 		fi
 		;;
@@ -3348,8 +3359,91 @@ for lib do case "$lib" in
 		dst_vklayer_icd=$APPDIR/${src_vklayer_icd#/usr/}
 		if [ -f "$src_vklayer_icd" ] && [ ! -f "$dst_vklayer_icd" ]; then
 			mkdir -p "${dst_vklayer_icd%/*}"
-			cp -v "$src_vklayer_icd" "$dst_vklayer_icd"
+			cp -vL "$src_vklayer_icd" "$dst_vklayer_icd"
 			_echo "* added vulkan layer icd: $src_vklayer_icd"
+		fi
+		;;
+	# this hook is a common false positive
+	# because a lot of applications execute commands thru the system shell
+	# and that often links to this library, causing overdeployment of terminfo files
+	*libncursesw.so*|*libcursesw.so*|*libcurses.so*)
+		src_terminfo_dir=/usr/share/terminfo
+		dst_terminfo_dir=$APPDIR/share/terminfo
+		if [ -d "$src_terminfo_dir" ] && [ ! -d "$dst_terminfo_dir" ]; then
+			cp -r "$src_terminfo_dir" "$dst_terminfo_dir"
+			_echo "* added $src_terminfo_dir"
+		fi
+
+		src_tabset_dir=/usr/share/tabset
+		dst_tabset_dir=$APPDIR/share/tabset
+		if [ -d "$src_tabset_dir" ] && [ ! -d "$dst_tabset_dir" ]; then
+			cp -r "$src_tabset_dir" "$dst_tabset_dir"
+			_echo "* added $src_tabset_dir"
+		fi
+		;;
+	*libmagic.so*)
+		# sharun only checks for $SHARUN_DIR/share/file/misc/magic.mgc
+		# but on ubuntu for example, the file is located in /usr/share/file/magic.mgc
+		# so we need to find the magic.mgc file and copy it to dst
+		src_magic_file=$(find -L /usr/share/file -type f -name magic.mgc -print -quit) || :
+		dst_magic_file=$APPDIR/share/file/misc/magic.mgc
+		if [ -f "$src_magic_file" ] && [ ! -f "$dst_magic_file" ]; then
+			mkdir -p "${dst_magic_file%/*}"
+			cp -vL "$src_magic_file" "$dst_magic_file"
+			_echo "* added $src_magic_file"
+		fi
+		;;
+	*/libgirepository-*.so*)
+		_girver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
+		src_girepository_dir=$LIB_DIR/girepository-$_girver
+		dst_girepository_dir=$DST_LIB_DIR/girepository-$_girver
+		if [ -d "$src_girepository_dir" ] && [ ! -d "$dst_girepository_dir" ]; then
+			cp -r "$src_girepository_dir" "$dst_girepository_dir"
+			_echo "* added $src_girepository_dir"
+
+			# there might be more .typelib files around, we need to copy them
+			_typelibfiles=$(find "$LIB_DIR"/*/* -type f -name '*.typelib' 2>/dev/null \
+			  | grep -v "$src_girepository_dir" | grep girepository-"$_girver"
+			 )
+			for f in $_typelibfiles; do
+				[ -f "$f" ] || continue
+				cp -v "$f" "$dst_girepository_dir"
+			done
+			if [ -n "$_typelibfiles" ]; then
+				_echo "* added additional .typelib files"
+			fi
+		fi
+		;;
+	 */gconv/*.so)
+		src_gconvm_file=$LIB_DIR/gconv/gconv-modules
+		dst_gconvm_file=$DST_LIB_DIR/gconv/gconv-modules
+		if [ -f "$src_gconvm_file" ] && [ ! -f "$dst_gconvm_file" ]; then
+			mkdir -p "${dst_gconvm_file%/*}"
+			cp -v "$src_gconvm_file" "$dst_gconvm_file"
+			_echo "* added $src_gconvm_file"
+		fi
+		;;
+	*/libc*.so*)
+		src_c_locale_dir=/usr/lib/locale/C.utf8
+		dst_c_locale_dir=$DST_LIB_DIR/locale/C.utf8
+		mkdir -p "$DST_LIB_DIR"/locale
+		if [ -d "$src_c_locale_dir" ] && [ ! -d "$dst_c_locale_dir" ]; then
+			cp -r "$src_c_locale_dir" "$dst_c_locale_dir"
+			_echo "* added C.UTF-8 locale"
+		fi
+		# C.UTF-8 is not enough, some apps may crash when this locale is used
+		# so we need to ship en_US.UTF-8 so we can guarantee applications
+		# will launch in systems without glibc locales like alpine linux
+		#
+		# Because distros use a locale-archive these days, we have to compile it
+		#
+		dst_en_locale_dir=$DST_LIB_DIR/locale/en_US.utf8
+		if [ ! -d "$dst_en_locale_dir" ] && _is_cmd localedef; then
+			mkdir -p /tmp/usr/lib/locale
+			localedef --prefix /tmp --no-archive -i en_US -f UTF-8 en_US.UTF-8 || :
+			if cp -r /tmp/usr/lib/locale/en_US.utf8 "$DST_LIB_DIR"/locale; then
+				_echo "* added en_US.UTF-8 locale"
+			fi
 		fi
 		;;
 	*libgegl*)
@@ -3420,19 +3514,8 @@ for lib do case "$lib" in
 			_echo "Copied over mangohud layer and patched mangohud"
 		fi
 		;;
-	*libwebkit*gtk*.so*)
+	*libwebkit*gtk-*.so*)
 		_add_bwrap_wrapper
-		# sharun deploys webkit2gtk but with relative path mapping
-		# the problem is that changes the working dir to the AppDir
-		# We can instead use path-mapping-hardcoded which does not
-		# have the changing of working directory issue
-
-		# restore relative path mapping to /usr
-		sed -i -e 's|\./\.//|/usr/|g' "$lib" || :
-
-		# remove working dir change
-		sed -i -e '/SHARUN_WORKING_DIR=${SHARUN_DIR}/d' "$APPENV" || :
-
 		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_bin_dir "$lib" || :
