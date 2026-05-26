@@ -3287,9 +3287,14 @@ for lib do case "$lib" in
 			_echo "* added $src_fontconfig_config"
 		fi
 		;;
-
-		# TODO, the folks hook can be implemented better
-
+	*libfolks*.so*)
+		src_folks_dir=$LIB_DIR/folks
+		dst_folks_dir=$DST_LIB_DIR/folks
+		if [ -d "$src_folks_dir" ] && [ ! -d "$dst_folks_dir" ]; then
+			cp -r "$src_folks_dir" "$dst_folks_dir"
+			_echo "* added $src_folks_dir"
+		fi
+		;;
 	*libthai*.so*)
 		src_libhai_dir=/usr/share/libthai
 		dst_libhai_dir=$APPDIR/share/libthai
