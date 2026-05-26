@@ -3227,6 +3227,15 @@ for lib do case "$lib" in
 			cp -r "$src_glib_schema_dir"/* "$dst_glib_schema_dir"
 			_echo "* added $src_glib_schema_dir"
 		fi
+
+		# apps may crash when the host has no mime database
+		src_mime_dir=/usr/share/mime
+		dst_mime_dir=$APPDIR/share/mime
+		if [ -d "$src_mime_dir" ] && [ ! -d "$dst_mime_dir" ]; then
+			cp -r "$src_mime_dir" "$dst_mime_dir"
+			rm -rf "$dst_mime_dir"/packages # bloat
+			_echo "* added $src_mime_dir"
+		fi
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
