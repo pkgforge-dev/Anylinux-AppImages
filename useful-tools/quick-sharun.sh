@@ -93,7 +93,6 @@ fi
 export DST_DIR="$APPDIR"
 export GEN_LIB_PATH=1
 export HARD_LINKS=1
-export WITH_HOOKS=1
 export STRACE_MODE=${STRACE_MODE:-1}
 export WRAPPE_CLVL=${WRAPPE_CLVL:-15}
 export VERBOSE=1
@@ -3223,7 +3222,8 @@ for lib do case "$lib" in
 		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
 		if [ -d "$src_glib_schema_dir" ] && [ ! -d "$dst_glib_schema_dir" ]; then
 			mkdir -p "$dst_glib_schema_dir"
-			cp -rv "$src_glib_schema_dir"/* "$dst_glib_schema_dir"
+			cp -r "$src_glib_schema_dir"/* "$dst_glib_schema_dir"
+			_echo "* added $src_glib_schema_dir"
 		fi
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
@@ -3246,7 +3246,7 @@ for lib do case "$lib" in
 		if [ -f "$src_gtk_immodule_cache" ] && [ ! -f "$dst_gtk_immodule_cache" ]; then
 			cp -v "$src_gtk_immodule_cache" "$dst_gtk_immodule_cache"
 			sed -i -e 's|/usr/lib/.*/immodules/||g' "$dst_gtk_immodule_cache"
-			_echo "* addded $src_gtk_immodule_cache"
+			_echo "* added $src_gtk_immodule_cache"
 		fi
 		;;
 	*libglycin*.so*)
@@ -3257,9 +3257,9 @@ for lib do case "$lib" in
 		src_glycin_conf_dir=/usr/share/glycin-loaders
 		dst_glycin_conf_dir=$APPDIR/share/glycin-loaders
 		if [ -d "$src_glycin_conf_dir" ] && [ ! -d "$dst_glycin_conf_dir" ]; then
-			cp -r "$src_glib_schema_dir" "$dst_glycin_conf_dir"
+			cp -r "$src_glycin_conf_dir" "$dst_glycin_conf_dir"
 			sed -i -e 's|/usr/lib.*/||g' "$dst_glycin_conf_dir"/*/*/*.conf
-			_echo "* addded $src_glycin_conf_dir"
+			_echo "* added $src_glycin_conf_dir"
 		fi
 		;;
 	*libgtksourceview-*.so*)
