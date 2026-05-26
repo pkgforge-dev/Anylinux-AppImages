@@ -597,9 +597,10 @@ _determine_what_to_deploy() {
 					;;
 				*libwebkit*gtk-*.so*)
 					DEPLOY_WEBKIT2GTK=${DEPLOY_WEBKIT2GTK:-1}
-					_webkit_dirname=$(echo "$lib" \
-					  | grep -o 'webkit2gtk.*.so' | sed "s|\.so.*||")
-					WEBKIT_DIR=${lib%/*}/$_webkit_dirname
+					_webkit_dir=${lib##*/}          # get basename
+					_webkit_dir=${_webkit_dir#lib}  # strip lib
+					_webkit_dir=${_webkit_dir%.so*} # strip .so
+					WEBKIT2GTK_DIR=${WEBKIT2GTK_DIR:-${lib%/*}/$_webkit_dir}
 					;;
 				*libsoup-*.so*)
 					DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
@@ -795,13 +796,14 @@ _make_deployment_array() {
 			set -- "$@" "$LIB_DIR"/libnss_mdns*minimal.so*
 			if b=$(command -v bwrap);  then set -- "$@" "$b"; fi
 			if b=$(command -v xdg-dbus-proxy);  then set -- "$@" "$b"; fi
-			if [ ! -d "$WEBKIT_DIR" ]; then
-				_err_msg "Unable to find $WEBKIT_DIR directory"
-				_err_msg "Please set the WEBKIT_DIR variable to its location"
+			if [ ! -d "$WEBKIT2GTK_DIR" ]; then
+				_err_msg "Unable to find $WEBKIT2GTK_DIR directory"
+				_err_msg "Please set the WEBKIT2GTK_DIR variable to its location"
+				exit 1
 			fi
 			ADD_DIR="
 				$ADD_DIR
-				$WEBKIT_DIR
+				$WEBKIT2GTK_DIR
 			"
 		fi
 
@@ -3348,8 +3350,8 @@ for lib do case "$lib" in
 		dst_vulkan_dir=$APPDIR/share/vulkan/icd.d
 		if [ -d "$src_vulkan_dir" ] && [ ! -d "$dst_vulkan_dir" ]; then
 			mkdir -p "$dst_vulkan_dir"
-			cp -v "$src_vulkan_dir"/* "$dst_vulkan_dir"
-			sed -i -e 's|/usr/lib.*/||g' "$dst_vulkan_dir"
+			cp -v "$src_vulkan_dir"/*.json "$dst_vulkan_dir"
+			sed -i -e 's|/usr/lib.*/||g' "$dst_vulkan_dir"/*.json
 			_echo "* added $src_vulkan_dir"
 		fi
 		;;
