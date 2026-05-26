@@ -3221,12 +3221,12 @@ for lib do case "$lib" in
 			cp -rv "$src_glib_schema_dir"/* "$dst_glib_schema_dir"
 		fi
 		;;
-	*/gdk-pixbuf-*/*/loaders/*.so)
+	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
 		dst_gdkpixbuf_cache=${lib%/*}.cache
 		if [ -f "$src_gdkpixbuf_cache" ] && [ ! -f "$dst_gdkpixbuf_cache" ]; then
 			cp -v "$src_gdkpixbuf_cache" "$dst_gdkpixbuf_cache"
-			sed -i 's|/usr/lib/.*/loaders/||g' "$dst_gdkpixbuf_cache"
+			sed -i -e 's|/usr/lib/.*/loaders/||g' "$dst_gdkpixbuf_cache"
 			_echo "* added $src_gdkpixbuf_cache"
 		fi
 		;;
@@ -3234,6 +3234,58 @@ for lib do case "$lib" in
 		# TODO investigate the need to copy /usr/share/mime
 		# it is likely more libraries need this location
 
+	*/gtk-*/*/immodules/*.so)
+		_gtkver=$(echo "$lib" | tr '/' '\n' | grep '^gtk-')
+		src_gtk_immodule_cache=$(echo "$LIB_DIR"/"$_gtkver"/*/immodules.cache)
+		dst_gtk_immodule_cache=${lib%/*}.cache
+		if [ -f "$src_gtk_immodule_cache" ] && [ ! -f "$dst_gtk_immodule_cache" ]; then
+			cp -v "$src_gtk_immodule_cache" "$dst_gtk_immodule_cache"
+			sed -i -e 's|/usr/lib/.*/immodules/||g' "$dst_gtk_immodule_cache"
+			_echo "* addded $src_gtk_immodule_cache"
+		fi
+		;;
+	*libglycin*.so*)
+		if [ "$GNOME_GLYCIN" != 1 ]; then
+			continue # only GNOME glycin needs handling
+		fi
+		_add_bwrap_wrapper
+		src_glycin_conf_dir=/usr/share/glycin-loaders
+		dst_glycin_conf_dir=$APPDIR/share/glycin-loaders
+		if [ -d "$src_glycin_conf_dir" ] && [ ! -d "$dst_glycin_conf_dir" ]; then
+			cp -rv "$src_glib_schema_dir" "$dst_glycin_conf_dir"
+			sed -i -e 's|/usr/lib.*/||g' "$dst_glycin_conf_dir"/*/*/*.conf
+			_echo "* addded $src_glycin_conf_dir"
+		fi
+		;;
+	*libgtksourceview-*.so*)
+		_gtk_srcview_ver=$(echo "$lib" |  awk -F'-' '{print $NF}' | sed "s|\.so.*||")
+		src_gtk_srcview_dir=/usr/share/gtksourceview-$_gtk_srcview_ver
+		dst_gtk_srcview_dir=$APPDIR/share/gtksourceview-$_gtk_srcview_ver
+		if [ -d "$src_gtk_srcview_dir" ] && [ ! -d "$dst_gtk_srcview_dir" ]; then
+			cp -rv "$src_gtk_srcview_dir" "$dst_gtk_srcview_dir"
+			_echo "* added $src_gtk_srcview_dir"
+		fi
+		;;
+	*libfontconfig.so*)
+		src_fontconfig_config=/etc/fonts/fonts.conf
+		dst_fontconfig_config=$APPDIR/etc/fonts/fonts.conf
+		if [ -f "$src_fontconfig_config" ] && [ ! -f "$dst_fontconfig_config" ]; then
+			mkdir -p "${dst_fontconfig_config%/*}"
+			cp -v "$src_fontconfig_config" "$dst_fontconfig_config"
+			_echo "* added $src_fontconfig_config"
+		fi
+		;;
+
+		# TODO, the folks hook can be implemented better
+
+	*libthai*.so*)
+		src_libhai_dir=/usr/share/libthai
+		dst_libhai_dir=$APPDIR/share/libthai
+		if [ -d "$src_libhai_dir" ] && [ ! -d "$dst_libhai_dir" ]; then
+			cp -vr "$src_libhai_dir" "$dst_libhai_dir"
+			_echo "* added $src_libhai_dir"
+		fi
+		;;
 	*libgegl*)
 		# GEGL_PATH is problematic so we avoiud it
 		# patch the lib directly to load its plugins instead
@@ -3318,11 +3370,6 @@ for lib do case "$lib" in
 		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_bin_dir "$lib" || :
-		;;
-	*libglycin*.so*)
-		if [ "$GNOME_GLYCIN" = 1 ]; then
-			_add_bwrap_wrapper
-		fi
 		;;
 	*libdecor*.so*)
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
