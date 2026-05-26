@@ -2587,12 +2587,6 @@ _post_deployment_steps() {
 		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
 
-	# TODO upstream to sharun
-	f=$APPDIR/share/alsa/alsa.conf
-	if [ -f "$f" ]; then
-		sed -i -e 's|"/etc/alsa/conf.d"|"/etc/alsa/conf.d"\n\t\t\t{ @func concat strings [ { @func getenv vars [ SHARUN_DIR ] default "" } "/share/alsa/alsa.conf.d" ] }|' "$f"
-	fi
-
 	if [ -d "$APPDIR"/shared/lib/pipewire-0.3 ] && [ -d /usr/share/pipewire ]; then
 		cp -r /usr/share/pipewire "$APPDIR"/share
 		cat <<-'EOF' > "$APPDIR"/bin/01-pipewire-config.src.hook
@@ -3284,6 +3278,78 @@ for lib do case "$lib" in
 		if [ -d "$src_libhai_dir" ] && [ ! -d "$dst_libhai_dir" ]; then
 			cp -vr "$src_libhai_dir" "$dst_libhai_dir"
 			_echo "* added $src_libhai_dir"
+		fi
+		;;
+	*libasound*.so*)
+		src_alsaconf_dir=/usr/share/alsa
+		dst_alsaconf_dir=$APPDIR/share/alsa
+		if [ -d "$src_alsaconf_dir" ] && [ ! -d "$dst_alsaconf_dir" ]; then
+			cp -vr "$src_alsaconf_dir" "$dst_alsaconf_dir"
+			_echo "* added $src_alsaconf_dir"
+		fi
+		# Adding alsa config dir is not enough, the file is harcoded
+		# to load additional files on the host
+		f=$APPDIR/share/alsa/alsa.conf
+		if [ -f "$f" ] && ! grep -q 'SHARUN_DIR' "$f"; then
+			sed -i -e \
+			  's|"/etc/alsa/conf.d"|"/etc/alsa/conf.d"\n\t\t\t{ @func concat strings [ { @func getenv vars [ SHARUN_DIR ] default "" } "/share/alsa/alsa.conf.d" ] }|' \
+			  "$f"
+		fi
+		;;
+	*libxkbcommon*.so*)
+		src_xkb_dir=/usr/share/X11/xkb
+		dst_xkb_dir=$APPDIR/share/X11/xkb
+		if [ -d "$src_xkb_dir" ] && [ ! -d "$dst_xkb_dir" ]; then
+			mkdir -p "$dst_xkb_dir"
+			cp -rv "$src_xkb_dir"/* "$dst_xkb_dir"
+			_echo "* added $src_xkb_dir"
+		fi
+
+		# TODO: Is libxkbcommon the only library that needs X11 locales? There is likely more.
+		src_xlocale_dir=/usr/share/X11/locale
+		dst_xlocale_dir=$APPDIR/share/X11/locale
+		if [ -d "$src_xlocale_dir" ] && [ ! -d "$dst_xlocale_dir" ]; then
+			mkdir -p "$dst_xlocale_dir"
+			cp -rv "$src_xlocale_dir"/* "$dst_xlocale_dir"
+			_echo "* added $src_xlocale_dir"
+		fi
+		;;
+	*libgbm.so*) # This hook should never be hit since OpenGL deployment already handles this
+		src_gbm_backends_dir=$LIB_DIR/gbm
+		dst_gbm_backends_dir=$DST_LIB_DIR/gbm
+		if [ -d "$src_gbm_backends_dir" ] && [ ! -d "$dst_gbm_backends_dir" ]; then
+			cp -vr "$src_gbm_backends_dir" "$dst_gbm_backends_dir"
+			_echo "* added $src_gbm_backends_dir"
+		fi
+		;;
+	*libEGL_mesa.so*)
+		src_glvnd_dir=/usr/share/glvnd/egl_vendor.d
+		dst_glvnd_dir=$APPDIR/share/glvnd/egl_vendor.d
+		if [ -d "$src_glvnd_dir" ] && [ ! -d "$dst_glvnd_dir" ]; then
+			mkdir -p "$dst_glvnd_dir"
+			cp -v "$src_glvnd_dir"/*.json "$dst_glvnd_dir"
+			sed -i -e 's|/usr/lib.*/||g' "$dst_glvnd_dir"/*.json
+			_echo "* added $src_glvnd_dir"
+		fi
+		;;
+	*libvulkan.so*)
+		src_vulkan_dir=/usr/share/vulkan/icd.d
+		dst_vulkan_dir=$APPDIR/share/vulkan/icd.d
+		if [ -d "$src_vulkan_dir" ] && [ ! -d "$dst_vulkan_dir" ]; then
+			mkdir -p "$dst_vulkan_dir"
+			cp -v "$src_vulkan_dir"/* "$dst_vulkan_dir"
+			sed -i -e 's|/usr/lib.*/||g' "$dst_vulkan_dir"
+			_echo "* added $src_vulkan_dir"
+		fi
+		;;
+	libVkLayer*.so*)
+		# find vulkan layer icd file
+		src_vklayer_icd=$(grep -r "${lib##*/}" /usr/share/vulkan/* | awk -F':' '{print $1; exit}')
+		dst_vklayer_icd=$APPDIR/${src_vklayer_icd#/usr/}
+		if [ -f "$src_vklayer_icd" ] && [ ! -f "$dst_vklayer_icd" ]; then
+			mkdir -p "${dst_vklayer_icd%/*}"
+			cp -v "$src_vklayer_icd" "$dst_vklayer_icd"
+			_echo "* added vulkan layer icd: $src_vklayer_icd"
 		fi
 		;;
 	*libgegl*)
