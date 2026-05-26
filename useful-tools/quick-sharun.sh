@@ -97,6 +97,7 @@ export WITH_HOOKS=1
 export STRACE_MODE=${STRACE_MODE:-1}
 export WRAPPE_CLVL=${WRAPPE_CLVL:-15}
 export VERBOSE=1
+export WITH_HOOKS=0
 
 if [ -z "$NO_STRIP" ]; then
 	export STRIP=1
@@ -3191,6 +3192,35 @@ set -- \
 	"$DST_LIB_DIR"/*/*/*/*.so*
 
 for lib do case "$lib" in
+	*gio/modules/*.so*)
+		src_gio_cache=$LIB_DIR/gio/modules/giomodule.cache
+		dst_gio_cache=$DST_LIB_DIR/gio/modules/giomodule.cache
+		if [ -f "$src_gio_cache" ] && [ ! -f "$dst_gio_cache" ]; then
+			cp -v "$src_gio_cache" "$dst_gio_cache"
+			_echo "* added $src_gio_cache"
+		fi
+		;;
+	*libgio-*.so*)
+		f=$APPDIR/bin/gio-launch-desktop
+		if [ ! -x "$f" ]; then
+			cat <<-'EOF' > "$f"
+			#!/bin/sh
+			export GIO_LAUNCHED_DESKTOP_FILE_PID=$$
+			exec "$@"
+			EOF
+			chmod +x "$f"
+			_echo "* added $f wrapper"
+		fi
+		;;
+	*libglib-*.so*)
+		glibver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
+		src_glib_schema_dir=/usr/share/glib-$glibver/schemas
+		dst_glib_schema_dir=$APPDIR/share/glib-$glibver/schemas
+		if [ -d "$src_glib_schema_dir" ] && [ ! -d "$dst_glib_schema_dir" ]; then
+			mkdir -p "$dst_glib_schema_dir"
+			cp -rv "$src_glib_schema_dir"/* "$dst_glib_schema_dir"
+		fi
+		;;
 	*libgegl*)
 		# GEGL_PATH is problematic so we avoiud it
 		# patch the lib directly to load its plugins instead
