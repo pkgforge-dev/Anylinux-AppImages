@@ -1140,6 +1140,30 @@ _make_deployment_array() {
 	TO_DEPLOY_ARRAY=$(_save_array "$@")
 }
 
+# run ldd on all the given arguments, filter and sort
+_list_dependencies() {
+	for elf do
+		if [ -f "$elf" ]; then
+			ldd "$elf"
+		fi
+	done  | tr '[[:space:]]' '\n' | grep '/' | sort -u
+}
+
+# preserve original lib structure at destination
+_determine_dst_dir() {
+	__dst_dir=$(
+		echo "$1" | sed \
+		-e "s|^$LIB_DIR||" \
+		-e 's|^/usr||'     \
+		-e 's|^/opt||'     \
+		-e 's|^/lib64||'   \
+		-e 's|^/lib32||'   \
+		-e 's|^/lib||'     \
+		-e 's|^/[^/]*-linux-gnu||'
+	)
+	echo "$DST_LIB_DIR"/"$__dst_dir"
+}
+
 _get_sharun() {
 	if [ ! -x "$TMPDIR"/sharun-aio ]; then
 		_echo "Downloading sharun..."
