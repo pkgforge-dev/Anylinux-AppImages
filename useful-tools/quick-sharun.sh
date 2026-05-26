@@ -3246,10 +3246,6 @@ for lib do case "$lib" in
 			_echo "* added $src_gdkpixbuf_cache"
 		fi
 		;;
-
-		# TODO investigate the need to copy /usr/share/mime
-		# it is likely more libraries need this location
-
 	*/gtk-*/*/immodules/*.so)
 		_gtkver=$(echo "$lib" | tr '/' '\n' | grep '^gtk-')
 		src_gtk_immodule_cache=$(echo "$LIB_DIR"/"$_gtkver"/*/immodules.cache)
