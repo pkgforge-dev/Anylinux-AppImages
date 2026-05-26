@@ -3327,8 +3327,8 @@ for lib do case "$lib" in
 			cp -r "$src_xkb_dir"/* "$dst_xkb_dir"
 			_echo "* added $src_xkb_dir"
 		fi
-
-		# TODO: Is libxkbcommon the only library that needs X11 locales? There is likely more.
+		;;
+	*libX11.so*)
 		src_xlocale_dir=/usr/share/X11/locale
 		dst_xlocale_dir=$APPDIR/share/X11/locale
 		if [ -d "$src_xlocale_dir" ] && [ ! -d "$dst_xlocale_dir" ]; then
