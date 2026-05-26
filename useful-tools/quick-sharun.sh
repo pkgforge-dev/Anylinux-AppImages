@@ -3221,6 +3221,19 @@ for lib do case "$lib" in
 			cp -rv "$src_glib_schema_dir"/* "$dst_glib_schema_dir"
 		fi
 		;;
+	*/gdk-pixbuf-*/*/loaders/*.so)
+		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
+		dst_gdkpixbuf_cache=${lib%/*}.cache
+		if [ -f "$src_gdkpixbuf_cache" ] && [ ! -f "$dst_gdkpixbuf_cache" ]; then
+			cp -v "$src_gdkpixbuf_cache" "$dst_gdkpixbuf_cache"
+			sed -i 's|/usr/lib/.*/loaders/||g' "$dst_gdkpixbuf_cache"
+			_echo "* added $src_gdkpixbuf_cache"
+		fi
+		;;
+
+		# TODO investigate the need to copy /usr/share/mime
+		# it is likely more libraries need this location
+
 	*libgegl*)
 		# GEGL_PATH is problematic so we avoiud it
 		# patch the lib directly to load its plugins instead
