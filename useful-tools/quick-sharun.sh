@@ -3157,8 +3157,6 @@ _check_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
-_deploy_datadir
-_deploy_locale
 _check_window_class
 _add_gtk_class_fix
 
@@ -3574,6 +3572,8 @@ for lib do case "$lib" in
 	esac
 done
 
+_deploy_datadir
+_deploy_locale
 _post_deployment_steps
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
