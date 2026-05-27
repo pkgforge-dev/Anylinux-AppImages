@@ -3365,6 +3365,7 @@ for lib do case "$lib" in
 		if [ -f "$src_vklayer_icd" ] && [ ! -f "$dst_vklayer_icd" ]; then
 			mkdir -p "${dst_vklayer_icd%/*}"
 			cp -vL "$src_vklayer_icd" "$dst_vklayer_icd"
+			sed -i -e 's|/usr/lib.*/||g' "$dst_vklayer_icd"
 			_echo "* added vulkan layer icd: $src_vklayer_icd"
 		fi
 		;;
