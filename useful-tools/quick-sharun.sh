@@ -3354,6 +3354,21 @@ for lib do case "$lib" in
 			sed -i -e 's|/usr/lib.*/||g' "$dst_glvnd_dir"/*.json
 			_echo "* added $src_glvnd_dir"
 		fi
+
+		src_drirc_dir=/usr/share/drirc.d
+		dst_drirc_dir=$APPDIR/share/drirc.d
+		if [ -d "$src_drirc_dir" ] && [ ! -d "$dst_drirc_dir" ]; then
+			cp -r "$src_drirc_dir" "$dst_drirc_dir"
+			_echo "* added $src_drirc_dir"
+		fi
+		;;
+	*libdrm_amdgpu.so*)
+		src_libdrm_dir=/usr/share/libdrm
+		dst_libdrm_dir=$APPDIR/share/libdrm
+		if [ -d "$src_libdrm_dir" ] && [ ! -d "$dst_libdrm_dir" ]; then
+			cp -r "$src_libdrm_dir" "$dst_libdrm_dir"
+			_echo "* added $src_libdrm_dir"
+		fi
 		;;
 	*libvulkan.so*)
 		src_vulkan_dir=/usr/share/vulkan/icd.d
@@ -3391,6 +3406,22 @@ for lib do case "$lib" in
 		if [ -d "$src_tabset_dir" ] && [ ! -d "$dst_tabset_dir" ]; then
 			cp -r "$src_tabset_dir" "$dst_tabset_dir"
 			_echo "* added $src_tabset_dir"
+		fi
+		;;
+	*/qt*/plugins/*.so)
+		f=$APPDIR/bin/qt.conf
+		if [ ! -f "$f" ]; then
+			_qtdir=${lib#$DST_LIB_DIR/} # leaves qt*
+			_qtdir=${_qtdir%%/*}        # gets basename
+			_libdir=${DST_LIB_DIR##*/}  # libdir basename (lib or lib32)
+			cat <<-EOF > "$f"
+			[Paths]
+			Prefix = ../$_libdir/$_qtdir
+			Plugins = plugins
+			Imports = qml
+			Qml2Imports = qml
+			EOF
+			_echo "* added $f "
 		fi
 		;;
 	*libmagic.so*)
