@@ -1462,26 +1462,34 @@ _deploy_datadir() {
 					defaults    |\
 					doc         |\
 					dotnet      |\
+					drirc.d     |\
 					et          |\
 					factory     |\
 					file        |\
 					fish        |\
 					fonts       |\
 					fontconfig  |\
+					ghostscript |\
 					git         |\
+					glib-*      |\
 					glvnd       |\
+					glycin*     |\
 					gtk-doc     |\
+					gtksource*  |\
 					gvfs        |\
 					help        |\
 					i18n        |\
 					icons       |\
 					info        |\
 					java        |\
+					libdrm      |\
+					libthai     |\
 					locale      |\
 					man         |\
 					misc        |\
 					mime        |\
 					model       |\
+					p11-kit     |\
 					pipewire    |\
 					pixmaps     |\
 					qt          |\
@@ -1492,6 +1500,8 @@ _deploy_datadir() {
 					ss          |\
 					swift       |\
 					systemd     |\
+					tabset      |\
+					terminfo    |\
 					themes      |\
 					vala        |\
 					vulkan      |\
