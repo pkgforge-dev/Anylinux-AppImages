@@ -3436,7 +3436,7 @@ for lib do case "$lib" in
 			fi
 		fi
 		;;
-	 */gconv/*.so)
+	*/gconv/*.so)
 		src_gconvm_file=$LIB_DIR/gconv/gconv-modules
 		dst_gconvm_file=$DST_LIB_DIR/gconv/gconv-modules
 		if [ -f "$src_gconvm_file" ] && [ ! -f "$dst_gconvm_file" ]; then
@@ -3445,7 +3445,7 @@ for lib do case "$lib" in
 			_echo "* added $src_gconvm_file"
 		fi
 		;;
-	*/libc*.so*)
+	*/libc.so*)
 		src_c_locale_dir=/usr/lib/locale/C.utf8
 		dst_c_locale_dir=$DST_LIB_DIR/locale/C.utf8
 		mkdir -p "$DST_LIB_DIR"/locale
