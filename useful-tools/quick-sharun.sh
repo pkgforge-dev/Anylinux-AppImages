@@ -3273,11 +3273,11 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/libthai*.so*)
-		src_libhai_dir=/usr/share/libthai
-		dst_libhai_dir=$APPDIR/share/libthai
-		if [ -d "$src_libhai_dir" ] && [ ! -d "$dst_libhai_dir" ]; then
-			cp -r "$src_libhai_dir" "$dst_libhai_dir"
-			_echo "* added $src_libhai_dir"
+		src_libthai_dir=/usr/share/libthai
+		dst_libthai_dir=$APPDIR/share/libthai
+		if [ -d "$src_libthai_dir" ] && [ ! -d "$dst_libthai_dir" ]; then
+			cp -r "$src_libthai_dir" "$dst_libthai_dir"
+			_echo "* added $src_libthai_dir"
 		fi
 		;;
 	*/libasound*.so*)
