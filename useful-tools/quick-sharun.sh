@@ -3468,7 +3468,6 @@ for lib do case "$lib" in
 		if [ -d /usr/share/p11-kit ] && [ ! -d "$APPDIR"/share/p11-kit ]; then
 			cp -r /usr/share/p11-kit "$APPDIR"/share
 		fi
-		continue
 		;;
 	*/p11-kit-trust.so*)
 		# Because OpenSUSE had to ruin this, we will have to patch the
