@@ -269,6 +269,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced) |
 | [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage) |
 | [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage) |
+| [OpenTubeX](https://github.com/pkgforge-dev/OpenTubeX-Appimage-Enhanced) |
 | [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage) |
 | [OpenXRay](https://github.com/pkgforge-dev/OpenXRay-AppImage) |
 | [OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage) |
@@ -395,6 +396,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage) |
 | [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage) |
 | [UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage) |
+| [Unity Hub](https://github.com/pkgforge-dev/UnityHub-AppImage) |
 | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage) |
 | [Varia](https://github.com/pkgforge-dev/Varia-AppImage) |
 | [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage) |
