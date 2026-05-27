@@ -1249,18 +1249,6 @@ _add_anylinux_lib() {
 		echo "anylinux.so" >> "$APPDIR"/.preload
 	fi
 
-	# remove xdg-open wrapper not needed when the lib is in use
-	# we still need to have a wrapper for gio-launch-desktop though
-	if [ -f "$APPDIR"/bin/gio-launch-desktop ]; then
-		rm -f "$APPDIR"/bin/gio-launch-desktop
-		cat <<-'EOF' > "$APPDIR"/bin/gio-launch-desktop
-		#!/bin/sh
-		export GIO_LAUNCHED_DESKTOP_FILE_PID=$$
-		exec "$@"
-		EOF
-		chmod +x "$APPDIR"/bin/gio-launch-desktop
-	fi
-	rm -f "$APPDIR"/bin/xdg-open
 	_echo "* anylinux.so successfully added!"
 }
 
