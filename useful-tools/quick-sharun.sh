@@ -2585,6 +2585,8 @@ _post_deployment_steps() {
 		fi
 		EOF
 	fi
+
+	"$APPDIR"/sharun -g || :
 }
 
 _add_apprun() {
@@ -3174,7 +3176,7 @@ set -- \
 	"$DST_LIB_DIR"/*/*/*/*.so*
 
 for lib do case "$lib" in
-	*gio/modules/*.so*)
+	*/gio/modules/*.so*)
 		src_gio_cache=$LIB_DIR/gio/modules/giomodule.cache
 		dst_gio_cache=$DST_LIB_DIR/gio/modules/giomodule.cache
 		if [ -f "$src_gio_cache" ] && [ ! -f "$dst_gio_cache" ]; then
@@ -3182,7 +3184,7 @@ for lib do case "$lib" in
 			_echo "* added $src_gio_cache"
 		fi
 		;;
-	*libgio-*.so*)
+	*/libgio-*.so*)
 		f=$APPDIR/bin/gio-launch-desktop
 		if [ ! -x "$f" ]; then
 			cat <<-'EOF' > "$f"
@@ -3194,7 +3196,7 @@ for lib do case "$lib" in
 			_echo "* added $f wrapper"
 		fi
 		;;
-	*libglib-*.so*)
+	*/libglib-*.so*)
 		_glibver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
 		src_glib_schema_dir=/usr/share/glib-$_glibver/schemas
 		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
@@ -3232,7 +3234,7 @@ for lib do case "$lib" in
 			_echo "* added $src_gtk_immodule_cache"
 		fi
 		;;
-	*libglycin*.so*)
+	*/libglycin*.so*)
 		if [ "$GNOME_GLYCIN" != 1 ]; then
 			continue # only GNOME glycin needs handling
 		fi
@@ -3245,7 +3247,7 @@ for lib do case "$lib" in
 			_echo "* added $src_glycin_conf_dir"
 		fi
 		;;
-	*libgtksourceview-*.so*)
+	*/libgtksourceview-*.so*)
 		_gtk_srcview_ver=$(echo "$lib" |  awk -F'-' '{print $NF}' | sed "s|\.so.*||")
 		src_gtk_srcview_dir=/usr/share/gtksourceview-$_gtk_srcview_ver
 		dst_gtk_srcview_dir=$APPDIR/share/gtksourceview-$_gtk_srcview_ver
@@ -3254,7 +3256,7 @@ for lib do case "$lib" in
 			_echo "* added $src_gtk_srcview_dir"
 		fi
 		;;
-	*libfontconfig.so*)
+	*/libfontconfig.so*)
 		src_fontconfig_config=/etc/fonts/fonts.conf
 		dst_fontconfig_config=$APPDIR/etc/fonts/fonts.conf
 		if [ -f "$src_fontconfig_config" ] && [ ! -f "$dst_fontconfig_config" ]; then
@@ -3263,7 +3265,7 @@ for lib do case "$lib" in
 			_echo "* added $src_fontconfig_config"
 		fi
 		;;
-	*libfolks*.so*)
+	*/libfolks*.so*)
 		src_folks_dir=$LIB_DIR/folks
 		dst_folks_dir=$DST_LIB_DIR/folks
 		if [ -d "$src_folks_dir" ] && [ ! -d "$dst_folks_dir" ]; then
@@ -3271,7 +3273,7 @@ for lib do case "$lib" in
 			_echo "* added $src_folks_dir"
 		fi
 		;;
-	*libthai*.so*)
+	*/libthai*.so*)
 		src_libhai_dir=/usr/share/libthai
 		dst_libhai_dir=$APPDIR/share/libthai
 		if [ -d "$src_libhai_dir" ] && [ ! -d "$dst_libhai_dir" ]; then
@@ -3279,7 +3281,7 @@ for lib do case "$lib" in
 			_echo "* added $src_libhai_dir"
 		fi
 		;;
-	*libasound*.so*)
+	*/libasound*.so*)
 		src_alsaconf_dir=/usr/share/alsa
 		dst_alsaconf_dir=$APPDIR/share/alsa
 		if [ -d "$src_alsaconf_dir" ] && [ ! -d "$dst_alsaconf_dir" ]; then
@@ -3295,7 +3297,7 @@ for lib do case "$lib" in
 			  "$f"
 		fi
 		;;
-	*libxkbcommon*.so*)
+	*/libxkbcommon*.so*)
 		src_xkb_dir=/usr/share/X11/xkb
 		dst_xkb_dir=$APPDIR/share/X11/xkb
 		if [ -d "$src_xkb_dir" ] && [ ! -d "$dst_xkb_dir" ]; then
@@ -3304,7 +3306,7 @@ for lib do case "$lib" in
 			_echo "* added $src_xkb_dir"
 		fi
 		;;
-	*libX11.so*)
+	*/libX11.so*)
 		src_xlocale_dir=/usr/share/X11/locale
 		dst_xlocale_dir=$APPDIR/share/X11/locale
 		if [ -d "$src_xlocale_dir" ] && [ ! -d "$dst_xlocale_dir" ]; then
@@ -3313,7 +3315,7 @@ for lib do case "$lib" in
 			_echo "* added $src_xlocale_dir"
 		fi
 		;;
-	*libgbm.so*) # This hook should never be hit since OpenGL deployment already handles this
+	*/libgbm.so*) # This hook should never be hit since OpenGL deployment already handles this
 		src_gbm_backends_dir=$LIB_DIR/gbm
 		dst_gbm_backends_dir=$DST_LIB_DIR/gbm
 		if [ -d "$src_gbm_backends_dir" ] && [ ! -d "$dst_gbm_backends_dir" ]; then
@@ -3321,7 +3323,7 @@ for lib do case "$lib" in
 			_echo "* added $src_gbm_backends_dir"
 		fi
 		;;
-	*libEGL_mesa.so*)
+	*/libEGL_mesa.so*)
 		src_glvnd_dir=/usr/share/glvnd/egl_vendor.d
 		dst_glvnd_dir=$APPDIR/share/glvnd/egl_vendor.d
 		if [ -d "$src_glvnd_dir" ] && [ ! -d "$dst_glvnd_dir" ]; then
@@ -3338,7 +3340,7 @@ for lib do case "$lib" in
 			_echo "* added $src_drirc_dir"
 		fi
 		;;
-	*libdrm_amdgpu.so*)
+	*/libdrm_amdgpu.so*)
 		src_libdrm_dir=/usr/share/libdrm
 		dst_libdrm_dir=$APPDIR/share/libdrm
 		if [ -d "$src_libdrm_dir" ] && [ ! -d "$dst_libdrm_dir" ]; then
@@ -3346,7 +3348,7 @@ for lib do case "$lib" in
 			_echo "* added $src_libdrm_dir"
 		fi
 		;;
-	*libvulkan.so*)
+	*/libvulkan.so*)
 		src_vulkan_dir=/usr/share/vulkan/icd.d
 		dst_vulkan_dir=$APPDIR/share/vulkan/icd.d
 		if [ -d "$src_vulkan_dir" ] && [ ! -d "$dst_vulkan_dir" ]; then
@@ -3356,7 +3358,7 @@ for lib do case "$lib" in
 			_echo "* added $src_vulkan_dir"
 		fi
 		;;
-	libVkLayer*.so*)
+	*/libVkLayer*.so*)
 		# find vulkan layer icd file
 		src_vklayer_icd=$(grep -r "${lib##*/}" /usr/share/vulkan/* | awk -F':' '{print $1; exit}')
 		dst_vklayer_icd=$APPDIR/${src_vklayer_icd#/usr/}
@@ -3369,7 +3371,7 @@ for lib do case "$lib" in
 	# this hook is a common false positive
 	# because a lot of applications execute commands thru the system shell
 	# and that often links to this library, causing overdeployment of terminfo files
-	*libncursesw.so*|*libcursesw.so*|*libcurses.so*)
+	*/libncursesw.so*|*/libcursesw.so*|*/libcurses.so*)
 		src_terminfo_dir=/usr/share/terminfo
 		dst_terminfo_dir=$APPDIR/share/terminfo
 		if [ -d "$src_terminfo_dir" ] && [ ! -d "$dst_terminfo_dir" ]; then
@@ -3400,7 +3402,7 @@ for lib do case "$lib" in
 			_echo "* added $f "
 		fi
 		;;
-	*libmagic.so*)
+	*/libmagic.so*)
 		# sharun only checks for $SHARUN_DIR/share/file/misc/magic.mgc
 		# but on ubuntu for example, the file is located in /usr/share/file/magic.mgc
 		# so we need to find the magic.mgc file and copy it to dst
@@ -3465,13 +3467,13 @@ for lib do case "$lib" in
 			fi
 		fi
 		;;
-	*libgegl*)
+	*/libgegl*)
 		# GEGL_PATH is problematic so we avoiud it
 		# patch the lib directly to load its plugins instead
 		_patch_away_usr_lib_dir "$lib" || continue
 		echo 'unset GEGL_PATH' >> "$APPENV"
 		;;
-	*libp11-kit.so*)
+	*/libp11-kit.so*)
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_share_dir "$lib" || :
 		if [ -d /usr/share/p11-kit ] && [ ! -d "$APPDIR"/share/p11-kit ]; then
@@ -3479,7 +3481,7 @@ for lib do case "$lib" in
 		fi
 		continue
 		;;
-	*p11-kit-trust.so*)
+	*/p11-kit-trust.so*)
 		# Because OpenSUSE had to ruin this, we will have to patch the
 		# the certificates to a path in /tmp that we will later make
 		# a symlink that points to the real host certs location
@@ -3504,14 +3506,14 @@ for lib do case "$lib" in
 		_echo "* fixed path to /etc/ssl/certs in $lib"
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
-	*libgimpwidgets*)
+	*/libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
-	*libmlt*.so*)
+	*/libmlt*.so*)
 		_patch_away_usr_lib_dir "$lib" || continue
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
-	*libMangoHud*.so*)
+	*/libMangoHud*.so*)
 		src_mangohud_layer=$(echo /usr/share/vulkan/implicit_layer.d/MangoHud*.json)
 		dst_mangohud_layer="$APPDIR"/share/vulkan/implicit_layer.d/"${src_mangohud_layer##*/}"
 		if [ -f "$src_mangohud_layer" ] && [ ! -f "$dst_mangohud_layer" ]; then
@@ -3533,16 +3535,16 @@ for lib do case "$lib" in
 			_echo "Copied over mangohud layer and patched mangohud"
 		fi
 		;;
-	*libwebkit*gtk-*.so*)
+	*/libwebkit*gtk-*.so*)
 		_add_bwrap_wrapper
 		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_bin_dir "$lib" || :
 		;;
-	*libdecor*.so*)
+	*/libdecor*.so*)
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
 		;;
-	*libSDL*.so*)
+	*/libSDL*.so*)
 		# make sure SDL does not attempt to use pipewire when not deployed
 		if [ "$DEPLOY_PIPEWIRE" != 1 ] \
 		  && ! grep -q 'SDL_AUDIODRIVER=' "$APPENV" 2>/dev/null; then
