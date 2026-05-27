@@ -396,6 +396,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage) |
 | [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage) |
 | [UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage) |
+| [Unity Hub](https://github.com/pkgforge-dev/UnityHub-AppImage) |
 | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage) |
 | [Varia](https://github.com/pkgforge-dev/Varia-AppImage) |
 | [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage) |
