@@ -1480,6 +1480,7 @@ _deploy_datadir() {
 					locale      |\
 					man         |\
 					misc        |\
+					mime        |\
 					model       |\
 					pipewire    |\
 					pixmaps     |\
