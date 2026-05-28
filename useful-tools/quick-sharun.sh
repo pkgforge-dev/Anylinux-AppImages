@@ -59,7 +59,7 @@ DEPENDENCIES="
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
-PATH_MAPPING_SCRIPT="$APPDIR"/bin/01-path-mapping-hardcoded.src.hook
+PATH_MAPPING_SCRIPT="$APPDIR"/bin/01-path-mapping-hardcoded.hook
 
 if [ -f "$PATH_MAPPING_SCRIPT" ]; then
 	while IFS= read -r line; do
@@ -906,7 +906,7 @@ _make_deployment_array() {
 			set -- "$@" \
 				"$LIB_DIR"/libvulkan*.so*  \
 				"$LIB_DIR"/libVkLayer*.so*
-			ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}vulkan-check.src.hook"
+			ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}vulkan-check.hook"
 		fi
 	fi
 	if [ "$DEPLOY_PIPEWIRE" = 1 ]; then
@@ -1304,7 +1304,7 @@ _check_always_software() {
 }
 
 _add_p11kit_cert_hook() {
-	cert_check="$APPDIR"/bin/01-check-ca-certs.src.hook
+	cert_check="$APPDIR"/bin/01-check-ca-certs.hook
 	if [ -f "$cert_check" ]; then
 		return 0
 	fi
@@ -3566,7 +3566,7 @@ for lib do case "$lib" in
 		_patch_away_usr_bin_dir "$lib" || :
 		;;
 	*/libdecor*.so*)
-		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
+		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.hook"
 		;;
 	*/libSDL*.so*)
 		# make sure SDL does not attempt to use pipewire when not deployed
