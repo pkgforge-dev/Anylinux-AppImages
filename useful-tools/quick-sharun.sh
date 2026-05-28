@@ -3369,7 +3369,7 @@ for lib do case "$lib" in
 			  fi
 			)
 		fi
-	fi
+		;;
 	*/libmagic.so*)
 		# sharun only checks for $SHARUN_DIR/share/file/misc/magic.mgc
 		# but on ubuntu for example, the file is located in /usr/share/file/magic.mgc
