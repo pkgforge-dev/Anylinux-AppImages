@@ -2367,6 +2367,7 @@ _check_hardcoded_data_dirs() {
 			libdrm   |\
 			libthai  |\
 			locale   |\
+			pipewire*|\
 			terminfo |\
 			vulkan   |\
 			X11      )
