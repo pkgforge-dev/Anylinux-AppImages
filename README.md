@@ -64,6 +64,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced) |
 | [BanjoRecomp](https://github.com/pkgforge-dev/BanjoRecomp-AppImage) |
 | [BasiliskII](https://github.com/pkgforge-dev/BasiliskII-AppImage-Enhanced) |
+| [BetterMediaInfo](https://github.com/pkgforge-dev/BetterMediaInfo-AppImage-Enhanced) |
 | [BibleTime](https://github.com/pkgforge-dev/BibleTime-AppImage) |
 | [BigPEmu](https://github.com/pkgforge-dev/BigPEmu-AppImage) |
 | [Bitwarden](https://github.com/pkgforge-dev/Bitwarden-AppImage-Enhanced) |
