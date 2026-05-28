@@ -97,10 +97,7 @@ export STRACE_MODE=${STRACE_MODE:-1}
 export WRAPPE_CLVL=${WRAPPE_CLVL:-15}
 export VERBOSE=1
 export WITH_HOOKS=0
-
-if [ -z "$NO_STRIP" ]; then
-	export STRIP=1
-fi
+export STRIP=0
 
 # github actions doesn't set USER and XDG_RUNTIME_DIR
 # causing some apps crash when running xvfb-run
@@ -503,6 +500,10 @@ _is_deployable_binary() {
 	return 1
 }
 
+_is_bun_binary() {
+	grep -aq -m1 '__bun_' "$1"
+}
+
 _determine_what_to_deploy() {
 	for bin do
 		# ignore flags
@@ -523,7 +524,7 @@ _determine_what_to_deploy() {
 				$bin
 			"
 		elif [ -x "$bin" ]; then
-			# some apps may dlopen pulseaudio instead of linking directly
+	# some apps may dlopen pulseaudio instead of linking directly
 			if grep -aoq -m 1 'libpulse.so' "$bin"; then
 				DEPLOY_PULSE=${DEPLOY_PULSE:-1}
 			fi
@@ -2367,6 +2368,7 @@ _check_hardcoded_data_dirs() {
 			libdrm   |\
 			libthai  |\
 			locale   |\
+			pipewire*|\
 			terminfo |\
 			vulkan   |\
 			X11      )
@@ -2485,6 +2487,39 @@ _post_deployment_steps() {
 	fi
 
 	"$APPDIR"/sharun -g || :
+}
+
+_strip_bins_and_libs() {
+	if [ "$NO_STRIP" = 1 ]; then
+		return 0
+	elif ! _is_cmd strip; then
+		_err_msg "Skipping strip since 'strip' is NOT installed!"
+		sleep 5
+		return 0
+	fi
+
+	if [ "$NO_STRIP" != 'libraries' ]; then
+		find "$APPDIR" -type f -name '*.so*' \
+			-exec strip -s -R .comment --strip-unneeded {} \; || :
+		_echo "* stripped libraries"
+	fi
+
+	if [ "$NO_STRIP" != 'binaries' ]; then
+		while IFS="" read -r f; do
+			if [ ! -x "$f" ]; then
+				continue
+			elif _is_bun_binary "$f"; then
+				continue # bun binaries are delicate
+			fi
+			case "$f" in
+				*/python*) continue;; # python binaries break
+			esac
+			strip -s -R .comment --strip-unneeded "$f" || :
+		done <<-EOF
+		$(find "$APPDIR"/shared/bin/ "$APPDIR"/lib*/ -type f)
+		EOF
+		_echo "* stripped binaries"
+	fi
 }
 
 _add_apprun() {
@@ -3577,6 +3612,7 @@ done
 _deploy_datadir
 _deploy_locale
 _post_deployment_steps
+_strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
 
