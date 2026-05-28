@@ -3351,7 +3351,7 @@ for lib do case "$lib" in
 			rm -f "$dst_qt_trans"/assistant*.qm
 			rm -f "$dst_qt_trans"/designer*.qm
 			rm -f "$dst_qt_trans"/linguist*.qm
-			_echo "* added Qt translations"
+			_echo "* added $src_qt_trans"
 		fi
 		;;
 	*/libgs.so*)
@@ -3368,6 +3368,7 @@ for lib do case "$lib" in
 			  	echo 'GS_LIB=${SHARUN_DIR}/share/ghostscript/Resource/Init' >> "$APPENV"
 			  fi
 			)
+			_echo "* added $src_gs_dir"
 		fi
 		;;
 	*/libmagic.so*)
