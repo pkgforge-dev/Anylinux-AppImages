@@ -3358,7 +3358,7 @@ for lib do case "$lib" in
 		src_gs_dir=/usr/share/ghostscript
 		dst_gs_dir=$APPDIR/share/ghostscript
 		if [ -d "$src_gs_dir" ] && [ ! -d "$dst_gs_dir" ]; then
-			cp -r "$src_gsdir" "$APPDIR"/share
+			cp -r "$src_gs_dir" "$dst_gs_dir"
 			(
 			  cd "$dst_gs_dir"
 			  d=$(echo ./*/Resource/Init)
@@ -3437,9 +3437,9 @@ for lib do case "$lib" in
 		;;
 	*/libgegl*.so*)
 		src_gegl_dir=$(echo "$LIB_DIR"/gegl-*)
-		dst_gegl_dir=$DST_LIB_DIR/${gegldir##*/}
+		dst_gegl_dir=$DST_LIB_DIR/${src_gegl_dir##*/}
 		if [ -d "$src_gegl_dir" ] && [ -d "$dst_gegl_dir" ]; then
-			if cp "$gegldir"/*.json "$dst_gegldir"; then
+			if cp "$src_gegl_dir"/*.json "$dst_gegldir"; then
 				_echo "* Copied gegl json files"
 			fi
 		fi
