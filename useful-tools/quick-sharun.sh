@@ -3441,7 +3441,7 @@ for lib do case "$lib" in
 		dst_gegl_dir=$DST_LIB_DIR/${src_gegl_dir##*/}
 		if [ -d "$src_gegl_dir" ] && [ -d "$dst_gegl_dir" ]; then
 			if cp "$src_gegl_dir"/*.json "$dst_gegl_dir"; then
-				_echo "* Copied gegl json files"
+				_echo "* added $src_gegl_dir .json files"
 			fi
 		fi
 		# GEGL_PATH is problematic so we avoid it
