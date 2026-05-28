@@ -248,6 +248,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Neverball](https://github.com/pkgforge-dev/Neverball-AppImage) |
 | [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage) |
 | [NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage) |
+| [Nitrogen](https://github.com/pkgforge-dev/Nitrogen-AppImage) |
 | [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage) |
 | [NP2kai](https://github.com/pkgforge-dev/Neko-Project-II-Kai-AppImage) |
 | [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage) |
