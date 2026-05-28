@@ -2527,19 +2527,24 @@ _deduplicate_libs() {
 		_lib_dirname=${lib%/*}
 		_lib_basename=${lib##*/}
 		_target_lib=$_lib_basename
-		while :; do
-			_shorter_name=${_lib_basename%.*} # strip one number from the lib name
+		_count=0
+		while [ "$_count" -lt 5 ]; do
+			_shorter_name=${_lib_basename%.*}
 			if [ "$_shorter_name" = "$_lib_basename" ]; then
-				break # can't get any shorter
+				break
 			fi
 			# now check if there is a similar name lib with shoter name
 			_duplicate_lib=$_lib_dirname/$_shorter_name
 			if [ -f "$_duplicate_lib" ] && [ ! -L "$_duplicate_lib" ]; then
 				if cmp -s "$_duplicate_lib" "$lib"; then
-					( cd "$_lib_dirname" && ln -svf "$_target_lib" "$_shorter_name" )
+					(
+						cd "$_lib_dirname"
+						ln -svf "$_target_lib" "$_shorter_name"
+					)
 				fi
 			fi
 			_lib_basename=$_shorter_name
+			_count=$((_count + 1))
 		done
 	done
 }
