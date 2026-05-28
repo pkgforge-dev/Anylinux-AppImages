@@ -93,10 +93,10 @@ fi
 export DST_DIR="$APPDIR"
 export GEN_LIB_PATH=1
 export HARD_LINKS=1
-export WITH_HOOKS=1
 export STRACE_MODE=${STRACE_MODE:-1}
 export WRAPPE_CLVL=${WRAPPE_CLVL:-15}
 export VERBOSE=1
+export WITH_HOOKS=0
 
 if [ -z "$NO_STRIP" ]; then
 	export STRIP=1
@@ -595,8 +595,12 @@ _determine_what_to_deploy() {
 							;;
 					esac
 					;;
-				*libwebkit*gtk*.so*)
+				*libwebkit*gtk-*.so*)
 					DEPLOY_WEBKIT2GTK=${DEPLOY_WEBKIT2GTK:-1}
+					_webkit_dir=${lib##*/}          # get basename
+					_webkit_dir=${_webkit_dir#lib}  # strip lib
+					_webkit_dir=${_webkit_dir%.so*} # strip .so
+					WEBKIT2GTK_DIR=${WEBKIT2GTK_DIR:-${lib%/*}/$_webkit_dir}
 					;;
 				*libsoup-*.so*)
 					DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
@@ -792,6 +796,15 @@ _make_deployment_array() {
 			set -- "$@" "$LIB_DIR"/libnss_mdns*minimal.so*
 			if b=$(command -v bwrap);  then set -- "$@" "$b"; fi
 			if b=$(command -v xdg-dbus-proxy);  then set -- "$@" "$b"; fi
+			if [ ! -d "$WEBKIT2GTK_DIR" ]; then
+				_err_msg "Unable to find $WEBKIT2GTK_DIR directory"
+				_err_msg "Please set the WEBKIT2GTK_DIR variable to its location"
+				exit 1
+			fi
+			ADD_DIR="
+				$ADD_DIR
+				$WEBKIT2GTK_DIR
+			"
 		fi
 
 		if [ "$DEPLOY_GLIB_NETWORKING" = 1 ]; then
@@ -1236,18 +1249,6 @@ _add_anylinux_lib() {
 		echo "anylinux.so" >> "$APPDIR"/.preload
 	fi
 
-	# remove xdg-open wrapper not needed when the lib is in use
-	# we still need to have a wrapper for gio-launch-desktop though
-	if [ -f "$APPDIR"/bin/gio-launch-desktop ]; then
-		rm -f "$APPDIR"/bin/gio-launch-desktop
-		cat <<-'EOF' > "$APPDIR"/bin/gio-launch-desktop
-		#!/bin/sh
-		export GIO_LAUNCHED_DESKTOP_FILE_PID=$$
-		exec "$@"
-		EOF
-		chmod +x "$APPDIR"/bin/gio-launch-desktop
-	fi
-	rm -f "$APPDIR"/bin/xdg-open
 	_echo "* anylinux.so successfully added!"
 }
 
@@ -1461,25 +1462,34 @@ _deploy_datadir() {
 					defaults    |\
 					doc         |\
 					dotnet      |\
+					drirc.d     |\
 					et          |\
 					factory     |\
 					file        |\
 					fish        |\
 					fonts       |\
 					fontconfig  |\
+					ghostscript |\
 					git         |\
+					glib-*      |\
 					glvnd       |\
+					glycin*     |\
 					gtk-doc     |\
+					gtksource*  |\
 					gvfs        |\
 					help        |\
 					i18n        |\
 					icons       |\
 					info        |\
 					java        |\
+					libdrm      |\
+					libthai     |\
 					locale      |\
 					man         |\
 					misc        |\
+					mime        |\
 					model       |\
+					p11-kit     |\
 					pipewire    |\
 					pixmaps     |\
 					qt          |\
@@ -1490,6 +1500,8 @@ _deploy_datadir() {
 					ss          |\
 					swift       |\
 					systemd     |\
+					tabset      |\
+					terminfo    |\
 					themes      |\
 					vala        |\
 					vulkan      |\
@@ -2562,12 +2574,6 @@ _post_deployment_steps() {
 		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
 
-	# TODO upstream to sharun
-	f=$APPDIR/share/alsa/alsa.conf
-	if [ -f "$f" ]; then
-		sed -i -e 's|"/etc/alsa/conf.d"|"/etc/alsa/conf.d"\n\t\t\t{ @func concat strings [ { @func getenv vars [ SHARUN_DIR ] default "" } "/share/alsa/alsa.conf.d" ] }|' "$f"
-	fi
-
 	if [ -d "$APPDIR"/shared/lib/pipewire-0.3 ] && [ -d /usr/share/pipewire ]; then
 		cp -r /usr/share/pipewire "$APPDIR"/share
 		cat <<-'EOF' > "$APPDIR"/bin/01-pipewire-config.src.hook
@@ -2578,6 +2584,8 @@ _post_deployment_steps() {
 		fi
 		EOF
 	fi
+
+	"$APPDIR"/sharun -g || :
 }
 
 _add_apprun() {
@@ -3149,8 +3157,6 @@ _check_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
-_deploy_datadir
-_deploy_locale
 _check_window_class
 _add_gtk_class_fix
 
@@ -3167,21 +3173,312 @@ set -- \
 	"$DST_LIB_DIR"/*/*/*/*.so*
 
 for lib do case "$lib" in
-	*libgegl*)
+	*/gio/modules/*.so*)
+		src_gio_cache=$LIB_DIR/gio/modules/giomodule.cache
+		dst_gio_cache=$DST_LIB_DIR/gio/modules/giomodule.cache
+		if [ -f "$src_gio_cache" ] && [ ! -f "$dst_gio_cache" ]; then
+			cp -v "$src_gio_cache" "$dst_gio_cache"
+			_echo "* added $src_gio_cache"
+		fi
+		;;
+	*/libgio-*.so*)
+		f=$APPDIR/bin/gio-launch-desktop
+		if [ ! -x "$f" ]; then
+			cat <<-'EOF' > "$f"
+			#!/bin/sh
+			export GIO_LAUNCHED_DESKTOP_FILE_PID=$$
+			exec "$@"
+			EOF
+			chmod +x "$f"
+			_echo "* added $f wrapper"
+		fi
+		;;
+	*/libglib-*.so*)
+		_glibver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
+		src_glib_schema_dir=/usr/share/glib-$_glibver/schemas
+		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
+		if [ -d "$src_glib_schema_dir" ] && [ ! -d "$dst_glib_schema_dir" ]; then
+			mkdir -p "$dst_glib_schema_dir"
+			cp -r "$src_glib_schema_dir"/* "$dst_glib_schema_dir"
+			_echo "* added $src_glib_schema_dir"
+		fi
+
+		# apps may crash when the host has no mime database
+		src_mime_dir=/usr/share/mime
+		dst_mime_dir=$APPDIR/share/mime
+		if [ -d "$src_mime_dir" ] && [ ! -d "$dst_mime_dir" ]; then
+			cp -r "$src_mime_dir" "$dst_mime_dir"
+			rm -rf "$dst_mime_dir"/packages # bloat
+			_echo "* added $src_mime_dir"
+		fi
+		;;
+	*/gdk-pixbuf-*/*/loaders/*.so*)
+		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
+		dst_gdkpixbuf_cache=${lib%/*}.cache
+		if [ -f "$src_gdkpixbuf_cache" ] && [ ! -f "$dst_gdkpixbuf_cache" ]; then
+			cp -v "$src_gdkpixbuf_cache" "$dst_gdkpixbuf_cache"
+			sed -i -e 's|/usr/lib/.*/loaders/||g' "$dst_gdkpixbuf_cache"
+			_echo "* added $src_gdkpixbuf_cache"
+		fi
+		;;
+	*/gtk-*/*/immodules/*.so)
+		_gtkver=$(echo "$lib" | tr '/' '\n' | grep '^gtk-')
+		src_gtk_immodule_cache=$(echo "$LIB_DIR"/"$_gtkver"/*/immodules.cache)
+		dst_gtk_immodule_cache=${lib%/*}.cache
+		if [ -f "$src_gtk_immodule_cache" ] && [ ! -f "$dst_gtk_immodule_cache" ]; then
+			cp -v "$src_gtk_immodule_cache" "$dst_gtk_immodule_cache"
+			sed -i -e 's|/usr/lib/.*/immodules/||g' "$dst_gtk_immodule_cache"
+			_echo "* added $src_gtk_immodule_cache"
+		fi
+		;;
+	*/libglycin*.so*)
+		if [ "$GNOME_GLYCIN" != 1 ]; then
+			continue # only GNOME glycin needs handling
+		fi
+		_add_bwrap_wrapper
+		src_glycin_conf_dir=/usr/share/glycin-loaders
+		dst_glycin_conf_dir=$APPDIR/share/glycin-loaders
+		if [ -d "$src_glycin_conf_dir" ] && [ ! -d "$dst_glycin_conf_dir" ]; then
+			cp -r "$src_glycin_conf_dir" "$dst_glycin_conf_dir"
+			sed -i -e 's|/usr/lib.*/||g' "$dst_glycin_conf_dir"/*/*/*.conf
+			_echo "* added $src_glycin_conf_dir"
+		fi
+		;;
+	*/libgtksourceview-*.so*)
+		_gtk_srcview_ver=$(echo "$lib" |  awk -F'-' '{print $NF}' | sed "s|\.so.*||")
+		src_gtk_srcview_dir=/usr/share/gtksourceview-$_gtk_srcview_ver
+		dst_gtk_srcview_dir=$APPDIR/share/gtksourceview-$_gtk_srcview_ver
+		if [ -d "$src_gtk_srcview_dir" ] && [ ! -d "$dst_gtk_srcview_dir" ]; then
+			cp -r "$src_gtk_srcview_dir" "$dst_gtk_srcview_dir"
+			_echo "* added $src_gtk_srcview_dir"
+		fi
+		;;
+	*/libfontconfig.so*)
+		src_fontconfig_config=/etc/fonts/fonts.conf
+		dst_fontconfig_config=$APPDIR/etc/fonts/fonts.conf
+		if [ -f "$src_fontconfig_config" ] && [ ! -f "$dst_fontconfig_config" ]; then
+			mkdir -p "${dst_fontconfig_config%/*}"
+			cp -v "$src_fontconfig_config" "$dst_fontconfig_config"
+			_echo "* added $src_fontconfig_config"
+		fi
+		;;
+	*/libfolks*.so*)
+		src_folks_dir=$LIB_DIR/folks
+		dst_folks_dir=$DST_LIB_DIR/folks
+		if [ -d "$src_folks_dir" ] && [ ! -d "$dst_folks_dir" ]; then
+			cp -r "$src_folks_dir" "$dst_folks_dir"
+			_echo "* added $src_folks_dir"
+		fi
+		;;
+	*/libthai*.so*)
+		src_libthai_dir=/usr/share/libthai
+		dst_libthai_dir=$APPDIR/share/libthai
+		if [ -d "$src_libthai_dir" ] && [ ! -d "$dst_libthai_dir" ]; then
+			cp -r "$src_libthai_dir" "$dst_libthai_dir"
+			_echo "* added $src_libthai_dir"
+		fi
+		;;
+	*/libasound*.so*)
+		src_alsaconf_dir=/usr/share/alsa
+		dst_alsaconf_dir=$APPDIR/share/alsa
+		if [ -d "$src_alsaconf_dir" ] && [ ! -d "$dst_alsaconf_dir" ]; then
+			cp -r "$src_alsaconf_dir" "$dst_alsaconf_dir"
+			_echo "* added $src_alsaconf_dir"
+		fi
+		# Adding alsa config dir is not enough, the file is harcoded
+		# to load additional files on the host
+		f=$APPDIR/share/alsa/alsa.conf
+		if [ -f "$f" ] && ! grep -q 'SHARUN_DIR' "$f"; then
+			sed -i -e \
+			  's|"/etc/alsa/conf.d"|"/etc/alsa/conf.d"\n\t\t\t{ @func concat strings [ { @func getenv vars [ SHARUN_DIR ] default "" } "/share/alsa/alsa.conf.d" ] }|' \
+			  "$f"
+		fi
+		;;
+	*/libxkbcommon*.so*)
+		src_xkb_dir=/usr/share/X11/xkb
+		dst_xkb_dir=$APPDIR/share/X11/xkb
+		if [ -d "$src_xkb_dir" ] && [ ! -d "$dst_xkb_dir" ]; then
+			mkdir -p "$dst_xkb_dir"
+			cp -r "$src_xkb_dir"/* "$dst_xkb_dir"
+			_echo "* added $src_xkb_dir"
+		fi
+		;;
+	*/libX11.so*)
+		src_xlocale_dir=/usr/share/X11/locale
+		dst_xlocale_dir=$APPDIR/share/X11/locale
+		if [ -d "$src_xlocale_dir" ] && [ ! -d "$dst_xlocale_dir" ]; then
+			mkdir -p "$dst_xlocale_dir"
+			cp -r "$src_xlocale_dir"/* "$dst_xlocale_dir"
+			_echo "* added $src_xlocale_dir"
+		fi
+		;;
+	*/libgbm.so*) # This hook should never be hit since OpenGL deployment already handles this
+		src_gbm_backends_dir=$LIB_DIR/gbm
+		dst_gbm_backends_dir=$DST_LIB_DIR/gbm
+		if [ -d "$src_gbm_backends_dir" ] && [ ! -d "$dst_gbm_backends_dir" ]; then
+			cp -r "$src_gbm_backends_dir" "$dst_gbm_backends_dir"
+			_echo "* added $src_gbm_backends_dir"
+		fi
+		;;
+	*/libEGL_mesa.so*)
+		src_glvnd_dir=/usr/share/glvnd/egl_vendor.d
+		dst_glvnd_dir=$APPDIR/share/glvnd/egl_vendor.d
+		if [ -d "$src_glvnd_dir" ] && [ ! -d "$dst_glvnd_dir" ]; then
+			mkdir -p "$dst_glvnd_dir"
+			cp -v "$src_glvnd_dir"/*.json "$dst_glvnd_dir"
+			sed -i -e 's|/usr/lib.*/||g' "$dst_glvnd_dir"/*.json
+			_echo "* added $src_glvnd_dir"
+		fi
+
+		src_drirc_dir=/usr/share/drirc.d
+		dst_drirc_dir=$APPDIR/share/drirc.d
+		if [ -d "$src_drirc_dir" ] && [ ! -d "$dst_drirc_dir" ]; then
+			cp -r "$src_drirc_dir" "$dst_drirc_dir"
+			_echo "* added $src_drirc_dir"
+		fi
+		;;
+	*/libdrm_amdgpu.so*)
+		src_libdrm_dir=/usr/share/libdrm
+		dst_libdrm_dir=$APPDIR/share/libdrm
+		if [ -d "$src_libdrm_dir" ] && [ ! -d "$dst_libdrm_dir" ]; then
+			cp -r "$src_libdrm_dir" "$dst_libdrm_dir"
+			_echo "* added $src_libdrm_dir"
+		fi
+		;;
+	*/libvulkan.so*)
+		src_vulkan_dir=/usr/share/vulkan/icd.d
+		dst_vulkan_dir=$APPDIR/share/vulkan/icd.d
+		if [ -d "$src_vulkan_dir" ] && [ ! -d "$dst_vulkan_dir" ]; then
+			mkdir -p "$dst_vulkan_dir"
+			cp -v "$src_vulkan_dir"/*.json "$dst_vulkan_dir"
+			sed -i -e 's|/usr/lib.*/||g' "$dst_vulkan_dir"/*.json
+			_echo "* added $src_vulkan_dir"
+		fi
+		;;
+	*/libVkLayer*.so*)
+		# find vulkan layer icd file
+		src_vklayer_icd=$(grep -r "${lib##*/}" /usr/share/vulkan/* | awk -F':' '{print $1; exit}')
+		dst_vklayer_icd=$APPDIR/${src_vklayer_icd#/usr/}
+		if [ -f "$src_vklayer_icd" ] && [ ! -f "$dst_vklayer_icd" ]; then
+			mkdir -p "${dst_vklayer_icd%/*}"
+			cp -vL "$src_vklayer_icd" "$dst_vklayer_icd"
+			sed -i -e 's|/usr/lib.*/||g' "$dst_vklayer_icd"
+			_echo "* added vulkan layer icd: $src_vklayer_icd"
+		fi
+		;;
+	# this hook is a common false positive
+	# because a lot of applications execute commands thru the system shell
+	# and that often links to this library, causing overdeployment of terminfo files
+	*/libncursesw.so*|*/libcursesw.so*|*/libcurses.so*)
+		src_terminfo_dir=/usr/share/terminfo
+		dst_terminfo_dir=$APPDIR/share/terminfo
+		if [ -d "$src_terminfo_dir" ] && [ ! -d "$dst_terminfo_dir" ]; then
+			cp -r "$src_terminfo_dir" "$dst_terminfo_dir"
+			_echo "* added $src_terminfo_dir"
+		fi
+
+		src_tabset_dir=/usr/share/tabset
+		dst_tabset_dir=$APPDIR/share/tabset
+		if [ -d "$src_tabset_dir" ] && [ ! -d "$dst_tabset_dir" ]; then
+			cp -r "$src_tabset_dir" "$dst_tabset_dir"
+			_echo "* added $src_tabset_dir"
+		fi
+		;;
+	*/qt*/plugins/*.so)
+		f=$APPDIR/bin/qt.conf
+		if [ ! -f "$f" ]; then
+			_qtdir=${lib#$DST_LIB_DIR/} # leaves qt*
+			_qtdir=${_qtdir%%/*}        # gets basename
+			_libdir=${DST_LIB_DIR##*/}  # libdir basename (lib or lib32)
+			cat <<-EOF > "$f"
+			[Paths]
+			Prefix = ../$_libdir/$_qtdir
+			Plugins = plugins
+			Imports = qml
+			Qml2Imports = qml
+			EOF
+			_echo "* added $f "
+		fi
+		;;
+	*/libmagic.so*)
+		# sharun only checks for $SHARUN_DIR/share/file/misc/magic.mgc
+		# but on ubuntu for example, the file is located in /usr/share/file/magic.mgc
+		# so we need to find the magic.mgc file and copy it to dst
+		src_magic_file=$(find -L /usr/share/file -type f -name magic.mgc -print -quit) || :
+		dst_magic_file=$APPDIR/share/file/misc/magic.mgc
+		if [ -f "$src_magic_file" ] && [ ! -f "$dst_magic_file" ]; then
+			mkdir -p "${dst_magic_file%/*}"
+			cp -vL "$src_magic_file" "$dst_magic_file"
+			_echo "* added $src_magic_file"
+		fi
+		;;
+	*/libgirepository-*.so*)
+		_girver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
+		src_girepository_dir=$LIB_DIR/girepository-$_girver
+		dst_girepository_dir=$DST_LIB_DIR/girepository-$_girver
+		if [ -d "$src_girepository_dir" ] && [ ! -d "$dst_girepository_dir" ]; then
+			cp -r "$src_girepository_dir" "$dst_girepository_dir"
+			_echo "* added $src_girepository_dir"
+
+			# there might be more .typelib files around, we need to copy them
+			_typelibfiles=$(find "$LIB_DIR"/*/* -type f -name '*.typelib' 2>/dev/null \
+			  | grep -v "$src_girepository_dir" | grep girepository-"$_girver"
+			 )
+			for f in $_typelibfiles; do
+				[ -f "$f" ] || continue
+				cp -v "$f" "$dst_girepository_dir"
+			done
+			if [ -n "$_typelibfiles" ]; then
+				_echo "* added additional .typelib files"
+			fi
+		fi
+		;;
+	*/gconv/*.so)
+		src_gconvm_file=$LIB_DIR/gconv/gconv-modules
+		dst_gconvm_file=$DST_LIB_DIR/gconv/gconv-modules
+		if [ -f "$src_gconvm_file" ] && [ ! -f "$dst_gconvm_file" ]; then
+			mkdir -p "${dst_gconvm_file%/*}"
+			cp -v "$src_gconvm_file" "$dst_gconvm_file"
+			_echo "* added $src_gconvm_file"
+		fi
+		;;
+	*/libc.so*)
+		src_c_locale_dir=/usr/lib/locale/C.utf8
+		dst_c_locale_dir=$DST_LIB_DIR/locale/C.utf8
+		mkdir -p "$DST_LIB_DIR"/locale
+		if [ -d "$src_c_locale_dir" ] && [ ! -d "$dst_c_locale_dir" ]; then
+			cp -r "$src_c_locale_dir" "$dst_c_locale_dir"
+			_echo "* added C.UTF-8 locale"
+		fi
+		# C.UTF-8 is not enough, some apps may crash when this locale is used
+		# so we need to ship en_US.UTF-8 so we can guarantee applications
+		# will launch in systems without glibc locales like alpine linux
+		#
+		# Because distros use a locale-archive these days, we have to compile it
+		#
+		dst_en_locale_dir=$DST_LIB_DIR/locale/en_US.utf8
+		if [ ! -d "$dst_en_locale_dir" ] && _is_cmd localedef; then
+			mkdir -p /tmp/usr/lib/locale
+			localedef --prefix /tmp --no-archive -i en_US -f UTF-8 en_US.UTF-8 || :
+			if cp -r /tmp/usr/lib/locale/en_US.utf8 "$DST_LIB_DIR"/locale; then
+				_echo "* added en_US.UTF-8 locale"
+			fi
+		fi
+		;;
+	*/libgegl*)
 		# GEGL_PATH is problematic so we avoiud it
 		# patch the lib directly to load its plugins instead
 		_patch_away_usr_lib_dir "$lib" || continue
 		echo 'unset GEGL_PATH' >> "$APPENV"
 		;;
-	*libp11-kit.so*)
+	*/libp11-kit.so*)
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_share_dir "$lib" || :
 		if [ -d /usr/share/p11-kit ] && [ ! -d "$APPDIR"/share/p11-kit ]; then
 			cp -r /usr/share/p11-kit "$APPDIR"/share
 		fi
-		continue
 		;;
-	*p11-kit-trust.so*)
+	*/p11-kit-trust.so*)
 		# Because OpenSUSE had to ruin this, we will have to patch the
 		# the certificates to a path in /tmp that we will later make
 		# a symlink that points to the real host certs location
@@ -3206,14 +3503,14 @@ for lib do case "$lib" in
 		_echo "* fixed path to /etc/ssl/certs in $lib"
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
-	*libgimpwidgets*)
+	*/libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
-	*libmlt*.so*)
+	*/libmlt*.so*)
 		_patch_away_usr_lib_dir "$lib" || continue
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
-	*libMangoHud*.so*)
+	*/libMangoHud*.so*)
 		src_mangohud_layer=$(echo /usr/share/vulkan/implicit_layer.d/MangoHud*.json)
 		dst_mangohud_layer="$APPDIR"/share/vulkan/implicit_layer.d/"${src_mangohud_layer##*/}"
 		if [ -f "$src_mangohud_layer" ] && [ ! -f "$dst_mangohud_layer" ]; then
@@ -3235,32 +3532,16 @@ for lib do case "$lib" in
 			_echo "Copied over mangohud layer and patched mangohud"
 		fi
 		;;
-	*libwebkit*gtk*.so*)
+	*/libwebkit*gtk-*.so*)
 		_add_bwrap_wrapper
-		# sharun deploys webkit2gtk but with relative path mapping
-		# the problem is that changes the working dir to the AppDir
-		# We can instead use path-mapping-hardcoded which does not
-		# have the changing of working directory issue
-
-		# restore relative path mapping to /usr
-		sed -i -e 's|\./\.//|/usr/|g' "$lib" || :
-
-		# remove working dir change
-		sed -i -e '/SHARUN_WORKING_DIR=${SHARUN_DIR}/d' "$APPENV" || :
-
 		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_bin_dir "$lib" || :
 		;;
-	*libglycin*.so*)
-		if [ "$GNOME_GLYCIN" = 1 ]; then
-			_add_bwrap_wrapper
-		fi
-		;;
-	*libdecor*.so*)
+	*/libdecor*.so*)
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
 		;;
-	*libSDL*.so*)
+	*/libSDL*.so*)
 		# make sure SDL does not attempt to use pipewire when not deployed
 		if [ "$DEPLOY_PIPEWIRE" != 1 ] \
 		  && ! grep -q 'SDL_AUDIODRIVER=' "$APPENV" 2>/dev/null; then
@@ -3291,6 +3572,8 @@ for lib do case "$lib" in
 	esac
 done
 
+_deploy_datadir
+_deploy_locale
 _post_deployment_steps
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
