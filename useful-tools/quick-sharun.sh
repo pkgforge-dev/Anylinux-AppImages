@@ -3439,7 +3439,7 @@ for lib do case "$lib" in
 		src_gegl_dir=$(echo "$LIB_DIR"/gegl-*)
 		dst_gegl_dir=$DST_LIB_DIR/${src_gegl_dir##*/}
 		if [ -d "$src_gegl_dir" ] && [ -d "$dst_gegl_dir" ]; then
-			if cp "$src_gegl_dir"/*.json "$dst_gegldir"; then
+			if cp "$src_gegl_dir"/*.json "$dst_gegl_dir"; then
 				_echo "* Copied gegl json files"
 			fi
 		fi
