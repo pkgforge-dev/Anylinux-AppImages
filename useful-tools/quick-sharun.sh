@@ -59,7 +59,7 @@ DEPENDENCIES="
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
-PATH_MAPPING_SCRIPT="$APPDIR"/bin/01-path-mapping-hardcoded.src.hook
+PATH_MAPPING_SCRIPT="$APPDIR"/bin/01-path-mapping-hardcoded.hook
 
 if [ -f "$PATH_MAPPING_SCRIPT" ]; then
 	while IFS= read -r line; do
@@ -97,10 +97,7 @@ export STRACE_MODE=${STRACE_MODE:-1}
 export WRAPPE_CLVL=${WRAPPE_CLVL:-15}
 export VERBOSE=1
 export WITH_HOOKS=0
-
-if [ -z "$NO_STRIP" ]; then
-	export STRIP=1
-fi
+export STRIP=0
 
 # github actions doesn't set USER and XDG_RUNTIME_DIR
 # causing some apps crash when running xvfb-run
@@ -501,6 +498,10 @@ _is_deployable_binary() {
 		esac
 	fi
 	return 1
+}
+
+_is_bun_binary() {
+	grep -aq -m1 '__bun_' "$1"
 }
 
 _determine_what_to_deploy() {
@@ -905,7 +906,7 @@ _make_deployment_array() {
 			set -- "$@" \
 				"$LIB_DIR"/libvulkan*.so*  \
 				"$LIB_DIR"/libVkLayer*.so*
-			ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}vulkan-check.src.hook"
+			ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}vulkan-check.hook"
 		fi
 	fi
 	if [ "$DEPLOY_PIPEWIRE" = 1 ]; then
@@ -1303,7 +1304,7 @@ _check_always_software() {
 }
 
 _add_p11kit_cert_hook() {
-	cert_check="$APPDIR"/bin/01-check-ca-certs.src.hook
+	cert_check="$APPDIR"/bin/01-check-ca-certs.hook
 	if [ -f "$cert_check" ]; then
 		return 0
 	fi
@@ -2473,96 +2474,6 @@ _post_deployment_steps() {
 			_echo "* Copied flutter data directory"
 		fi
 	fi
-	if [ "$DEPLOY_IMAGEMAGICK" = 1 ]; then
-		mkdir -p "$DST_LIB_DIR"  "$APPDIR"/etc
-		cp -rv /etc/ImageMagick-* "$APPDIR"/etc
-
-		# we can copy /usr/share/ImageMagick to the AppDir and set MAGICK_CONFIGURE_PATH
-		# to include both the etc/ImageMagick and share/ImageMagick directory
-		# but it is simpler to instead have all the config files in a single location
-		# imagemagick will load them all regardless
-		set -- /usr/share/ImageMagick-*/*.xml
-		if [ -f "$1" ]; then
-			cp -rv /usr/share/ImageMagick-*/*.xml "$APPDIR"/etc/ImageMagick*
-		fi
-		# there is also a configuration file in libdir
-		set -- "$LIB_DIR"/ImageMagick-*/config*/configure.xml
-		if [ -f "$1" ]; then
-			cp -v "$1" "$APPDIR"/etc/ImageMagick*
-		fi
-
-		# MAGICK_HOME is all that needs to be set
-		echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
-		# however MAGICK_HOME only works when compiled with a specific flag
-		# we can still make this relocatable by setting these other env variables
-		# which will always work even when not compiled with MAGICK_HOME support
-		(
-			# This method will not work with 32bit imagemagick
-			# TODO: Add proper logic for this in lib4bin
-			cd "$APPDIR"
-			set -- shared/lib/ImageMagick-*/modules*/coders
-			if [ -d "$1" ]; then
-				echo "MAGICK_CODER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-			fi
-			set -- shared/lib/ImageMagick-*/modules*/filters
-			if [ -d "$1" ]; then
-				# checking the code it seems that MAGICK_FILTER_MODULE_PATH
-				# is NOT USED in the code and seems to be an error!!! the variable
-				# that modules.c references is MAGICK_CODER_FILTER_PATH
-				# we will still be set both just in case
-				echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-				echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-			fi
-			set -- etc/ImageMagick*
-			if [ -d "$1" ]; then
-				echo "MAGICK_CONFIGURE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-			fi
-		)
-
-		_echo "* Copied ImageMagick directories"
-	fi
-	if [ "$DEPLOY_GHOSTSCRIPT" = 1 ]; then
-		src_gsdir=/usr/share/ghostscript
-		dst_gsdir=$APPDIR/share/ghostscript
-		if [ -d "$src_gsdir" ] && [ ! -d "$dst_gsdir" ]; then
-			cp -r "$src_gsdir" "$APPDIR"/share
-			# TODO: upstream to sharun
-			(
-				cd "$dst_gsdir"
-				d=$(echo ./*/Resource/Init)
-				if [ -d "$d" ]; then
-					echo "GS_LIB=\${SHARUN_DIR}/share/ghostscript/${d#./}" >> "$APPENV"
-				else
-					echo 'GS_LIB=${SHARUN_DIR}/share/ghostscript/Resource/Init' >> "$APPENV"
-				fi
-			)
-		fi
-	fi
-	if [ "$DEPLOY_GEGL" = 1 ]; then
-		gegldir=$(echo "$LIB_DIR"/gegl-*)
-		dst_gegldir=$DST_LIB_DIR/${gegldir##*/}
-		if [ -d "$gegldir" ] && [ -d "$dst_gegldir" ]; then
-			cp "$gegldir"/*.json "$dst_gegldir"
-			_echo "* Copied gegl json files"
-		fi
-	fi
-	if [ "$DEPLOY_QT" = 1 ]; then
-		src_trans=/usr/share/$QT_DIR/translations
-		dst_trans=$DST_LIB_DIR/$QT_DIR/translations
-		if [ -d "$src_trans" ] && [ ! -d "$dst_trans" ]; then
-			mkdir -p "${dst_trans%/*}"
-			cp -r "$src_trans" "$dst_trans"
-			rm -f "$dst_trans"/assistant*.qm
-			rm -f "$dst_trans"/designer*.qm
-			rm -f "$dst_trans"/linguist*.qm
-		fi
-		if [ -f "$TMPDIR"/libqgtk3.so ]; then
-			d=$DST_LIB_DIR/$QT_DIR/plugins/platformthemes
-			mkdir -p "$d"
-			mv "$TMPDIR"/libqgtk3.so "$d"
-			"$APPDIR"/sharun -g 2>/dev/null || :
-		fi
-	fi
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		_fix_cpython_ldconfig_mess
 	fi
@@ -2575,18 +2486,40 @@ _post_deployment_steps() {
 		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
 
-	if [ -d "$APPDIR"/shared/lib/pipewire-0.3 ] && [ -d /usr/share/pipewire ]; then
-		cp -r /usr/share/pipewire "$APPDIR"/share
-		cat <<-'EOF' > "$APPDIR"/bin/01-pipewire-config.src.hook
-		#!/bin/false
-		_pipewire_dir=$APPDIR/share/pipewire
-		if [ ! -d /usr/share/pipewire ] && [ -d "$_pipewire_dir" ]; then
-			export PIPEWIRE_CONFIG_DIR="$_pipewire_dir"
-		fi
-		EOF
+	"$APPDIR"/sharun -g || :
+}
+
+_strip_bins_and_libs() {
+	if [ "$NO_STRIP" = 1 ]; then
+		return 0
+	elif ! _is_cmd strip; then
+		_err_msg "Skipping strip since 'strip' is NOT installed!"
+		sleep 5
+		return 0
 	fi
 
-	"$APPDIR"/sharun -g || :
+	if [ "$NO_STRIP" != 'libraries' ]; then
+		find "$APPDIR" -type f -name '*.so*' \
+			-exec strip -s -R .comment --strip-unneeded {} \; || :
+		_echo "* stripped libraries"
+	fi
+
+	if [ "$NO_STRIP" != 'binaries' ]; then
+		while IFS="" read -r f; do
+			if [ ! -x "$f" ]; then
+				continue
+			elif _is_bun_binary "$f"; then
+				continue # bun binaries are delicate
+			fi
+			case "$f" in
+				*/python*) continue;; # python binaries break
+			esac
+			strip -s -R .comment --strip-unneeded "$f" || :
+		done <<-EOF
+		$(find "$APPDIR"/shared/bin/ "$APPDIR"/lib*/ -type f)
+		EOF
+		_echo "* stripped binaries"
+	fi
 }
 
 _add_apprun() {
@@ -3400,6 +3333,43 @@ for lib do case "$lib" in
 			EOF
 			_echo "* added $f "
 		fi
+
+		# move the gtk3 plugin back into the AppDir
+		if [ -f "$TMPDIR"/libqgtk3.so ]; then
+			d=$DST_LIB_DIR/$QT_DIR/plugins/platformthemes
+			mkdir -p "$d"
+			mv "$TMPDIR"/libqgtk3.so "$d"
+		fi
+
+		# deploy translation files
+		src_qt_trans=/usr/share/$QT_DIR/translations
+		dst_qt_trans=$DST_LIB_DIR/$QT_DIR/translations
+		if [ -d "$src_qt_trans" ] && [ ! -d "$dst_qt_trans" ]; then
+			mkdir -p "${dst_qt_trans%/*}"
+			# debloat a bit since we don't need all of them
+			cp -r "$src_qt_trans" "$dst_qt_trans"
+			rm -f "$dst_qt_trans"/assistant*.qm
+			rm -f "$dst_qt_trans"/designer*.qm
+			rm -f "$dst_qt_trans"/linguist*.qm
+			_echo "* added $src_qt_trans"
+		fi
+		;;
+	*/libgs.so*)
+		src_gs_dir=/usr/share/ghostscript
+		dst_gs_dir=$APPDIR/share/ghostscript
+		if [ -d "$src_gs_dir" ] && [ ! -d "$dst_gs_dir" ]; then
+			cp -r "$src_gs_dir" "$dst_gs_dir"
+			(
+			  cd "$dst_gs_dir"
+			  d=$(echo ./*/Resource/Init)
+			  if [ -d "$d" ]; then
+			  	echo "GS_LIB=\${SHARUN_DIR}/share/ghostscript/${d#./}" >> "$APPENV"
+			  else
+			  	echo 'GS_LIB=${SHARUN_DIR}/share/ghostscript/Resource/Init' >> "$APPENV"
+			  fi
+			)
+			_echo "* added $src_gs_dir"
+		fi
 		;;
 	*/libmagic.so*)
 		# sharun only checks for $SHARUN_DIR/share/file/misc/magic.mgc
@@ -3466,18 +3436,75 @@ for lib do case "$lib" in
 			fi
 		fi
 		;;
-	*/libgegl*)
-		# GEGL_PATH is problematic so we avoiud it
+	*/libgegl*.so*)
+		src_gegl_dir=$(echo "$LIB_DIR"/gegl-*)
+		dst_gegl_dir=$DST_LIB_DIR/${src_gegl_dir##*/}
+		if [ -d "$src_gegl_dir" ] && [ -d "$dst_gegl_dir" ]; then
+			if cp "$src_gegl_dir"/*.json "$dst_gegl_dir"; then
+				_echo "* added $src_gegl_dir .json files"
+			fi
+		fi
+		# GEGL_PATH is problematic so we avoid it
 		# patch the lib directly to load its plugins instead
 		_patch_away_usr_lib_dir "$lib" || continue
 		echo 'unset GEGL_PATH' >> "$APPENV"
 		;;
-	*/libp11-kit.so*)
-		_patch_away_usr_lib_dir "$lib" || :
-		_patch_away_usr_share_dir "$lib" || :
-		if [ -d /usr/share/p11-kit ] && [ ! -d "$APPDIR"/share/p11-kit ]; then
-			cp -r /usr/share/p11-kit "$APPDIR"/share
+	*/libMagick*.so*)
+		src_magick_config_dir=$(echo /etc/ImageMagick*)
+		dst_magick_config_dir=$APPDIR/etc/${src_magick_config_dir##*/}
+		if [ -d "$src_magick_config_dir" ] && [ ! -d "$dst_magick_config_dir" ]; then
+			mkdir -p "$dst_magick_config_dir"
+			(
+			  # imagemagick has a ton of .xml config files that need
+			  # to be added, they can all be copied to one location
+			  set -- \
+			  	/usr/share/ImageMagick*/*  \
+			  	"$src_magick_config_dir"/* \
+			  	"$LIB_DIR"/ImageMagick*/config*/*.xml
+			  for f do
+			  	if [ -f "$f" ]; then
+			  		_copy=1
+			  		cp "$f" "$dst_magick_config_dir"
+			  	fi
+			  done
+			  if [ "$_copy" = 1 ]; then
+			  	_echo "* added ImageMagick config files..."
+			  fi
+			  # MAGICK_HOME is all that needs to be set
+			  echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
+			  # however MAGICK_HOME only works when compiled with a specific flag
+			  # we can still make this relocatable by setting these other env variables
+			  # which will always work even when not compiled with MAGICK_HOME support
+			  cd "$APPDIR"
+			  set -- shared/lib*/ImageMagick-*/modules*/coders
+			  if [ -d "$1" ]; then
+			  	echo "MAGICK_CODER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+			  fi
+			  set -- shared/lib*/ImageMagick-*/modules*/filters
+			  if [ -d "$1" ]; then
+			  	# checking the code it seems that MAGICK_FILTER_MODULE_PATH
+			  	# is NOT USED in the code and seems to be an error!!! the variable
+			  	# that modules.c references is MAGICK_CODER_FILTER_PATH
+			  	# we will still be set both just in case
+			  	echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+			  	echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+			  fi
+			  set -- etc/ImageMagick*
+			  if [ -d "$1" ]; then
+			  	echo "MAGICK_CONFIGURE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
+			  fi
+			)
 		fi
+		;;
+	*/libp11-kit.so*)
+		src_p11kit_config_dir=/usr/share/p11-kit
+		dst_p11kit_config_dir=$APPDIR/share/p11-kit
+		if [ -d "$src_p11kit_config_dir" ] && [ ! -d "$dst_p11kit_config_dir" ]; then
+			cp -r "$src_p11kit_config_dir" "$dst_p11kit_config_dir"
+			_echo "* added $src_p11kit_config_dir"
+		fi
+		_patch_away_usr_lib_dir   "$lib" || :
+		_patch_away_usr_share_dir "$lib" || :
 		;;
 	*/p11-kit-trust.so*)
 		# Because OpenSUSE had to ruin this, we will have to patch the
@@ -3540,7 +3567,7 @@ for lib do case "$lib" in
 		_patch_away_usr_bin_dir "$lib" || :
 		;;
 	*/libdecor*.so*)
-		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.src.hook"
+		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.hook"
 		;;
 	*/libSDL*.so*)
 		# make sure SDL does not attempt to use pipewire when not deployed
@@ -3568,14 +3595,29 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/7z.so)
+		# the 7z binaries need the lib next to them
 		cp -v "$lib" "$APPDIR"/bin
 		;;
+	*/libpipewire-*.so*)
+		src_pipewire_config_dir=/usr/share/pipewire
+		dst_pipewire_config_dir=$APPDIR/share/pipewire
+		if [ -d "$src_pipewire_config_dir" ] && [ ! -d "$dst_pipewire_config_dir" ]; then
+			cp -r "$src_pipewire_config_dir" "$dst_pipewire_config_dir"
+
+			cat <<-'EOF' > "$APPDIR"/bin/01-pipewire-config.hook
+			_pipewire_dir=$APPDIR/share/pipewire
+			if [ ! -d /usr/share/pipewire ] && [ -d "$_pipewire_dir" ]; then
+				export PIPEWIRE_CONFIG_DIR="$_pipewire_dir"
+			fi
+			EOF
+		fi
 	esac
 done
 
 _deploy_datadir
 _deploy_locale
 _post_deployment_steps
+_strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
 
