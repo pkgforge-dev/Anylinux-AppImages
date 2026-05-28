@@ -524,7 +524,7 @@ _determine_what_to_deploy() {
 				$bin
 			"
 		elif [ -x "$bin" ]; then
-	# some apps may dlopen pulseaudio instead of linking directly
+			# some apps may dlopen pulseaudio instead of linking directly
 			if grep -aoq -m 1 'libpulse.so' "$bin"; then
 				DEPLOY_PULSE=${DEPLOY_PULSE:-1}
 			fi
