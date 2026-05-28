@@ -3496,11 +3496,14 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/libp11-kit.so*)
-		_patch_away_usr_lib_dir "$lib" || :
-		_patch_away_usr_share_dir "$lib" || :
-		if [ -d /usr/share/p11-kit ] && [ ! -d "$APPDIR"/share/p11-kit ]; then
-			cp -r /usr/share/p11-kit "$APPDIR"/share
+		src_p11kit_config_dir=/usr/share/p11-kit
+		dst_p11kit_config_dir=$APPDIR/share/p11-kit
+		if [ -d "$src_p11kit_config_dir" ] && [ ! -d "$dst_p11kit_config_dir" ]; then
+			cp -r "$src_p11kit_config_dir" "$dst_p11kit_config_dir"
+			_echo "* added $src_p11kit_config_dir"
 		fi
+		_patch_away_usr_lib_dir   "$lib" || :
+		_patch_away_usr_share_dir "$lib" || :
 		;;
 	*/p11-kit-trust.so*)
 		# Because OpenSUSE had to ruin this, we will have to patch the
@@ -3597,8 +3600,9 @@ for lib do case "$lib" in
 	*/libpipewire-*.so*)
 		src_pipewire_config_dir=/usr/share/pipewire
 		dst_pipewire_config_dir=$APPDIR/share/pipewire
-		if [ -d "$src_pipewire_config_dir" ] && [ -d "$dst_pipewire_config_dir" ]; then
-			cp -r /usr/share/pipewire "$APPDIR"/share
+		if [ -d "$src_pipewire_config_dir" ] && [ ! -d "$dst_pipewire_config_dir" ]; then
+			cp -r "$src_pipewire_config_dir" "$dst_pipewire_config_dir"
+
 			cat <<-'EOF' > "$APPDIR"/bin/01-pipewire-config.hook
 			_pipewire_dir=$APPDIR/share/pipewire
 			if [ ! -d /usr/share/pipewire ] && [ -d "$_pipewire_dir" ]; then
