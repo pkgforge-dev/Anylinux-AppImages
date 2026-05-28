@@ -95,7 +95,6 @@ export GEN_LIB_PATH=1
 export HARD_LINKS=1
 export STRACE_MODE=${STRACE_MODE:-1}
 export WRAPPE_CLVL=${WRAPPE_CLVL:-15}
-export VERBOSE=1
 export WITH_HOOKS=0
 export STRIP=0
 
@@ -2522,6 +2521,29 @@ _strip_bins_and_libs() {
 	fi
 }
 
+# lib4bin sometimes leaves duplicates of libraries instead of making the proper symlink
+_deduplicate_libs() {
+	find "$APPDIR"/lib/ -name '*.so.*' -type f | while IFS="" read -r lib; do
+		_lib_dirname=${lib%/*}
+		_lib_basename=${lib##*/}
+		_target_lib=$_lib_basename
+		while :; do
+			_shorter_name=${_lib_basename%.*} # strip one number from the lib name
+			if [ "$_shorter_name" = "$_lib_basename" ]; then
+				break # can't get any shorter
+			fi
+			# now check if there is a similar name lib with shoter name
+			_duplicate_lib=$_lib_dirname/$_shorter_name
+			if [ -f "$_duplicate_lib" ] && [ ! -L "$_duplicate_lib" ]; then
+				if cmp -s "$_duplicate_lib" "$lib"; then
+					( cd "$_lib_dirname" && ln -svf "$_target_lib" "$_shorter_name" )
+				fi
+			fi
+			_lib_basename=$_shorter_name
+		done
+	done
+}
+
 _add_apprun() {
 	f=$APPDIR/AppRun
 	if [ -f "$f" ]; then
@@ -3617,6 +3639,7 @@ done
 _deploy_datadir
 _deploy_locale
 _post_deployment_steps
+_deduplicate_libs
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
