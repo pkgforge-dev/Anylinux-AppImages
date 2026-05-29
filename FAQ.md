@@ -31,6 +31,12 @@ title: Frequently Asked Questions
   <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a76e02d2-8b8b-411c-92e0-07aa9c6c75aa" />
 </details>
 
+<details>
+  <summary>Here is <a href="https://git.eden-emu.dev/eden-emu/eden">Eden</a> running in <b>FreeBSD</b> using Vulkan with NVIDIA via Linuxulator 👀</summary>
+  <img width="1193" height="671" alt="image" src="https://github.com/user-attachments/assets/473de2ba-f950-4e3a-9327-d741c70eda6e" />
+</details>
+
+
 # How come this only became possible in 2024?
 
 * For application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
