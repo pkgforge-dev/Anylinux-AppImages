@@ -13,6 +13,10 @@
 
 set -e
 
+if [ "$QUICK_SHARUN_DEBUG" = 1 ]; then
+	set -x
+fi
+
 APPIMAGE_ARCH=$(uname -m)
 ARCH=${ARCH:-$APPIMAGE_ARCH}
 TMPDIR=${TMPDIR:-/tmp}
