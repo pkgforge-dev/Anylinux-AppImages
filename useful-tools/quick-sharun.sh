@@ -3425,7 +3425,7 @@ for lib do case "$lib" in
 			# there might be more .typelib files around, we need to copy them
 			_typelibfiles=$(find "$LIB_DIR"/*/* -type f -name '*.typelib' 2>/dev/null \
 			  | grep -v "$src_girepository_dir" | grep girepository-"$_girver"
-			 )
+			 ) || :
 			for f in $_typelibfiles; do
 				[ -f "$f" ] || continue
 				cp -v "$f" "$dst_girepository_dir"
