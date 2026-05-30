@@ -67,6 +67,12 @@ jobs:
           - arch: aarch64
             runs-on: ubuntu-24.04-arm
             script: qt6-dbus-demo-onlysoftware-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: sdl-demo-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: sdl-demo-appimage
     container: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
