@@ -166,6 +166,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Gearsystem](https://github.com/pkgforge-dev/Gearsystem-AppImage) |
 | [Ghostship](https://github.com/pkgforge-dev/Ghostship-AppImage-Enhanced) |
 | [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage) |
+| [gImageReader](https://github.com/pkgforge-dev/gImageReader-AppImage) |
 | [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage) |
 | [GitHub Desktop](https://github.com/pkgforge-dev/GitHub-Desktop-AppImage-Enhanced) |
 | [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage) |
