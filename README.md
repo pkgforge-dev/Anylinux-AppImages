@@ -431,6 +431,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage) |
 | [yt-dlp](https://github.com/pkgforge-dev/yt-dlp-AppImage) |
 | [ZapZap](https://github.com/pkgforge-dev/ZapZap-AppImage-Enhanced) |
+| [Zed](https://github.com/pkgforge-dev/Zed-AppImage) |
 | [Zelda64Recomp](https://github.com/pkgforge-dev/Zelda64Recomp-AppImage) |
 | [Zen Browser](https://github.com/pkgforge-dev/Zen-Browser-AppImage-Enhanced) |
 | [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage) |
