@@ -409,6 +409,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [VICE](https://github.com/pkgforge-dev/VICE-AppImage) |
 | [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage) |
 | [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage) |
+| [Visual Studio Code](https://github.com/pkgforge-dev/Visual-Studio-Code-AppImage) |
 | [VisualBoyAdvance-M](https://github.com/pkgforge-dev/VisualBoyAdvance-M-AppImage) |
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
 | [Warp](https://github.com/pkgforge-dev/Warp-AppImage) |
