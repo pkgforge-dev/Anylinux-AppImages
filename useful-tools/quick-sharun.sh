@@ -3592,6 +3592,7 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/libwebkit*gtk-*.so*)
+		( cd "$DST_LIB_DIR" && ln -s . "$APPIMAGE_ARCH"-linux-gnu || : )
 		_add_bwrap_wrapper
 		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
