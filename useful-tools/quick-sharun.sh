@@ -2393,13 +2393,14 @@ _check_hardcoded_data_dirs() {
 _sort_env_file() {
 	# make sure the .env has all the "unset" last, due to a bug in the dotenv
 	# library used by sharun all the unsets have to be declared last in the .env
+	# also deduplicate since the same var may be set multiple times
 	if [ -f "$APPDIR"/.env ]; then
 		sorted_env="$(LC_ALL=C awk '
 			{
 				if ($0 ~ /^unset/) {
 					unset_array[++u] = $0
 				} else {
-					print
+					if (!seen[$0]++) print
 				}
 			}
 			END {
@@ -2490,6 +2491,15 @@ _post_deployment_steps() {
 	fi
 
 	"$APPDIR"/sharun -g || :
+
+	# on debian some libs may hardcode paths like /usr/lib/x86_64-linux-gnu
+	# make a compat symlink so patched paths resolve to bundled libs
+	d=$APPIMAGE_ARCH-linux-gnu
+	case "$LIB_DIR" in
+		*/"$d"*)
+			( cd "$DST_LIB_DIR" && ln -s . "$d" 2>/dev/null || : )
+			;;
+	esac
 }
 
 _strip_bins_and_libs() {
@@ -3566,8 +3576,32 @@ for lib do case "$lib" in
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
 	*/libmlt*.so*)
-		_patch_away_usr_lib_dir "$lib" || continue
-		_patch_away_usr_share_dir "$lib" || continue
+		src_mlt_data_dir=$(echo /usr/share/mlt-*)
+		dst_mlt_data_dir=$APPDIR/share/${src_mlt_data_dir##*/}
+
+		if [ -d "$src_mlt_data_dir" ] && [ ! -d "$dst_mlt_data_dir" ]; then
+			cp -r "$src_mlt_data_dir" "$dst_mlt_data_dir"
+			_echo "* added $src_mlt_data_dir"
+		fi
+		if [ -d "$dst_mlt_data_dir"/profiles ]; then
+			echo "MLT_PROFILES_PATH=\${SHARUN_DIR}/share/${dst_mlt_data_dir##*/}/profiles" >> "$APPENV"
+		fi
+		if [ -d "$dst_mlt_data_dir"/presets ]; then
+			echo "MLT_PRESETS_PATH=\${SHARUN_DIR}/share/${dst_mlt_data_dir##*/}/presets"   >> "$APPENV"
+		fi
+
+		dst_mlt_lib_dir=$(echo "$DST_LIB_DIR"/mlt-*)
+		if [ -d "$dst_mlt_lib_dir" ]; then
+			echo "MLT_REPOSITORY=\${SHARUN_DIR}/lib/${dst_mlt_lib_dir##*/}" >> "$APPENV"
+		fi
+		;;
+	*/frei0r-*/*.so*)
+		d=${lib%/*}
+		d=${d##*/}
+		echo "FREI0R_PATH=\${SHARUN_DIR}/lib/$d" >> "$APPENV"
+		;;
+	*/ladspa/*.so*)
+		echo 'LADSPA_PATH=${SHARUN_DIR}/lib/ladspa' >> "$APPENV"
 		;;
 	*/libMangoHud*.so*)
 		src_mangohud_layer=$(echo /usr/share/vulkan/implicit_layer.d/MangoHud*.json)
@@ -3592,7 +3626,6 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/libwebkit*gtk-*.so*)
-		( cd "$DST_LIB_DIR" && ln -s . "$APPIMAGE_ARCH"-linux-gnu || : )
 		_add_bwrap_wrapper
 		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
