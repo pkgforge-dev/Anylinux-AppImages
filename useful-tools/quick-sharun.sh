@@ -2399,9 +2399,9 @@ _sort_env_file() {
 			{
 				if ($0 ~ /^unset/) {
 					unset_array[++u] = $0
-			} else {
-				if (!seen[$0]++) print
-			}
+				} else {
+					if (!seen[$0]++) print
+				}
 			}
 			END {
 				for (i = 1; i <= u; i++) {
