@@ -3596,8 +3596,8 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/frei0r-*/*.so*)
-		d="${lib%/*}"
-		d="${d##*/}"
+		d=${lib%/*}
+		d=${d##*/}
 		echo "FREI0R_PATH=\${SHARUN_DIR}/lib/$d" >> "$APPENV"
 		;;
 	*/ladspa/*.so*)
