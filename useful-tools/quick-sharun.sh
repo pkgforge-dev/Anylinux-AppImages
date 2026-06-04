@@ -1185,11 +1185,35 @@ _deploy_libs() {
 	eval set -- "$TO_DEPLOY_ARRAY" "$ARRAY"
 
 	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
+}
 
-	# debug possible issue with lib4bin
-	if find "$DST_LIB_DIR"/ -xtype l -name '*.so*' | grep .; then
-		_err_msg "Broken library symlinks detected in '$DST_LIB_DIR'!"
-	fi
+_fix_broken_symlinks() {
+	# lib4bin sometimes leaves broken library symlink, technical debt is getting big...
+	find "$DST_LIB_DIR"/ -xtype l -name '*.so*' | while IFS="" read -r broken_link; do
+		if [ -n "$broken_link" ]; then
+			_err_msg "Broken library symlinks detected in '$broken_link'!"
+			_err_msg "Attempting to fix..."
+
+			if link_path=$(readlink -f "$broken_link"); then
+				# attempt to find the missing lib at dest first, then host
+				for p in "$DST_LIB_DIR" "$LIB_DIR"; do
+
+					i=$(find "$p"/ -name "${link_path##*/}" -print -quit) || :
+					if [ -f "$i" ]; then
+						rm -f "$broken_link"
+						cp -Lv "$i" "$broken_link"
+						break
+					fi
+				done
+
+				if [ -f "$broken_link" ]; then
+					_echo "Fixed broken library symlink"
+				else
+					_err_msg "Failed to fix broken library symlink!"
+				fi
+			fi
+		fi
+	done
 }
 
 _handle_bins_scripts() {
@@ -3126,6 +3150,7 @@ _echo "------------------------------------------------------------"
 
 _get_sharun
 _deploy_libs "$@"
+_fix_broken_symlinks
 _check_always_software
 _handle_bins_scripts
 
