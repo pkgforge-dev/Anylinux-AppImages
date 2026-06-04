@@ -3681,6 +3681,15 @@ for lib do case "$lib" in
 			fi
 			EOF
 		fi
+		;;
+	*/libtesseract.so*)
+		src_tess_data_dir=/usr/share/tessdata
+		dst_tess_data_dir=$APPDIR/share/tessdata
+		if [ -d "$src_tess_data_dir" ] && [ ! -d "$dst_tess_data_dir" ]; then
+			cp -r "$src_tess_data_dir" "$dst_tess_data_dir"
+			_echo "* added $src_tess_data_dir"
+		fi
+		;;
 	esac
 done
 
