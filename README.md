@@ -113,6 +113,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced) |
 | [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage) |
 | [DiffPDF](https://github.com/pkgforge-dev/DiffPDF-AppImage) |
+| [Dillo](https://github.com/pkgforge-dev/Dillo-AppImage) |
 | [Discord](https://github.com/pkgforge-dev/Discord-AppImage) |
 | [DNZHRecomp](https://github.com/pkgforge-dev/DNZHRecomp-AppImage) |
 | [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage) |
