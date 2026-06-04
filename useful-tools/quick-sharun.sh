@@ -1187,7 +1187,7 @@ _deploy_libs() {
 	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
 
 	# debug possible issue with lib4bin
-	if find "$DST_LIB_DIR"/ -xtype l -name '*.so*'; then
+	if find "$DST_LIB_DIR"/ -xtype l -name '*.so*' | grep .; then
 		_err_msg "Broken library symlinks detected in '$DST_LIB_DIR'!"
 	fi
 }
