@@ -2667,6 +2667,7 @@ _add_apprun() {
 	        cat /etc/os-release >"$PWD"/"${APPIMAGE##*/}"-debug.log || :
 	        export LD_DEBUG=libs
 	        export VK_LOADER_DEBUG=all
+			export LIBGL_DEBUG=verbose
 	        export LC_ALL=C
 	        export SHARUN_PRINTENV=1
 	        "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
