@@ -2668,6 +2668,7 @@ _add_apprun() {
 	        export LD_DEBUG=libs
 	        export VK_LOADER_DEBUG=all
 			export LIBGL_DEBUG=verbose
+			export EGL_LOG_LEVEL=debug
 	        export LC_ALL=C
 	        export SHARUN_PRINTENV=1
 	        "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
