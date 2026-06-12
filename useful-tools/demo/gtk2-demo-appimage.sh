@@ -9,7 +9,7 @@ SHARUN="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOS
 AUR="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/make-aur-package.sh"
 EXTRA_PACKAGES="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 
-export ICON=DUMMY
+export ICON=https://git.devuan.org/Daemonratte/gtk2-ng/raw/branch/master/demos/gtk-demo/gtk2-ng-256.png
 export DESKTOP=DUMMY
 export OUTPATH=./dist
 export OUTNAME=gtk2-ng-demo-"$ARCH".AppImage
