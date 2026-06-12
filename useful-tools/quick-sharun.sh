@@ -3662,6 +3662,25 @@ for lib do case "$lib" in
 		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_bin_dir "$lib" || :
+
+		# check if webkit2gtk was compiled relocatable
+		if grep -aq -m 1 'WEBKIT_EXEC_PATH' "$lib" \
+		  && ! grep -q WEBKIT_EXEC_PATH "$APPENV"; then
+			(
+			  set -- "$APPDIR"/bin/WebKit*
+			  if [ -f "$1" ]; then
+			  	echo 'WEBKIT_EXEC_PATH=${SHARUN_DIR}/bin' >> "$APPENV"
+			  fi
+			)
+		fi
+		;;
+	*/libwebkit*gtkinjectedbundle.so*)
+		# WEBKIT_INJECTED_BUNDLE_PATH always works
+		# It is not guarded behind a compiled flag unlike WEBKIT_EXEC_PATH
+		if ! grep -q 'WEBKIT_INJECTED_BUNDLE_PATH' "$APPENV"; then
+			cp -v "$lib" "$APPDIR"/bin
+			echo 'WEBKIT_INJECTED_BUNDLE_PATH=${SHARUN_DIR}/bin' >> "$APPENV"
+		fi
 		;;
 	*/libdecor*.so*)
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.hook"
