@@ -84,6 +84,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ClassicImageViewer](https://github.com/pkgforge-dev/ClassicImageViewer-AppImage-Enhanced) |
 | [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage) |
 | [Claude Code](https://github.com/pkgforge-dev/claude-code-AppImage) |
+| [Claws Mail](https://github.com/pkgforge-dev/Claws-Mail-AppImage) |
 | [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage) |
 | [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage) |
 | [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage) |
