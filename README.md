@@ -50,6 +50,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Android Tools](https://github.com/pkgforge-dev/android-tools-AppImage) |
 | [Android Translation Layer](https://github.com/pkgforge-dev/android_translation_layer-AppImage) |
 | [anki](https://github.com/pkgforge-dev/anki-AppImage) |
+| [Antigravity](https://github.com/pkgforge-dev/Antigravity-AppImage) |
+| [Antigravity IDE](https://github.com/pkgforge-dev/Antigravity-IDE-AppImage) |
 | [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition) |
 | [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage) |
 | [Arx Libertatis](https://github.com/pkgforge-dev/Arx-Libertatis-AppImage) |
