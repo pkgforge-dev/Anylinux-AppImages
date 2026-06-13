@@ -26,7 +26,7 @@ DIRICON=$APPDIR/.DirIcon
 DST_LIB_DIR=$APPDIR/shared/lib
 MAIN_BIN=${MAIN_BIN##*/}
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
