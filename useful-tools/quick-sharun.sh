@@ -1105,6 +1105,7 @@ _make_deployment_array() {
 			"$LIB_DIR"/libxkbcommon-x11.so*  \
 			"$LIB_DIR"/libXext.so*           \
 			"$LIB_DIR"/libXfixes.so*         \
+			"$LIB_DIR"/libXinerama.so*       \
 			"$LIB_DIR"/libXrandr.so*         \
 			"$LIB_DIR"/libXss.so*            \
 			"$LIB_DIR"/libX11-xcb.so*        \
