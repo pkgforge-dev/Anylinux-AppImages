@@ -71,6 +71,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Blender](https://github.com/pkgforge-dev/Blender-AppImage) |
 | [BM64Recomp](https://github.com/pkgforge-dev/BM64Recomp-AppImage-Enhanced) |
 | [BMHeroRecomp](https://github.com/pkgforge-dev/BMHeroRecomp-AppImage-Enhanced) |
+| [Brave Origin](https://github.com/pkgforge-dev/Brave-Origin-AppImage) |
 | [Bulky](https://github.com/pkgforge-dev/Bulky-AppImage) |
 | [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage) |
 | [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage) |
