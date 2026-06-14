@@ -99,7 +99,7 @@ static void init_locale(void) {
 		DEBUG_PRINT("Locale fixed via LOCPATH to /usr/share/locale\n");
 		return;
 	}
-	
+
 	// set LOCPATH to our bundled locales
 	const char *appdir = getenv("APPDIR");
 	if (appdir && *appdir) {
@@ -338,6 +338,19 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 			DEBUG_PRINT("Restored XDG_CACHE_HOME to %s\n", real_cache);
 		else
 			DEBUG_PRINT("Failed to restore XDG_CACHE_HOME to %s\n", real_cache);
+	}
+
+	// we always set XDG_CACHE_HOME to a new location to prevent conflicts with
+	// the host cache, restore XDG_CACHE_HOME to the original value
+	const char *use_host_cache = getenv("USE_HOST_XDG_CACHE_HOME");
+	if (!use_host_cache || strcmp(use_host_cache, "1") != 0) {
+		const char *host_cache = getenv("HOST_XDG_CACHE_HOME");
+		if (host_cache && *host_cache) {
+			if (setenv("XDG_CACHE_HOME", host_cache, 1) == 0)
+				DEBUG_PRINT("Restored XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
+			else
+				DEBUG_PRINT("Failed to restore XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
+		}
 	}
 
 	const char *real_home = getenv("REAL_HOME");

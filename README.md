@@ -353,6 +353,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage) |
 | [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage) |
 | [servo](https://github.com/pkgforge-dev/servo-AppImage) |
+| [Shiru](https://github.com/pkgforge-dev/Shiru-AppImage) |
 | [Shockolate](https://github.com/pkgforge-dev/Shockolate-AppImage) |
 | [Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage) |
 | [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced) |
