@@ -2259,6 +2259,7 @@ _add_path_mapping_hardcoded() {
 }
 
 _patch_away_usr_bin_dir() {
+	set -- "$(readlink -f "$1")"
 	if ! grep -Eaoq -m 1 "/usr/bin" "$1"; then
 		return 1
 	fi
@@ -2272,6 +2273,7 @@ _patch_away_usr_bin_dir() {
 }
 
 _patch_away_usr_lib_dir() {
+	set -- "$(readlink -f "$1")"
 	if ! grep -Eaoq -m 1 "/usr/lib" "$1"; then
 		return 1
 	fi
@@ -2285,6 +2287,7 @@ _patch_away_usr_lib_dir() {
 }
 
 _patch_away_usr_share_dir() {
+	set -- "$(readlink -f "$1")"
 	if ! grep -Eaoq -m 1 "/usr/share" "$1"; then
 		return 1
 	fi
