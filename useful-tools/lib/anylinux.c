@@ -235,6 +235,7 @@ static const char* vars_to_unset[] = {
 	"MLT_PRESETS_PATH",
 	"MLT_PROFILES_PATH",
 	"MLT_REPOSITORY",
+	"OPENSSL_CONF",
 	"PERLLIB",
 	"PIPEWIRE_CONFIG_DIR",
 	"PIPEWIRE_MODULE_DIR",
