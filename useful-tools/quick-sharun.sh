@@ -2721,8 +2721,10 @@ _add_hooks_library() {
 	                        :
 	                        ;;
 	                *)
-	                        XDG_CACHE_HOME=$CACHEDIR/AppImage-Cache
-	                        export XDG_CACHE_HOME
+	                        _cache_dir=$CACHEDIR/AppImage-Cache
+	                        if [ -d "$_cache_dir" ] || mkdir -p "$_cache_dir" 2>/dev/null; then
+	                                export XDG_CACHE_HOME="$_cache_dir"
+	                        fi
 	                        ;;
 	        esac
 	fi
