@@ -2721,13 +2721,8 @@ _add_hooks_library() {
 	                        :
 	                        ;;
 	                *)
-	                        if _cache_dir=${TMPDIR:-/tmp}/.$(id -u)-AppImage-Cache; then
-	                                mkdir -p "$_cache_dir" 2>/dev/null || :
-	                                if chmod 700 "$_cache_dir" 2>/dev/null; then
-	                                        XDG_CACHE_HOME=$_cache_dir
-	                                        export XDG_CACHE_HOME
-	                                fi
-	                        fi
+	                        XDG_CACHE_HOME=$CACHEDIR/AppImage-Cache
+	                        export XDG_CACHE_HOME
 	                        ;;
 	        esac
 	fi
