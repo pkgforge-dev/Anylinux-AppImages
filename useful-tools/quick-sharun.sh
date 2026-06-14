@@ -3510,6 +3510,13 @@ for lib do case "$lib" in
 			fi
 		fi
 		;;
+	*/ld-linux*.so*|*/ld-musl*.so*)
+		# patch away the dynamic linker /etc to disable /etc/ld.so.preload
+		if grep -qa -m 1 '/etc' "$lib"; then
+			sed -i -e 's|/etc|/ZZZ|g' "$lib"
+			_echo "* patched away ${lib##*/} /etc/ld.so.preload"
+		fi
+		;;
 	*/libgegl*.so*)
 		src_gegl_dir=$(echo "$LIB_DIR"/gegl-*)
 		dst_gegl_dir=$DST_LIB_DIR/${src_gegl_dir##*/}
