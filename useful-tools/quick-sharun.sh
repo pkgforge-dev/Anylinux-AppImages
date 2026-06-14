@@ -1188,35 +1188,6 @@ _deploy_libs() {
 	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
 }
 
-_fix_broken_symlinks() {
-	# lib4bin sometimes leaves broken library symlink, technical debt is getting big...
-	find "$DST_LIB_DIR"/ -xtype l -name '*.so*' | while IFS="" read -r broken_link; do
-		if [ -n "$broken_link" ]; then
-			_err_msg "Broken library symlinks detected in '$broken_link'!"
-			_err_msg "Attempting to fix..."
-
-			if link_path=$(readlink -f "$broken_link"); then
-				# attempt to find the missing lib at dest first, then host
-				for p in "$DST_LIB_DIR" "$LIB_DIR"; do
-
-					i=$(find "$p"/ -name "${link_path##*/}" -print -quit) || :
-					if [ -f "$i" ]; then
-						rm -f "$broken_link"
-						cp -Lv "$i" "$broken_link"
-						break
-					fi
-				done
-
-				if [ -f "$broken_link" ]; then
-					_echo "Fixed broken library symlink"
-				else
-					_err_msg "Failed to fix broken library symlink!"
-				fi
-			fi
-		fi
-	done
-}
-
 _handle_bins_scripts() {
 	# check for gstreamer binaries these need to be in the gstreamer libdir
 	# since sharun will set the following vars to that location:
@@ -2565,34 +2536,6 @@ _strip_bins_and_libs() {
 	fi
 }
 
-# lib4bin sometimes leaves duplicates of libraries instead of making the proper symlink
-_deduplicate_libs() {
-	find "$APPDIR"/lib/ -name '*.so.*' -type f | while IFS="" read -r lib; do
-		_lib_dirname=${lib%/*}
-		_lib_basename=${lib##*/}
-		_target_lib=$_lib_basename
-		_count=0
-		while [ "$_count" -lt 5 ]; do
-			_shorter_name=${_lib_basename%.*}
-			if [ "$_shorter_name" = "$_lib_basename" ]; then
-				break
-			fi
-			# now check if there is a similar name lib with shoter name
-			_duplicate_lib=$_lib_dirname/$_shorter_name
-			if [ -f "$_duplicate_lib" ] && [ ! -L "$_duplicate_lib" ]; then
-				if cmp -s "$_duplicate_lib" "$lib"; then
-					(
-						cd "$_lib_dirname"
-						ln -svf "$_target_lib" "$_shorter_name"
-					)
-				fi
-			fi
-			_lib_basename=$_shorter_name
-			_count=$((_count + 1))
-		done
-	done
-}
-
 _add_apprun() {
 	f=$APPDIR/AppRun
 	if [ -f "$f" ]; then
@@ -3153,7 +3096,6 @@ _echo "------------------------------------------------------------"
 
 _get_sharun
 _deploy_libs "$@"
-_fix_broken_symlinks
 _check_always_software
 _handle_bins_scripts
 
@@ -3750,7 +3692,6 @@ done
 _deploy_datadir
 _deploy_locale
 _post_deployment_steps
-_deduplicate_libs
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
