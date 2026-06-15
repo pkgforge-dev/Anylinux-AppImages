@@ -3566,6 +3566,31 @@ for lib do case "$lib" in
 		_echo "* fixed path to /etc/ssl/certs in $lib"
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
+	*/libcrypto.so*)
+		# Apps may fail to connect to internet if they use the host ssl config
+		# see: https://github.com/pkgforge-dev/Viber-AppImage-Enhanced/issues/16
+
+		# make a minimal ssl config instead of copying the hosts
+		dst_ssl_conf=$APPDIR/etc/ssl/openssl.cnf
+		if [ ! -f "$dst_ssl_conf" ]; then
+			mkdir -p "${dst_ssl_conf%/*}"
+			cat <<-'EOF' > "$dst_ssl_conf"
+			[openssl_conf]
+			openssl_conf = openssl_init
+
+			[openssl_init]
+			providers = provider_sect
+
+			[provider_sect]
+			default = default_sect
+
+			[default_sect]
+			activate = 1
+			EOF
+			echo 'OPENSSL_CONF=${SHARUN_DIR}/etc/ssl/openssl.cnf' >> "$APPENV"
+			_echo "* added minimal ssl config"
+		fi
+		;;
 	*/libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
