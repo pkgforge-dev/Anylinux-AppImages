@@ -3130,6 +3130,29 @@ set -- \
 	"$DST_LIB_DIR"/*/*/*.so*   \
 	"$DST_LIB_DIR"/*/*/*/*.so*
 
+# make sure to remove any full rpath from the libs
+if _is_cmd patchelf; then
+	for lib do
+		if patchelf --print-rpath "$lib" | grep -q '^/'; then
+			patchelf --remove-rpath "$lib"
+			_echo "removed full rpath from "$lib""
+		fi
+	done
+else
+	_err_msg "==========================================================="
+	_err_msg "ERROR: Missing patchelf dependency!"
+	_err_msg "We need to patchelf to make sure bundled libraries do not"
+	_err_msg "contain a full rpath to /usr/lib which would cause them to"
+	_err_msg "load libraries from the host first!"
+	_err_msg ""
+	_err_msg "We will continue without patchelf, however note in the near"
+	_err_msg "future we will fail when patchelf is not present"
+	_err_msg "==========================================================="
+	sleep 15
+	# exit 1
+fi
+
+# now start the post deployment hooks
 for lib do case "$lib" in
 	*/gio/modules/*.so*)
 		src_gio_cache=$LIB_DIR/gio/modules/giomodule.cache
