@@ -3410,15 +3410,6 @@ for lib do case "$lib" in
 		dst_gs_dir=$APPDIR/share/ghostscript
 		if [ -d "$src_gs_dir" ] && [ ! -d "$dst_gs_dir" ]; then
 			cp -r "$src_gs_dir" "$dst_gs_dir"
-			(
-			  cd "$dst_gs_dir"
-			  d=$(echo ./*/Resource/Init)
-			  if [ -d "$d" ]; then
-			  	echo "GS_LIB=\${SHARUN_DIR}/share/ghostscript/${d#./}" >> "$APPENV"
-			  else
-			  	echo 'GS_LIB=${SHARUN_DIR}/share/ghostscript/Resource/Init' >> "$APPENV"
-			  fi
-			)
 			_echo "* added $src_gs_dir"
 		fi
 		;;
@@ -3592,11 +3583,10 @@ for lib do case "$lib" in
 	*/libcrypto.so*)
 		# Apps may fail to connect to internet if they use the host ssl config
 		# see: https://github.com/pkgforge-dev/Viber-AppImage-Enhanced/issues/16
-
-		# make a minimal ssl config instead of copying the hosts
 		dst_ssl_conf=$APPDIR/etc/ssl/openssl.cnf
 		if [ ! -f "$dst_ssl_conf" ]; then
 			mkdir -p "${dst_ssl_conf%/*}"
+			# make a minimal ssl config instead of copying the hosts
 			cat <<-'EOF' > "$dst_ssl_conf"
 			[openssl_conf]
 			openssl_conf = openssl_init
@@ -3610,7 +3600,6 @@ for lib do case "$lib" in
 			[default_sect]
 			activate = 1
 			EOF
-			echo 'OPENSSL_CONF=${SHARUN_DIR}/etc/ssl/openssl.cnf' >> "$APPENV"
 			_echo "* added minimal ssl config"
 		fi
 		;;
@@ -3625,25 +3614,6 @@ for lib do case "$lib" in
 			cp -r "$src_mlt_data_dir" "$dst_mlt_data_dir"
 			_echo "* added $src_mlt_data_dir"
 		fi
-		if [ -d "$dst_mlt_data_dir"/profiles ]; then
-			echo "MLT_PROFILES_PATH=\${SHARUN_DIR}/share/${dst_mlt_data_dir##*/}/profiles" >> "$APPENV"
-		fi
-		if [ -d "$dst_mlt_data_dir"/presets ]; then
-			echo "MLT_PRESETS_PATH=\${SHARUN_DIR}/share/${dst_mlt_data_dir##*/}/presets"   >> "$APPENV"
-		fi
-
-		dst_mlt_lib_dir=$(echo "$DST_LIB_DIR"/mlt-*)
-		if [ -d "$dst_mlt_lib_dir" ]; then
-			echo "MLT_REPOSITORY=\${SHARUN_DIR}/lib/${dst_mlt_lib_dir##*/}" >> "$APPENV"
-		fi
-		;;
-	*/frei0r-*/*.so*)
-		d=${lib%/*}
-		d=${d##*/}
-		echo "FREI0R_PATH=\${SHARUN_DIR}/lib/$d" >> "$APPENV"
-		;;
-	*/ladspa/*.so*)
-		echo 'LADSPA_PATH=${SHARUN_DIR}/lib/ladspa' >> "$APPENV"
 		;;
 	*/libMangoHud*.so*)
 		src_mangohud_layer=$(echo /usr/share/vulkan/implicit_layer.d/MangoHud*.json)
