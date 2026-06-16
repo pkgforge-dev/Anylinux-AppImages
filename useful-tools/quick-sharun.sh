@@ -98,7 +98,6 @@ fi
 # for sharun
 export DST_DIR="$APPDIR"
 export STRACE_MODE=${STRACE_MODE:-1}
-export WRAPPE_CLVL=${WRAPPE_CLVL:-15}
 
 # github actions doesn't set USER and XDG_RUNTIME_DIR
 # causing some apps crash when running xvfb-run
