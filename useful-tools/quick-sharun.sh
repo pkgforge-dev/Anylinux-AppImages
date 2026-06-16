@@ -27,6 +27,7 @@ DST_LIB_DIR=$APPDIR/shared/lib
 MAIN_BIN=${MAIN_BIN##*/}
 
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
+ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/latest/download/onelf-$APPIMAGE_ARCH-linux}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
@@ -3017,38 +3018,27 @@ _check_main_bin() {
 }
 
 _make_static_bin() (
-	DST_DIR="$APPDIR"/bin
-	while :; do case "$1" in
-		--dst-dir)
-			DST_DIR="$2"
-			shift
-			;;
-		-*)
-			_err_msg "ERROR: Unknown option: '$1'"
-			exit 1
-			;;
-		'')
-			break
-			;;
-		*)
-			BIN_TO_DEPLOY="${BIN_TO_DEPLOY:+$BIN_TO_DEPLOY:}$1"
-			shift
-			;;
-		esac
-	done
-	_IFS=$IFS
-	IFS=:
-	set -- $BIN_TO_DEPLOY
-	IFS=$_IFS
-	_echo "------------------------------------------------------------"
+	ONELF=$TMPDIR/onelf
+	if [ ! -x "$ONELF" ]; then
+		_echo "Downloading onelf..."
+		_download "$ONELF" "$ONELF_LINK"
+		chmod +x "$ONELF"
+	fi
+
+	DST_DIR=$APPDIR/bin
 	mkdir -p "$DST_DIR"
-	export DST_DIR
-	for b do
-		_echo "Packing $b as a static binary..."
-		$XVFB_CMD "$TMPDIR"/sharun-aio l \
-			--with-wrappe            \
-			--wrappe-exec "${b##*/}" \
-			"$b" || :
+	_echo "------------------------------------------------------------"
+	for bin do
+		b=${bin##*/}
+		_echo "Packing $bin as a static binary with onelf..."
+
+		_tmpdir=$TMPDIR/.onelf_build_$$_$b
+		rm -rf "$_tmpdir"
+		mkdir -p "$_tmpdir"
+
+		"$ONELF" bundle-libs "$_tmpdir" --from-binary "$bin" --strip --scan-dlopen
+		"$ONELF" pack "$_tmpdir" -o "$DST_DIR"/"$b" --command bin/"$b"
+		rm -rf "$_tmpdir"
 	done
 	_echo "------------------------------------------------------------"
 )
@@ -3147,7 +3137,6 @@ case "$1" in
 		;;
 	--make-static-bin)
 		shift
-		_get_sharun
 		_make_static_bin "$@"
 		exit 0
 		;;
