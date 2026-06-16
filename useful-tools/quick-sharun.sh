@@ -3790,16 +3790,6 @@ _add_apprun
 
 chmod +x "$APPDIR"/AppRun || :
 
-# always make sure that AppDir/lib exists, sometimes lib4bin does not make it
-# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
-for d in lib lib32; do
-	dir=$APPDIR/shared/$d
-	symlink=$APPDIR/$d
-	if [ ! -d "$symlink" ] && [ -d "$dir" ]; then
-		ln -s shared/"$d" "$symlink"
-	fi
-done
-
 # deploy directories
 while read -r d; do
 	if [ -d "$d" ]; then
