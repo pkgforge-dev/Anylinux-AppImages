@@ -33,6 +33,7 @@ pacman -Syu --noconfirm \
 	libxrandr        \
 	libxtst          \
 	mesa-utils       \
+	patchelf         \
 	vkmark           \
 	vulkan-tools     \
 	wget             \
