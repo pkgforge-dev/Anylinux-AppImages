@@ -2498,7 +2498,8 @@ _post_deployment_steps() {
 		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
 	fi
 
-	"$APPDIR"/sharun -g || :
+	# make the lib.path file. Very important for sharun to discover bundled libs!
+	"$APPDIR"/sharun -g
 
 	# on debian some libs may hardcode paths like /usr/lib/x86_64-linux-gnu
 	# make a compat symlink so patched paths resolve to bundled libs
