@@ -321,7 +321,10 @@ _get_icon() {
 
 _sanity_check() {
 	for d in $DEPENDENCIES; do
-		_is_cmd "$d" || _err_msg "ERROR: Missing dependency '$d'!"
+		if ! _is_cmd "$d"; then
+			_err_msg "ERROR: Missing dependency '$d'!"
+			exit 1
+		fi
 	done
 
 	if ! mkdir -p "$APPDIR"/share "$APPDIR"/bin; then
