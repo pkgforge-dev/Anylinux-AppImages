@@ -3129,17 +3129,31 @@ _echo "------------------------------------------------------------"
 echo ""
 
 set -- \
-	"$DST_LIB_DIR"/*.so*       \
-	"$DST_LIB_DIR"/*/*.so*     \
-	"$DST_LIB_DIR"/*/*/*.so*   \
-	"$DST_LIB_DIR"/*/*/*/*.so*
+	"$DST_LIB_DIR"/*.so*         \
+	"$DST_LIB_DIR"/*/*.so*       \
+	"$DST_LIB_DIR"/*/*/*.so*     \
+	"$DST_LIB_DIR"/*/*/*/*.so*   \
+	"$DST_LIB_DIR"/*/*/*/*/*.so* \
+	"$DST_LIB_DIR"/*/*/*/*/*/*.so*
 
-# make sure to remove any full rpath from the libs
 for lib do
+	[ -f "$lib" ] || continue
+	# make sure to remove any full rpath from the libs
 	if patchelf --print-rpath "$lib" | grep -q '^/'; then
 		patchelf --remove-rpath "$lib"
 		_echo "* removed full rpath from $lib"
 	fi
+
+	# also remove full paths from needed libs, for example
+	# a library may depend on /usr/lib/libkek.so instead of libkek.so
+	patchelf --print-needed "$lib" | while IFS="" read -r l; do
+		case "$l" in
+			/*)
+				patchelf --replace-needed "$l" "${l##*/}" "$lib"
+				_echo "* removed full needed lib path $l from $lib"
+				;;
+		esac
+	done
 done
 
 # now start the post deployment hooks
