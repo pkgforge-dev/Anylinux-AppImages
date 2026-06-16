@@ -504,7 +504,11 @@ _is_deployable_binary() {
 }
 
 _is_bun_binary() {
-	grep -aq -m1 '__bun_' "$1"
+	grep -aq -m 1 '__bun_' "$1"
+}
+
+_is_pyinstaller_binary() {
+	grep -aq -m 1 'pydata' "$1"
 }
 
 _determine_what_to_deploy() {
@@ -2527,9 +2531,11 @@ _strip_bins_and_libs() {
 				continue
 			elif _is_bun_binary "$f"; then
 				continue # bun binaries are delicate
+			elif _is_pyinstaller_binary "$f"; then
+				continue # same story as bun binaries
 			fi
 			case "$f" in
-				*/python*) continue;; # python binaries break
+				*/python*) continue;; # python interpreter also breaks
 			esac
 			strip -s -R .comment --strip-unneeded "$f" || :
 		done <<-EOF
@@ -3736,6 +3742,13 @@ for bin do
 	if p=$(grep -ao -m 1 '/usr/lib/.*/' "$bin"); then
 		_echo "* Detected hardcoded path to $p in $bin"
 		_patch_away_usr_lib_dir "$bin" || :
+	fi
+	if _is_bun_binary "$bin" || _is_pyinstaller_binary "$bin"; then
+		# bun/pyisntaller binaries cannot be executed with the
+		# dynamic linker directly, so we will change PT_INTERP to
+		# /tmp/.ld-sharun.so.67, sharun will copy it there at runtime
+		patchelf --set-interpreter /tmp/.ld-sharun.so.67 "$bin"
+		_echo "* Set interpreter to /tmp/.ld-sharun.so.67 for $bin"
 	fi
 done
 
