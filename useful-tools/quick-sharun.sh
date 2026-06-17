@@ -23,7 +23,7 @@ TMPDIR=${TMPDIR:-/tmp}
 APPDIR=${APPDIR:-$PWD/AppDir}
 APPENV=$APPDIR/.env
 DIRICON=$APPDIR/.DirIcon
-DST_LIB_DIR=$APPDIR/shared/lib
+DST_LIB_DIR=$APPDIR/lib
 MAIN_BIN=${MAIN_BIN##*/}
 
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
@@ -371,7 +371,7 @@ _sanity_check() {
 	fi
 
 	if [ "$LIB32" = 1 ]; then
-		DST_LIB_DIR=$APPDIR/shared/lib32
+		DST_LIB_DIR=$APPDIR/lib32
 		_err_msg "WARNING: 32bit deployment is experimental!"
 	fi
 }
@@ -1049,11 +1049,30 @@ _make_deployment_array() {
 			"$LIB_DIR"/imlib2/loaders/*
 	fi
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-		if pythonbin=$(command -v python); then
-			set -- "$@" "$pythonbin"*
-		elif pythonbin=$(command -v python3); then
-			set -- "$@" "$pythonbin"*
+		if   b=$(command -v python);  then set -- "$@" "$b"*
+		elif b=$(command -v python3); then set -- "$@" "$b"*
 		fi
+
+		d=$(set -- "$LIB_DIR"/python* && echo "$1")
+		if [ ! -d "$d" ]; then
+			_err_msg "ERROR: Cannot find python installation in $LIB_DIR"
+			exit 1
+		fi
+		mkdir -p "$DST_LIB_DIR"
+		cp -r "$d" "$DST_LIB_DIR"
+		(
+			if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
+				cd "$DST_LIB_DIR"/"${d##*/}"
+				find ./ -type f -name '*.a' -delete || :
+				for f in $(find ./ -type f -name '*.pyc' -print); do
+					case "$f" in
+						*/"$MAIN_BIN"*) :;;
+						*) [ ! -f "$f" ] || rm -f "$f";;
+					esac
+				done
+			fi
+		)
+		_fix_cpython_ldconfig_mess
 	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Deploying gegl"
@@ -2208,7 +2227,7 @@ _fix_cpython_ldconfig_mess() {
 	        *)       arch=x86-64;;
 	    esac
 
-	    for f in "$APPDIR"/shared/lib*/*.so* "$APPDIR"/shared/lib*/*/*.so*; do
+	    for f in "$APPDIR"/lib*/*.so* "$APPDIR"/lib*/*/*.so*; do
 	        echo "	${f##*/} (libc6,$arch) => $f"
 	    done
 
@@ -2437,96 +2456,6 @@ _sort_env_file() {
 		)"
 		echo "$sorted_env" > "$APPDIR"/.env
 	fi
-}
-
-_post_deployment_steps() {
-	# these need to be done later because sharun may make shared/lib a symlink
-	# to lib and if we make shared/lib first then it breaks sharun
-	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-		set -- "$LIB_DIR"/python*
-		if [ -d "$1" ]; then
-			cp -r "$1" "$DST_LIB_DIR"
-		else
-			_err_msg "ERROR: Cannot find python installation in $LIB_DIR"
-			exit 1
-		fi
-		if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
-			(
-				cd "$DST_LIB_DIR"/"${1##*/}"
-				find ./ -type f -name '*.a' -delete || :
-				for f in $(find ./ -type f -name '*.pyc' -print); do
-					case "$f" in
-						*/"$MAIN_BIN"*) :;;
-						*) [ ! -f "$f" ] || rm -f "$f";;
-					esac
-				done
-			)
-		fi
-	fi
-	if [ "$DEPLOY_FLUTTER" = 1 ]; then
-		if [ -z "$FLUTTER_LIB" ]; then
-			_err_msg "Flutter deployment was forced but looks like the"
-			_err_msg "the application does not link to libflutter at all"
-			_err_msg "If you see this message please open a bug report!"
-			exit 1
-		fi
-
-		# flutter apps need to have a relative lib and data directory
-		# we need to find the directory that contains libapp.so
-		if libapp=$(cd "$APPDIR"/bin \
-		  && find ../shared/lib/ -type f -name 'libapp.so' -print -quit); then
-			d=${libapp%/*}
-			if [ ! -d "$APPDIR"/bin/"${d##*/}" ]; then
-				ln -s "$d" "$APPDIR"/bin/"${d##*/}"
-			fi
-		else
-			_err_msg "Cannot find libapp.so in $APPDIR"
-			_err_msg "include it for flutter deployment to work"
-		fi
-
-		dst_flutter_dir="$APPDIR"/bin/data
-		if [ ! -d "$dst_flutter_dir" ]; then
-			if [ -z "$FLUTTER_DATA_DIR" ]; then
-				d=${FLUTTER_LIB%/*.so*}
-				# find data dir, we assume it is relative to
-				# where libflutter*.so came from
-				if [ -d "$d"/../data ]; then
-					FLUTTER_DATA_DIR="$d"/../data
-				elif [ -d "$d"/../../data ]; then
-					FLUTTER_DATA_DIR="$d"/../../data
-				else
-					_err_msg "Cannot find data directory of $FLUTTER_LIB"
-					_err_msg "Please set FLUTTER_DATA_DIR to its location"
-					exit 1
-				fi
-			fi
-			cp -rv "$FLUTTER_DATA_DIR" "$dst_flutter_dir"
-			_echo "* Copied flutter data directory"
-		fi
-	fi
-	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-		_fix_cpython_ldconfig_mess
-	fi
-	# copy the entire hicolor icons dir
-	# by default the hicolor icon theme ships no icons, this
-	# means any present icon is likely needed by the application
-	if [ -d /usr/share/icons/hicolor ]; then
-		mkdir -p "$APPDIR"/share/icons
-		cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
-		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
-	fi
-
-	# make the lib.path file. Very important for sharun to discover bundled libs!
-	"$APPDIR"/sharun -g
-
-	# on debian some libs may hardcode paths like /usr/lib/x86_64-linux-gnu
-	# make a compat symlink so patched paths resolve to bundled libs
-	d=$APPIMAGE_ARCH-linux-gnu
-	case "$LIB_DIR" in
-		*/"$d"*)
-			( cd "$DST_LIB_DIR" && ln -s . "$d" 2>/dev/null || : )
-			;;
-	esac
 }
 
 _strip_bins_and_libs() {
@@ -3124,6 +3053,48 @@ _deploy_libs "$@"
 _check_always_software
 _handle_bins_scripts
 
+if [ "$DEPLOY_FLUTTER" = 1 ]; then
+	if [ -z "$FLUTTER_LIB" ]; then
+		_err_msg "Flutter deployment was forced but looks like the"
+		_err_msg "the application does not link to libflutter at all"
+		_err_msg "If you see this message please open a bug report!"
+		exit 1
+	fi
+
+	# flutter apps need to have a relative lib and data directory
+	# we need to find the directory that contains libapp.so
+	if libapp=$(cd "$APPDIR"/bin \
+	  && find ../lib/ -type f -name 'libapp.so' -print -quit); then
+		d=${libapp%/*}
+		if [ ! -d "$APPDIR"/bin/"${d##*/}" ]; then
+			ln -s "$d" "$APPDIR"/bin/"${d##*/}"
+		fi
+	else
+		_err_msg "Cannot find libapp.so in $APPDIR"
+		_err_msg "include it for flutter deployment to work"
+	fi
+
+	dst_flutter_dir="$APPDIR"/bin/data
+	if [ ! -d "$dst_flutter_dir" ]; then
+		if [ -z "$FLUTTER_DATA_DIR" ]; then
+			d=${FLUTTER_LIB%/*.so*}
+			# find data dir, we assume it is relative to
+			# where libflutter*.so came from
+			if [ -d "$d"/../data ]; then
+				FLUTTER_DATA_DIR="$d"/../data
+			elif [ -d "$d"/../../data ]; then
+				FLUTTER_DATA_DIR="$d"/../../data
+			else
+				_err_msg "Cannot find data directory of $FLUTTER_LIB"
+				_err_msg "Please set FLUTTER_DATA_DIR to its location"
+				exit 1
+			fi
+		fi
+		cp -rv "$FLUTTER_DATA_DIR" "$dst_flutter_dir"
+		_echo "* Copied flutter data directory"
+	fi
+fi
+
 echo ""
 _echo "------------------------------------------------------------"
 echo ""
@@ -3538,11 +3509,11 @@ for lib do case "$lib" in
 			  # we can still make this relocatable by setting these other env variables
 			  # which will always work even when not compiled with MAGICK_HOME support
 			  cd "$APPDIR"
-			  set -- shared/lib*/ImageMagick-*/modules*/coders
+			  set -- lib*/ImageMagick-*/modules*/coders
 			  if [ -d "$1" ]; then
 			  	echo "MAGICK_CODER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
 			  fi
-			  set -- shared/lib*/ImageMagick-*/modules*/filters
+			  set -- lib*/ImageMagick-*/modules*/filters
 			  if [ -d "$1" ]; then
 			  	# checking the code it seems that MAGICK_FILTER_MODULE_PATH
 			  	# is NOT USED in the code and seems to be an error!!! the variable
@@ -3733,8 +3704,30 @@ for lib do case "$lib" in
 done
 
 _deploy_datadir
+
+# copy the entire hicolor icons dir
+# by default the hicolor icon theme ships no icons, this
+# means any present icon is likely needed by the application
+if [ -d /usr/share/icons/hicolor ]; then
+	mkdir -p "$APPDIR"/share/icons
+	cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
+	_remove_empty_dirs "$APPDIR"/share/icons/hicolor
+fi
+
 _deploy_locale
-_post_deployment_steps
+
+# make the lib.path file. Very important for sharun to discover bundled libs!
+"$APPDIR"/sharun -g
+
+# on debian some libs may hardcode paths like /usr/lib/x86_64-linux-gnu
+# make a compat symlink so patched paths resolve to bundled libs
+d=$APPIMAGE_ARCH-linux-gnu
+case "$LIB_DIR" in
+	*/"$d"*)
+		( cd "$DST_LIB_DIR" && ln -s . "$d" 2>/dev/null || : )
+		;;
+esac
+
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
