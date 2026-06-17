@@ -647,6 +647,14 @@ _determine_what_to_deploy() {
 				*libp11-kit.so*)
 					DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 					;;
+				# libc.so.6 is glibc only, musl does not have it
+				*libc.so.6*    |\
+				*libdl.so*     |\
+				*libpthread.so*|\
+				*ld-linux*.so* |\
+				*librt.so*     )
+					DEPLOY_GLIBC=${DEPLOY_GLIBC:-1}
+					;;
 			esac
 		done
 	done
@@ -673,15 +681,28 @@ _determine_what_to_deploy() {
 }
 
 _make_deployment_array() {
-	# gconv is always deployed, removing it only saves ~30 KiB
-	# in the final appimage size and not worth the hassle
-	# It also causes hard to spot issues when needed and not present
-	#
-	# https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20
-	# https://github.com/pkgforge-dev/Anylinux-AppImages/pull/410
-	#
-	if [ -d "$LIB_DIR"/gconv ]; then
-		_echo "* Deploying minimal gconv"
+	if [ "$DEPLOY_GLIBC" = 1 ]; then
+		# ancient glibc libs still needed for compat (nvidia drivers, old binaries, etc.)
+		set -- "$@" \
+			"$LIB_DIR"/libpthread.so* \
+			"$LIB_DIR"/libdl.so*      \
+			"$LIB_DIR"/librt.so*      \
+			"$LIB_DIR"/libm.so*       \
+			"$LIB_DIR"/libutil.so*    \
+			"$LIB_DIR"/libresolv.so*  \
+			"$LIB_DIR"/libnsl.so*
+		# nss libs, not all apps need this but it is very hard to determine this
+		set -- "$@" \
+			"$LIB_DIR"/libnss_dns.so*     \
+			"$LIB_DIR"/libnss_files.so*   \
+			"$LIB_DIR"/libnss_resolve.so* \
+			"$LIB_DIR"/libnss_mymachines.so*
+		# gconv is always deployed, removing it only saves ~30 KiB
+		# in the final appimage size and not worth the hassle
+		# It also causes hard to spot issues when needed and not present
+		#
+		# https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20
+		# https://github.com/pkgforge-dev/Anylinux-AppImages/pull/410
 		set -- "$@" \
 			"$LIB_DIR"/gconv/UTF*.so*     \
 			"$LIB_DIR"/gconv/ANSI*.so*    \
@@ -1115,11 +1136,7 @@ _make_deployment_array() {
 			"$LIB_DIR"/libX11-xcb.so*        \
 			"$LIB_DIR"/libwayland-egl.so*    \
 			"$LIB_DIR"/libwayland-cursor.so* \
-			"$LIB_DIR"/libwayland-client.so* \
-			"$LIB_DIR"/libnss_mymachines.so* \
-			"$LIB_DIR"/libnss_resolve.so*    \
-			"$LIB_DIR"/libnss_files.so*      \
-			"$LIB_DIR"/libnss_dns.so*
+			"$LIB_DIR"/libwayland-client.so*
 	fi
 
 	# also pass all the files in the directories to add to lib4bin
