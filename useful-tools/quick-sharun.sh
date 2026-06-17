@@ -682,6 +682,7 @@ _determine_what_to_deploy() {
 
 _make_deployment_array() {
 	if [ "$DEPLOY_GLIBC" = 1 ]; then
+		_echo "* Deploying glibc"
 		# ancient glibc libs still needed for compat (nvidia drivers, old binaries, etc.)
 		set -- "$@" \
 			"$LIB_DIR"/libpthread.so* \
