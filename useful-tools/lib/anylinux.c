@@ -14,6 +14,9 @@
  * It also offers the ability to block specific libraries from being loaded via dlopen
  * by setting ANYLINUX_DO_NOT_LOAD_LIBS to a colon-separated list of glob patterns
  *
+ * It also overrides __nss_configure_lookup to prevent glibc from dlopening
+ * nss libs that are not bundled in the AppImage
+ *
  * It also overrides bindtextdomain calls to /usr/share/locale to TEXTDOMAINDIR
  * which sharun automatically sets to our bundled locale dir
  *
@@ -471,6 +474,57 @@ VISIBLE int execvpe(const char *filename, char *const argv[], char *const envp[]
 VISIBLE int execvp(const char *filename, char *const argv[]) {
 	DEBUG_PRINT("execvp hijacked: %s\n", filename);
 	return execvpe(filename, argv, environ);
+}
+
+// Force NSS to only use the modules we bundle. Without this, glibc reads the
+// host /etc/nsswitch.conf at runtime and may try to dlopen NSS modules
+// (libnss_mdns4_minimal.so.2) that are not in the AppImage causing crashes.
+//
+// Use "files" for user/group/shadow lookups and "files dns" for host resolution.
+// These correspond to libnss_files.so and libnss_dns.so, bundled by glibc deployment.
+__attribute__((constructor(101)))
+static void init_nssfix(void) {
+	typedef int (*nss_configure_fn)(const char *, const char *);
+
+	nss_configure_fn nss_configure_lookup = (nss_configure_fn)dlsym(RTLD_DEFAULT, "__nss_configure_lookup");
+
+	if (!nss_configure_lookup) {
+		DEBUG_PRINT("nssfix: __nss_configure_lookup not found, skipping\n");
+		return;
+	}
+
+	static const struct {
+		const char *dbname;
+		const char *service_line;
+	} nss_overrides[] = {
+		{ "aliases",    "files" },
+		{ "ethers",     "files" },
+		{ "group",      "files" },
+		{ "gshadow",    "files" },
+		{ "hosts",      "files dns" },
+		{ "initgroups", "files" },
+		{ "netgroup",   "files" },
+		{ "networks",   "files" },
+		{ "passwd",     "files" },
+		{ "protocols",  "files" },
+		{ "publickey",  "files" },
+		{ "rpc",        "files" },
+		{ "services",   "files" },
+		{ "shadow",     "files" },
+		{ NULL, NULL }
+	};
+
+	for (size_t i = 0; nss_overrides[i].dbname; i++) {
+		int rc = nss_configure_lookup(
+			nss_overrides[i].dbname,
+			nss_overrides[i].service_line);
+		if (rc != 0) {
+			DEBUG_PRINT("nssfix: \"%s\" -> \"%s\" FAILED\n",
+				    nss_overrides[i].dbname,
+				    nss_overrides[i].service_line);
+		}
+	}
+	DEBUG_PRINT("nssfix: Ignoring host nsswitch.conf, using only files+dns\n");
 }
 
 // Intercept dlopen to block loading of specific libraries
