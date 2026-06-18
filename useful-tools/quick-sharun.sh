@@ -1686,6 +1686,10 @@ _get_desktop() {
 		_err_msg "Note there cannot be more than one .desktop file in that location"
 		exit 1
 	fi
+
+	# strip DBusActivatable=true
+	# this leads to broken apps since no appimage manager installs dbus services
+	sed -i -e '/DBusActivatable=/d' "$DESKTOP_ENTRY"
 }
 
 _check_window_class() {
