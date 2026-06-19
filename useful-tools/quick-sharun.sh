@@ -1388,7 +1388,11 @@ _lib4bin_deploy_binaries() {
 			cd "$DST_BIN_DIR"
 			ln -f ../sharun "${b##*/}"
 			# check if original bin name differs from read symlink
-			[ "${orig##*/}" = "${b##*/}" ] || ln -f ../sharun "${orig##*/}"
+			if [ "${orig##*/}" != "${b##*/}" ]; then
+				ln -f ../sharun "${orig##*/}"
+				[ -L "$DST_SHARED_BIN_DIR/${orig##*/}" ] || \
+					ln -sf "${b##*/}" "$DST_SHARED_BIN_DIR/${orig##*/}"
+			fi
 		) || exit 1
 	done
 }
