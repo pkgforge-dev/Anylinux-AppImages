@@ -132,7 +132,7 @@ _is_cmd() {
 }
 
 _is_elf() {
-	head -c 4 "$1" | grep -qa 'ELF'
+	head -c 4 "$1" 2>/dev/null | grep -qa 'ELF'
 }
 
 _is_static() {
@@ -1284,7 +1284,7 @@ _lib4bin_collect_strace() {
 
 	libs=''
 	while read -r b; do
-		b=$(readlink -f "$b")
+		b=$(readlink -f "$b") || continue
 		_is_elf "$b" || continue
 		[ -x "$b" ]  || continue
 		if _is_so "$b"; then
@@ -1323,7 +1323,7 @@ _lib4bin_collect_strace() {
 # deploy shared libraries to DST_LIB_DIR
 _lib4bin_deploy_shared_libs() {
 	while read -r lib; do
-		r=$(readlink -f "$lib")
+		r=$(readlink -f "$lib") || continue
 		if ! _is_elf "$r" || ! ldd "$r" >/dev/null 2>&1; then
 			_echo "SKIPPED: [$lib] not shared object!"
 			continue
@@ -1347,7 +1347,7 @@ _lib4bin_deploy_shared_libs() {
 _lib4bin_deploy_binaries() {
 	seen=""
 	while read -r b; do
-		b=$(readlink -f "$b")
+		b=$(readlink -f "$b") || continue
 		printf '%s\n' "$seen" | grep -Fxq "$b" && continue
 		seen=$(printf '%s\n%s' "$seen" "$b")
 
