@@ -1347,6 +1347,7 @@ _lib4bin_deploy_shared_libs() {
 _lib4bin_deploy_binaries() {
 	seen=""
 	while read -r b; do
+		orig=$b  # preserve original bin name since we may need to symlink it later
 		b=$(readlink -f "$b") || continue
 		printf '%s\n' "$seen" | grep -Fxq "$b" && continue
 		seen=$(printf '%s\n%s' "$seen" "$b")
@@ -1386,6 +1387,8 @@ _lib4bin_deploy_binaries() {
 		mkdir -p "$DST_BIN_DIR" && (
 			cd "$DST_BIN_DIR"
 			ln -f ../sharun "${b##*/}"
+			# check if original bin name differs from read symlink
+			[ "${orig##*/}" = "${b##*/}" ] || ln -f ../sharun "${orig##*/}"
 		) || exit 1
 	done
 }
