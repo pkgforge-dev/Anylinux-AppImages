@@ -11,7 +11,7 @@
 
 # Set DESKTOP and ICON to the path of top level .desktop and icon to deploy them
 
-set -e
+set -ex
 
 if [ "$QUICK_SHARUN_DEBUG" = 1 ]; then
 	set -x
