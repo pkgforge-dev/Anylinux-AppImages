@@ -122,7 +122,7 @@ export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 export $(dbus-launch 2>/dev/null || echo 'NO_DBUS=1')
 
 # CI containers often run as root which prevents
-# web apps from running with lib4bin strace mode
+# web apps from running with LD_DEBUG strace mode
 export ELECTRON_DISABLE_SANDBOX=1
 export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1
 export QTWEBENGINE_DISABLE_SANDBOX=1
@@ -382,11 +382,9 @@ _sanity_check() {
 			XVFB_CMD="xvfb-run -a --"
 		else
 			_err_msg "WARNING: xvfb-run was not detected on the system"
-			_err_msg "xvfb-run is used with sharun for strace mode, this is needed"
-			_err_msg "to find dlopened libraries as normally this script is going"
-			_err_msg "to be run in a headless enviromment where the application"
-			_err_msg "will fail to start and result strace mode will not be able"
-			_err_msg "to find the libraries dlopened by the application"
+			_err_msg "xvfb-run is used in strace mode to provide a display"
+			_err_msg "for apps to run to find dlopened libraries."
+			_err_msg "GUI apps will not run without display! We cannot check for dlopened libs!"
 			XVFB_CMD=""
 			sleep 5
 		fi
