@@ -50,6 +50,9 @@ DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
 LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
 
+STRACE_MODE=${STRACE_MODE:-1}
+STRACE_TIME=${STRACE_TIME:-5}
+
 DEPENDENCIES="
 	awk
 	cc
@@ -64,6 +67,18 @@ DEPENDENCIES="
 	strings
 	tr
 "
+
+# libraries whose dependencies should not be collected via ldd
+# we skip libqgtk3.so by default to prevent deploying GTK in Qt apps
+# Qt works fine by doing this, the libqgtk3.so plugin even works with alpine
+# linux gtk3 without issue, if the plugin fails to load Qt does not crash either
+QUICK_SHARUN_SKIP_DEPS_FOR="
+	$QUICK_SHARUN_SKIP_DEPS_FOR
+	libqgtk3.so
+"
+
+# prevent Qt from dlopening libqtgtk3.so via strace mode
+export QT_QPA_PLATFORMTHEME=${QT_QPA_PLATFORMTHEME:-fusion}
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
@@ -97,10 +112,6 @@ if [ -e "$1" ] && [ "$2" = "--" ]; then
 	STRACE_ARGS_PROVIDED=1
 fi
 
-# for sharun
-export DST_DIR="$APPDIR"
-export STRACE_MODE=${STRACE_MODE:-1}
-export STRACE_TIME=${STRACE_TIME:-5}
 
 # github actions doesn't set USER and XDG_RUNTIME_DIR
 # causing some apps crash when running xvfb-run
@@ -1264,13 +1275,16 @@ _lib4bin_get_lib_dst_dir() {
 }
 
 # collect ldd library dependencies
+# QUICK_SHARUN_SKIP_DEPS_FOR=newline-separated basenames to skip ldd for
 _lib4bin_collect_ldd() {
 	libs=""
 	while read -r b; do
 		b=$(readlink -f "$b") || continue
 		_is_elf "$b"          || continue
 
-		libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
+		if [ -z "$QUICK_SHARUN_SKIP_DEPS_FOR" ] || ! printf '%s\n' "$QUICK_SHARUN_SKIP_DEPS_FOR" | grep -Fxq "${b##*/}"; then
+			libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
+		fi
 		if _is_so "$b"; then
 			libs="$(printf '%s\n%s' "$libs" "$b")"
 		fi
