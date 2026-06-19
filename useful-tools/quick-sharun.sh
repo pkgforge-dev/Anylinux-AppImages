@@ -1304,7 +1304,7 @@ _lib4bin_collect_strace() {
 		unset LD_DEBUG
 
 		sleep "$STRACE_TIME"
-		kill -TERM $pid 2>/dev/null
+		kill -TERM $pid 2>/dev/null || :
 		wait $pid 2>/dev/null || :
 
 		out=$(awk '/calling init/{print $NF}' "$dlopened" | sed \
