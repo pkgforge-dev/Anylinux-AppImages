@@ -24,9 +24,11 @@ APPDIR=${APPDIR:-$PWD/AppDir}
 APPENV=$APPDIR/.env
 DIRICON=$APPDIR/.DirIcon
 DST_LIB_DIR=$APPDIR/lib
+DST_BIN_DIR=$APPDIR/bin
+DST_SHARED_BIN_DIR=$APPDIR/shared/bin
 MAIN_BIN=${MAIN_BIN##*/}
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH}
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/latest/download/onelf-$APPIMAGE_ARCH-linux}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
@@ -98,6 +100,7 @@ fi
 # for sharun
 export DST_DIR="$APPDIR"
 export STRACE_MODE=${STRACE_MODE:-1}
+export STRACE_TIME=${STRACE_TIME:-5}
 
 # github actions doesn't set USER and XDG_RUNTIME_DIR
 # causing some apps crash when running xvfb-run
@@ -129,10 +132,33 @@ _is_cmd() {
 }
 
 _is_elf() {
-	if [ -f "$1" ] && head -c 4 "$1" | grep -qa 'ELF'; then
-		return 0
+	head -c 4 "$1" | grep -qa 'ELF'
+}
+
+_is_static() {
+	if _is_elf "$1"; then
+		ldd "$1" 2>/dev/null | grep -qi 'statically linked\|not a dynamic'
+	else
+		return 1
 	fi
+}
+
+_is_script() {
+	shebang=$(head -c 2 "$1" 2>/dev/null)
+	[ "$shebang" = '#!' ]
+}
+
+_is_so() {
+	case "${1##*/}" in
+		*.so|*.so.[0-9]*)
+		return 0
+		;;
+	esac
 	return 1
+}
+
+_lib4bin_ldd_libs() {
+	ldd "$1" 2>/dev/null | awk '/=>/{print $3}' | sort -u
 }
 
 _download() {
@@ -1201,33 +1227,208 @@ _make_deployment_array() {
 }
 
 _get_sharun() {
-	if [ ! -x "$TMPDIR"/sharun-aio ]; then
-		_echo "Downloading sharun..."
-		_download "$TMPDIR"/sharun-aio "$SHARUN_LINK"
-		if head -c 4 "$TMPDIR"/sharun-aio | grep -qa 'ELF'; then
-			chmod +x "$TMPDIR"/sharun-aio
-		else
-			_err_msg "ERROR: What was downloaded is not sharun!"
-			_err_msg "This is usually caused by network issues"
-			exit 1
-		fi
+	if [ -x "$APPDIR/sharun" ]; then
+		return 0
+	fi
+	_echo "Downloading sharun..."
+	_download "$APPDIR/sharun" "$SHARUN_LINK"
+	if _is_elf "$APPDIR/sharun"; then
+		chmod +x "$APPDIR/sharun"
+	else
+		_err_msg "ERROR: What was downloaded is not sharun!"
+		_err_msg "This is usually caused by network issues"
+		exit 1
 	fi
 }
 
 _deploy_libs() {
-	# when strace args are given sharun will only use them when
-	# you pass a single binary to it that is:
-	# 'sharun-aio l /path/to/bin -- google.com' works (site is opened)
-	# 'sharun-aio l /path/to/lib /path/to/bin -- google.com' does not work
-	if [ "$STRACE_ARGS_PROVIDED" = 1 ]; then
-		$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
+	# merge deployment array with user-provided binaries
+	eval set -- "$TO_DEPLOY_ARRAY" "$@"
+
+	# run the embedded lib4bin deployment engine
+	_lib4bin_main "$@"
+}
+
+# compute destination path in DST_LIB_DIR from a source file path
+_lib4bin_get_lib_dst_dir() {
+	p=$(readlink -f "${1%/*}" | sed \
+	  -e "s|^$LIB_DIR||" \
+	  -e 's|^/usr||'     \
+	  -e 's|^/opt||'     \
+	  -e 's|^/lib64||'   \
+	  -e 's|^/lib32||'   \
+	  -e 's|^/lib||'     \
+	  -e 's|^/[^/]*-linux-gnu||'
+	)
+	echo "$DST_LIB_DIR"/"$p"
+}
+
+# collect ldd library dependencies
+_lib4bin_collect_ldd() {
+	libs=""
+	while read -r b; do
+		b=$(readlink -f "$b") || continue
+		_is_elf "$b"          || continue
+
+		libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
+		if _is_so "$b"; then
+			libs="$(printf '%s\n%s' "$libs" "$b")"
+		fi
+	done
+	printf '%s\n' "$libs" | sort -u | sed '/^$/d'
+}
+
+# collect dlopen libraries via LD_DEBUG=libs
+_lib4bin_collect_strace() {
+	[ "$STRACE_MODE" = 1 ] || return 0
+
+	libs=''
+	while read -r b; do
+		b=$(readlink -f "$b")
+		_is_elf "$b" || continue
+		[ -x "$b" ]  || continue
+		if _is_so "$b"; then
+			continue
+		fi
+
+		dlopened=$TMPDIR/libs.$$
+
+		_echo "STRACE: [$b] ..."
+		export LD_DEBUG=libs
+		if [ -n "$XVFB_CMD" ]; then
+			$XVFB_CMD "$b" >/dev/null 2>"$dlopened" &
+		else
+			"$b" >/dev/null 2>"$dlopened" &
+		fi
+		pid=$!
+		unset LD_DEBUG
+
+		sleep "$STRACE_TIME"
+		kill -TERM $pid 2>/dev/null
+		wait $pid 2>/dev/null || :
+
+		out=$(awk '/calling init/{print $NF}' "$dlopened" | sed \
+		                                                     -e '/nvidia/d'      \
+		                                                     -e '/libcuda/d'     \
+		                                                     -e '/lib-dynload/d' \
+		                                                     -e '/_internal/d'
+		)
+		rm -f "$dlopened"
+		[ -n "$out" ] || continue
+		libs=$(printf '%s\n%s' "$libs" "$out")
+	done
+	printf '%s\n' "$libs" | sort -u | sed '/^$/d'
+}
+
+# deploy shared libraries to DST_LIB_DIR
+_lib4bin_deploy_shared_libs() {
+	while read -r lib; do
+		r=$(readlink -f "$lib")
+		if ! _is_elf "$r" || ! ldd "$r" >/dev/null 2>&1; then
+			_echo "SKIPPED: [$lib] not shared object!"
+			continue
+		fi
+
+		dst_dir=$(_lib4bin_get_lib_dst_dir "$r")
+		dst=$dst_dir/${r##*/}
+		mkdir -p "$dst_dir"
+		[ -f "$dst" ] || cp -fv "$lib" "$dst"
+
+		# create symlink for SONAME if it differs from real name
+		if [ -L "$lib" ] && [ "${lib##*/}" != "${r##*/}" ]; then
+			d=$(_lib4bin_get_lib_dst_dir "$lib")
+			mkdir -p "$d"
+			ln -sfr "$dst" "$d/${lib##*/}"
+		fi
+	done
+}
+
+# deploy binaries, download sharun if needed
+_lib4bin_deploy_binaries() {
+	seen=""
+	while read -r b; do
+		b=$(readlink -f "$b")
+		printf '%s\n' "$seen" | grep -Fxq "$b" && continue
+		seen=$(printf '%s\n%s' "$seen" "$b")
+
+		if _is_script "$b"; then
+			dst=$DST_BIN_DIR/${b##*/}
+			mkdir -p "$DST_BIN_DIR"
+			if [ ! -f "$dst" ]; then
+				cp -fv "$b" "$dst"
+				chmod 755 "$dst"
+			fi
+			for i in python bash sh ash zsh fish dash perl ruby go node; do
+				if grep -qo "^#!.*bin/$i" "$dst"; then
+					sed -i "1s|^#!.*bin/$i|#!/usr/bin/env $i|" "$dst"
+					break
+				fi
+			done
+			continue
+		fi
+
+		_is_elf "$b" || continue
+		[ -x "$b" ]  || continue
+		if _is_so "$b" || _is_static "$b"; then
+			continue
+		fi
+
+		[ -x "$APPDIR/sharun" ] || _get_sharun
+
+		_echo "...: [${b##*/}] ..."
+		dst=$DST_SHARED_BIN_DIR/${b##*/}
+		if [ ! -f "$dst" ]; then
+			cp -fv "$b" "$dst"
+			chmod +x "$dst"
+		fi
+
+		# hardlink in bin/ -> ../sharun
+		mkdir -p "$DST_BIN_DIR" && (
+			cd "$DST_BIN_DIR"
+			ln -f ../sharun "${b##*/}"
+		) || exit 1
+	done
+}
+
+_lib4bin_main() {
+	__shared_dir="${APPDIR}/shared"
+	[ -f "$__shared_dir" ] || [ -L "$__shared_dir" ] && __shared_dir="${__shared_dir}.dir"
+	mkdir -p "$__shared_dir" "$DST_BIN_DIR" "$DST_SHARED_BIN_DIR"
+
+	# shared/lib -> ../lib symlink for sharun runtime
+	if [ ! -d "$__shared_dir/lib" ] && [ ! -L "$__shared_dir/lib" ]; then
+		mkdir -p "$DST_LIB_DIR"
+		(cd "$__shared_dir" && ln -sf ../lib lib) || exit 1
+	fi
+	if [ "$LIB32" = 1 ] && [ ! -d "$__shared_dir/lib32" ] && [ ! -L "$__shared_dir/lib32" ]; then
+		mkdir -p "$APPDIR/lib32"
+		(cd "$__shared_dir" && ln -sf ../lib32 lib32) || exit 1
 	fi
 
-	# now merge the deployment array
-	ARRAY=$(_save_array "$@")
-	eval set -- "$TO_DEPLOY_ARRAY" "$ARRAY"
+	_echo "Collecting ldd libraries..."
+	ldd_libs="$(printf '%s\n' "$@" | _lib4bin_collect_ldd)"
 
-	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
+	strace_libs=''
+	if [ "$STRACE_MODE" = 1 ]; then
+		_echo "Collecting dlopen libraries via LD_DEBUG=libs..."
+		strace_libs="$(printf '%s\n' "$@" | _lib4bin_collect_strace)"
+	fi
+
+	all_libs="$(printf '%s\n%s' "$ldd_libs" "$strace_libs" | sort -u | sed '/^$/d')"
+
+	_echo "Deploying shared libraries..."
+	printf '%s\n' "$all_libs" | _lib4bin_deploy_shared_libs
+
+	_echo "Deploying binaries..."
+	printf '%s\n' "$@" | _lib4bin_deploy_binaries
+
+	_echo "Generating lib.path..."
+	if [ -x "$APPDIR/sharun" ]; then
+		"$APPDIR/sharun" -g
+	else
+		_err_msg "ERROR: sharun binary not found at $APPDIR/sharun!"
+		exit 1
+	fi
 }
 
 _handle_bins_scripts() {
