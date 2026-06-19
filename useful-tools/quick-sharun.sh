@@ -785,13 +785,6 @@ _make_deployment_array() {
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
 				*libQt*Gui.so*)
-					# terrible hack to prevent partial gtk deployment
-					# see: https://github.com/VHSgunzo/sharun/issues/91
-					p="$plugindir"/platformthemes/libqgtk3.so
-					if [ "$DEPLOY_GTK" != 1 ] \
-					  && [ -n "$CI" ] && [ -w "$p" ]; then
-						mv "$p" "$TMPDIR"
-					fi
 					set -- "$@" \
 						"$plugindir"/imageformats/* \
 						"$plugindir"/iconengines/*  \
@@ -1275,14 +1268,15 @@ _lib4bin_get_lib_dst_dir() {
 }
 
 # collect ldd library dependencies
-# QUICK_SHARUN_SKIP_DEPS_FOR=newline-separated basenames to skip ldd for
 _lib4bin_collect_ldd() {
 	libs=""
 	while read -r b; do
 		b=$(readlink -f "$b") || continue
 		_is_elf "$b"          || continue
 
-		if [ -z "$QUICK_SHARUN_SKIP_DEPS_FOR" ] || ! printf '%s\n' "$QUICK_SHARUN_SKIP_DEPS_FOR" | grep -Fxq "${b##*/}"; then
+		if echo "$QUICK_SHARUN_SKIP_DEPS_FOR" | grep -Fxq "${b##*/}"; then
+			: # do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
+		else
 			libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
 		fi
 		if _is_so "$b"; then
@@ -3592,13 +3586,6 @@ for lib do case "$lib" in
 			Qml2Imports = qml
 			EOF
 			_echo "* added $f "
-		fi
-
-		# move the gtk3 plugin back into the AppDir
-		if [ -f "$TMPDIR"/libqgtk3.so ]; then
-			d=$DST_LIB_DIR/$QT_DIR/plugins/platformthemes
-			mkdir -p "$d"
-			mv "$TMPDIR"/libqgtk3.so "$d"
 		fi
 
 		# deploy translation files
