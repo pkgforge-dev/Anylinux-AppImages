@@ -11,7 +11,7 @@
 
 # Set DESKTOP and ICON to the path of top level .desktop and icon to deploy them
 
-set -ex
+set -e
 
 if [ "$QUICK_SHARUN_DEBUG" = 1 ]; then
 	set -x
@@ -1294,14 +1294,12 @@ _lib4bin_collect_strace() {
 		dlopened=$TMPDIR/libs.$$
 
 		_echo "STRACE: [$b] ..."
-		export LD_DEBUG=libs
 		if [ -n "$XVFB_CMD" ]; then
-			$XVFB_CMD "$b" >/dev/null 2>"$dlopened" &
+			$XVFB_CMD env LD_DEBUG=libs "$b" >/dev/null 2>"$dlopened" &
 		else
-			"$b" >/dev/null 2>"$dlopened" &
+			LD_DEBUG=libs "$b" >/dev/null 2>"$dlopened" &
 		fi
 		pid=$!
-		unset LD_DEBUG
 
 		sleep "$STRACE_TIME"
 		kill -TERM $pid 2>/dev/null || :
@@ -1390,8 +1388,8 @@ _lib4bin_deploy_binaries() {
 			# check if original bin name differs from read symlink
 			if [ "${orig##*/}" != "${b##*/}" ]; then
 				ln -f ../sharun "${orig##*/}"
-				[ -L "$DST_SHARED_BIN_DIR/${orig##*/}" ] || \
-					ln -sf "${b##*/}" "$DST_SHARED_BIN_DIR/${orig##*/}"
+				orig_shared_bin=$DST_SHARED_BIN_DIR/${orig##*/}
+				[ -L "$orig_shared_bin" ] || ln -sf "${b##*/}" "$orig_shared_bin"
 			fi
 		) || exit 1
 	done
