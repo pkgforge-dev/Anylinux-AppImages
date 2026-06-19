@@ -1144,6 +1144,7 @@ _make_deployment_array() {
 		set -- "$@" \
 			"$LIB_DIR"/libXi.so*             \
 			"$LIB_DIR"/libXcursor.so*        \
+			"$LIB_DIR"/libXtst.so*           \
 			"$LIB_DIR"/libxcb-ewmh.so*       \
 			"$LIB_DIR"/libxcb-icccm.so*      \
 			"$LIB_DIR"/libxkbcommon.so*      \
