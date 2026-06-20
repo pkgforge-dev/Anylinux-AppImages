@@ -43,7 +43,7 @@ echo "Bundling AppImage..."
 echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
-./quick-sharun /usr/bin/qdbusviewer6
+STRACE_MODE=0 ./quick-sharun /usr/bin/qdbusviewer6
 
 ./quick-sharun --make-appimage
 
