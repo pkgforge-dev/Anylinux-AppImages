@@ -1383,13 +1383,12 @@ _lib4bin_deploy_binaries() {
 
 		_is_elf "$b" || continue
 		[ -x "$b" ]  || continue
-		if _is_so "$b" || _is_static "$b"; then
+		if _is_so "$b"; then
 			continue
 		fi
 
 		[ -x "$APPDIR/sharun" ] || _get_sharun
 
-		_echo "...: [${b##*/}] ..."
 		dst=$DST_SHARED_BIN_DIR/${b##*/}
 		if [ ! -f "$dst" ]; then
 			cp -fv "$b" "$dst"
@@ -1425,8 +1424,8 @@ _lib4bin_main() {
 		(cd "$__shared_dir" && ln -sf ../lib32 lib32) || exit 1
 	fi
 
-	_echo "Collecting ldd libraries..."
-	ldd_libs="$(printf '%s\n' "$@" | _lib4bin_collect_ldd)"
+	_echo "Collecting dependencies..."
+	ldd_libs=$(printf '%s\n' "$@" | _lib4bin_collect_ldd)
 
 	strace_libs=''
 	if [ "$STRACE_MODE" = 1 ]; then
@@ -1434,7 +1433,7 @@ _lib4bin_main() {
 		strace_libs="$(printf '%s\n' "$@" | _lib4bin_collect_strace)"
 	fi
 
-	all_libs="$(printf '%s\n%s' "$ldd_libs" "$strace_libs" | sort -u | sed '/^$/d')"
+	all_libs=$(printf '%s\n%s' "$ldd_libs" "$strace_libs" | sort -u | sed '/^$/d')
 
 	_echo "Deploying shared libraries..."
 	printf '%s\n' "$all_libs" | _lib4bin_deploy_shared_libs
