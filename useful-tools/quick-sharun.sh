@@ -1334,23 +1334,24 @@ _lib4bin_collect_strace() {
 
 # deploy shared libraries to DST_LIB_DIR
 _lib4bin_deploy_shared_libs() {
-	while read -r lib; do
-		r=$(readlink -f "$lib") || continue
-		if ! _is_elf "$r" || ! ldd "$r" >/dev/null 2>&1; then
-			_echo "SKIPPED: [$lib] not shared object!"
+	while read -r l; do
+		orig=$l
+		l=$(readlink -f "$l") || continue
+		if _is_elf "$l"; then
+			dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
+			dst=$dst_dir/${l##*/}
+			mkdir -p "$dst_dir"
+			[ -f "$dst" ] || cp -fv "$orig" "$dst"
+
+			# create symlink for SONAME if it differs from real name
+			if [ -L "$orig" ] && [ "${orig##*/}" != "${l##*/}" ]; then
+				d=$(_lib4bin_get_lib_dst_dir "$orig")
+				mkdir -p "$d"
+				ln -sfr "$dst" "$d/${orig##*/}"
+			fi
+		else
+			_echo "SKIPPED: [$orig] not shared object!"
 			continue
-		fi
-
-		dst_dir=$(_lib4bin_get_lib_dst_dir "$r")
-		dst=$dst_dir/${r##*/}
-		mkdir -p "$dst_dir"
-		[ -f "$dst" ] || cp -fv "$lib" "$dst"
-
-		# create symlink for SONAME if it differs from real name
-		if [ -L "$lib" ] && [ "${lib##*/}" != "${r##*/}" ]; then
-			d=$(_lib4bin_get_lib_dst_dir "$lib")
-			mkdir -p "$d"
-			ln -sfr "$dst" "$d/${lib##*/}"
 		fi
 	done
 }
