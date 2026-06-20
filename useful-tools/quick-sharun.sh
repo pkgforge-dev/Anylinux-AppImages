@@ -953,6 +953,21 @@ _make_deployment_array() {
 			"$LIB_DIR"/libpulse.so* \
 			"$LIB_DIR"/alsa-lib/libasound*pulse*.so*
 	fi
+	# deploy a minimal set of alsa plugins, we don't have a deploy alsa mode
+	# it would make no sense to ship an application with only support for alsa
+	#
+	# but we end up with libasound.so bundled as a transitive dependency of
+	# pipewire or pulseaudio which means people on alsa only setups will run
+	# into issues if the alsa plugins are missing
+	if [ "$DEPLOY_PULSE" = 1 ] || [ "$DEPLOY_PIPEWIRE" = 1 ]; then
+		set -- "$@" \
+			"$LIB_DIR"/alsa-lib/libasound*pcm_upmix.so*       \
+			"$LIB_DIR"/alsa-lib/libasound*pcm_vdownmix.so*    \
+			"$LIB_DIR"/alsa-lib/libasound*pcm_speex.so*       \
+			"$LIB_DIR"/alsa-lib/libasound*pcm_usb_stream.so*  \
+			"$LIB_DIR"/alsa-lib/libasound*rate_speexrate*.so* \
+			"$LIB_DIR"/alsa-lib/libasound*rate_samplerate*.so*
+	fi
 	if [ "$DEPLOY_GSTREAMER_ALL" = 1 ] || [ "$DEPLOY_GSTREAMER" = 1 ]; then
 		GST_DIR=$(echo "$LIB_DIR"/gstreamer-*)
 		if [ "$DEPLOY_GSTREAMER_ALL" = 1 ]; then
