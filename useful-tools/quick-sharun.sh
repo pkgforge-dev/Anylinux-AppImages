@@ -401,7 +401,7 @@ _sanity_check() {
 
 	for d do
 		[ -L "$APPDIR"/shared/"$d" ] || rm -rf "$APPDIR"/shared/"$d"
-		ln -sf ../"$d" "$APPDIR"/shared/"$d"
+		[ -L "$APPDIR"/shared/"$d" ] || ln -sf ../"$d" "$APPDIR"/shared/"$d"
 	done
 }
 
