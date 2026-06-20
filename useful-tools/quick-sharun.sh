@@ -25,7 +25,7 @@ APPENV=$APPDIR/.env
 DIRICON=$APPDIR/.DirIcon
 DST_LIB_DIR=$APPDIR/lib
 DST_BIN_DIR=$APPDIR/bin
-DST_SHARED_BIN_DIR=$APPDIR/shared/bin
+SHARUN_BIN_DIR=$APPDIR/shared/bin
 MAIN_BIN=${MAIN_BIN##*/}
 
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH}
@@ -82,7 +82,7 @@ export QT_QPA_PLATFORMTHEME=${QT_QPA_PLATFORMTHEME:-fusion}
 
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
-PATH_MAPPING_SCRIPT="$APPDIR"/bin/01-path-mapping-hardcoded.hook
+PATH_MAPPING_SCRIPT=$DST_BIN_DIR/01-path-mapping-hardcoded.hook
 
 if [ -f "$PATH_MAPPING_SCRIPT" ]; then
 	while IFS= read -r line; do
@@ -139,14 +139,6 @@ _is_cmd() {
 
 _is_elf() {
 	head -c 4 "$1" 2>/dev/null | grep -qa 'ELF'
-}
-
-_is_static() {
-	if _is_elf "$1"; then
-		ldd "$1" 2>/dev/null | grep -qi 'statically linked\|not a dynamic'
-	else
-		return 1
-	fi
 }
 
 _is_script() {
@@ -359,7 +351,7 @@ _sanity_check() {
 		fi
 	done
 
-	if ! mkdir -p "$APPDIR"/share "$APPDIR"/bin; then
+	if ! mkdir -p "$APPDIR"/share "$DST_BIN_DIR" "$SHARUN_BIN_DIR"; then
 		_err_msg "ERROR: Cannot create '$APPDIR' directory!"
 		exit 1
 	fi
@@ -400,10 +392,17 @@ _sanity_check() {
 		LIB32=1
 	fi
 
+	set -- lib
 	if [ "$LIB32" = 1 ]; then
 		DST_LIB_DIR=$APPDIR/lib32
 		_err_msg "WARNING: 32bit deployment is experimental!"
+		set -- "$@" lib32
 	fi
+
+	for d do
+		[ -L "$APPDIR"/shared/"$d" ] || rm -rf "$APPDIR"/shared/"$d"
+		ln -sf ../"$d" "$APPDIR"/shared/"$d"
+	done
 }
 
 # do a basic test to make sure at least the application is not totally broken
@@ -1173,8 +1172,8 @@ _make_deployment_array() {
 		set -- "$@" \
 			"$(command -v dotnet)"  \
 			$(find "$DOTNET_DIR"/shared -type f -name '*.so*' -print)
-		cp -r "$DOTNET_DIR"/shared "$APPDIR"/bin
-		cp -r "$DOTNET_DIR"/host   "$APPDIR"/bin
+		cp -r "$DOTNET_DIR"/shared "$DST_BIN_DIR"
+		cp -r "$DOTNET_DIR"/host   "$DST_BIN_DIR"
 		echo 'DOTNET_ROOT=${SHARUN_DIR}/bin' >> "$APPENV"
 	fi
 	# these are needed by several toolkits
@@ -1276,7 +1275,7 @@ _lib4bin_get_lib_dst_dir() {
 # collect ldd library dependencies
 _lib4bin_collect_ldd() {
 	libs=""
-	while read -r b; do
+	for b do
 		b=$(readlink -f "$b") || continue
 		_is_elf "$b"          || continue
 
@@ -1291,7 +1290,10 @@ _lib4bin_collect_ldd() {
 		$QUICK_SHARUN_SKIP_DEPS_FOR
 		EOF
 
-		[ -n "$skip" ] || libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
+		if [ -z "$skip" ]; then
+			libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
+		fi
+
 		if _is_so "$b"; then
 			libs=$(printf '%s\n%s' "$libs" "$b")
 		fi
@@ -1300,11 +1302,12 @@ _lib4bin_collect_ldd() {
 }
 
 # collect dlopen libraries via LD_DEBUG=libs
+# STRACE_BINARY=space/newline-separated binary names to trace (default: all)
 _lib4bin_collect_strace() {
 	[ "$STRACE_MODE" = 1 ] || return 0
 
 	libs=""
-	while read -r b; do
+	for b do
 		b=$(readlink -f "$b") || continue
 		_is_elf "$b"          || continue
 		[ -x "$b" ]           || continue
@@ -1312,13 +1315,26 @@ _lib4bin_collect_strace() {
 			continue
 		fi
 
+		if [ -n "$STRACE_BINARY" ]; then
+			match=""
+			flags=""
+			for strace_bin in $STRACE_BINARY; do
+				if [ "$strace_bin" = "${b##*/}" ]; then
+					match=1
+					flags=$STRACE_FLAGS
+					break
+				fi
+			done
+			[ -n "$match" ] || continue
+		fi
+
 		dlopened=$TMPDIR/libs.$$
 
 		_echo "STRACE: [$b] ..."
 		if [ -n "$XVFB_CMD" ]; then
-			$XVFB_CMD env LD_DEBUG=libs "$b" >/dev/null 2>"$dlopened" &
+			$XVFB_CMD env LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
 		else
-			LD_DEBUG=libs "$b" >/dev/null 2>"$dlopened" &
+			LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
 		fi
 		pid=$!
 
@@ -1341,7 +1357,7 @@ _lib4bin_collect_strace() {
 
 # deploy shared libraries to DST_LIB_DIR
 _lib4bin_deploy_shared_libs() {
-	while read -r l; do
+	for l do
 		orig=$l
 		l=$(readlink -f "$l") || continue
 		if _is_elf "$l"; then
@@ -1366,7 +1382,7 @@ _lib4bin_deploy_shared_libs() {
 # deploy binaries, download sharun if needed
 _lib4bin_deploy_binaries() {
 	seen=""
-	while read -r b; do
+	for b do
 		orig=$b  # preserve original bin name since we may need to symlink it later
 		b=$(readlink -f "$b") || continue
 		echo "$seen" | grep -Fxq "$b" && continue
@@ -1396,7 +1412,7 @@ _lib4bin_deploy_binaries() {
 
 		[ -x "$APPDIR/sharun" ] || _get_sharun
 
-		dst=$DST_SHARED_BIN_DIR/${b##*/}
+		dst=$SHARUN_BIN_DIR/${b##*/}
 		if [ ! -f "$dst" ]; then
 			cp -fv "$b" "$dst"
 			chmod +x "$dst"
@@ -1409,7 +1425,7 @@ _lib4bin_deploy_binaries() {
 			# check if original bin name differs from read symlink
 			if [ "${orig##*/}" != "${b##*/}" ]; then
 				ln -f ../sharun "${orig##*/}"
-				orig_shared_bin=$DST_SHARED_BIN_DIR/${orig##*/}
+				orig_shared_bin=$SHARUN_BIN_DIR/${orig##*/}
 				[ -L "$orig_shared_bin" ] || ln -sf "${b##*/}" "$orig_shared_bin"
 			fi
 		) || exit 1
@@ -1417,36 +1433,22 @@ _lib4bin_deploy_binaries() {
 }
 
 _lib4bin_main() {
-	__shared_dir="${APPDIR}/shared"
-	[ -f "$__shared_dir" ] || [ -L "$__shared_dir" ] && __shared_dir="${__shared_dir}.dir"
-	mkdir -p "$__shared_dir" "$DST_BIN_DIR" "$DST_SHARED_BIN_DIR"
-
-	# shared/lib -> ../lib symlink for sharun runtime
-	if [ ! -d "$__shared_dir/lib" ] && [ ! -L "$__shared_dir/lib" ]; then
-		mkdir -p "$DST_LIB_DIR"
-		(cd "$__shared_dir" && ln -sf ../lib lib) || exit 1
-	fi
-	if [ "$LIB32" = 1 ] && [ ! -d "$__shared_dir/lib32" ] && [ ! -L "$__shared_dir/lib32" ]; then
-		mkdir -p "$APPDIR/lib32"
-		(cd "$__shared_dir" && ln -sf ../lib32 lib32) || exit 1
-	fi
-
 	_echo "Collecting dependencies..."
-	ldd_libs=$(printf '%s\n' "$@" | _lib4bin_collect_ldd)
+	ldd_libs=$(_lib4bin_collect_ldd "$@")
 
 	strace_libs=''
 	if [ "$STRACE_MODE" = 1 ]; then
 		_echo "Collecting dlopen libraries via LD_DEBUG=libs..."
-		strace_libs="$(printf '%s\n' "$@" | _lib4bin_collect_strace)"
+		strace_libs="$(_lib4bin_collect_strace "$@")"
 	fi
 
 	all_libs=$(printf '%s\n%s' "$ldd_libs" "$strace_libs" | sort -u | sed '/^$/d')
 
 	_echo "Deploying shared libraries..."
-	echo "$all_libs" | _lib4bin_deploy_shared_libs
+	_lib4bin_deploy_shared_libs $all_libs
 
 	_echo "Deploying binaries..."
-	printf '%s\n' "$@" | _lib4bin_deploy_binaries
+	_lib4bin_deploy_binaries "$@"
 
 	_echo "Generating lib.path..."
 	if [ -x "$APPDIR/sharun" ]; then
@@ -1467,7 +1469,7 @@ _handle_bins_scripts() {
 	set -- "$DST_LIB_DIR"/gstreamer-*
 	if [ -d "$1" ]; then
 		gstlibdir="$1"
-		set -- "$APPDIR"/shared/bin/gst-*
+		set -- "$SHARUN_BIN_DIR"/gst-*
 		for bin do
 			if [ -f "$bin" ]; then
 				ln "$APPDIR"/sharun "$gstlibdir"/"${bin##*/}"
@@ -1485,7 +1487,7 @@ _handle_bins_scripts() {
 	fi
 
 	# handle shell scripts
-	set -- "$APPDIR"/bin/*
+	set -- "$DST_BIN_DIR"/*
 	for s do
 		if ! head -c 20 "$s" | grep -q '#!.*sh'; then
 			continue
@@ -1577,7 +1579,7 @@ _check_always_software() {
 }
 
 _add_p11kit_cert_hook() {
-	cert_check="$APPDIR"/bin/01-check-ca-certs.hook
+	cert_check=$DST_BIN_DIR/01-check-ca-certs.hook
 	if [ -f "$cert_check" ]; then
 		return 0
 	fi
@@ -1653,7 +1655,7 @@ _map_paths_ld_preload_open() {
 
 _map_paths_binary_patch() {
 	if [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
-		set -- "$APPDIR"/shared/bin/*
+		set -- "$SHARUN_BIN_DIR"/*
 		for bin do
 			_patch_away_usr_bin_dir   "$bin"
 			_patch_away_usr_lib_dir   "$bin"
@@ -1665,7 +1667,7 @@ _map_paths_binary_patch() {
 		set +f
 		_echo "* Patching files listed in PATH_MAPPING_HARDCODED..."
 		# only search for files to patch in the lib and bin dirs
-		path1="$APPDIR"/shared/bin
+		path1=$SHARUN_BIN_DIR
 		path2=$DST_LIB_DIR
 		for f do
 			file=$(find -L "$path1"/ "$path2"/ -type f -name "$f")
@@ -1686,7 +1688,7 @@ _map_paths_binary_patch() {
 _deploy_datadir() {
 	if [ "$DEPLOY_DATADIR" = 1 ]; then
 		# find if there is a datadir that matches bundled binary name
-		set -- "$APPDIR"/bin/*
+		set -- "$DST_BIN_DIR"/*
 		for bin do
 			if [ ! -f "$bin" ] || [ ! -x "$bin" ]; then
 				continue
@@ -1719,7 +1721,7 @@ _deploy_datadir() {
 			bin=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$1")
 			bin=${bin##*/}
 			possible_dirs=$(
-				strings "$APPDIR"/shared/bin/"$bin" \
+				strings "$SHARUN_BIN_DIR"/"$bin" \
 				  | grep -v '[;:,.(){}?<>*]' \
 				  | tr '/' '\n'
 			)
@@ -1831,7 +1833,7 @@ _deploy_locale() {
 		return 0
 	fi
 
-	set -- "$APPDIR"/shared/bin/*
+	set -- "$SHARUN_BIN_DIR"/*
 	for bin do
 		if grep -Eaoq -m 1 "/usr/share/locale" "$bin"; then
 			DEPLOY_LOCALE=1
@@ -1845,7 +1847,7 @@ _deploy_locale() {
 		cp -r "$LOCALE_DIR" "$APPDIR"/share
 		if [ "$DEBLOAT_LOCALE" = 1 ]; then
 			_echo "* Removing unneeded locales..."
-			for f in "$APPDIR"/shared/bin/* "$APPDIR"/bin/*; do
+			for f in "$SHARUN_BIN_DIR"/* "$DST_BIN_DIR"/*; do
 				if [ -f "$f" ]; then
 					f=${f##*/}
 					set -- "$@" ! -name "*$f*"
@@ -1936,8 +1938,8 @@ _check_window_class() {
 
 _add_bwrap_wrapper() {
 	cfile=$APPDIR/.anylinux-bwrap-wrapper.c
-	target=$APPDIR/bin/bwrap
-	realbwrap=$APPDIR/bin/bwrap.wrapped
+	target=$DST_BIN_DIR/bwrap
+	realbwrap=$DST_BIN_DIR/bwrap.wrapped
 
 
 	if [ -f "$realbwrap" ]; then
@@ -1946,7 +1948,7 @@ _add_bwrap_wrapper() {
 		# rename the real bwrap
 		mv "$target" "$realbwrap"
 		# rename the real binary as well
-		mv "$APPDIR"/shared/bin/"${target##*/}" "$APPDIR"/shared/bin/"${realbwrap##*/}"
+		mv "$SHARUN_BIN_DIR"/"${target##*/}" "$SHARUN_BIN_DIR"/"${realbwrap##*/}"
 	else
 		# this should never happen, we are gonna exit without error however
 		# since maybe older versions of webkit2gtk can be installed without bwrap?
@@ -2406,7 +2408,7 @@ _add_bwrap_wrapper() {
 	}
 	EOF
 
-	cc -Wall -Wextra -O2 -o "$APPDIR"/shared/bin/"${target##*/}" "$cfile"
+	cc -Wall -Wextra -O2 -o "$SHARUN_BIN_DIR"/"${target##*/}" "$cfile"
 	ln "$APPDIR"/sharun "$target"
 	chmod +x "$target"
 	_echo "* added bwrap wrapper!"
@@ -2424,7 +2426,7 @@ _fix_cpython_ldconfig_mess() {
 	# https://github.com/pkgforge-dev/ghostty-appimage/issues/122
 
 	set -- "$DST_LIB_DIR"/python*/ctypes/util.py
-	ldconfig="$APPDIR"/bin/_ldconfig
+	ldconfig=$DST_BIN_DIR/_ldconfig
 	if [ -x "$ldconfig" ]; then
 		return 0
 	elif [ ! -f "$1" ]; then
@@ -2603,7 +2605,7 @@ _check_hardcoded_lib_dirs() {
 				;;
 		esac
 
-		for f in "$DST_LIB_DIR"/*.so* "$APPDIR"/shared/bin/*; do
+		for f in "$DST_LIB_DIR"/*.so* "$SHARUN_BIN_DIR"/*; do
 			if [ ! -f "$f" ]; then
 				continue
 			elif grep -aoq -m 1 "$LIB_DIR"/"$d" "$f"; then
@@ -2618,7 +2620,7 @@ _check_hardcoded_data_dirs() {
 	# first check for hardcoded path to /usr/share/fonts and copy if so
 	src_fonts=/usr/share/fonts
 	dst_fonts="$APPDIR"/share/fonts
-	if grep -aoq -m 1 "$src_fonts" "$APPDIR"/shared/bin/*; then
+	if grep -aoq -m 1 "$src_fonts" "$SHARUN_BIN_DIR"/*; then
 		if [ -d "$src_fonts" ] && [ ! -d "$dst_fonts" ]; then
 			mkdir -p "$dst_fonts"
 			for d in "$src_fonts"/*; do
@@ -2656,7 +2658,7 @@ _check_hardcoded_data_dirs() {
 				;;
 		esac
 
-		for f in "$DST_LIB_DIR"/*.so* "$APPDIR"/shared/bin/*; do
+		for f in "$DST_LIB_DIR"/*.so* "$SHARUN_BIN_DIR"/*; do
 			if [ ! -f "$f" ]; then
 				continue
 			elif grep -aoq -m 1 /usr/share/"$d" "$f"; then
@@ -2719,7 +2721,7 @@ _strip_bins_and_libs() {
 			esac
 			strip -s -R .comment --strip-unneeded "$f" || :
 		done <<-EOF
-		$(find "$APPDIR"/shared/bin/ "$APPDIR"/lib*/ -type f)
+		$(find "$SHARUN_BIN_DIR"/ "$APPDIR"/lib*/ -type f)
 		EOF
 		_echo "* stripped binaries"
 	fi
@@ -2767,7 +2769,7 @@ _add_apprun() {
 
 	if [ -f "$APPDIR"/AppRun.lib ]; then
 	        . "$APPDIR"/AppRun.lib
-	        for hook in "$APPDIR"/bin/*.hook; do
+	        for hook in $APPDIR/bin/*.hook; do
 	            [ -e "$hook" ] || continue
 	            . "$hook"
 	        done
@@ -2792,8 +2794,8 @@ _add_apprun() {
 	        cat /etc/os-release >"$PWD"/"${APPIMAGE##*/}"-debug.log || :
 	        export LD_DEBUG=libs
 	        export VK_LOADER_DEBUG=all
-			export LIBGL_DEBUG=verbose
-			export EGL_LOG_LEVEL=debug
+	        export LIBGL_DEBUG=verbose
+	        export EGL_LOG_LEVEL=debug
 	        export LC_ALL=C
 	        export SHARUN_PRINTENV=1
 	        "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
@@ -3091,7 +3093,7 @@ _add_hooks_library() {
 _handle_nested_bins() {
 	# wrap any executable in lib with sharun
 	for b in $(find "$DST_LIB_DIR"/ -type f ! -name '*.so*'); do
-		if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
+		if [ -x "$b" ] && [ -x "$SHARUN_BIN_DIR"/"${b##*/}" ]; then
 			rm -f "$b"
 			ln "$APPDIR"/sharun "$b"
 			_echo "* Wrapped lib executable '$b' with sharun"
@@ -3099,8 +3101,8 @@ _handle_nested_bins() {
 	done
 
 	# do the same for possible nested binaries in bin
-	for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*' 2>/dev/null); do
-		if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
+	for b in $(find "$DST_BIN_DIR"/*/ -type f ! -name '*.so*' 2>/dev/null); do
+		if [ -x "$b" ] && [ -x "$SHARUN_BIN_DIR"/"${b##*/}" ]; then
 			rm -f "$b"
 			ln "$APPDIR"/sharun "$b"
 			_echo "* Wrapped nested bin executable '$b' with sharun"
@@ -3125,7 +3127,7 @@ _check_main_bin() {
 		esac
 	fi
 
-	if [ -f "$APPDIR"/bin/"$MAIN_BIN" ]; then
+	if [ -f "$DST_BIN_DIR"/"$MAIN_BIN" ]; then
 		return 0
 	fi
 
@@ -3145,7 +3147,7 @@ _make_static_bin() (
 		chmod +x "$ONELF"
 	fi
 
-	DST_DIR=$APPDIR/bin
+	DST_DIR=$DST_BIN_DIR
 	mkdir -p "$DST_DIR"
 	_echo "------------------------------------------------------------"
 	for bin do
@@ -3295,18 +3297,18 @@ if [ "$DEPLOY_FLUTTER" = 1 ]; then
 
 	# flutter apps need to have a relative lib and data directory
 	# we need to find the directory that contains libapp.so
-	if libapp=$(cd "$APPDIR"/bin \
+	if libapp=$(cd "$DST_BIN_DIR" \
 	  && find ../lib/ -type f -name 'libapp.so' -print -quit); then
 		d=${libapp%/*}
-		if [ ! -d "$APPDIR"/bin/"${d##*/}" ]; then
-			ln -s "$d" "$APPDIR"/bin/"${d##*/}"
+		if [ ! -d "$DST_BIN_DIR"/"${d##*/}" ]; then
+			ln -s "$d" "$DST_BIN_DIR"/"${d##*/}"
 		fi
 	else
 		_err_msg "Cannot find libapp.so in $APPDIR"
 		_err_msg "include it for flutter deployment to work"
 	fi
 
-	dst_flutter_dir="$APPDIR"/bin/data
+	dst_flutter_dir=$DST_BIN_DIR/data
 	if [ ! -d "$dst_flutter_dir" ]; then
 		if [ -z "$FLUTTER_DATA_DIR" ]; then
 			d=${FLUTTER_LIB%/*.so*}
@@ -3383,7 +3385,7 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/libgio-*.so*)
-		f=$APPDIR/bin/gio-launch-desktop
+		f=$DST_BIN_DIR/gio-launch-desktop
 		if [ ! -x "$f" ]; then
 			cat <<-'EOF' > "$f"
 			#!/bin/sh
@@ -3586,7 +3588,7 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/qt*/plugins/*.so)
-		f=$APPDIR/bin/qt.conf
+		f=$DST_BIN_DIR/qt.conf
 		if [ ! -f "$f" ]; then
 			_qtdir=${lib#$DST_LIB_DIR/} # leaves qt*
 			_qtdir=${_qtdir%%/*}        # gets basename
@@ -3832,16 +3834,16 @@ for lib do case "$lib" in
 			cp -v "$src_mangohud_layer" "$dst_mangohud_layer"
 			sed -i 's|/.*/mangohud/||' "$dst_mangohud_layer"
 
-			if [ ! -f "$APPDIR"/bin/mangohud ] \
+			if [ ! -f "$DST_BIN_DIR"/mangohud ] \
 				&& command -v mangohud 1>/dev/null; then
-				cp -v "$(command -v mangohud)" "$APPDIR"/bin
+				cp -v "$(command -v mangohud)" "$DST_BIN_DIR"
 			fi
 
 			sed -i \
 				-e 's|/usr/.*/||'                         \
 				-e '1a\export SHARUN_ALLOW_LD_PRELOAD=1'  \
 				-e 's|#!.*|#!/bin/sh|'                    \
-				"$APPDIR"/bin/mangohud || :
+				"$DST_BIN_DIR"/mangohud || :
 
 			_echo "Copied over mangohud layer and patched mangohud"
 		fi
@@ -3856,7 +3858,7 @@ for lib do case "$lib" in
 		if grep -aq -m 1 'WEBKIT_EXEC_PATH' "$lib" \
 		  && ! grep -q WEBKIT_EXEC_PATH "$APPENV"; then
 			(
-			  set -- "$APPDIR"/bin/WebKit*
+			  set -- "$DST_BIN_DIR"/WebKit*
 			  if [ -f "$1" ]; then
 			  	echo 'WEBKIT_EXEC_PATH=${SHARUN_DIR}/bin' >> "$APPENV"
 			  fi
@@ -3867,7 +3869,7 @@ for lib do case "$lib" in
 		# WEBKIT_INJECTED_BUNDLE_PATH always works
 		# It is not guarded behind a compiled flag unlike WEBKIT_EXEC_PATH
 		if ! grep -q 'WEBKIT_INJECTED_BUNDLE_PATH' "$APPENV"; then
-			cp -v "$lib" "$APPDIR"/bin
+			cp -v "$lib" "$DST_BIN_DIR"
 			echo 'WEBKIT_INJECTED_BUNDLE_PATH=${SHARUN_DIR}/bin' >> "$APPENV"
 		fi
 		;;
@@ -3901,7 +3903,7 @@ for lib do case "$lib" in
 		;;
 	*/7z.so)
 		# the 7z binaries need the lib next to them
-		cp -v "$lib" "$APPDIR"/bin
+		cp -v "$lib" "$DST_BIN_DIR"
 		;;
 	*/libpipewire-*.so*)
 		src_pipewire_config_dir=/usr/share/pipewire
@@ -3909,7 +3911,7 @@ for lib do case "$lib" in
 		if [ -d "$src_pipewire_config_dir" ] && [ ! -d "$dst_pipewire_config_dir" ]; then
 			cp -r "$src_pipewire_config_dir" "$dst_pipewire_config_dir"
 
-			cat <<-'EOF' > "$APPDIR"/bin/01-pipewire-config.hook
+			cat <<-'EOF' > "$DST_BIN_DIR"/01-pipewire-config.hook
 			_pipewire_dir=$APPDIR/share/pipewire
 			if [ ! -d /usr/share/pipewire ] && [ -d "$_pipewire_dir" ]; then
 				export PIPEWIRE_CONFIG_DIR="$_pipewire_dir"
@@ -3958,7 +3960,7 @@ _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
 
 # patch away any hardcoded path to /usr/share or /usr/lib in bins...
-set -- "$APPDIR"/shared/bin/*
+set -- "$SHARUN_BIN_DIR"/*
 for bin do
 	if p=$(grep -ao -m 1 '/usr/share/.*/' "$bin"); then
 		_echo "* Detected hardcoded path to $p in $bin"
@@ -3986,7 +3988,7 @@ if [ -n "$ADD_HOOKS" ]; then
 	IFS=':'
 	set -- $ADD_HOOKS
 	IFS="$old_ifs"
-	hook_dst="$APPDIR"/bin
+	hook_dst=$DST_BIN_DIR
 	for hook do
 		# hooks used to be executed differently depending on the suffix
 		# this was dropped and now all hooks are sourced
