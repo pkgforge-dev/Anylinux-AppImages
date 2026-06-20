@@ -108,11 +108,6 @@ if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 	DEBLOAT_SYS_PYTHON=${DEBLOAT_SYS_PYTHON:-1}
 fi
 
-if [ -e "$1" ] && [ "$2" = "--" ]; then
-	STRACE_ARGS_PROVIDED=1
-fi
-
-
 # github actions doesn't set USER and XDG_RUNTIME_DIR
 # causing some apps crash when running xvfb-run
 export USER="${LOGNAME:-${USER:-${USERNAME:-yomama}}}"
@@ -1244,13 +1239,13 @@ _make_deployment_array() {
 }
 
 _get_sharun() {
-	if [ -x "$APPDIR/sharun" ]; then
+	if [ -x "$APPDIR"/sharun ]; then
 		return 0
 	fi
 	_echo "Downloading sharun..."
-	_download "$APPDIR/sharun" "$SHARUN_LINK"
-	if _is_elf "$APPDIR/sharun"; then
-		chmod +x "$APPDIR/sharun"
+	_download "$APPDIR"/sharun "$SHARUN_LINK"
+	if _is_elf "$APPDIR"/sharun; then
+		chmod +x "$APPDIR"/sharun
 	else
 		_err_msg "ERROR: What was downloaded is not sharun!"
 		_err_msg "This is usually caused by network issues"
@@ -1259,10 +1254,8 @@ _get_sharun() {
 }
 
 _deploy_libs() {
-	# merge deployment array with user-provided binaries
+	# now merge the deployment array
 	eval set -- "$TO_DEPLOY_ARRAY" "$@"
-
-	# run the embedded lib4bin deployment engine
 	_lib4bin_main "$@"
 }
 
@@ -1303,11 +1296,11 @@ _lib4bin_collect_ldd() {
 _lib4bin_collect_strace() {
 	[ "$STRACE_MODE" = 1 ] || return 0
 
-	libs=''
+	libs=""
 	while read -r b; do
 		b=$(readlink -f "$b") || continue
-		_is_elf "$b" || continue
-		[ -x "$b" ]  || continue
+		_is_elf "$b"          || continue
+		[ -x "$b" ]           || continue
 		if _is_so "$b"; then
 			continue
 		fi
@@ -3277,7 +3270,7 @@ _determine_what_to_deploy "$@"
 _make_deployment_array
 
 echo ""
-_echo "Now jumping to sharun..."
+_echo "Now jumping to deploying..."
 _echo "------------------------------------------------------------"
 
 _get_sharun
