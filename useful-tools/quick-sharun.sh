@@ -351,7 +351,7 @@ _sanity_check() {
 		fi
 	done
 
-	if ! mkdir -p "$APPDIR"/share "$DST_BIN_DIR" "$SHARUN_BIN_DIR"; then
+	if ! mkdir -p "$APPDIR"/share "$DST_LIB_DIR" "$DST_BIN_DIR" "$SHARUN_BIN_DIR"; then
 		_err_msg "ERROR: Cannot create '$APPDIR' directory!"
 		exit 1
 	fi
