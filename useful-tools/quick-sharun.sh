@@ -1280,16 +1280,23 @@ _lib4bin_collect_ldd() {
 		b=$(readlink -f "$b") || continue
 		_is_elf "$b"          || continue
 
-		if echo "$QUICK_SHARUN_SKIP_DEPS_FOR" | grep -Fxq "${b##*/}"; then
-			: # do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
-		else
-			libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
-		fi
+		skip=""
+		# do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
+		while read -r d; do
+			if [ "$d" = "${b##*/}" ]; then
+				skip=1
+				break
+			fi
+		done <<-EOF
+		$QUICK_SHARUN_SKIP_DEPS_FOR
+		EOF
+
+		[ -n "$skip" ] || libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
 		if _is_so "$b"; then
-			libs="$(printf '%s\n%s' "$libs" "$b")"
+			libs=$(printf '%s\n%s' "$libs" "$b")
 		fi
 	done
-	printf '%s\n' "$libs" | sort -u | sed '/^$/d'
+	echo "$libs" | sort -u | sed '/^$/d'
 }
 
 # collect dlopen libraries via LD_DEBUG=libs
@@ -1329,7 +1336,7 @@ _lib4bin_collect_strace() {
 		[ -n "$out" ] || continue
 		libs=$(printf '%s\n%s' "$libs" "$out")
 	done
-	printf '%s\n' "$libs" | sort -u | sed '/^$/d'
+	echo "$libs" | sort -u | sed '/^$/d'
 }
 
 # deploy shared libraries to DST_LIB_DIR
@@ -1362,7 +1369,7 @@ _lib4bin_deploy_binaries() {
 	while read -r b; do
 		orig=$b  # preserve original bin name since we may need to symlink it later
 		b=$(readlink -f "$b") || continue
-		printf '%s\n' "$seen" | grep -Fxq "$b" && continue
+		echo "$seen" | grep -Fxq "$b" && continue
 		seen=$(printf '%s\n%s' "$seen" "$b")
 
 		if _is_script "$b"; then
@@ -1436,7 +1443,7 @@ _lib4bin_main() {
 	all_libs=$(printf '%s\n%s' "$ldd_libs" "$strace_libs" | sort -u | sed '/^$/d')
 
 	_echo "Deploying shared libraries..."
-	printf '%s\n' "$all_libs" | _lib4bin_deploy_shared_libs
+	echo "$all_libs" | _lib4bin_deploy_shared_libs
 
 	_echo "Deploying binaries..."
 	printf '%s\n' "$@" | _lib4bin_deploy_binaries
