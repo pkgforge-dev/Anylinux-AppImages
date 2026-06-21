@@ -2728,7 +2728,12 @@ _strip_bins_and_libs() {
 }
 
 _add_apprun() {
-	f=$APPDIR/AppRun
+	# sharun needs to be the AppRun while our AppRun is named AppRun.sh, sharun will
+	# then execute AppRun.sh with whatever shell it can find on the system or AppDir
+	# this allows AppImages to work on systems without /bin/sh or /usr/bin/env
+	ln -f "$APPDIR"/sharun "$APPDIR"/AppRun
+
+	f=$APPDIR/AppRun.sh
 	if [ -f "$f" ]; then
 		return 0
 	fi
@@ -4014,7 +4019,7 @@ fi
 _add_hooks_library
 _add_apprun
 
-chmod +x "$APPDIR"/AppRun || :
+chmod +x "$APPDIR"/AppRun.sh "$APPDIR"/AppRun || :
 
 # deploy directories
 while read -r d; do
