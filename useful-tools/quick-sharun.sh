@@ -3147,8 +3147,7 @@ _make_static_bin() (
 		chmod +x "$ONELF"
 	fi
 
-	DST_DIR=$DST_BIN_DIR
-	mkdir -p "$DST_DIR"
+	mkdir -p "$DST_BIN_DIR"
 	_echo "------------------------------------------------------------"
 	for bin do
 		b=${bin##*/}
@@ -3159,7 +3158,7 @@ _make_static_bin() (
 		mkdir -p "$_tmpdir"
 
 		"$ONELF" bundle-libs "$_tmpdir" --from-binary "$bin" --strip --scan-dlopen
-		"$ONELF" pack "$_tmpdir" -o "$DST_DIR"/"$b" --command bin/"$b"
+		"$ONELF" pack "$_tmpdir" -o "$DST_BIN_DIR"/"$b" --command bin/"$b"
 		rm -rf "$_tmpdir"
 	done
 	_echo "------------------------------------------------------------"
