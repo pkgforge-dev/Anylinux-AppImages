@@ -432,8 +432,10 @@ _test_appimage() {
 	export APPIMAGE_TARGET_DIR="$PWD"/_test-app
 	export APPIMAGE_EXTRACT_AND_RUN=1
 
+	set -m
 	xvfb-run -a -- "$APP" "$@" &
 	pid=$!
+	set +m
 
 	# let the app run for 12 seconds, if it exits early it means something is wrong
 	COUNT=0
@@ -447,8 +449,9 @@ _test_appimage() {
 		_echo "------------------------------------------------------------"
 		_echo "Test went OK."
 		_echo "------------------------------------------------------------"
-		kill $pid 2>/dev/null || :
+		kill -TERM -$pid 2>/dev/null || :
 		sleep 1
+		kill -KILL -$pid 2>/dev/null || :
 		exit 0
 	else
 		# process exited before timeout, something went wrong.
@@ -475,12 +478,15 @@ _simple_test_appimage() {
 	_echo "Doing simple test '$APP'..."
 	_echo "------------------------------------------------------------"
 
+	set -m
 	"$APP" "$@" 2>"$log" &
 	pid=$!
+	set +m
 
 	sleep 7
-	kill $pid 2>/dev/null || :
+	kill -TERM -$pid 2>/dev/null || :
 	sleep 1
+	kill -KILL -$pid 2>/dev/null || :
 
 	test="$(cat "$log")"
 	case "$test" in
