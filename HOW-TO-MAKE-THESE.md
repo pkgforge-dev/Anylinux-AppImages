@@ -295,7 +295,7 @@ There is a solution for this, originally made by @VHSGunzo called sharun. This p
 
 - it also fixes the issue of  `/proc/self/exe` being `ld-linux-x86-64.so.2` 👀 For this issue, what it does is it places all the shared libraries and binaries in `shared/{lib,bin}` and then hardlinks itself to the `bin` directory of our `AppDir`; then when you call `bin/app`, it automatically calls the bundled dynamic linker and runs the binary with the name of the hardlink, while giving the path to our bundled libraries with `--library-path`
 
-- sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it. **Starting with this version, sharun removes the `/bin/sh` dependency from the `AppRun`** — it will try to use any `sh` or `bash` it can find on the host or AppDir, making it even more portable.
+- sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it.
 
 Any application made with sharun ends up being able to work **on any linux distro**, be it ubuntu 14.04, musl distros and even directly in NixOS without any wrapper (non FHS environment).
 
