@@ -154,9 +154,10 @@ All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook
 - `ANYLINUX_LIB=1`    - Preloads library that fixes several common issues that affect AppImage (default: enabled).
 - `GTK_CLASS_FIX=1`   - Bundles a small shim that fixes the WM_CLASS for GTK apps (default: disabled).
 - `OPTIMIZE_LAUNCH=1` - Speeds up AppImage launch time using a DWARFS profile image (default: disabled). This is very similar to PGO optimizations in compilers. You often do not need to enable this, since DWARFS on its own is many times faster than SquashFS. In many cases, launch times are near-identical to those of native applications (±300 ms on a system with a 2016 CPU).
-- `STRACE_MODE=1` - Uses strace to find dynamically loaded libraries (default: enabled)
+- `STRACE_MODE=1` - Uses strace to find dynamically loaded libraries (default: enabled). To control which binaries are traced and with what flags, use `STRACE_BINARY` (space/newline-separated binary names) and `STRACE_FLAGS` instead of the old positional argument approach.
 - `STRIP=1` - Strips debug symbols to reduce size (default: enabled unless `NO_STRIP` is set)
 - `DEBLOAT_LOCALE=1` - Removes unneeded locale files to reduce size (default: enabled)
+- `QUICK_SHARUN_SKIP_DEPS_FOR` - Space/newline-separated list of library names to skip dependency deployment for (e.g., `libqgtk3.so`). By default `libqgtk3.so` is always included to avoid deploying GTK3 in Qt apps when `QT_QPA_PLATFORMTHEME=fusion` is set.
 
 -----------------------------------
 
@@ -284,21 +285,17 @@ But isn't this a lot of work to find and set all the env variables that my appli
 
 ### *Sharun*
 
-There is a solution for this, made by @VHSGunzo called sharun:
+There is a solution for this, originally made by @VHSGunzo called sharun. This project uses a [fork of sharun](https://github.com/pkgforge-dev/Anylinux-sharun).
 
-<https://github.com/VHSgunzo/sharun>
+<https://github.com/VHSGunzo/Anylinux-sharun>
 
-- sharun is able to find all the libraries that your application needs, **including those that are dlopened**. It turns out that a lot of applications depend on dlopened libraries; those are the libraries that you cannot easily find with just `ldd`. Sharun uses a deployment script called `lib4bin` that has the strace mode; **that mode makes `lib4bin` open the application with strace to check all the dlopened libraries and then bundle them.**
+- sharun is able to find all the libraries that your application needs, **including those that are dlopened**. It turns out that a lot of applications depend on dlopened libraries; those are the libraries that you cannot easily find with just `ldd`. **UPDATE:** Library deployment and strace-based dlopen detection have been integrated directly into `quick-sharun`, so there is no longer a separate deployment script — it all happens automatically when you run `quick-sharun`.
 
-- sharun also detects and sets a ton of [env variables](https://github.com/VHSgunzo/sharun?tab=readme-ov-file#environment-variables-that-are-set-if-sharun-finds-a-directory-or-file.) that the application needs to work.
+- sharun also detects and sets a ton of env variables that the application needs to work.
 
 - it also fixes the issue of  `/proc/self/exe` being `ld-linux-x86-64.so.2` 👀 For this issue, what it does is it places all the shared libraries and binaries in `shared/{lib,bin}` and then hardlinks itself to the `bin` directory of our `AppDir`; then when you call `bin/app`, it automatically calls the bundled dynamic linker and runs the binary with the name of the hardlink, while giving the path to our bundled libraries with `--library-path`
 
-- sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it, **this means we no longer depend on the host shell to get our application to launch.**
-
-- sharun is not just for the AppImages, you can also use it anywhere you need to make any sort of application portable. You can even make pseudo-static binaries from existing dynamic binaries, which sharun does with the help of wrappe.
-
-- sharun even has hooks to fix applications that aren't relocatable, like webkit2gtk which is hardcoded to look for some binaries in `/usr/lib`, it fixes this with patching all automatically for you.
+- sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it. **Starting with this version, sharun removes the `/bin/sh` dependency from the `AppRun`** — it will try to use any `sh` or `bash` it can find on the host or AppDir, making it even more portable.
 
 Any application made with sharun ends up being able to work **on any linux distro**, be it ubuntu 14.04, musl distros and even directly in NixOS without any wrapper (non FHS environment).
 
