@@ -1276,8 +1276,8 @@ _lib4bin_get_lib_dst_dir() {
 _lib4bin_collect_ldd() {
 	libs=""
 	for b do
-		b=$(readlink -f "$b") || continue
-		_is_elf "$b"          || continue
+		[ -f "$b" ]  || continue
+		_is_elf "$b" || continue
 
 		skip=""
 		# do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
@@ -1308,9 +1308,9 @@ _lib4bin_collect_strace() {
 
 	libs=""
 	for b do
-		b=$(readlink -f "$b") || continue
-		_is_elf "$b"          || continue
-		[ -x "$b" ]           || continue
+		[ -f "$b" ]  || continue
+		_is_elf "$b" || continue
+		[ -x "$b" ]  || continue
 		if _is_so "$b"; then
 			continue
 		fi
@@ -1358,23 +1358,39 @@ _lib4bin_collect_strace() {
 # deploy shared libraries to DST_LIB_DIR
 _lib4bin_deploy_shared_libs() {
 	for l do
-		orig=$l
-		l=$(readlink -f "$l") || continue
-		if _is_elf "$l"; then
-			dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
-			dst=$dst_dir/${l##*/}
-			mkdir -p "$dst_dir"
-			[ -f "$dst" ] || cp -fv "$orig" "$dst"
-
-			# create symlink for SONAME if it differs from real name
-			if [ -L "$orig" ] && [ "${orig##*/}" != "${l##*/}" ]; then
-				d=$(_lib4bin_get_lib_dst_dir "$orig")
-				mkdir -p "$d"
-				ln -sfr "$dst" "$d/${orig##*/}"
-			fi
-		else
-			_echo "SKIPPED: [$orig] not shared object!"
+		[ -f "$l" ] || continue
+		if ! _is_elf "$l"; then
+			_echo "SKIPPED: [$l] not shared object!"
 			continue
+		fi
+
+		l_name=${l##*/}
+
+		if [ -L "$l" ]; then
+			readlink_path=$(readlink -f "$l") || continue
+			readlink_path_name=${readlink_path##*/}
+			dst_dir=$(_lib4bin_get_lib_dst_dir "$readlink_path")
+		else
+			readlink_path_name=""
+			dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
+		fi
+
+		if [ -n "$readlink_path_name" ]; then
+			dst=$dst_dir/$readlink_path_name
+		else
+			dst=$dst_dir/$l_name
+		fi
+
+		mkdir -p "$dst_dir"
+		[ -f "$dst" ] || cp -fv "$l" "$dst"
+
+		# symlink may land in a "wrong" subdir if it targets a relative dir
+		# example: libfltk.so.1.3.11 -> fltk1.3/libfltk.so.1.3.11 on archlinux
+		# but sharun adds all subdirs to --library-path, so nothing should break
+		# note: original lib4bin actually made broken symlinks when this happened
+		if [ -n "$readlink_path_name" ] \
+		  && [ "$l_name" != "$readlink_path_name" ]; then
+			ln -sf "$readlink_path_name" "$dst_dir"/"$l_name"
 		fi
 	done
 }
@@ -1383,10 +1399,10 @@ _lib4bin_deploy_shared_libs() {
 _lib4bin_deploy_binaries() {
 	seen=""
 	for b do
-		orig=$b  # preserve original bin name since we may need to symlink it later
-		b=$(readlink -f "$b") || continue
 		echo "$seen" | grep -Fxq "$b" && continue
 		seen=$(printf '%s\n%s' "$seen" "$b")
+
+		[ -f "$b" ] || continue
 
 		if _is_script "$b"; then
 			dst=$DST_BIN_DIR/${b##*/}
@@ -1412,21 +1428,39 @@ _lib4bin_deploy_binaries() {
 
 		[ -x "$APPDIR/sharun" ] || _get_sharun
 
-		dst=$SHARUN_BIN_DIR/${b##*/}
+		b_name=${b##*/}
+
+		if [ -L "$b" ]; then
+			readlink_path=$(readlink -f "$b") || continue
+			readlink_path_name=${readlink_path##*/}
+		else
+			readlink_path_name=""
+		fi
+
+		if [ -n "$readlink_path_name" ]; then
+			dst=$SHARUN_BIN_DIR/$readlink_path_name
+		else
+			dst=$SHARUN_BIN_DIR/$b_name
+		fi
+
+		mkdir -p "$SHARUN_BIN_DIR"
 		if [ ! -f "$dst" ]; then
 			cp -fv "$b" "$dst"
 			chmod +x "$dst"
 		fi
 
+		if [ -n "$readlink_path_name" ] \
+		  && [ "$b_name" != "$readlink_path_name" ]; then
+			ln -sf "$readlink_path_name" "$SHARUN_BIN_DIR"/"$b_name"
+		fi
+
 		# hardlink in bin/ -> ../sharun
 		mkdir -p "$DST_BIN_DIR" && (
 			cd "$DST_BIN_DIR"
-			ln -f ../sharun "${b##*/}"
-			# check if original bin name differs from read symlink
-			if [ "${orig##*/}" != "${b##*/}" ]; then
-				ln -f ../sharun "${orig##*/}"
-				orig_shared_bin=$SHARUN_BIN_DIR/${orig##*/}
-				[ -L "$orig_shared_bin" ] || ln -sf "${b##*/}" "$orig_shared_bin"
+			ln -f ../sharun "$b_name"
+			if [ -n "$readlink_path_name" ] \
+			  && [ "$b_name" != "$readlink_path_name" ]; then
+				ln -f ../sharun "$readlink_path_name"
 			fi
 		) || exit 1
 	done
