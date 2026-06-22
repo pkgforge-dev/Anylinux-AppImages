@@ -1331,15 +1331,19 @@ _lib4bin_collect_strace() {
 		dlopened=$TMPDIR/libs.$$
 
 		_echo "STRACE: [$b] ..."
+		set -m
 		if [ -n "$XVFB_CMD" ]; then
-			$XVFB_CMD env LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
+			$XVFB_CMD LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
 		else
 			LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
 		fi
 		pid=$!
+		set +m
 
 		sleep "$STRACE_TIME"
-		kill -TERM $pid 2>/dev/null || :
+		kill -TERM -$pid 2>/dev/null || :
+		sleep 1
+		kill -KILL -$pid 2>/dev/null || :
 		wait $pid 2>/dev/null || :
 
 		out=$(awk '/calling init/{print $NF}' "$dlopened" | sed \
