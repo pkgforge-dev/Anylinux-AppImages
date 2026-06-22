@@ -307,6 +307,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [polybar](https://github.com/pkgforge-dev/polybar-AppImage) |
 | [POSTAL](https://github.com/pkgforge-dev/POSTAL-AppImage) |
 | [Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage) |
+| [PrimeHack](https://github.com/pkgforge-dev/PrimeHack-AppImage) |
 | [PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced) |
 | [Protontricks](https://github.com/pkgforge-dev/Protontricks-AppImage) |
 | [Ptyxis](https://github.com/pkgforge-dev/Ptyxis-AppImage) |
