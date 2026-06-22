@@ -3350,6 +3350,13 @@ _echo "Finished deployment! Starting post deployment hooks..."
 _echo "------------------------------------------------------------"
 echo ""
 
+# It is common for libraries to have optional dependencies to pipewire they will
+# try to dlopen pipewire and if isn't available they fallback to pulseaudio or alsa
+# given that it is possible to deploy an application without pipewire we do not
+# want that application then dlopen the pipewire of the host and crash
+set -- "$DST_LIB_DIR"/libpipewire-0.3.so*
+[ -f "$1" ] || no_pipewire=1
+
 set -- \
 	"$DST_LIB_DIR"/*.so*         \
 	"$DST_LIB_DIR"/*/*.so*       \
@@ -3376,6 +3383,10 @@ for lib do
 				;;
 		esac
 	done
+
+	if [ "$no_pipewire" = 1 ] && grep -aq -m 1 'libpipewire-0.3.so' "$lib"; then
+		sed -i -e 's|libpipewire-0.3.so|no-pipewire-kek.so|g' "$lib"
+	fi
 done
 
 # now start the post deployment hooks
@@ -3881,12 +3892,6 @@ for lib do case "$lib" in
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.hook"
 		;;
 	*/libSDL*.so*)
-		# make sure SDL does not attempt to use pipewire when not deployed
-		if [ "$DEPLOY_PIPEWIRE" != 1 ] \
-		  && ! grep -q 'SDL_AUDIODRIVER=' "$APPENV" 2>/dev/null; then
-			echo 'SDL_AUDIODRIVER=pulseaudio' >> "$APPENV"
-		fi
-
 		# SDL may be bundled without libdecor since it maybe missing from the CI runner
 		# or the application makes of GTK/Qt + SDL, in which case we do not need libdecor
 		# at all, make sure SDL does not attempt to load libdecor in these cases
