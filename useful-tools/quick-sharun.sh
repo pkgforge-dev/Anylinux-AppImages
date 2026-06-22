@@ -23,10 +23,12 @@ TMPDIR=${TMPDIR:-/tmp}
 APPDIR=${APPDIR:-$PWD/AppDir}
 APPENV=$APPDIR/.env
 DIRICON=$APPDIR/.DirIcon
-DST_LIB_DIR=$APPDIR/shared/lib
+DST_LIB_DIR=$APPDIR/lib
+DST_BIN_DIR=$APPDIR/bin
+SHARUN_BIN_DIR=$APPDIR/shared/bin
 MAIN_BIN=${MAIN_BIN##*/}
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH-aio}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/latest/download/sharun-$APPIMAGE_ARCH}
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/latest/download/onelf-$APPIMAGE_ARCH-linux}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
@@ -48,6 +50,9 @@ DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
 LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
 
+STRACE_MODE=${STRACE_MODE:-1}
+STRACE_TIME=${STRACE_TIME:-5}
+
 DEPENDENCIES="
 	awk
 	cc
@@ -56,15 +61,28 @@ DEPENDENCIES="
 	grep
 	ldd
 	mv
+	patchelf
 	rm
 	sleep
 	strings
 	tr
 "
 
+# libraries whose dependencies should not be collected via ldd
+# we skip libqgtk3.so by default to prevent deploying GTK in Qt apps
+# Qt works fine by doing this, the libqgtk3.so plugin even works with alpine
+# linux gtk3 without issue, if the plugin fails to load Qt does not crash either
+QUICK_SHARUN_SKIP_DEPS_FOR="
+	$QUICK_SHARUN_SKIP_DEPS_FOR
+	libqgtk3.so
+"
+
+# prevent Qt from dlopening libqtgtk3.so via strace mode
+export QT_QPA_PLATFORMTHEME=${QT_QPA_PLATFORMTHEME:-fusion}
+
 # check if the _tmp_* vars have not be declared already
 # likely to happen if this script run more than once
-PATH_MAPPING_SCRIPT="$APPDIR"/bin/01-path-mapping-hardcoded.hook
+PATH_MAPPING_SCRIPT=$DST_BIN_DIR/01-path-mapping-hardcoded.hook
 
 if [ -f "$PATH_MAPPING_SCRIPT" ]; then
 	while IFS= read -r line; do
@@ -90,20 +108,6 @@ if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 	DEBLOAT_SYS_PYTHON=${DEBLOAT_SYS_PYTHON:-1}
 fi
 
-if [ -e "$1" ] && [ "$2" = "--" ]; then
-	STRACE_ARGS_PROVIDED=1
-fi
-
-# for sharun
-export DST_DIR="$APPDIR"
-export GEN_LIB_PATH=1
-export HARD_LINKS=1
-export STRACE_MODE=${STRACE_MODE:-1}
-export WRAPPE_CLVL=${WRAPPE_CLVL:-15}
-export WITH_HOOKS=0
-export STRIP=0
-export VERBOSE=${VERBOSE:-1}
-
 # github actions doesn't set USER and XDG_RUNTIME_DIR
 # causing some apps crash when running xvfb-run
 export USER="${LOGNAME:-${USER:-${USERNAME:-yomama}}}"
@@ -113,7 +117,7 @@ export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 export $(dbus-launch 2>/dev/null || echo 'NO_DBUS=1')
 
 # CI containers often run as root which prevents
-# web apps from running with lib4bin strace mode
+# web apps from running with LD_DEBUG strace mode
 export ELECTRON_DISABLE_SANDBOX=1
 export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1
 export QTWEBENGINE_DISABLE_SANDBOX=1
@@ -134,10 +138,25 @@ _is_cmd() {
 }
 
 _is_elf() {
-	if [ -f "$1" ] && head -c 4 "$1" | grep -qa 'ELF'; then
+	head -c 4 "$1" 2>/dev/null | grep -qa 'ELF'
+}
+
+_is_script() {
+	shebang=$(head -c 2 "$1" 2>/dev/null)
+	[ "$shebang" = '#!' ]
+}
+
+_is_so() {
+	case "${1##*/}" in
+		*.so|*.so.[0-9]*)
 		return 0
-	fi
+		;;
+	esac
 	return 1
+}
+
+_lib4bin_ldd_libs() {
+	ldd "$1" 2>/dev/null | awk '/=>/{print $3}' | sort -u
 }
 
 _download() {
@@ -332,7 +351,7 @@ _sanity_check() {
 		fi
 	done
 
-	if ! mkdir -p "$APPDIR"/share "$APPDIR"/bin; then
+	if ! mkdir -p "$APPDIR"/share "$DST_LIB_DIR" "$DST_BIN_DIR" "$SHARUN_BIN_DIR"; then
 		_err_msg "ERROR: Cannot create '$APPDIR' directory!"
 		exit 1
 	fi
@@ -350,11 +369,9 @@ _sanity_check() {
 			XVFB_CMD="xvfb-run -a --"
 		else
 			_err_msg "WARNING: xvfb-run was not detected on the system"
-			_err_msg "xvfb-run is used with sharun for strace mode, this is needed"
-			_err_msg "to find dlopened libraries as normally this script is going"
-			_err_msg "to be run in a headless enviromment where the application"
-			_err_msg "will fail to start and result strace mode will not be able"
-			_err_msg "to find the libraries dlopened by the application"
+			_err_msg "xvfb-run is used in strace mode to provide a display"
+			_err_msg "for apps to run to find dlopened libraries."
+			_err_msg "GUI apps will not run without display! We cannot check for dlopened libs!"
 			XVFB_CMD=""
 			sleep 5
 		fi
@@ -375,10 +392,17 @@ _sanity_check() {
 		LIB32=1
 	fi
 
+	set -- lib
 	if [ "$LIB32" = 1 ]; then
-		DST_LIB_DIR=$APPDIR/shared/lib32
+		DST_LIB_DIR=$APPDIR/lib32
 		_err_msg "WARNING: 32bit deployment is experimental!"
+		set -- "$@" lib32
 	fi
+
+	for d do
+		[ -L "$APPDIR"/shared/"$d" ] || rm -rf "$APPDIR"/shared/"$d"
+		[ -L "$APPDIR"/shared/"$d" ] || ln -sf ../"$d" "$APPDIR"/shared/"$d"
+	done
 }
 
 # do a basic test to make sure at least the application is not totally broken
@@ -408,8 +432,10 @@ _test_appimage() {
 	export APPIMAGE_TARGET_DIR="$PWD"/_test-app
 	export APPIMAGE_EXTRACT_AND_RUN=1
 
+	set -m
 	xvfb-run -a -- "$APP" "$@" &
 	pid=$!
+	set +m
 
 	# let the app run for 12 seconds, if it exits early it means something is wrong
 	COUNT=0
@@ -423,8 +449,9 @@ _test_appimage() {
 		_echo "------------------------------------------------------------"
 		_echo "Test went OK."
 		_echo "------------------------------------------------------------"
-		kill $pid 2>/dev/null || :
+		kill -TERM -$pid 2>/dev/null || :
 		sleep 1
+		kill -KILL -$pid 2>/dev/null || :
 		exit 0
 	else
 		# process exited before timeout, something went wrong.
@@ -451,12 +478,15 @@ _simple_test_appimage() {
 	_echo "Doing simple test '$APP'..."
 	_echo "------------------------------------------------------------"
 
+	set -m
 	"$APP" "$@" 2>"$log" &
 	pid=$!
+	set +m
 
 	sleep 7
-	kill $pid 2>/dev/null || :
+	kill -TERM -$pid 2>/dev/null || :
 	sleep 1
+	kill -KILL -$pid 2>/dev/null || :
 
 	test="$(cat "$log")"
 	case "$test" in
@@ -509,7 +539,11 @@ _is_deployable_binary() {
 }
 
 _is_bun_binary() {
-	grep -aq -m1 '__bun_' "$1"
+	grep -aq -m 1 '__bun_' "$1"
+}
+
+_is_pyinstaller_binary() {
+	grep -aq -m 1 'pydata' "$1"
 }
 
 _determine_what_to_deploy() {
@@ -749,13 +783,6 @@ _make_deployment_array() {
 		for lib in $NEEDED_LIBS; do
 			case "$lib" in
 				*libQt*Gui.so*)
-					# terrible hack to prevent partial gtk deployment
-					# see: https://github.com/VHSgunzo/sharun/issues/91
-					p="$plugindir"/platformthemes/libqgtk3.so
-					if [ "$DEPLOY_GTK" != 1 ] \
-					  && [ -n "$CI" ] && [ -w "$p" ]; then
-						mv "$p" "$TMPDIR"
-					fi
 					set -- "$@" \
 						"$plugindir"/imageformats/* \
 						"$plugindir"/iconengines/*  \
@@ -1065,11 +1092,30 @@ _make_deployment_array() {
 			"$LIB_DIR"/imlib2/loaders/*
 	fi
 	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-		if pythonbin=$(command -v python); then
-			set -- "$@" "$pythonbin"*
-		elif pythonbin=$(command -v python3); then
-			set -- "$@" "$pythonbin"*
+		if   b=$(command -v python);  then set -- "$@" "$b"*
+		elif b=$(command -v python3); then set -- "$@" "$b"*
 		fi
+
+		d=$(set -- "$LIB_DIR"/python* && echo "$1")
+		if [ ! -d "$d" ]; then
+			_err_msg "ERROR: Cannot find python installation in $LIB_DIR"
+			exit 1
+		fi
+		mkdir -p "$DST_LIB_DIR"
+		cp -r "$d" "$DST_LIB_DIR"
+		(
+			if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
+				cd "$DST_LIB_DIR"/"${d##*/}"
+				find ./ -type f -name '*.a' -delete || :
+				for f in $(find ./ -type f -name '*.pyc' -print); do
+					case "$f" in
+						*/"$MAIN_BIN"*) :;;
+						*) [ ! -f "$f" ] || rm -f "$f";;
+					esac
+				done
+			fi
+		)
+		_fix_cpython_ldconfig_mess
 	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Deploying gegl"
@@ -1132,8 +1178,8 @@ _make_deployment_array() {
 		set -- "$@" \
 			"$(command -v dotnet)"  \
 			$(find "$DOTNET_DIR"/shared -type f -name '*.so*' -print)
-		cp -r "$DOTNET_DIR"/shared "$APPDIR"/bin
-		cp -r "$DOTNET_DIR"/host   "$APPDIR"/bin
+		cp -r "$DOTNET_DIR"/shared "$DST_BIN_DIR"
+		cp -r "$DOTNET_DIR"/host   "$DST_BIN_DIR"
 		echo 'DOTNET_ROOT=${SHARUN_DIR}/bin' >> "$APPENV"
 	fi
 	# these are needed by several toolkits
@@ -1198,62 +1244,263 @@ _make_deployment_array() {
 }
 
 _get_sharun() {
-	if [ ! -x "$TMPDIR"/sharun-aio ]; then
-		_echo "Downloading sharun..."
-		_download "$TMPDIR"/sharun-aio "$SHARUN_LINK"
-		if head -c 4 "$TMPDIR"/sharun-aio | grep -qa 'ELF'; then
-			chmod +x "$TMPDIR"/sharun-aio
-		else
-			_err_msg "ERROR: What was downloaded is not sharun!"
-			_err_msg "This is usually caused by network issues"
-			exit 1
-		fi
+	if [ -x "$APPDIR"/sharun ]; then
+		return 0
+	fi
+	_echo "Downloading sharun..."
+	_download "$APPDIR"/sharun "$SHARUN_LINK"
+	if _is_elf "$APPDIR"/sharun; then
+		chmod +x "$APPDIR"/sharun
+	else
+		_err_msg "ERROR: What was downloaded is not sharun!"
+		_err_msg "This is usually caused by network issues"
+		exit 1
 	fi
 }
 
 _deploy_libs() {
-	# when strace args are given sharun will only use them when
-	# you pass a single binary to it that is:
-	# 'sharun-aio l /path/to/bin -- google.com' works (site is opened)
-	# 'sharun-aio l /path/to/lib /path/to/bin -- google.com' does not work
-	if [ "$STRACE_ARGS_PROVIDED" = 1 ]; then
-		$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
-	fi
-
 	# now merge the deployment array
-	ARRAY=$(_save_array "$@")
-	eval set -- "$TO_DEPLOY_ARRAY" "$ARRAY"
-
-	$XVFB_CMD "$TMPDIR"/sharun-aio l "$@"
+	eval set -- "$TO_DEPLOY_ARRAY" "$@"
+	_lib4bin_main "$@"
 }
 
-_fix_broken_symlinks() {
-	# lib4bin sometimes leaves broken library symlink, technical debt is getting big...
-	find "$DST_LIB_DIR"/ -xtype l -name '*.so*' | while IFS="" read -r broken_link; do
-		if [ -n "$broken_link" ]; then
-			_err_msg "Broken library symlinks detected in '$broken_link'!"
-			_err_msg "Attempting to fix..."
+# compute destination path in DST_LIB_DIR from a source file path
+_lib4bin_get_lib_dst_dir() {
+	p=$(readlink -f "${1%/*}" | sed \
+	  -e "s|^$LIB_DIR||" \
+	  -e 's|^/usr||'     \
+	  -e 's|^/opt||'     \
+	  -e 's|^/lib64||'   \
+	  -e 's|^/lib32||'   \
+	  -e 's|^/lib||'     \
+	  -e 's|^/[^/]*-linux-gnu||'
+	)
+	echo "$DST_LIB_DIR"/"$p"
+}
 
-			if link_path=$(readlink -f "$broken_link"); then
-				# attempt to find the missing lib at dest first, then host
-				for p in "$DST_LIB_DIR" "$LIB_DIR"; do
+# collect ldd library dependencies
+_lib4bin_collect_ldd() {
+	libs=""
+	for b do
+		[ -f "$b" ]  || continue
+		_is_elf "$b" || continue
 
-					i=$(find "$p"/ -name "${link_path##*/}" -print -quit) || :
-					if [ -f "$i" ]; then
-						rm -f "$broken_link"
-						cp -Lv "$i" "$broken_link"
-						break
-					fi
-				done
-
-				if [ -f "$broken_link" ]; then
-					_echo "Fixed broken library symlink"
-				else
-					_err_msg "Failed to fix broken library symlink!"
-				fi
+		skip=""
+		# do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
+		while read -r d; do
+			if [ "$d" = "${b##*/}" ]; then
+				skip=1
+				break
 			fi
+		done <<-EOF
+		$QUICK_SHARUN_SKIP_DEPS_FOR
+		EOF
+
+		if [ -z "$skip" ]; then
+			libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
+		fi
+
+		if _is_so "$b"; then
+			libs=$(printf '%s\n%s' "$libs" "$b")
 		fi
 	done
+	echo "$libs" | sort -u | sed '/^$/d'
+}
+
+# collect dlopen libraries via LD_DEBUG=libs
+# STRACE_BINARY=space/newline-separated binary names to trace (default: all)
+_lib4bin_collect_strace() {
+	[ "$STRACE_MODE" = 1 ] || return 0
+
+	libs=""
+	for b do
+		[ -f "$b" ]  || continue
+		_is_elf "$b" || continue
+		[ -x "$b" ]  || continue
+		if _is_so "$b"; then
+			continue
+		fi
+
+		if [ -n "$STRACE_BINARY" ]; then
+			match=""
+			flags=""
+			for strace_bin in $STRACE_BINARY; do
+				if [ "$strace_bin" = "${b##*/}" ]; then
+					match=1
+					flags=$STRACE_FLAGS
+					break
+				fi
+			done
+			[ -n "$match" ] || continue
+		fi
+
+		dlopened=$TMPDIR/libs.$$
+
+		_echo "STRACE: [$b] ..."
+		set -m
+		if [ -n "$XVFB_CMD" ]; then
+			$XVFB_CMD LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
+		else
+			LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
+		fi
+		pid=$!
+		set +m
+
+		sleep "$STRACE_TIME"
+		kill -TERM -$pid 2>/dev/null || :
+		sleep 1
+		kill -KILL -$pid 2>/dev/null || :
+		wait $pid 2>/dev/null || :
+
+		out=$(awk '/calling init/{print $NF}' "$dlopened" | sed \
+		                                                     -e '/nvidia/d'      \
+		                                                     -e '/libcuda/d'     \
+		                                                     -e '/lib-dynload/d' \
+		                                                     -e '/_internal/d'
+		)
+		rm -f "$dlopened"
+		[ -n "$out" ] || continue
+		libs=$(printf '%s\n%s' "$libs" "$out")
+	done
+	echo "$libs" | sort -u | sed '/^$/d'
+}
+
+# deploy shared libraries to DST_LIB_DIR
+_lib4bin_deploy_shared_libs() {
+	for l do
+		[ -f "$l" ] || continue
+		if ! _is_elf "$l"; then
+			_echo "SKIPPED: [$l] not shared object!"
+			continue
+		fi
+
+		l_name=${l##*/}
+
+		if [ -L "$l" ]; then
+			readlink_path=$(readlink -f "$l") || continue
+			readlink_path_name=${readlink_path##*/}
+			dst_dir=$(_lib4bin_get_lib_dst_dir "$readlink_path")
+		else
+			readlink_path_name=""
+			dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
+		fi
+
+		if [ -n "$readlink_path_name" ]; then
+			dst=$dst_dir/$readlink_path_name
+		else
+			dst=$dst_dir/$l_name
+		fi
+
+		mkdir -p "$dst_dir"
+		[ -f "$dst" ] || cp -fv "$l" "$dst"
+
+		# symlink may land in a "wrong" subdir if it targets a relative dir
+		# example: libfltk.so.1.3.11 -> fltk1.3/libfltk.so.1.3.11 on archlinux
+		# but sharun adds all subdirs to --library-path, so nothing should break
+		# note: original lib4bin actually made broken symlinks when this happened
+		if [ -n "$readlink_path_name" ] \
+		  && [ "$l_name" != "$readlink_path_name" ]; then
+			ln -sf "$readlink_path_name" "$dst_dir"/"$l_name"
+		fi
+	done
+}
+
+# deploy binaries, download sharun if needed
+_lib4bin_deploy_binaries() {
+	seen=""
+	for b do
+		echo "$seen" | grep -Fxq "$b" && continue
+		seen=$(printf '%s\n%s' "$seen" "$b")
+
+		[ -f "$b" ] || continue
+
+		if _is_script "$b"; then
+			dst=$DST_BIN_DIR/${b##*/}
+			mkdir -p "$DST_BIN_DIR"
+			if [ ! -f "$dst" ]; then
+				cp -fv "$b" "$dst"
+				chmod 755 "$dst"
+			fi
+			for i in python bash sh ash zsh fish dash perl ruby go node; do
+				if grep -qo "^#!.*bin/$i" "$dst"; then
+					sed -i "1s|^#!.*bin/$i|#!/usr/bin/env $i|" "$dst"
+					break
+				fi
+			done
+			continue
+		fi
+
+		_is_elf "$b" || continue
+		[ -x "$b" ]  || continue
+		if _is_so "$b"; then
+			continue
+		fi
+
+		[ -x "$APPDIR/sharun" ] || _get_sharun
+
+		b_name=${b##*/}
+
+		if [ -L "$b" ]; then
+			readlink_path=$(readlink -f "$b") || continue
+			readlink_path_name=${readlink_path##*/}
+		else
+			readlink_path_name=""
+		fi
+
+		if [ -n "$readlink_path_name" ]; then
+			dst=$SHARUN_BIN_DIR/$readlink_path_name
+		else
+			dst=$SHARUN_BIN_DIR/$b_name
+		fi
+
+		mkdir -p "$SHARUN_BIN_DIR"
+		if [ ! -f "$dst" ]; then
+			cp -fv "$b" "$dst"
+			chmod +x "$dst"
+		fi
+
+		if [ -n "$readlink_path_name" ] \
+		  && [ "$b_name" != "$readlink_path_name" ]; then
+			ln -sf "$readlink_path_name" "$SHARUN_BIN_DIR"/"$b_name"
+		fi
+
+		# hardlink in bin/ -> ../sharun
+		mkdir -p "$DST_BIN_DIR" && (
+			cd "$DST_BIN_DIR"
+			ln -f ../sharun "$b_name"
+			if [ -n "$readlink_path_name" ] \
+			  && [ "$b_name" != "$readlink_path_name" ]; then
+				ln -f ../sharun "$readlink_path_name"
+			fi
+		) || exit 1
+	done
+}
+
+_lib4bin_main() {
+	_echo "Collecting dependencies..."
+	ldd_libs=$(_lib4bin_collect_ldd "$@")
+
+	strace_libs=''
+	if [ "$STRACE_MODE" = 1 ]; then
+		_echo "Collecting dlopen libraries via LD_DEBUG=libs..."
+		strace_libs="$(_lib4bin_collect_strace "$@")"
+	fi
+
+	all_libs=$(printf '%s\n%s' "$ldd_libs" "$strace_libs" | sort -u | sed '/^$/d')
+
+	_echo "Deploying shared libraries..."
+	_lib4bin_deploy_shared_libs $all_libs
+
+	_echo "Deploying binaries..."
+	_lib4bin_deploy_binaries "$@"
+
+	_echo "Generating lib.path..."
+	if [ -x "$APPDIR/sharun" ]; then
+		"$APPDIR/sharun" -g
+	else
+		_err_msg "ERROR: sharun binary not found at $APPDIR/sharun!"
+		exit 1
+	fi
 }
 
 _handle_bins_scripts() {
@@ -1266,7 +1513,7 @@ _handle_bins_scripts() {
 	set -- "$DST_LIB_DIR"/gstreamer-*
 	if [ -d "$1" ]; then
 		gstlibdir="$1"
-		set -- "$APPDIR"/shared/bin/gst-*
+		set -- "$SHARUN_BIN_DIR"/gst-*
 		for bin do
 			if [ -f "$bin" ]; then
 				ln "$APPDIR"/sharun "$gstlibdir"/"${bin##*/}"
@@ -1284,7 +1531,7 @@ _handle_bins_scripts() {
 	fi
 
 	# handle shell scripts
-	set -- "$APPDIR"/bin/*
+	set -- "$DST_BIN_DIR"/*
 	for s do
 		if ! head -c 20 "$s" | grep -q '#!.*sh'; then
 			continue
@@ -1376,7 +1623,7 @@ _check_always_software() {
 }
 
 _add_p11kit_cert_hook() {
-	cert_check="$APPDIR"/bin/01-check-ca-certs.hook
+	cert_check=$DST_BIN_DIR/01-check-ca-certs.hook
 	if [ -f "$cert_check" ]; then
 		return 0
 	fi
@@ -1452,7 +1699,7 @@ _map_paths_ld_preload_open() {
 
 _map_paths_binary_patch() {
 	if [ "$PATH_MAPPING_HARDCODED" = 1 ]; then
-		set -- "$APPDIR"/shared/bin/*
+		set -- "$SHARUN_BIN_DIR"/*
 		for bin do
 			_patch_away_usr_bin_dir   "$bin"
 			_patch_away_usr_lib_dir   "$bin"
@@ -1464,7 +1711,7 @@ _map_paths_binary_patch() {
 		set +f
 		_echo "* Patching files listed in PATH_MAPPING_HARDCODED..."
 		# only search for files to patch in the lib and bin dirs
-		path1="$APPDIR"/shared/bin
+		path1=$SHARUN_BIN_DIR
 		path2=$DST_LIB_DIR
 		for f do
 			file=$(find -L "$path1"/ "$path2"/ -type f -name "$f")
@@ -1485,7 +1732,7 @@ _map_paths_binary_patch() {
 _deploy_datadir() {
 	if [ "$DEPLOY_DATADIR" = 1 ]; then
 		# find if there is a datadir that matches bundled binary name
-		set -- "$APPDIR"/bin/*
+		set -- "$DST_BIN_DIR"/*
 		for bin do
 			if [ ! -f "$bin" ] || [ ! -x "$bin" ]; then
 				continue
@@ -1518,7 +1765,7 @@ _deploy_datadir() {
 			bin=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$1")
 			bin=${bin##*/}
 			possible_dirs=$(
-				strings "$APPDIR"/shared/bin/"$bin" \
+				strings "$SHARUN_BIN_DIR"/"$bin" \
 				  | grep -v '[;:,.(){}?<>*]' \
 				  | tr '/' '\n'
 			)
@@ -1630,7 +1877,7 @@ _deploy_locale() {
 		return 0
 	fi
 
-	set -- "$APPDIR"/shared/bin/*
+	set -- "$SHARUN_BIN_DIR"/*
 	for bin do
 		if grep -Eaoq -m 1 "/usr/share/locale" "$bin"; then
 			DEPLOY_LOCALE=1
@@ -1644,7 +1891,7 @@ _deploy_locale() {
 		cp -r "$LOCALE_DIR" "$APPDIR"/share
 		if [ "$DEBLOAT_LOCALE" = 1 ]; then
 			_echo "* Removing unneeded locales..."
-			for f in "$APPDIR"/shared/bin/* "$APPDIR"/bin/*; do
+			for f in "$SHARUN_BIN_DIR"/* "$DST_BIN_DIR"/*; do
 				if [ -f "$f" ]; then
 					f=${f##*/}
 					set -- "$@" ! -name "*$f*"
@@ -1735,8 +1982,8 @@ _check_window_class() {
 
 _add_bwrap_wrapper() {
 	cfile=$APPDIR/.anylinux-bwrap-wrapper.c
-	target=$APPDIR/bin/bwrap
-	realbwrap=$APPDIR/bin/bwrap.wrapped
+	target=$DST_BIN_DIR/bwrap
+	realbwrap=$DST_BIN_DIR/bwrap.wrapped
 
 
 	if [ -f "$realbwrap" ]; then
@@ -1745,7 +1992,7 @@ _add_bwrap_wrapper() {
 		# rename the real bwrap
 		mv "$target" "$realbwrap"
 		# rename the real binary as well
-		mv "$APPDIR"/shared/bin/"${target##*/}" "$APPDIR"/shared/bin/"${realbwrap##*/}"
+		mv "$SHARUN_BIN_DIR"/"${target##*/}" "$SHARUN_BIN_DIR"/"${realbwrap##*/}"
 	else
 		# this should never happen, we are gonna exit without error however
 		# since maybe older versions of webkit2gtk can be installed without bwrap?
@@ -2205,7 +2452,7 @@ _add_bwrap_wrapper() {
 	}
 	EOF
 
-	cc -Wall -Wextra -O2 -o "$APPDIR"/shared/bin/"${target##*/}" "$cfile"
+	cc -Wall -Wextra -O2 -o "$SHARUN_BIN_DIR"/"${target##*/}" "$cfile"
 	ln "$APPDIR"/sharun "$target"
 	chmod +x "$target"
 	_echo "* added bwrap wrapper!"
@@ -2223,7 +2470,7 @@ _fix_cpython_ldconfig_mess() {
 	# https://github.com/pkgforge-dev/ghostty-appimage/issues/122
 
 	set -- "$DST_LIB_DIR"/python*/ctypes/util.py
-	ldconfig="$APPDIR"/bin/_ldconfig
+	ldconfig=$DST_BIN_DIR/_ldconfig
 	if [ -x "$ldconfig" ]; then
 		return 0
 	elif [ ! -f "$1" ]; then
@@ -2258,7 +2505,7 @@ _fix_cpython_ldconfig_mess() {
 	        *)       arch=x86-64;;
 	    esac
 
-	    for f in "$APPDIR"/shared/lib*/*.so* "$APPDIR"/shared/lib*/*/*.so*; do
+	    for f in "$APPDIR"/lib*/*.so* "$APPDIR"/lib*/*/*.so*; do
 	        echo "	${f##*/} (libc6,$arch) => $f"
 	    done
 
@@ -2331,6 +2578,7 @@ _add_path_mapping_hardcoded() {
 }
 
 _patch_away_usr_bin_dir() {
+	set -- "$(readlink -f "$1")"
 	if ! grep -Eaoq -m 1 "/usr/bin" "$1"; then
 		return 1
 	fi
@@ -2344,6 +2592,7 @@ _patch_away_usr_bin_dir() {
 }
 
 _patch_away_usr_lib_dir() {
+	set -- "$(readlink -f "$1")"
 	if ! grep -Eaoq -m 1 "/usr/lib" "$1"; then
 		return 1
 	fi
@@ -2357,6 +2606,7 @@ _patch_away_usr_lib_dir() {
 }
 
 _patch_away_usr_share_dir() {
+	set -- "$(readlink -f "$1")"
 	if ! grep -Eaoq -m 1 "/usr/share" "$1"; then
 		return 1
 	fi
@@ -2399,7 +2649,7 @@ _check_hardcoded_lib_dirs() {
 				;;
 		esac
 
-		for f in "$DST_LIB_DIR"/*.so* "$APPDIR"/shared/bin/*; do
+		for f in "$DST_LIB_DIR"/*.so* "$SHARUN_BIN_DIR"/*; do
 			if [ ! -f "$f" ]; then
 				continue
 			elif grep -aoq -m 1 "$LIB_DIR"/"$d" "$f"; then
@@ -2414,7 +2664,7 @@ _check_hardcoded_data_dirs() {
 	# first check for hardcoded path to /usr/share/fonts and copy if so
 	src_fonts=/usr/share/fonts
 	dst_fonts="$APPDIR"/share/fonts
-	if grep -aoq -m 1 "$src_fonts" "$APPDIR"/shared/bin/*; then
+	if grep -aoq -m 1 "$src_fonts" "$SHARUN_BIN_DIR"/*; then
 		if [ -d "$src_fonts" ] && [ ! -d "$dst_fonts" ]; then
 			mkdir -p "$dst_fonts"
 			for d in "$src_fonts"/*; do
@@ -2452,7 +2702,7 @@ _check_hardcoded_data_dirs() {
 				;;
 		esac
 
-		for f in "$DST_LIB_DIR"/*.so* "$APPDIR"/shared/bin/*; do
+		for f in "$DST_LIB_DIR"/*.so* "$SHARUN_BIN_DIR"/*; do
 			if [ ! -f "$f" ]; then
 				continue
 			elif grep -aoq -m 1 /usr/share/"$d" "$f"; then
@@ -2486,95 +2736,6 @@ _sort_env_file() {
 	fi
 }
 
-_post_deployment_steps() {
-	# these need to be done later because sharun may make shared/lib a symlink
-	# to lib and if we make shared/lib first then it breaks sharun
-	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-		set -- "$LIB_DIR"/python*
-		if [ -d "$1" ]; then
-			cp -r "$1" "$DST_LIB_DIR"
-		else
-			_err_msg "ERROR: Cannot find python installation in $LIB_DIR"
-			exit 1
-		fi
-		if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
-			(
-				cd "$DST_LIB_DIR"/"${1##*/}"
-				find ./ -type f -name '*.a' -delete || :
-				for f in $(find ./ -type f -name '*.pyc' -print); do
-					case "$f" in
-						*/"$MAIN_BIN"*) :;;
-						*) [ ! -f "$f" ] || rm -f "$f";;
-					esac
-				done
-			)
-		fi
-	fi
-	if [ "$DEPLOY_FLUTTER" = 1 ]; then
-		if [ -z "$FLUTTER_LIB" ]; then
-			_err_msg "Flutter deployment was forced but looks like the"
-			_err_msg "the application does not link to libflutter at all"
-			_err_msg "If you see this message please open a bug report!"
-			exit 1
-		fi
-
-		# flutter apps need to have a relative lib and data directory
-		# we need to find the directory that contains libapp.so
-		if libapp=$(cd "$APPDIR"/bin \
-		  && find ../shared/lib/ -type f -name 'libapp.so' -print -quit); then
-			d=${libapp%/*}
-			if [ ! -d "$APPDIR"/bin/"${d##*/}" ]; then
-				ln -s "$d" "$APPDIR"/bin/"${d##*/}"
-			fi
-		else
-			_err_msg "Cannot find libapp.so in $APPDIR"
-			_err_msg "include it for flutter deployment to work"
-		fi
-
-		dst_flutter_dir="$APPDIR"/bin/data
-		if [ ! -d "$dst_flutter_dir" ]; then
-			if [ -z "$FLUTTER_DATA_DIR" ]; then
-				d=${FLUTTER_LIB%/*.so*}
-				# find data dir, we assume it is relative to
-				# where libflutter*.so came from
-				if [ -d "$d"/../data ]; then
-					FLUTTER_DATA_DIR="$d"/../data
-				elif [ -d "$d"/../../data ]; then
-					FLUTTER_DATA_DIR="$d"/../../data
-				else
-					_err_msg "Cannot find data directory of $FLUTTER_LIB"
-					_err_msg "Please set FLUTTER_DATA_DIR to its location"
-					exit 1
-				fi
-			fi
-			cp -rv "$FLUTTER_DATA_DIR" "$dst_flutter_dir"
-			_echo "* Copied flutter data directory"
-		fi
-	fi
-	if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
-		_fix_cpython_ldconfig_mess
-	fi
-	# copy the entire hicolor icons dir
-	# by default the hicolor icon theme ships no icons, this
-	# means any present icon is likely needed by the application
-	if [ -d /usr/share/icons/hicolor ]; then
-		mkdir -p "$APPDIR"/share/icons
-		cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
-		_remove_empty_dirs "$APPDIR"/share/icons/hicolor
-	fi
-
-	"$APPDIR"/sharun -g || :
-
-	# on debian some libs may hardcode paths like /usr/lib/x86_64-linux-gnu
-	# make a compat symlink so patched paths resolve to bundled libs
-	d=$APPIMAGE_ARCH-linux-gnu
-	case "$LIB_DIR" in
-		*/"$d"*)
-			( cd "$DST_LIB_DIR" && ln -s . "$d" 2>/dev/null || : )
-			;;
-	esac
-}
-
 _strip_bins_and_libs() {
 	if [ "$NO_STRIP" = 1 ]; then
 		return 0
@@ -2596,48 +2757,27 @@ _strip_bins_and_libs() {
 				continue
 			elif _is_bun_binary "$f"; then
 				continue # bun binaries are delicate
+			elif _is_pyinstaller_binary "$f"; then
+				continue # same story as bun binaries
 			fi
 			case "$f" in
-				*/python*) continue;; # python binaries break
+				*/python*) continue;; # python interpreter also breaks
 			esac
 			strip -s -R .comment --strip-unneeded "$f" || :
 		done <<-EOF
-		$(find "$APPDIR"/shared/bin/ "$APPDIR"/lib*/ -type f)
+		$(find "$SHARUN_BIN_DIR"/ "$APPDIR"/lib*/ -type f)
 		EOF
 		_echo "* stripped binaries"
 	fi
 }
 
-# lib4bin sometimes leaves duplicates of libraries instead of making the proper symlink
-_deduplicate_libs() {
-	find "$APPDIR"/lib/ -name '*.so.*' -type f | while IFS="" read -r lib; do
-		_lib_dirname=${lib%/*}
-		_lib_basename=${lib##*/}
-		_target_lib=$_lib_basename
-		_count=0
-		while [ "$_count" -lt 5 ]; do
-			_shorter_name=${_lib_basename%.*}
-			if [ "$_shorter_name" = "$_lib_basename" ]; then
-				break
-			fi
-			# now check if there is a similar name lib with shoter name
-			_duplicate_lib=$_lib_dirname/$_shorter_name
-			if [ -f "$_duplicate_lib" ] && [ ! -L "$_duplicate_lib" ]; then
-				if cmp -s "$_duplicate_lib" "$lib"; then
-					(
-						cd "$_lib_dirname"
-						ln -svf "$_target_lib" "$_shorter_name"
-					)
-				fi
-			fi
-			_lib_basename=$_shorter_name
-			_count=$((_count + 1))
-		done
-	done
-}
-
 _add_apprun() {
-	f=$APPDIR/AppRun
+	# sharun needs to be the AppRun while our AppRun is named AppRun.sh, sharun will
+	# then execute AppRun.sh with whatever shell it can find on the system or AppDir
+	# this allows AppImages to work on systems without /bin/sh or /usr/bin/env
+	ln -f "$APPDIR"/sharun "$APPDIR"/AppRun
+
+	f=$APPDIR/AppRun.sh
 	if [ -f "$f" ]; then
 		return 0
 	fi
@@ -2676,17 +2816,9 @@ _add_apprun() {
 	        exit 0
 	fi
 
-	__fedora_cert=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
-	if [ ! -f /etc/ssl/certs/ca-certificates.crt ] && [ -f "$__fedora_cert" ]; then
-	        CURL_CA_BUNDLE=${CURL_CA_BUNDLE:-$__fedora_cert}
-	        REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-$__fedora_cert}
-	        SSL_CERT_FILE=${SSL_CERT_FILE:-$__fedora_cert}
-	        export CURL_CA_BUNDLE REQUESTS_CA_BUNDLE SSL_CERT_FILE
-	fi
-
 	if [ -f "$APPDIR"/AppRun.lib ]; then
 	        . "$APPDIR"/AppRun.lib
-	        for hook in "$APPDIR"/bin/*.hook; do
+	        for hook in $APPDIR/bin/*.hook; do
 	            [ -e "$hook" ] || continue
 	            . "$hook"
 	        done
@@ -2711,8 +2843,8 @@ _add_apprun() {
 	        cat /etc/os-release >"$PWD"/"${APPIMAGE##*/}"-debug.log || :
 	        export LD_DEBUG=libs
 	        export VK_LOADER_DEBUG=all
-			export LIBGL_DEBUG=verbose
-			export EGL_LOG_LEVEL=debug
+	        export LIBGL_DEBUG=verbose
+	        export EGL_LOG_LEVEL=debug
 	        export LC_ALL=C
 	        export SHARUN_PRINTENV=1
 	        "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
@@ -3010,7 +3142,7 @@ _add_hooks_library() {
 _handle_nested_bins() {
 	# wrap any executable in lib with sharun
 	for b in $(find "$DST_LIB_DIR"/ -type f ! -name '*.so*'); do
-		if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
+		if [ -x "$b" ] && [ -x "$SHARUN_BIN_DIR"/"${b##*/}" ]; then
 			rm -f "$b"
 			ln "$APPDIR"/sharun "$b"
 			_echo "* Wrapped lib executable '$b' with sharun"
@@ -3018,8 +3150,8 @@ _handle_nested_bins() {
 	done
 
 	# do the same for possible nested binaries in bin
-	for b in $(find "$APPDIR"/bin/*/ -type f ! -name '*.so*' 2>/dev/null); do
-		if [ -x "$b" ] && [ -x "$APPDIR"/shared/bin/"${b##*/}" ]; then
+	for b in $(find "$DST_BIN_DIR"/*/ -type f ! -name '*.so*' 2>/dev/null); do
+		if [ -x "$b" ] && [ -x "$SHARUN_BIN_DIR"/"${b##*/}" ]; then
 			rm -f "$b"
 			ln "$APPDIR"/sharun "$b"
 			_echo "* Wrapped nested bin executable '$b' with sharun"
@@ -3044,7 +3176,7 @@ _check_main_bin() {
 		esac
 	fi
 
-	if [ -f "$APPDIR"/bin/"$MAIN_BIN" ]; then
+	if [ -f "$DST_BIN_DIR"/"$MAIN_BIN" ]; then
 		return 0
 	fi
 
@@ -3064,8 +3196,7 @@ _make_static_bin() (
 		chmod +x "$ONELF"
 	fi
 
-	DST_DIR=$APPDIR/bin
-	mkdir -p "$DST_DIR"
+	mkdir -p "$DST_BIN_DIR"
 	_echo "------------------------------------------------------------"
 	for bin do
 		b=${bin##*/}
@@ -3076,7 +3207,7 @@ _make_static_bin() (
 		mkdir -p "$_tmpdir"
 
 		"$ONELF" bundle-libs "$_tmpdir" --from-binary "$bin" --strip --scan-dlopen
-		"$ONELF" pack "$_tmpdir" -o "$DST_DIR"/"$b" --command bin/"$b"
+		"$ONELF" pack "$_tmpdir" -o "$DST_BIN_DIR"/"$b" --command bin/"$b"
 		rm -rf "$_tmpdir"
 	done
 	_echo "------------------------------------------------------------"
@@ -3196,14 +3327,55 @@ _determine_what_to_deploy "$@"
 _make_deployment_array
 
 echo ""
-_echo "Now jumping to sharun..."
+_echo "Now jumping to deploying..."
 _echo "------------------------------------------------------------"
 
 _get_sharun
 _deploy_libs "$@"
-_fix_broken_symlinks
 _check_always_software
 _handle_bins_scripts
+
+if [ "$DEPLOY_FLUTTER" = 1 ]; then
+	if [ -z "$FLUTTER_LIB" ]; then
+		_err_msg "Flutter deployment was forced but looks like the"
+		_err_msg "the application does not link to libflutter at all"
+		_err_msg "If you see this message please open a bug report!"
+		exit 1
+	fi
+
+	# flutter apps need to have a relative lib and data directory
+	# we need to find the directory that contains libapp.so
+	if libapp=$(cd "$DST_BIN_DIR" \
+	  && find ../lib/ -type f -name 'libapp.so' -print -quit); then
+		d=${libapp%/*}
+		if [ ! -d "$DST_BIN_DIR"/"${d##*/}" ]; then
+			ln -s "$d" "$DST_BIN_DIR"/"${d##*/}"
+		fi
+	else
+		_err_msg "Cannot find libapp.so in $APPDIR"
+		_err_msg "include it for flutter deployment to work"
+	fi
+
+	dst_flutter_dir=$DST_BIN_DIR/data
+	if [ ! -d "$dst_flutter_dir" ]; then
+		if [ -z "$FLUTTER_DATA_DIR" ]; then
+			d=${FLUTTER_LIB%/*.so*}
+			# find data dir, we assume it is relative to
+			# where libflutter*.so came from
+			if [ -d "$d"/../data ]; then
+				FLUTTER_DATA_DIR="$d"/../data
+			elif [ -d "$d"/../../data ]; then
+				FLUTTER_DATA_DIR="$d"/../../data
+			else
+				_err_msg "Cannot find data directory of $FLUTTER_LIB"
+				_err_msg "Please set FLUTTER_DATA_DIR to its location"
+				exit 1
+			fi
+		fi
+		cp -rv "$FLUTTER_DATA_DIR" "$dst_flutter_dir"
+		_echo "* Copied flutter data directory"
+	fi
+fi
 
 echo ""
 _echo "------------------------------------------------------------"
@@ -3222,12 +3394,46 @@ _echo "Finished deployment! Starting post deployment hooks..."
 _echo "------------------------------------------------------------"
 echo ""
 
-set -- \
-	"$DST_LIB_DIR"/*.so*       \
-	"$DST_LIB_DIR"/*/*.so*     \
-	"$DST_LIB_DIR"/*/*/*.so*   \
-	"$DST_LIB_DIR"/*/*/*/*.so*
+# It is common for libraries to have optional dependencies to pipewire they will
+# try to dlopen pipewire and if isn't available they fallback to pulseaudio or alsa
+# given that it is possible to deploy an application without pipewire we do not
+# want that application then dlopen the pipewire of the host and crash
+set -- "$DST_LIB_DIR"/libpipewire-0.3.so*
+[ -f "$1" ] || no_pipewire=1
 
+set -- \
+	"$DST_LIB_DIR"/*.so*         \
+	"$DST_LIB_DIR"/*/*.so*       \
+	"$DST_LIB_DIR"/*/*/*.so*     \
+	"$DST_LIB_DIR"/*/*/*/*.so*   \
+	"$DST_LIB_DIR"/*/*/*/*/*.so* \
+	"$DST_LIB_DIR"/*/*/*/*/*/*.so*
+
+for lib do
+	[ -f "$lib" ] || continue
+	# make sure to remove any full rpath from the libs
+	if patchelf --print-rpath "$lib" | grep -q '^/'; then
+		patchelf --remove-rpath "$lib"
+		_echo "* removed full rpath from $lib"
+	fi
+
+	# also remove full paths from needed libs, for example
+	# a library may depend on /usr/lib/libkek.so instead of libkek.so
+	patchelf --print-needed "$lib" | while IFS="" read -r l; do
+		case "$l" in
+			/*)
+				patchelf --replace-needed "$l" "${l##*/}" "$lib"
+				_echo "* removed full needed lib path $l from $lib"
+				;;
+		esac
+	done
+
+	if [ "$no_pipewire" = 1 ] && grep -aq -m 1 'libpipewire-0.3.so' "$lib"; then
+		sed -i -e 's|libpipewire-0.3.so|no-pipewire-kek.so|g' "$lib"
+	fi
+done
+
+# now start the post deployment hooks
 for lib do case "$lib" in
 	*/gio/modules/*.so*)
 		src_gio_cache=$LIB_DIR/gio/modules/giomodule.cache
@@ -3238,7 +3444,7 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/libgio-*.so*)
-		f=$APPDIR/bin/gio-launch-desktop
+		f=$DST_BIN_DIR/gio-launch-desktop
 		if [ ! -x "$f" ]; then
 			cat <<-'EOF' > "$f"
 			#!/bin/sh
@@ -3441,7 +3647,7 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/qt*/plugins/*.so)
-		f=$APPDIR/bin/qt.conf
+		f=$DST_BIN_DIR/qt.conf
 		if [ ! -f "$f" ]; then
 			_qtdir=${lib#$DST_LIB_DIR/} # leaves qt*
 			_qtdir=${_qtdir%%/*}        # gets basename
@@ -3454,13 +3660,6 @@ for lib do case "$lib" in
 			Qml2Imports = qml
 			EOF
 			_echo "* added $f "
-		fi
-
-		# move the gtk3 plugin back into the AppDir
-		if [ -f "$TMPDIR"/libqgtk3.so ]; then
-			d=$DST_LIB_DIR/$QT_DIR/plugins/platformthemes
-			mkdir -p "$d"
-			mv "$TMPDIR"/libqgtk3.so "$d"
 		fi
 
 		# deploy translation files
@@ -3481,15 +3680,6 @@ for lib do case "$lib" in
 		dst_gs_dir=$APPDIR/share/ghostscript
 		if [ -d "$src_gs_dir" ] && [ ! -d "$dst_gs_dir" ]; then
 			cp -r "$src_gs_dir" "$dst_gs_dir"
-			(
-			  cd "$dst_gs_dir"
-			  d=$(echo ./*/Resource/Init)
-			  if [ -d "$d" ]; then
-			  	echo "GS_LIB=\${SHARUN_DIR}/share/ghostscript/${d#./}" >> "$APPENV"
-			  else
-			  	echo 'GS_LIB=${SHARUN_DIR}/share/ghostscript/Resource/Init' >> "$APPENV"
-			  fi
-			)
 			_echo "* added $src_gs_dir"
 		fi
 		;;
@@ -3558,6 +3748,13 @@ for lib do case "$lib" in
 			fi
 		fi
 		;;
+	*/ld-linux*.so*|*/ld-musl*.so*)
+		# patch away the dynamic linker /etc to disable /etc/ld.so.preload
+		if grep -qa -m 1 '/etc' "$lib"; then
+			sed -i -e 's|/etc/ld.so.preload|/XXX/ld.so.preload|g' "$lib"
+			_echo "* patched away ${lib##*/} /etc/ld.so.preload"
+		fi
+		;;
 	*/libgegl*.so*)
 		src_gegl_dir=$(echo "$LIB_DIR"/gegl-*)
 		dst_gegl_dir=$DST_LIB_DIR/${src_gegl_dir##*/}
@@ -3598,11 +3795,11 @@ for lib do case "$lib" in
 			  # we can still make this relocatable by setting these other env variables
 			  # which will always work even when not compiled with MAGICK_HOME support
 			  cd "$APPDIR"
-			  set -- shared/lib*/ImageMagick-*/modules*/coders
+			  set -- lib*/ImageMagick-*/modules*/coders
 			  if [ -d "$1" ]; then
 			  	echo "MAGICK_CODER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
 			  fi
-			  set -- shared/lib*/ImageMagick-*/modules*/filters
+			  set -- lib*/ImageMagick-*/modules*/filters
 			  if [ -d "$1" ]; then
 			  	# checking the code it seems that MAGICK_FILTER_MODULE_PATH
 			  	# is NOT USED in the code and seems to be an error!!! the variable
@@ -3656,11 +3853,10 @@ for lib do case "$lib" in
 	*/libcrypto.so*)
 		# Apps may fail to connect to internet if they use the host ssl config
 		# see: https://github.com/pkgforge-dev/Viber-AppImage-Enhanced/issues/16
-
-		# make a minimal ssl config instead of copying the hosts
 		dst_ssl_conf=$APPDIR/etc/ssl/openssl.cnf
 		if [ ! -f "$dst_ssl_conf" ]; then
 			mkdir -p "${dst_ssl_conf%/*}"
+			# make a minimal ssl config instead of copying the hosts
 			cat <<-'EOF' > "$dst_ssl_conf"
 			[openssl_conf]
 			openssl_conf = openssl_init
@@ -3674,7 +3870,6 @@ for lib do case "$lib" in
 			[default_sect]
 			activate = 1
 			EOF
-			echo 'OPENSSL_CONF=${SHARUN_DIR}/etc/ssl/openssl.cnf' >> "$APPENV"
 			_echo "* added minimal ssl config"
 		fi
 		;;
@@ -3689,25 +3884,6 @@ for lib do case "$lib" in
 			cp -r "$src_mlt_data_dir" "$dst_mlt_data_dir"
 			_echo "* added $src_mlt_data_dir"
 		fi
-		if [ -d "$dst_mlt_data_dir"/profiles ]; then
-			echo "MLT_PROFILES_PATH=\${SHARUN_DIR}/share/${dst_mlt_data_dir##*/}/profiles" >> "$APPENV"
-		fi
-		if [ -d "$dst_mlt_data_dir"/presets ]; then
-			echo "MLT_PRESETS_PATH=\${SHARUN_DIR}/share/${dst_mlt_data_dir##*/}/presets"   >> "$APPENV"
-		fi
-
-		dst_mlt_lib_dir=$(echo "$DST_LIB_DIR"/mlt-*)
-		if [ -d "$dst_mlt_lib_dir" ]; then
-			echo "MLT_REPOSITORY=\${SHARUN_DIR}/lib/${dst_mlt_lib_dir##*/}" >> "$APPENV"
-		fi
-		;;
-	*/frei0r-*/*.so*)
-		d=${lib%/*}
-		d=${d##*/}
-		echo "FREI0R_PATH=\${SHARUN_DIR}/lib/$d" >> "$APPENV"
-		;;
-	*/ladspa/*.so*)
-		echo 'LADSPA_PATH=${SHARUN_DIR}/lib/ladspa' >> "$APPENV"
 		;;
 	*/libMangoHud*.so*)
 		src_mangohud_layer=$(echo /usr/share/vulkan/implicit_layer.d/MangoHud*.json)
@@ -3717,16 +3893,16 @@ for lib do case "$lib" in
 			cp -v "$src_mangohud_layer" "$dst_mangohud_layer"
 			sed -i 's|/.*/mangohud/||' "$dst_mangohud_layer"
 
-			if [ ! -f "$APPDIR"/bin/mangohud ] \
+			if [ ! -f "$DST_BIN_DIR"/mangohud ] \
 				&& command -v mangohud 1>/dev/null; then
-				cp -v "$(command -v mangohud)" "$APPDIR"/bin
+				cp -v "$(command -v mangohud)" "$DST_BIN_DIR"
 			fi
 
 			sed -i \
 				-e 's|/usr/.*/||'                         \
 				-e '1a\export SHARUN_ALLOW_LD_PRELOAD=1'  \
 				-e 's|#!.*|#!/bin/sh|'                    \
-				"$APPDIR"/bin/mangohud || :
+				"$DST_BIN_DIR"/mangohud || :
 
 			_echo "Copied over mangohud layer and patched mangohud"
 		fi
@@ -3741,7 +3917,7 @@ for lib do case "$lib" in
 		if grep -aq -m 1 'WEBKIT_EXEC_PATH' "$lib" \
 		  && ! grep -q WEBKIT_EXEC_PATH "$APPENV"; then
 			(
-			  set -- "$APPDIR"/bin/WebKit*
+			  set -- "$DST_BIN_DIR"/WebKit*
 			  if [ -f "$1" ]; then
 			  	echo 'WEBKIT_EXEC_PATH=${SHARUN_DIR}/bin' >> "$APPENV"
 			  fi
@@ -3752,7 +3928,7 @@ for lib do case "$lib" in
 		# WEBKIT_INJECTED_BUNDLE_PATH always works
 		# It is not guarded behind a compiled flag unlike WEBKIT_EXEC_PATH
 		if ! grep -q 'WEBKIT_INJECTED_BUNDLE_PATH' "$APPENV"; then
-			cp -v "$lib" "$APPDIR"/bin
+			cp -v "$lib" "$DST_BIN_DIR"
 			echo 'WEBKIT_INJECTED_BUNDLE_PATH=${SHARUN_DIR}/bin' >> "$APPENV"
 		fi
 		;;
@@ -3760,12 +3936,6 @@ for lib do case "$lib" in
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.hook"
 		;;
 	*/libSDL*.so*)
-		# make sure SDL does not attempt to use pipewire when not deployed
-		if [ "$DEPLOY_PIPEWIRE" != 1 ] \
-		  && ! grep -q 'SDL_AUDIODRIVER=' "$APPENV" 2>/dev/null; then
-			echo 'SDL_AUDIODRIVER=pulseaudio' >> "$APPENV"
-		fi
-
 		# SDL may be bundled without libdecor since it maybe missing from the CI runner
 		# or the application makes of GTK/Qt + SDL, in which case we do not need libdecor
 		# at all, make sure SDL does not attempt to load libdecor in these cases
@@ -3786,7 +3956,7 @@ for lib do case "$lib" in
 		;;
 	*/7z.so)
 		# the 7z binaries need the lib next to them
-		cp -v "$lib" "$APPDIR"/bin
+		cp -v "$lib" "$DST_BIN_DIR"
 		;;
 	*/libpipewire-*.so*)
 		src_pipewire_config_dir=/usr/share/pipewire
@@ -3794,7 +3964,7 @@ for lib do case "$lib" in
 		if [ -d "$src_pipewire_config_dir" ] && [ ! -d "$dst_pipewire_config_dir" ]; then
 			cp -r "$src_pipewire_config_dir" "$dst_pipewire_config_dir"
 
-			cat <<-'EOF' > "$APPDIR"/bin/01-pipewire-config.hook
+			cat <<-'EOF' > "$DST_BIN_DIR"/01-pipewire-config.hook
 			_pipewire_dir=$APPDIR/share/pipewire
 			if [ ! -d /usr/share/pipewire ] && [ -d "$_pipewire_dir" ]; then
 				export PIPEWIRE_CONFIG_DIR="$_pipewire_dir"
@@ -3814,15 +3984,36 @@ for lib do case "$lib" in
 done
 
 _deploy_datadir
+
+# copy the entire hicolor icons dir
+# by default the hicolor icon theme ships no icons, this
+# means any present icon is likely needed by the application
+if [ -d /usr/share/icons/hicolor ]; then
+	mkdir -p "$APPDIR"/share/icons
+	cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
+	_remove_empty_dirs "$APPDIR"/share/icons/hicolor
+fi
+
 _deploy_locale
-_post_deployment_steps
-_deduplicate_libs
+
+# make the lib.path file. Very important for sharun to discover bundled libs!
+"$APPDIR"/sharun -g
+
+# on debian some libs may hardcode paths like /usr/lib/x86_64-linux-gnu
+# make a compat symlink so patched paths resolve to bundled libs
+d=$APPIMAGE_ARCH-linux-gnu
+case "$LIB_DIR" in
+	*/"$d"*)
+		( cd "$DST_LIB_DIR" && ln -s . "$d" 2>/dev/null || : )
+		;;
+esac
+
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
 
 # patch away any hardcoded path to /usr/share or /usr/lib in bins...
-set -- "$APPDIR"/shared/bin/*
+set -- "$SHARUN_BIN_DIR"/*
 for bin do
 	if p=$(grep -ao -m 1 '/usr/share/.*/' "$bin"); then
 		_echo "* Detected hardcoded path to $p in $bin"
@@ -3832,16 +4023,14 @@ for bin do
 		_echo "* Detected hardcoded path to $p in $bin"
 		_patch_away_usr_lib_dir "$bin" || :
 	fi
+	if _is_bun_binary "$bin" || _is_pyinstaller_binary "$bin"; then
+		# bun/pyisntaller binaries cannot be executed with the
+		# dynamic linker directly, so we will change PT_INTERP to
+		# /tmp/.ld-sharun.so.67, sharun will copy it there at runtime
+		patchelf --set-interpreter /tmp/.ld-sharun.so.67 "$bin"
+		_echo "* Set interpreter to /tmp/.ld-sharun.so.67 for $bin"
+	fi
 done
-
-# some libraries may need to look for a relative ../share directory
-# normally this is for when they are located in /usr/lib
-# however with sharun this structure is not present, instead
-# we have the libraries inside `shared/lib` and `share` is one level
-# further back, so we make a relative symlink to fix this issue
-if [ ! -d "$APPDIR"/shared/share ]; then
-	ln -s ../share "$APPDIR"/shared/share
-fi
 
 echo ""
 _echo "------------------------------------------------------------"
@@ -3852,7 +4041,7 @@ if [ -n "$ADD_HOOKS" ]; then
 	IFS=':'
 	set -- $ADD_HOOKS
 	IFS="$old_ifs"
-	hook_dst="$APPDIR"/bin
+	hook_dst=$DST_BIN_DIR
 	for hook do
 		# hooks used to be executed differently depending on the suffix
 		# this was dropped and now all hooks are sourced
@@ -3879,17 +4068,7 @@ fi
 _add_hooks_library
 _add_apprun
 
-chmod +x "$APPDIR"/AppRun || :
-
-# always make sure that AppDir/lib exists, sometimes lib4bin does not make it
-# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/269#issuecomment-3829584043
-for d in lib lib32; do
-	dir=$APPDIR/shared/$d
-	symlink=$APPDIR/$d
-	if [ ! -d "$symlink" ] && [ -d "$dir" ]; then
-		ln -s shared/"$d" "$symlink"
-	fi
-done
+chmod +x "$APPDIR"/AppRun.sh "$APPDIR"/AppRun || :
 
 # deploy directories
 while read -r d; do

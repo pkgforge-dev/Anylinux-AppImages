@@ -25,6 +25,7 @@ pacman -Syu --noconfirm \
 	libxkbcommon-x11 \
 	libxrandr        \
 	libxtst          \
+	patchelf         \
 	wget             \
 	xorg-server-xvfb \
 	zsync

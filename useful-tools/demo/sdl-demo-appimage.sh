@@ -25,6 +25,7 @@ pacman -Syu --noconfirm \
 	libxkbcommon-x11 \
 	libxrandr        \
 	libxtst          \
+	patchelf         \
 	sdl2             \
 	sdl2_ttf         \
 	fontconfig       \
