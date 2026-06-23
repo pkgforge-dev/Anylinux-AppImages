@@ -11,12 +11,15 @@
 
 # Set DESKTOP and ICON to the path of top level .desktop and icon to deploy them
 
+
+
 set -e
 
 if [ "$QUICK_SHARUN_DEBUG" = 1 ]; then
 	set -x
 fi
 
+_START_TIME=$(date +%s) || :
 APPIMAGE_ARCH=$(uname -m)
 ARCH=${ARCH:-$APPIMAGE_ARCH}
 TMPDIR=${TMPDIR:-/tmp}
@@ -28,7 +31,8 @@ DST_BIN_DIR=$APPDIR/bin
 SHARUN_BIN_DIR=$APPDIR/shared/bin
 MAIN_BIN=${MAIN_BIN##*/}
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/1.0.0/sharun-$APPIMAGE_ARCH}
+
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/2.0.0/sharun-$APPIMAGE_ARCH}
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/latest/download/onelf-$APPIMAGE_ARCH-linux}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
@@ -2714,24 +2718,9 @@ _check_hardcoded_data_dirs() {
 }
 
 _sort_env_file() {
-	# make sure the .env has all the "unset" last, due to a bug in the dotenv
-	# library used by sharun all the unsets have to be declared last in the .env
-	# also deduplicate since the same var may be set multiple times
+	# deduplicate entries since the same var may be set multiple times
 	if [ -f "$APPDIR"/.env ]; then
-		sorted_env="$(LC_ALL=C awk '
-			{
-				if ($0 ~ /^unset/) {
-					unset_array[++u] = $0
-				} else {
-					if (!seen[$0]++) print
-				}
-			}
-			END {
-				for (i = 1; i <= u; i++) {
-					print unset_array[i]
-				}
-			}' "$APPDIR"/.env
-		)"
+		sorted_env="$(LC_ALL=C awk '!seen[$0]++' "$APPDIR"/.env)"
 		echo "$sorted_env" > "$APPDIR"/.env
 	fi
 }
@@ -2794,14 +2783,10 @@ _add_apprun() {
 
 	set -e
 
-	APPDIR=$(cd "${0%/*}" && echo "$PWD")
 	MAIN_BIN=@MAIN_BIN@
 	ARG0="${ARGV0:-$0}"
-
 	unset ARGV0
 
-	export APPIMAGE_ARCH=@APPIMAGE_ARCH@
-	export HOSTPATH=$PATH
 	export PATH=$APPDIR/bin:$PATH
 	export ARG0 APPDIR PATH
 
@@ -2856,10 +2841,7 @@ _add_apprun() {
 
 	chmod +x "$f"
 
-	sed -i \
-		-e "s|@MAIN_BIN@|$MAIN_BIN|"  \
-		-e "s|@APPIMAGE_ARCH@|$APPIMAGE_ARCH|" \
-		"$f"
+	sed -i -e "s|@MAIN_BIN@|$MAIN_BIN|" "$f"
 
 	_echo "* Added $f"
 }
@@ -2872,14 +2854,6 @@ _add_hooks_library() {
 	_echo "Adding '$f'..."
 	cat <<-'EOF' > "$f"
 	#!/bin/sh
-
-	HOST_HOME=${REAL_HOME:-$HOME}
-	HOST_XDG_CONFIG_HOME=${REAL_XDG_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOST_HOME/.config}}
-	HOST_XDG_DATA_HOME=${REAL_XDG_DATA_HOME:-${XDG_DATA_HOME:-$HOST_HOME/.local/share}}
-	HOST_XDG_CACHE_HOME=${REAL_XDG_CACHE_HOME:-${XDG_CACHE_HOME:-$HOST_HOME/.cache}}
-	HOST_XDG_STATE_HOME=${REAL_XDG_STATE_HOME:-${XDG_STATE_HOME:-$HOST_HOME/.local/state}}
-
-	export HOST_HOME HOST_XDG_CONFIG_HOME HOST_XDG_DATA_HOME HOST_XDG_CACHE_HOME HOST_XDG_STATE_HOME
 
 	BINDIR=${XDG_BIN_HOME:-~/.local/bin}
 	DATADIR=${XDG_DATA_HOME:-~/.local/share}
@@ -3446,13 +3420,9 @@ for lib do case "$lib" in
 	*/libgio-*.so*)
 		f=$DST_BIN_DIR/gio-launch-desktop
 		if [ ! -x "$f" ]; then
-			cat <<-'EOF' > "$f"
-			#!/bin/sh
-			export GIO_LAUNCHED_DESKTOP_FILE_PID=$$
-			exec "$@"
-			EOF
-			chmod +x "$f"
-			_echo "* added $f wrapper"
+			# sharun doubles as gio-launch-desktop
+			ln -f "$APPDIR"/sharun "$f"
+			_echo "* enabled sharun gio-launch-desktop mode"
 		fi
 		;;
 	*/libglib-*.so*)
@@ -4190,7 +4160,10 @@ if [ "$OUTPUT_APPIMAGE" = 1 ]; then
 	_make_appimage
 else
 	_sort_env_file
+	_ELAPSED=$(( $(date +%s) - _START_TIME )) || :
+	_echo "Time taken: $(( _ELAPSED / 60 ))m $(( _ELAPSED % 60 ))s"
 	_echo "------------------------------------------------------------"
 	_echo "All done!"
 	_echo "------------------------------------------------------------"
 fi
+
