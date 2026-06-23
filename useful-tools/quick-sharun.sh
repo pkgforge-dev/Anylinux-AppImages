@@ -4161,9 +4161,9 @@ if [ "$OUTPUT_APPIMAGE" = 1 ]; then
 else
 	_sort_env_file
 	_ELAPSED=$(( $(date +%s) - _START_TIME )) || :
-	_echo "Time taken: $(( _ELAPSED / 60 ))m $(( _ELAPSED % 60 ))s"
 	_echo "------------------------------------------------------------"
 	_echo "All done!"
+	_echo "Time taken: $(( _ELAPSED / 60 ))m $(( _ELAPSED % 60 ))s"
 	_echo "------------------------------------------------------------"
 fi
 
