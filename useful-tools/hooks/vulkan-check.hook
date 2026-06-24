@@ -159,6 +159,7 @@ _use_host_mesa() {
 		/usr/lib/$APPIMAGE_ARCH-linux-gnu/dri
 		/usr/lib64/dri
 		/usr/lib/dri
+		/run/opengl-driver/lib/dri
 		EOF
 
 		# We need to only expose the host mesa drivers and nothing else
@@ -168,6 +169,7 @@ _use_host_mesa() {
 			err_msg " - /usr/lib/$APPIMAGE_ARCH-linux-gnu/dri "
 			err_msg " - /usr/lib64/dri"
 			err_msg " - /usr/lib/dri"
+			err_msg " - /run/opengl-driver/lib/dri"
 			err_msg "Set HOST_LIB_DIR to where you have your drivers"
 			return 1
 		fi
@@ -232,8 +234,15 @@ _use_host_mesa() {
 			done
 		done
 
+		for d in /run/opengl-driver/share /usr/share; do
+			if [ -d "$d" ]; then
+				_share=$d
+				break
+			fi
+		done
+
 		for d in $_data_dirs_to_expose; do
-			d=/usr/share/$d
+			d=$_share/$d
 			if [ -d "$d" ]; then
 				ln -sf "$d" "$SHARUN_MESA_PATH"/share/
 			fi
