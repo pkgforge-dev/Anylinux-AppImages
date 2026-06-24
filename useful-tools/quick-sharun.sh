@@ -157,7 +157,7 @@ _is_so() {
 }
 
 _lib4bin_ldd_libs() {
-	ldd "$1" 2>/dev/null | awk '/=>/{print $3}' | sort -u
+	ldd "$1" 2>/dev/null | awk '/=>/{print $3} $1 ~ /^\//{print $1}' | sort -u
 }
 
 _download() {
