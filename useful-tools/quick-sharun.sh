@@ -17,6 +17,7 @@ if [ "$QUICK_SHARUN_DEBUG" = 1 ]; then
 	set -x
 fi
 
+_START_TIME=$(date +%s) || :
 APPIMAGE_ARCH=$(uname -m)
 ARCH=${ARCH:-$APPIMAGE_ARCH}
 TMPDIR=${TMPDIR:-/tmp}
@@ -28,7 +29,7 @@ DST_BIN_DIR=$APPDIR/bin
 SHARUN_BIN_DIR=$APPDIR/shared/bin
 MAIN_BIN=${MAIN_BIN##*/}
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/1.0.0/sharun-$APPIMAGE_ARCH}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/2.2.1/sharun-$APPIMAGE_ARCH}
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/latest/download/onelf-$APPIMAGE_ARCH-linux}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
@@ -1981,481 +1982,21 @@ _check_window_class() {
 }
 
 _add_bwrap_wrapper() {
-	cfile=$APPDIR/.anylinux-bwrap-wrapper.c
+	# our fork of sharun works as a bwrap wrapper, basically if an application
+	# needs bwrap to sandbox itself (example WebKit), they will execute a sharun
+	# bwrap wrapper, this wrapper will make sure appimage paths and env variables
+	# are always present in the sandbox so that everything works correctly
+	#
+	# the wrapper automatically gets enabled when when pass bwrap to the
+	# deployment array, however if bwrap was not installed in the CI
+	# container, there will be no wrapper, we have to make the hardlink
+	# manually since the wrapper can use the system bwrap instead
 	target=$DST_BIN_DIR/bwrap
-	realbwrap=$DST_BIN_DIR/bwrap.wrapped
-
-
-	if [ -f "$realbwrap" ]; then
-		return 0 # We wrapped it already
-	elif [ -f "$target" ]; then
-		# rename the real bwrap
-		mv "$target" "$realbwrap"
-		# rename the real binary as well
-		mv "$SHARUN_BIN_DIR"/"${target##*/}" "$SHARUN_BIN_DIR"/"${realbwrap##*/}"
-	else
-		# this should never happen, we are gonna exit without error however
-		# since maybe older versions of webkit2gtk can be installed without bwrap?
-		_err_msg "Something went very wrong here because bwrap was not deployed"
-		return 0
+	if [ ! -x "$target" ]; then
+		ln -f "$APPDIR"/sharun "$target"
+		chmod +x "$target"
+		_echo "* added sharun bwrap wrapper!"
 	fi
-
-	cat <<-'EOF' > "$cfile"
-	/*
-	 * anylinux-bwrap-wrapper — intercepts bubblewrap to inject essential bind mounts
-	 *                     and remap hardcoded paths inside the sandbox.
-	 *
-	 * Many applications sandbox themselves via bwrap (e.g. WebKitGTK) but dont
-	 * account for AppImage paths. Symlinks created by quick-sharun in /tmp become
-	 * unresolvable inside the sandbox. This wrapper injects:
-	 *   --bind $APPDIR $APPDIR   so the AppImage mount is visible inside
-	 *   --bind /tmp /tmp         so sharun's /tmp symlinks stay valid
-	 *   --setenv SHARUN_DIR ...  so child processes know the symlink prefix
-	 *   --setenv APPDIR ...      so the AppDir path survives into the sandbox
-	 *   --setenv PATH ...        so binaries in $APPDIR/bin get executed always
-	 *   --proc /proc             so that sharun can read /proc/self/exe and work
-	 *
-	 * It also rewrites hardcoded command paths (e.g. /usr/bin/xdg-dbus-proxy) to
-	 * their AppDir equivalents when found, so the AppImage's bundled binaries are
-	 * used instead of the host.
-	 *
-	 * Two codepaths: "--args N" (options passed through a pipe) and plain argv.
-	 */
-
-	#define _GNU_SOURCE
-	#include <errno.h>
-	#include <fcntl.h>
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-	#include <unistd.h>
-	#include <limits.h>
-
-	/* ---- Option tables ------------------------------------------------ */
-	/*
-	 * bwrap options and how many trailing arguments they consume.
-	 * Used by find_cmd_idx() to skip over values and not mistake them
-	 * for the command to execute.
-	 */
-	static int opt_arg_count(const char *arg)
-	{
-	    static const struct { const char *name; int n; } table[] = {
-	        { "--overlay",           3 },  /* RWSRC WORKDIR DEST */
-	        { "--bind",              2 }, { "--ro-bind",          2 },
-	        { "--bind-try",          2 }, { "--ro-bind-try",      2 },
-	        { "--dev-bind",          2 }, { "--dev-bind-try",     2 },
-	        { "--bind-data",         2 }, { "--ro-bind-data",     2 },
-	        { "--file",              2 }, { "--ro-file",          2 },
-	        { "--dev-mknod",         2 }, { "--symlink",          2 },
-	        { "--chmod",             2 }, { "--bind-fd",          2 },
-	        { "--ro-bind-fd",        2 }, { "--setenv",           2 },
-	        { "--tmpfs",             1 }, { "--proc",             1 },
-	        { "--dev",               1 }, { "--devpts",           1 },
-	        { "--mqueue",            1 }, { "--hostname",         1 },
-	        { "--seccomp",           1 }, { "--block-fd",         1 },
-	        { "--userns",            1 }, { "--uid",              1 },
-	        { "--gid",               1 }, { "--chdir",            1 },
-	        { "--unsetenv",          1 }, { "--lock-file",        1 },
-	        { "--sync-fd",           1 }, { "--info-fd",          1 },
-	        { "--json-status-fd",    1 }, { "--add-seccomp-fd",   1 },
-	        { "--add-feature",       1 }, { "--args",             1 },
-	        { "--dir",               1 }, { "--remount-ro",       1 },
-	        { "--perms",             1 }, { "--size",             1 },
-	        { "--argv0",             1 }, { "--overlay-src",      1 },
-	        { "--tmp-overlay",       1 }, { "--ro-overlay",       1 },
-	        { "--exec-label",        1 }, { "--file-label",       1 },
-	        { "--userns-block-fd",   1 }, { "--pidns",            1 },
-	        { NULL, 0 }
-	    };
-	    for (int i = 0; table[i].name; i++)
-	        if (strcmp(arg, table[i].name) == 0) return table[i].n;
-	    return 0;
-	}
-
-	/* ---- Helpers ------------------------------------------------------ */
-
-	/* Split a NUL-separated buffer into a null-terminated string array. */
-	static int parse_content(const char *buf, size_t len, char ***out)
-	{
-	    int cap = 64, n = 0;
-	    char **arr = calloc(cap, sizeof(char *));
-	    if (!arr) return -1;
-
-	    for (size_t i = 0, start = 0; i <= len; i++) {
-	        if (i == len || buf[i] == '\0') {
-	            size_t slen = i - start;
-	            if (slen == 0) { start = i + 1; continue; }
-	            if (n >= cap) {
-	                cap *= 2;
-	                char **tmp = realloc(arr, cap * sizeof(char *));
-	                if (!tmp) { for (int k = 0; k < n; k++) free(arr[k]); free(arr); return -1; }
-	                arr = tmp;
-	            }
-	            char *s = malloc(slen + 1);
-	            memcpy(s, buf + start, slen);
-	            s[slen] = '\0';
-	            arr[n++] = s;
-	            start = i + 1;
-	        }
-	    }
-	    *out = arr;
-	    return n;
-	}
-
-	/* Read all data from a file descriptor until EOF. */
-	static char *read_fd(int fd, size_t *out_len)
-	{
-	    size_t cap = 4096, len = 0;
-	    char *buf = malloc(cap);
-	    if (!buf) return NULL;
-	    ssize_t n;
-	    while ((n = read(fd, buf + len, cap - len)) > 0) {
-	        len += n;
-	        if (len == cap) {
-	            cap *= 2;
-	            char *tmp = realloc(buf, cap);
-	            if (!tmp) { free(buf); return NULL; }
-	            buf = tmp;
-	        }
-	    }
-	    if (n < 0) { free(buf); return NULL; }
-	    buf[len] = '\0';
-	    *out_len = len;
-	    return buf;
-	}
-
-	/* Serialize a string array as NUL-separated bytes into a new pipe; return the read fd. */
-	static int serialize_to_pipe(char **args, int n)
-	{
-	    size_t len = 0;
-	    for (int i = 0; i < n; i++) len += strlen(args[i]) + 1;
-
-	    char *buf = malloc(len);
-	    if (!buf) return -1;
-	    size_t pos = 0;
-	    for (int i = 0; i < n; i++) {
-	        size_t sl = strlen(args[i]);
-	        memcpy(buf + pos, args[i], sl);
-	        pos += sl;
-	        buf[pos++] = '\0';
-	    }
-
-	    int fds[2];
-	    if (pipe(fds) != 0) { free(buf); return -1; }
-	    fcntl(fds[1], F_SETFD, FD_CLOEXEC); /* write end only */
-	    size_t off = 0;
-	    while (off < len) {
-	        ssize_t w = write(fds[1], buf + off, len - off);
-	        if (w <= 0) break;
-	        off += w;
-	    }
-	    close(fds[1]);
-	    free(buf);
-	    return fds[0];
-	}
-
-	/*
-	 * Walk bwrap args to find where the command starts.
-	 * Returns the index of "--" or the first non-option item,
-	 * or n if all items are options.
-	 */
-	static int find_cmd_idx(char **args, int n)
-	{
-	    for (int i = 0; i < n; i++) {
-	        if (strcmp(args[i], "--") == 0) return i;
-	        if (args[i][0] == '-') { i += opt_arg_count(args[i]); continue; }
-	        return i;
-	    }
-	    return n;
-	}
-
-	/*
-	 * Build the array of --bind/--setenv options we inject into bwrap.
-	 * Returns the count of items placed in *out, or -1 on failure.
-	 */
-	static int build_injections(const char *appdir, const char *sharun_dir,
-	                            const char *path, char ***out)
-	{
-	    struct { const char *flag, *a, *b; } entries[] = {
-	        { "--proc",   "/proc",    NULL      },  /* sharun needs /proc for /proc/self/exe to resolve symlinks */
-	        { "--bind",   appdir,     appdir     },  /* AppDir visible inside */
-	        { "--bind",   "/tmp",     "/tmp"     },  /* must follow webkit's --tmpfs /tmp */
-	        { "--setenv", "SHARUN_DIR", sharun_dir },
-	        { "--setenv", "APPDIR",   appdir     },
-	        { "--setenv", "PATH",     path       },
-	    };
-	    int nentries = (int)(sizeof(entries) / sizeof(entries[0]));
-
-	    /* Count how many slots we need (skip entries with NULL values for 'a') */
-	    int cap = 0;
-	    for (int i = 0; i < nentries; i++) {
-	        if (!entries[i].a) continue;
-	        cap += entries[i].b ? 3 : 2;
-	    }
-
-	    char **arr = calloc(cap + 1, sizeof(char *));
-	    if (!arr) return -1;
-
-	    int j = 0;
-	    for (int i = 0; i < nentries; i++) {
-	        if (!entries[i].a) continue;
-	        arr[j++] = strdup(entries[i].flag);
-	        arr[j++] = strdup(entries[i].a);
-	        if (entries[i].b)
-	            arr[j++] = strdup(entries[i].b);
-	    }
-	    arr[j] = NULL;
-	    *out = arr;
-	    return j;
-	}
-
-	/*
-	 * Try execvp of bwrap.wrapped, falling back to the same directory
-	 * as this wrapper (shared/bin/).
-	 */
-	static void exec_binary(char **argv)
-	{
-	    execvp("bwrap.wrapped", argv);
-	    char self[PATH_MAX];
-	    ssize_t len = readlink("/proc/self/exe", self, sizeof(self) - 1);
-	    if (len > 0 && (size_t)len < sizeof(self) - 14) {
-	        self[len] = '\0';
-	        char *slash = strrchr(self, '/');
-	        if (slash) {
-	            *slash = '\0';
-	            char path[PATH_MAX + 16];
-	            snprintf(path, sizeof(path), "%s/bwrap.wrapped", self);
-	            execv(path, argv);
-	        }
-	    }
-	    fprintf(stderr, "anylinux-bwrap-wrapper: failed to exec bwrap.wrapped: %s\n",
-	            strerror(errno));
-	    _exit(1);
-	}
-
-	/*
-	 * If a path looks like a hardcoded system binary, check whether the AppDir
-	 * ships it. Returns a malloc'd AppDir path, or NULL if no match found.
-	 */
-	static char *try_remap_path(const char *path, const char *appdir)
-	{
-	    if (!appdir || !path || path[0] != '/') return NULL;
-	    const char *base = strrchr(path, '/');
-	    if (!base || !base[1]) return NULL;
-	    base++;
-
-	    char buf[PATH_MAX];
-	    const char *dirs[] = { "bin", "lib", "libexec", NULL };
-	    for (int i = 0; dirs[i]; i++) {
-	        snprintf(buf, sizeof(buf), "%s/%s/%s", appdir, dirs[i], base);
-	        if (access(buf, X_OK) == 0) return strdup(buf);
-	    }
-	    return NULL;
-	}
-
-	/*
-	 * Scan exec argv for the command and replace it with an AppDir equivalent
-	 * when one exists (e.g. /usr/bin/xdg-dbus-proxy → $APPDIR/bin/xdg-dbus-proxy).
-	 */
-	static void remap_argv_command(char **new_argv, const char *appdir)
-	{
-	    if (!appdir) return;
-	    for (int i = 1; new_argv[i]; i++) {
-	        if (strcmp(new_argv[i], "--") == 0) {
-	            if (new_argv[i + 1]) {
-	                char *r = try_remap_path(new_argv[i + 1], appdir);
-	                if (r) { free(new_argv[i + 1]); new_argv[i + 1] = r; }
-	            }
-	            return;
-	        }
-	        if (new_argv[i][0] == '-') { i += opt_arg_count(new_argv[i]); continue; }
-	        char *r = try_remap_path(new_argv[i], appdir);
-	        if (r) { free(new_argv[i]); new_argv[i] = r; }
-	        return;
-	    }
-	}
-
-	/* ---- Main --------------------------------------------------------- */
-
-	int main(int argc, char *argv[])
-	{
-	    const char *appdir     = getenv("APPDIR");
-	    const char *sharun_dir = getenv("SHARUN_DIR");
-	    const char *path       = getenv("PATH");
-
-	    if (argc < 2) {
-	        fprintf(stderr, "Usage: anylinux-bwrap-wrapper [bwrap options...]\n");
-	        return 1;
-	    }
-
-	    /* Build the options we will inject */
-	    char **injections;
-	    int inject_count = build_injections(appdir, sharun_dir, path, &injections);
-	    if (inject_count < 0) {
-	        fprintf(stderr, "anylinux-bwrap-wrapper: malloc failed\n");
-	        return 1;
-	    }
-
-	    /*
-	     * Check if this is a "--args N" invocation (webkit passes its
-	     * complex option list through a pipe). If so, the options are
-	     * in the pipe and argv just holds --args N -- <command>.
-	     * We must rewrite the pipe content with our binds appended.
-	     */
-	    int args_fd = -1, args_idx = -1;
-	    for (int i = 1; i < argc; i++) {
-	        if (strcmp(argv[i], "--args") == 0 && i + 1 < argc) {
-	            args_fd = atoi(argv[i + 1]);
-	            args_idx = i;
-	            break;
-	        }
-	    }
-
-	    if (args_fd >= 0) {
-	        /* ---- --args N path ---- */
-
-	        /* Read the NUL-separated options from the fd */
-	        size_t content_len;
-	        char *content = read_fd(args_fd, &content_len);
-	        if (!content) {
-	            fprintf(stderr, "anylinux-bwrap-wrapper: failed to read --args fd %d\n", args_fd);
-	            return 1;
-	        }
-	        close(args_fd);
-
-	        char **fd_args;
-	        int n = parse_content(content, content_len, &fd_args);
-	        free(content);
-	        if (n < 0) {
-	            fprintf(stderr, "anylinux-bwrap-wrapper: parse_content failed\n");
-	            return 1;
-	        }
-
-	        /*
-	         * Find where the command begins. Items before cmd_idx are
-	         * bwrap options and go (with injections appended) to a new
-	         * pipe. Items at/after cmd_idx (-- / command / args) go to
-	         * the exec argv instead.
-	         */
-	        int cmd_idx = find_cmd_idx(fd_args, n);
-	        int opts_seccomp = 0;
-	        for (int i = 0; i < cmd_idx; i++) {
-	            if (strcmp(fd_args[i], "--seccomp") == 0) {
-	                opts_seccomp++;
-	                i++;
-	            }
-	        }
-
-	        /* Build options array (original options minus --seccomp plus injections) */
-	        int opt_n = cmd_idx - 2 * opts_seccomp;
-	        int total_opt_n = opt_n + inject_count;
-	        char **opt_args = calloc(total_opt_n + 1, sizeof(char *));
-	        if (!opt_args) return 1;
-	        int oi = 0;
-	        for (int i = 0; i < cmd_idx; i++) {
-	            if (strcmp(fd_args[i], "--seccomp") == 0) {
-	                i++; /* skip fd number */
-	                continue;
-	            }
-	            opt_args[oi++] = fd_args[i];
-	        }
-	        for (int i = 0; i < inject_count; i++)
-	            opt_args[oi++] = injections[i];
-	        opt_args[total_opt_n] = NULL;
-
-	        int new_fd = serialize_to_pipe(opt_args, total_opt_n);
-	        free(opt_args);
-	        if (new_fd < 0) {
-	            fprintf(stderr, "anylinux-bwrap-wrapper: pipe failed\n");
-	            return 1;
-	        }
-
-	        /*
-	         * Build exec argv:
-	         *   bwrap.wrapped --args NEWFD [original argv minus --args N] [fd command]
-	         */
-	        int new_argc = argc + (n - cmd_idx);
-	        char **new_argv = calloc(new_argc + 1, sizeof(char *));
-	        if (!new_argv) return 1;
-
-	        char fd_str[32];
-	        snprintf(fd_str, sizeof(fd_str), "%d", new_fd);
-
-	        new_argv[0] = "bwrap.wrapped";
-	        int j = 1;
-	        for (int i = 1; i < argc; i++) {
-	            if (i == args_idx) {
-	                new_argv[j++] = strdup("--args");
-	                new_argv[j++] = strdup(fd_str);
-	                i++; /* skip the old fd number */
-	            } else {
-	                new_argv[j++] = strdup(argv[i]);
-	            }
-	        }
-	        for (int i = cmd_idx; i < n; i++)
-	            new_argv[j++] = fd_args[i];
-	        new_argv[j] = NULL;
-
-	        remap_argv_command(new_argv, appdir);
-	        exec_binary(new_argv);
-	        /* not reached */
-	    }
-
-	    /* ---- Direct argv path (no --args) ---- */
-
-	    /* Build argv without --seccomp N (this blocks lstat and breaks sharun) */
-	    int st_argc = 0;
-	    char **st_argv = calloc(argc + 1, sizeof(char *));
-	    if (!st_argv) return 1;
-	    st_argv[st_argc++] = argv[0];
-	    for (int i = 1; i < argc; i++) {
-	        if (strcmp(argv[i], "--seccomp") == 0) {
-	            i++; /* skip fd number */
-	            continue;
-	        }
-	        st_argv[st_argc++] = argv[i];
-	    }
-	    st_argv[st_argc] = NULL;
-
-	    /*
-	     * Find where to insert our binds in the stripped argv:
-	     * before "--" or before the first non-option argument (the command).
-	     */
-	    int insert_at = 1 + find_cmd_idx(st_argv + 1, st_argc - 1);
-
-	    /* Build exec argv with injections inserted at insert_at */
-	    int new_argc = st_argc + inject_count;
-	    char **new_argv = calloc(new_argc + 1, sizeof(char *));
-	    if (!new_argv) return 1;
-
-	    new_argv[0] = "bwrap.wrapped";
-	    int j = 1;
-	    for (int i = 1; i < st_argc; i++) {
-	        if (i == insert_at) {
-	            for (int k = 0; k < inject_count; k++)
-	                new_argv[j++] = injections[k];
-	        }
-	        new_argv[j++] = strdup(st_argv[i]);
-	    }
-	    /* If no suitable insertion point was found, tack on at the end */
-	    if (insert_at == st_argc) {
-	        for (int k = 0; k < inject_count; k++)
-	            new_argv[j++] = injections[k];
-	    }
-	    new_argv[j] = NULL;
-
-	    free(st_argv);
-
-	    remap_argv_command(new_argv, appdir);
-	    exec_binary(new_argv);
-	    return 1;
-	}
-	EOF
-
-	cc -Wall -Wextra -O2 -o "$SHARUN_BIN_DIR"/"${target##*/}" "$cfile"
-	ln "$APPDIR"/sharun "$target"
-	chmod +x "$target"
-	_echo "* added bwrap wrapper!"
 }
 
 _fix_cpython_ldconfig_mess() {
@@ -2714,24 +2255,9 @@ _check_hardcoded_data_dirs() {
 }
 
 _sort_env_file() {
-	# make sure the .env has all the "unset" last, due to a bug in the dotenv
-	# library used by sharun all the unsets have to be declared last in the .env
-	# also deduplicate since the same var may be set multiple times
+	# deduplicate entries since the same var may be set multiple times
 	if [ -f "$APPDIR"/.env ]; then
-		sorted_env="$(LC_ALL=C awk '
-			{
-				if ($0 ~ /^unset/) {
-					unset_array[++u] = $0
-				} else {
-					if (!seen[$0]++) print
-				}
-			}
-			END {
-				for (i = 1; i <= u; i++) {
-					print unset_array[i]
-				}
-			}' "$APPDIR"/.env
-		)"
+		sorted_env="$(LC_ALL=C awk '!seen[$0]++' "$APPDIR"/.env)"
 		echo "$sorted_env" > "$APPDIR"/.env
 	fi
 }
@@ -2794,14 +2320,10 @@ _add_apprun() {
 
 	set -e
 
-	APPDIR=$(cd "${0%/*}" && echo "$PWD")
 	MAIN_BIN=@MAIN_BIN@
 	ARG0="${ARGV0:-$0}"
-
 	unset ARGV0
 
-	export APPIMAGE_ARCH=@APPIMAGE_ARCH@
-	export HOSTPATH=$PATH
 	export PATH=$APPDIR/bin:$PATH
 	export ARG0 APPDIR PATH
 
@@ -2856,10 +2378,7 @@ _add_apprun() {
 
 	chmod +x "$f"
 
-	sed -i \
-		-e "s|@MAIN_BIN@|$MAIN_BIN|"  \
-		-e "s|@APPIMAGE_ARCH@|$APPIMAGE_ARCH|" \
-		"$f"
+	sed -i -e "s|@MAIN_BIN@|$MAIN_BIN|" "$f"
 
 	_echo "* Added $f"
 }
@@ -2872,14 +2391,6 @@ _add_hooks_library() {
 	_echo "Adding '$f'..."
 	cat <<-'EOF' > "$f"
 	#!/bin/sh
-
-	HOST_HOME=${REAL_HOME:-$HOME}
-	HOST_XDG_CONFIG_HOME=${REAL_XDG_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOST_HOME/.config}}
-	HOST_XDG_DATA_HOME=${REAL_XDG_DATA_HOME:-${XDG_DATA_HOME:-$HOST_HOME/.local/share}}
-	HOST_XDG_CACHE_HOME=${REAL_XDG_CACHE_HOME:-${XDG_CACHE_HOME:-$HOST_HOME/.cache}}
-	HOST_XDG_STATE_HOME=${REAL_XDG_STATE_HOME:-${XDG_STATE_HOME:-$HOST_HOME/.local/state}}
-
-	export HOST_HOME HOST_XDG_CONFIG_HOME HOST_XDG_DATA_HOME HOST_XDG_CACHE_HOME HOST_XDG_STATE_HOME
 
 	BINDIR=${XDG_BIN_HOME:-~/.local/bin}
 	DATADIR=${XDG_DATA_HOME:-~/.local/share}
@@ -3446,13 +2957,9 @@ for lib do case "$lib" in
 	*/libgio-*.so*)
 		f=$DST_BIN_DIR/gio-launch-desktop
 		if [ ! -x "$f" ]; then
-			cat <<-'EOF' > "$f"
-			#!/bin/sh
-			export GIO_LAUNCHED_DESKTOP_FILE_PID=$$
-			exec "$@"
-			EOF
-			chmod +x "$f"
-			_echo "* added $f wrapper"
+			# sharun doubles as gio-launch-desktop
+			ln -f "$APPDIR"/sharun "$f"
+			_echo "* enabled sharun gio-launch-desktop mode"
 		fi
 		;;
 	*/libglib-*.so*)
@@ -4190,7 +3697,9 @@ if [ "$OUTPUT_APPIMAGE" = 1 ]; then
 	_make_appimage
 else
 	_sort_env_file
+	_ELAPSED=$(( $(date +%s) - _START_TIME )) || :
 	_echo "------------------------------------------------------------"
 	_echo "All done!"
+	_echo "Time taken: $(( _ELAPSED / 60 ))m $(( _ELAPSED % 60 ))s"
 	_echo "------------------------------------------------------------"
 fi
