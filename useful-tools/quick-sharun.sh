@@ -867,7 +867,7 @@ _make_deployment_array() {
 		fi
 
 		if [ "$DEPLOY_GLIB_NETWORKING" = 1 ]; then
-			_echo "* Deploying Glib-Netwroking"
+			_echo "* Deploying Glib-Networking"
 			DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 			set -- "$@" \
 				"$LIB_DIR"/gio/modules/libgiognutls.so   \
