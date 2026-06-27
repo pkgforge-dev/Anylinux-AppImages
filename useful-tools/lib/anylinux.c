@@ -199,8 +199,11 @@ static int should_block_library(const char *filename) {
 
 // problematic vars to check
 static const char* vars_to_unset[] = {
+	"ALSA_CONFIG_PATH",
 	"BABL_PATH",
 	"__EGL_VENDOR_LIBRARY_DIRS",
+	"__EGL_VENDOR_LIBRARY_FILENAMES",
+	"FOLKS_BACKEND_PATH",
 	"FREI0R_PATH",
 	"GBM_BACKENDS_PATH",
 	"GCONV_PATH",
@@ -248,6 +251,10 @@ static const char* vars_to_unset[] = {
 	"TCL_LIBRARY",
 	"TEXTDOMAINDIR",
 	"TK_LIBRARY",
+	"VK_DRIVER_FILES",
+	"WEBKIT_EXEC_PATH",
+	"WEBKIT_INJECTED_BUNDLE_PATH",
+	"QT_XKB_CONFIG_ROOT",
 	"XKB_CONFIG_ROOT",
 	"XTABLES_LIBDIR",
 	NULL
