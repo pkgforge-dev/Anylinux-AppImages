@@ -2990,6 +2990,9 @@ for lib do case "$lib" in
 	*/gconv/*.so)
 		_try_cp "$LIB_DIR"/gconv/gconv-modules "$DST_LIB_DIR"/gconv/gconv-modules
 		;;
+	*/libpipewire-*.so*)
+		_try_cp /usr/share/pipewire "$APPDIR"/share/pipewire
+		;;
 	# this hook is a common false positive, because a lot of applications
 	# execute the system sh and that links to this library, deploying these files
 	*/libncursesw.so*|*/libcursesw.so*|*/libcurses.so*)
@@ -3295,9 +3298,6 @@ for lib do case "$lib" in
 			_patch_away_usr_share_dir "$lib" || continue
 			_echo "Copied and patched imlib2 xpm loader"
 		fi
-		;;
-	*/libpipewire-*.so*)
-		_try_cp /usr/share/pipewire "$APPDIR"/share/pipewire
 		;;
 	esac
 done
