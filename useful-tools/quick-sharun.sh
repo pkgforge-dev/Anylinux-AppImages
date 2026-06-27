@@ -29,7 +29,7 @@ DST_BIN_DIR=$APPDIR/bin
 SHARUN_BIN_DIR=$APPDIR/shared/bin
 MAIN_BIN=${MAIN_BIN##*/}
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/2.2.1/sharun-$APPIMAGE_ARCH}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/2.2.2/sharun-$APPIMAGE_ARCH}
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/latest/download/onelf-$APPIMAGE_ARCH-linux}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
@@ -525,6 +525,15 @@ _save_array() {
 _remove_empty_dirs() {
 	find "$1" -type d \
 	  -exec rmdir -p --ignore-fail-on-non-empty {} + 2>/dev/null || true
+}
+
+_try_cp() {
+	_src=$1
+	set -- "$(readlink -f "$1")" "$2"
+	if [ -e "$1" ] && [ ! -e "$2" ] && mkdir -p "${2%/*}"; then
+		cp -r "$1" "$2"
+		_echo "* added $_src"
+	fi
 }
 
 # skip non executable binaries and .node binaries
@@ -1523,12 +1532,7 @@ _handle_bins_scripts() {
 	fi
 
 	if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
-		src_res=/usr/share/$QT_DIR/resources
-		dst_res=$DST_LIB_DIR/$QT_DIR/resources
-		if [ -d "$src_res" ] && [ ! -d "$dst_res" ]; then
-			mkdir -p "${dst_res%/*}"
-			cp -r "$src_res" "$dst_res"
-		fi
+		_try_cp /usr/share/"$QT_DIR"/resources "$DST_LIB_DIR"/"$QT_DIR"/resources
 	fi
 
 	# handle shell scripts
@@ -2912,6 +2916,10 @@ echo ""
 set -- "$DST_LIB_DIR"/libpipewire-0.3.so*
 [ -f "$1" ] || no_pipewire=1
 
+# we need to do the same for libdecor
+set -- "$DST_LIB_DIR"/libdecor-0.so.0
+[ -f "$1" ] || no_libdecor=1
+
 set -- \
 	"$DST_LIB_DIR"/*.so*         \
 	"$DST_LIB_DIR"/*/*.so*       \
@@ -2942,23 +2950,69 @@ for lib do
 	if [ "$no_pipewire" = 1 ] && grep -aq -m 1 'libpipewire-0.3.so' "$lib"; then
 		sed -i -e 's|libpipewire-0.3.so|no-pipewire-kek.so|g' "$lib"
 	fi
+	if [ "$no_libdecor" = 1 ] && grep -aq -m 1 'libdecor-0.so' "$lib"; then
+		sed -i -e 's|libdecor-0.so|fuck-gnome.so|g' "$lib"
+	fi
 done
 
 # now start the post deployment hooks
 for lib do case "$lib" in
 	*/gio/modules/*.so*)
-		src_gio_cache=$LIB_DIR/gio/modules/giomodule.cache
-		dst_gio_cache=$DST_LIB_DIR/gio/modules/giomodule.cache
-		if [ -f "$src_gio_cache" ] && [ ! -f "$dst_gio_cache" ]; then
-			cp -v "$src_gio_cache" "$dst_gio_cache"
-			_echo "* added $src_gio_cache"
-		fi
+		_try_cp "$LIB_DIR"/gio/modules/giomodule.cache "$DST_LIB_DIR"/gio/modules/giomodule.cache
+		;;
+	*/libfontconfig.so*)
+		_try_cp /etc/fonts/fonts.conf "$APPDIR"/etc/fonts/fonts.conf
+		;;
+	*/libfolks*.so*)
+		_try_cp "$LIB_DIR"/folks "$DST_LIB_DIR"/folks
+		;;
+	*/libthai*.so*)
+		_try_cp /usr/share/libthai "$APPDIR"/share/libthai
+		;;
+	*/libxkbcommon*.so*)
+		_try_cp /usr/share/X11/xkb "$APPDIR"/share/X11/xkb
+		;;
+	*/libX11.so*)
+		_try_cp /usr/share/X11/locale "$APPDIR"/share/X11/locale
+		;;
+	*/libgbm.so*)
+		_try_cp "$LIB_DIR"/gbm "$DST_LIB_DIR"/gbm
+		;;
+	*/libdrm_amdgpu.so*)
+		_try_cp /usr/share/libdrm "$APPDIR"/share/libdrm
+		;;
+	*/libtesseract.so*)
+		_try_cp /usr/share/tessdata "$APPDIR"/share/tessdata
+		;;
+	*/libgs.so*)
+		_try_cp /usr/share/ghostscript "$APPDIR"/share/ghostscript
+		;;
+	*/gconv/*.so)
+		_try_cp "$LIB_DIR"/gconv/gconv-modules "$DST_LIB_DIR"/gconv/gconv-modules
+		;;
+	# this hook is a common false positive, because a lot of applications
+	# execute the system sh and that links to this library, deploying these files
+	*/libncursesw.so*|*/libcursesw.so*|*/libcurses.so*)
+		_try_cp /usr/share/terminfo "$APPDIR"/share/terminfo
+		_try_cp /usr/share/tabset   "$APPDIR"/share/tabset
+		;;
+	*/7z.so) # the 7z binaries need the lib next to them
+		cp -v "$lib" "$DST_BIN_DIR"
+		;;
+	*/libmagic.so*)
+		# sharun only checks for $SHARUN_DIR/share/file/misc/magic.mgc
+		# but on ubuntu for example, the file is located in /usr/share/file/magic.mgc
+		# so we need to find the magic.mgc file and copy it to dst
+		src_magic_file=$(find -L /usr/share/file -type f -name magic.mgc -print -quit) || :
+		dst_magic_file=$APPDIR/share/file/misc/magic.mgc
+		_try_cp "$src_magic_file" "$dst_magic_file"
 		;;
 	*/libgio-*.so*)
 		f=$DST_BIN_DIR/gio-launch-desktop
 		if [ ! -x "$f" ]; then
 			# sharun doubles as gio-launch-desktop
 			ln -f "$APPDIR"/sharun "$f"
+			chmod +x "$f"
 			_echo "* enabled sharun gio-launch-desktop mode"
 		fi
 		;;
@@ -2966,39 +3020,24 @@ for lib do case "$lib" in
 		_glibver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
 		src_glib_schema_dir=/usr/share/glib-$_glibver/schemas
 		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
-		if [ -d "$src_glib_schema_dir" ] && [ ! -d "$dst_glib_schema_dir" ]; then
-			mkdir -p "$dst_glib_schema_dir"
-			cp -r "$src_glib_schema_dir"/* "$dst_glib_schema_dir"
-			_echo "* added $src_glib_schema_dir"
-		fi
 
+		_try_cp "$src_glib_schema_dir" "$dst_glib_schema_dir"
 		# apps may crash when the host has no mime database
-		src_mime_dir=/usr/share/mime
-		dst_mime_dir=$APPDIR/share/mime
-		if [ -d "$src_mime_dir" ] && [ ! -d "$dst_mime_dir" ]; then
-			cp -r "$src_mime_dir" "$dst_mime_dir"
-			rm -rf "$dst_mime_dir"/packages # bloat
-			_echo "* added $src_mime_dir"
-		fi
+		_try_cp /usr/share/mime "$APPDIR"/share/mime
+		rm -rf "$APPDIR"/share/mime/packages # bloat
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
 		dst_gdkpixbuf_cache=${lib%/*}.cache
-		if [ -f "$src_gdkpixbuf_cache" ] && [ ! -f "$dst_gdkpixbuf_cache" ]; then
-			cp -v "$src_gdkpixbuf_cache" "$dst_gdkpixbuf_cache"
-			sed -i -e 's|/usr/lib/.*/loaders/||g' "$dst_gdkpixbuf_cache"
-			_echo "* added $src_gdkpixbuf_cache"
-		fi
+		_try_cp "$src_gdkpixbuf_cache" "$dst_gdkpixbuf_cache"
+		sed -i -e 's|/usr/lib/.*/loaders/||g' "$dst_gdkpixbuf_cache" || :
 		;;
 	*/gtk-*/*/immodules/*.so)
 		_gtkver=$(echo "$lib" | tr '/' '\n' | grep '^gtk-')
 		src_gtk_immodule_cache=$(echo "$LIB_DIR"/"$_gtkver"/*/immodules.cache)
 		dst_gtk_immodule_cache=${lib%/*}.cache
-		if [ -f "$src_gtk_immodule_cache" ] && [ ! -f "$dst_gtk_immodule_cache" ]; then
-			cp -v "$src_gtk_immodule_cache" "$dst_gtk_immodule_cache"
-			sed -i -e 's|/usr/lib/.*/immodules/||g' "$dst_gtk_immodule_cache"
-			_echo "* added $src_gtk_immodule_cache"
-		fi
+		_try_cp "$src_gtk_immodule_cache" "$dst_gtk_immodule_cache"
+		sed -i -e 's|/usr/lib/.*/immodules/||g' "$dst_gtk_immodule_cache" || :
 		;;
 	*/libglycin*.so*)
 		if [ "$GNOME_GLYCIN" != 1 ]; then
@@ -3007,53 +3046,22 @@ for lib do case "$lib" in
 		_add_bwrap_wrapper
 		src_glycin_conf_dir=/usr/share/glycin-loaders
 		dst_glycin_conf_dir=$APPDIR/share/glycin-loaders
-		if [ -d "$src_glycin_conf_dir" ] && [ ! -d "$dst_glycin_conf_dir" ]; then
-			cp -r "$src_glycin_conf_dir" "$dst_glycin_conf_dir"
-			sed -i -e 's|/usr/lib.*/||g' "$dst_glycin_conf_dir"/*/*/*.conf
-			_echo "* added $src_glycin_conf_dir"
-		fi
+		_try_cp "$src_glycin_conf_dir" "$dst_glycin_conf_dir"
+		sed -i -e 's|/usr/lib.*/||g' "$dst_glycin_conf_dir"/*/*/*.conf || :
 		;;
 	*/libgtksourceview-*.so*)
 		_gtk_srcview_ver=$(echo "$lib" |  awk -F'-' '{print $NF}' | sed "s|\.so.*||")
 		src_gtk_srcview_dir=/usr/share/gtksourceview-$_gtk_srcview_ver
 		dst_gtk_srcview_dir=$APPDIR/share/gtksourceview-$_gtk_srcview_ver
-		if [ -d "$src_gtk_srcview_dir" ] && [ ! -d "$dst_gtk_srcview_dir" ]; then
-			cp -r "$src_gtk_srcview_dir" "$dst_gtk_srcview_dir"
-			_echo "* added $src_gtk_srcview_dir"
-		fi
+		_try_cp "$src_gtk_srcview_dir" "$dst_gtk_srcview_dir"
 		;;
-	*/libfontconfig.so*)
-		src_fontconfig_config=/etc/fonts/fonts.conf
-		dst_fontconfig_config=$APPDIR/etc/fonts/fonts.conf
-		if [ -f "$src_fontconfig_config" ] && [ ! -f "$dst_fontconfig_config" ]; then
-			mkdir -p "${dst_fontconfig_config%/*}"
-			cp -v "$src_fontconfig_config" "$dst_fontconfig_config"
-			_echo "* added $src_fontconfig_config"
-		fi
-		;;
-	*/libfolks*.so*)
-		src_folks_dir=$LIB_DIR/folks
-		dst_folks_dir=$DST_LIB_DIR/folks
-		if [ -d "$src_folks_dir" ] && [ ! -d "$dst_folks_dir" ]; then
-			cp -r "$src_folks_dir" "$dst_folks_dir"
-			_echo "* added $src_folks_dir"
-		fi
-		;;
-	*/libthai*.so*)
-		src_libthai_dir=/usr/share/libthai
-		dst_libthai_dir=$APPDIR/share/libthai
-		if [ -d "$src_libthai_dir" ] && [ ! -d "$dst_libthai_dir" ]; then
-			cp -r "$src_libthai_dir" "$dst_libthai_dir"
-			_echo "* added $src_libthai_dir"
-		fi
+	*/libmlt*.so*)
+		src_mlt_data_dir=$(echo /usr/share/mlt-*)
+		dst_mlt_data_dir=$APPDIR/share/${src_mlt_data_dir##*/}
+		_try_cp "$src_mlt_data_dir" "$dst_mlt_data_dir"
 		;;
 	*/libasound*.so*)
-		src_alsaconf_dir=/usr/share/alsa
-		dst_alsaconf_dir=$APPDIR/share/alsa
-		if [ -d "$src_alsaconf_dir" ] && [ ! -d "$dst_alsaconf_dir" ]; then
-			cp -r "$src_alsaconf_dir" "$dst_alsaconf_dir"
-			_echo "* added $src_alsaconf_dir"
-		fi
+		_try_cp /usr/share/alsa "$APPDIR"/share/alsa
 		# Adding alsa config dir is not enough, the file is harcoded
 		# to load additional files on the host
 		f=$APPDIR/share/alsa/alsa.conf
@@ -3063,56 +3071,12 @@ for lib do case "$lib" in
 			  "$f"
 		fi
 		;;
-	*/libxkbcommon*.so*)
-		src_xkb_dir=/usr/share/X11/xkb
-		dst_xkb_dir=$APPDIR/share/X11/xkb
-		if [ -d "$src_xkb_dir" ] && [ ! -d "$dst_xkb_dir" ]; then
-			mkdir -p "$dst_xkb_dir"
-			cp -r "$src_xkb_dir"/* "$dst_xkb_dir"
-			_echo "* added $src_xkb_dir"
-		fi
-		;;
-	*/libX11.so*)
-		src_xlocale_dir=/usr/share/X11/locale
-		dst_xlocale_dir=$APPDIR/share/X11/locale
-		if [ -d "$src_xlocale_dir" ] && [ ! -d "$dst_xlocale_dir" ]; then
-			mkdir -p "$dst_xlocale_dir"
-			cp -r "$src_xlocale_dir"/* "$dst_xlocale_dir"
-			_echo "* added $src_xlocale_dir"
-		fi
-		;;
-	*/libgbm.so*) # This hook should never be hit since OpenGL deployment already handles this
-		src_gbm_backends_dir=$LIB_DIR/gbm
-		dst_gbm_backends_dir=$DST_LIB_DIR/gbm
-		if [ -d "$src_gbm_backends_dir" ] && [ ! -d "$dst_gbm_backends_dir" ]; then
-			cp -r "$src_gbm_backends_dir" "$dst_gbm_backends_dir"
-			_echo "* added $src_gbm_backends_dir"
-		fi
-		;;
 	*/libEGL_mesa.so*)
 		src_glvnd_dir=/usr/share/glvnd/egl_vendor.d
 		dst_glvnd_dir=$APPDIR/share/glvnd/egl_vendor.d
-		if [ -d "$src_glvnd_dir" ] && [ ! -d "$dst_glvnd_dir" ]; then
-			mkdir -p "$dst_glvnd_dir"
-			cp -v "$src_glvnd_dir"/*.json "$dst_glvnd_dir"
-			sed -i -e 's|/usr/lib.*/||g' "$dst_glvnd_dir"/*.json
-			_echo "* added $src_glvnd_dir"
-		fi
-
-		src_drirc_dir=/usr/share/drirc.d
-		dst_drirc_dir=$APPDIR/share/drirc.d
-		if [ -d "$src_drirc_dir" ] && [ ! -d "$dst_drirc_dir" ]; then
-			cp -r "$src_drirc_dir" "$dst_drirc_dir"
-			_echo "* added $src_drirc_dir"
-		fi
-		;;
-	*/libdrm_amdgpu.so*)
-		src_libdrm_dir=/usr/share/libdrm
-		dst_libdrm_dir=$APPDIR/share/libdrm
-		if [ -d "$src_libdrm_dir" ] && [ ! -d "$dst_libdrm_dir" ]; then
-			cp -r "$src_libdrm_dir" "$dst_libdrm_dir"
-			_echo "* added $src_libdrm_dir"
-		fi
+		_try_cp "$src_glvnd_dir" "$dst_glvnd_dir"
+		sed -i -e 's|/usr/lib.*/||g' "$dst_glvnd_dir"/*.json || :
+		_try_cp /usr/share/drirc.d "$APPDIR"/share/drirc.d
 		;;
 	*/libvulkan.so*)
 		src_vulkan_dir=/usr/share/vulkan/icd.d
@@ -3128,31 +3092,10 @@ for lib do case "$lib" in
 		# find vulkan layer icd file
 		src_vklayer_icd=$(grep -r "${lib##*/}" /usr/share/vulkan/* | awk -F':' '{print $1; exit}')
 		dst_vklayer_icd=$APPDIR/${src_vklayer_icd#/usr/}
-		if [ -f "$src_vklayer_icd" ] && [ ! -f "$dst_vklayer_icd" ]; then
-			mkdir -p "${dst_vklayer_icd%/*}"
-			cp -vL "$src_vklayer_icd" "$dst_vklayer_icd"
-			sed -i -e 's|/usr/lib.*/||g' "$dst_vklayer_icd"
-			_echo "* added vulkan layer icd: $src_vklayer_icd"
-		fi
+		_try_cp "$src_vklayer_icd" "$dst_vklayer_icd"
+		sed -i -e 's|/usr/lib.*/||g' "$dst_vklayer_icd" || :
 		;;
-	# this hook is a common false positive
-	# because a lot of applications execute commands thru the system shell
-	# and that often links to this library, causing overdeployment of terminfo files
-	*/libncursesw.so*|*/libcursesw.so*|*/libcurses.so*)
-		src_terminfo_dir=/usr/share/terminfo
-		dst_terminfo_dir=$APPDIR/share/terminfo
-		if [ -d "$src_terminfo_dir" ] && [ ! -d "$dst_terminfo_dir" ]; then
-			cp -r "$src_terminfo_dir" "$dst_terminfo_dir"
-			_echo "* added $src_terminfo_dir"
-		fi
 
-		src_tabset_dir=/usr/share/tabset
-		dst_tabset_dir=$APPDIR/share/tabset
-		if [ -d "$src_tabset_dir" ] && [ ! -d "$dst_tabset_dir" ]; then
-			cp -r "$src_tabset_dir" "$dst_tabset_dir"
-			_echo "* added $src_tabset_dir"
-		fi
-		;;
 	*/qt*/plugins/*.so)
 		f=$DST_BIN_DIR/qt.conf
 		if [ ! -f "$f" ]; then
@@ -3172,35 +3115,13 @@ for lib do case "$lib" in
 		# deploy translation files
 		src_qt_trans=/usr/share/$QT_DIR/translations
 		dst_qt_trans=$DST_LIB_DIR/$QT_DIR/translations
-		if [ -d "$src_qt_trans" ] && [ ! -d "$dst_qt_trans" ]; then
-			mkdir -p "${dst_qt_trans%/*}"
-			# debloat a bit since we don't need all of them
-			cp -r "$src_qt_trans" "$dst_qt_trans"
-			rm -f "$dst_qt_trans"/assistant*.qm
-			rm -f "$dst_qt_trans"/designer*.qm
-			rm -f "$dst_qt_trans"/linguist*.qm
-			_echo "* added $src_qt_trans"
-		fi
+		_try_cp "$src_qt_trans" "$dst_qt_trans"
+		# debloat a bit since we don't need all of them
+		rm -f "$dst_qt_trans"/assistant*.qm
+		rm -f "$dst_qt_trans"/designer*.qm
+		rm -f "$dst_qt_trans"/linguist*.qm
 		;;
-	*/libgs.so*)
-		src_gs_dir=/usr/share/ghostscript
-		dst_gs_dir=$APPDIR/share/ghostscript
-		if [ -d "$src_gs_dir" ] && [ ! -d "$dst_gs_dir" ]; then
-			cp -r "$src_gs_dir" "$dst_gs_dir"
-			_echo "* added $src_gs_dir"
-		fi
-		;;
-	*/libmagic.so*)
-		# sharun only checks for $SHARUN_DIR/share/file/misc/magic.mgc
-		# but on ubuntu for example, the file is located in /usr/share/file/magic.mgc
-		# so we need to find the magic.mgc file and copy it to dst
-		src_magic_file=$(find -L /usr/share/file -type f -name magic.mgc -print -quit) || :
-		dst_magic_file=$APPDIR/share/file/misc/magic.mgc
-		if [ -f "$src_magic_file" ] && [ ! -f "$dst_magic_file" ]; then
-			mkdir -p "${dst_magic_file%/*}"
-			cp -vL "$src_magic_file" "$dst_magic_file"
-			_echo "* added $src_magic_file"
-		fi
+
 		;;
 	*/libgirepository-*.so*)
 		_girver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
@@ -3223,23 +3144,8 @@ for lib do case "$lib" in
 			fi
 		fi
 		;;
-	*/gconv/*.so)
-		src_gconvm_file=$LIB_DIR/gconv/gconv-modules
-		dst_gconvm_file=$DST_LIB_DIR/gconv/gconv-modules
-		if [ -f "$src_gconvm_file" ] && [ ! -f "$dst_gconvm_file" ]; then
-			mkdir -p "${dst_gconvm_file%/*}"
-			cp -v "$src_gconvm_file" "$dst_gconvm_file"
-			_echo "* added $src_gconvm_file"
-		fi
-		;;
 	*/libc.so*)
-		src_c_locale_dir=/usr/lib/locale/C.utf8
-		dst_c_locale_dir=$DST_LIB_DIR/locale/C.utf8
-		mkdir -p "$DST_LIB_DIR"/locale
-		if [ -d "$src_c_locale_dir" ] && [ ! -d "$dst_c_locale_dir" ]; then
-			cp -r "$src_c_locale_dir" "$dst_c_locale_dir"
-			_echo "* added C.UTF-8 locale"
-		fi
+		_try_cp /usr/lib/locale/C.utf8 "$DST_LIB_DIR"/locale/C.utf8
 		# C.UTF-8 is not enough, some apps may crash when this locale is used
 		# so we need to ship en_US.UTF-8 so we can guarantee applications
 		# will launch in systems without glibc locales like alpine linux
@@ -3278,57 +3184,28 @@ for lib do case "$lib" in
 	*/libMagick*.so*)
 		src_magick_config_dir=$(echo /etc/ImageMagick*)
 		dst_magick_config_dir=$APPDIR/etc/${src_magick_config_dir##*/}
-		if [ -d "$src_magick_config_dir" ] && [ ! -d "$dst_magick_config_dir" ]; then
-			mkdir -p "$dst_magick_config_dir"
-			(
-			  # imagemagick has a ton of .xml config files that need
-			  # to be added, they can all be copied to one location
-			  set -- \
-			  	/usr/share/ImageMagick*/*  \
-			  	"$src_magick_config_dir"/* \
-			  	"$LIB_DIR"/ImageMagick*/config*/*.xml
-			  for f do
-			  	if [ -f "$f" ]; then
-			  		_copy=1
-			  		cp "$f" "$dst_magick_config_dir"
-			  	fi
-			  done
-			  if [ "$_copy" = 1 ]; then
-			  	_echo "* added ImageMagick config files..."
-			  fi
-			  # MAGICK_HOME is all that needs to be set
-			  echo 'MAGICK_HOME=${SHARUN_DIR}' >> "$APPENV"
-			  # however MAGICK_HOME only works when compiled with a specific flag
-			  # we can still make this relocatable by setting these other env variables
-			  # which will always work even when not compiled with MAGICK_HOME support
-			  cd "$APPDIR"
-			  set -- lib*/ImageMagick-*/modules*/coders
-			  if [ -d "$1" ]; then
-			  	echo "MAGICK_CODER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-			  fi
-			  set -- lib*/ImageMagick-*/modules*/filters
-			  if [ -d "$1" ]; then
-			  	# checking the code it seems that MAGICK_FILTER_MODULE_PATH
-			  	# is NOT USED in the code and seems to be an error!!! the variable
-			  	# that modules.c references is MAGICK_CODER_FILTER_PATH
-			  	# we will still be set both just in case
-			  	echo "MAGICK_CODER_FILTER_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-			  	echo "MAGICK_FILTER_MODULE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-			  fi
-			  set -- etc/ImageMagick*
-			  if [ -d "$1" ]; then
-			  	echo "MAGICK_CONFIGURE_PATH=\${SHARUN_DIR}/$1" >> "$APPENV"
-			  fi
-			)
-		fi
+		_try_cp "$src_magick_config_dir" "$dst_magick_config_dir"
+		[ -d "$dst_magick_config_dir" ] || continue
+		(
+			# imagemagick has a ton of .xml config files that need
+			# to be added, they can all be copied to one location
+			set -- \
+				/usr/share/ImageMagick*/*  \
+				"$src_magick_config_dir"/* \
+				"$LIB_DIR"/ImageMagick*/config*/*.xml
+			for f do
+				if [ -f "$f" ]; then
+					_copy=1
+					cp "$f" "$dst_magick_config_dir"
+				fi
+			done
+			if [ "$_copy" = 1 ]; then
+				_echo "* added ImageMagick config files..."
+			fi
+		)
 		;;
 	*/libp11-kit.so*)
-		src_p11kit_config_dir=/usr/share/p11-kit
-		dst_p11kit_config_dir=$APPDIR/share/p11-kit
-		if [ -d "$src_p11kit_config_dir" ] && [ ! -d "$dst_p11kit_config_dir" ]; then
-			cp -r "$src_p11kit_config_dir" "$dst_p11kit_config_dir"
-			_echo "* added $src_p11kit_config_dir"
-		fi
+		_try_cp /usr/share/p11-kit "$APPDIR"/share/p11-kit
 		_patch_away_usr_lib_dir   "$lib" || :
 		_patch_away_usr_share_dir "$lib" || :
 		;;
@@ -3383,15 +3260,6 @@ for lib do case "$lib" in
 	*/libgimpwidgets*)
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
-	*/libmlt*.so*)
-		src_mlt_data_dir=$(echo /usr/share/mlt-*)
-		dst_mlt_data_dir=$APPDIR/share/${src_mlt_data_dir##*/}
-
-		if [ -d "$src_mlt_data_dir" ] && [ ! -d "$dst_mlt_data_dir" ]; then
-			cp -r "$src_mlt_data_dir" "$dst_mlt_data_dir"
-			_echo "* added $src_mlt_data_dir"
-		fi
-		;;
 	*/libMangoHud*.so*)
 		src_mangohud_layer=$(echo /usr/share/vulkan/implicit_layer.d/MangoHud*.json)
 		dst_mangohud_layer="$APPDIR"/share/vulkan/implicit_layer.d/"${src_mangohud_layer##*/}"
@@ -3416,41 +3284,11 @@ for lib do case "$lib" in
 		;;
 	*/libwebkit*gtk-*.so*)
 		_add_bwrap_wrapper
-		# now do better path map to the libs
 		_patch_away_usr_lib_dir "$lib" || :
 		_patch_away_usr_bin_dir "$lib" || :
-
-		# check if webkit2gtk was compiled relocatable
-		if grep -aq -m 1 'WEBKIT_EXEC_PATH' "$lib" \
-		  && ! grep -q WEBKIT_EXEC_PATH "$APPENV"; then
-			(
-			  set -- "$DST_BIN_DIR"/WebKit*
-			  if [ -f "$1" ]; then
-			  	echo 'WEBKIT_EXEC_PATH=${SHARUN_DIR}/bin' >> "$APPENV"
-			  fi
-			)
-		fi
-		;;
-	*/libwebkit*gtkinjectedbundle.so*)
-		# WEBKIT_INJECTED_BUNDLE_PATH always works
-		# It is not guarded behind a compiled flag unlike WEBKIT_EXEC_PATH
-		if ! grep -q 'WEBKIT_INJECTED_BUNDLE_PATH' "$APPENV"; then
-			cp -v "$lib" "$DST_BIN_DIR"
-			echo 'WEBKIT_INJECTED_BUNDLE_PATH=${SHARUN_DIR}/bin' >> "$APPENV"
-		fi
 		;;
 	*/libdecor*.so*)
 		ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}fix-gnome-csd.hook"
-		;;
-	*/libSDL*.so*)
-		# SDL may be bundled without libdecor since it maybe missing from the CI runner
-		# or the application makes of GTK/Qt + SDL, in which case we do not need libdecor
-		# at all, make sure SDL does not attempt to load libdecor in these cases
-		if [ -f "$DST_LIB_DIR"/libdecor-0.so.0 ]; then
-			continue
-		elif grep -aoq -m 1 'libdecor-0.so.0' "$lib"; then
-			sed -i -e 's|libdecor-0.so.0|fuck-gnome.so.X|g' "$lib"
-		fi
 		;;
 	*/xpm.so)
 		f=/usr/share/imlib2/rgb.txt
@@ -3460,10 +3298,6 @@ for lib do case "$lib" in
 			_patch_away_usr_share_dir "$lib" || continue
 			_echo "Copied and patched imlib2 xpm loader"
 		fi
-		;;
-	*/7z.so)
-		# the 7z binaries need the lib next to them
-		cp -v "$lib" "$DST_BIN_DIR"
 		;;
 	*/libpipewire-*.so*)
 		src_pipewire_config_dir=/usr/share/pipewire
@@ -3477,14 +3311,6 @@ for lib do case "$lib" in
 				export PIPEWIRE_CONFIG_DIR="$_pipewire_dir"
 			fi
 			EOF
-		fi
-		;;
-	*/libtesseract.so*)
-		src_tess_data_dir=/usr/share/tessdata
-		dst_tess_data_dir=$APPDIR/share/tessdata
-		if [ -d "$src_tess_data_dir" ] && [ ! -d "$dst_tess_data_dir" ]; then
-			cp -r "$src_tess_data_dir" "$dst_tess_data_dir"
-			_echo "* added $src_tess_data_dir"
 		fi
 		;;
 	esac
