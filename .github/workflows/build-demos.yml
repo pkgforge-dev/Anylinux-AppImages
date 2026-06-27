@@ -84,7 +84,9 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Make AppImage
-        run: sh ./useful-tools/demo/${{ matrix.script }}.sh
+        run: |
+          sleep 5 # wait 5 seconds since github sometimes uses the file from the previous commit
+          sh ./useful-tools/demo/${{ matrix.script }}.sh
 
       - name: Upload artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
