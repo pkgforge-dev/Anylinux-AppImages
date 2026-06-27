@@ -200,14 +200,14 @@ _help_msg() {
 	  - Automatic patching of hardcoded paths in binaries and libraries.
 
 	  OPTIONS / ENVIRONMENT VARIABLES:
-	  ADD_HOOKS          List of hooks (colon-separated) to deploy with the application.
-	  DESKTOP            Path or URL to a .desktop file to include.
-	  ICON               Path or URL to an icon file to include.
-	  OUTPUT_APPIMAGE    Set to 1 to turn the deployed AppDir into an AppImage.
-	  DEPLOY_QT          Set to 1 to force deployment of Qt. Will determine to deploy
-	                 QtWebEngine and Qml as well, these can be controlled with
-	                 DEPLOY_QT_WEB_ENGINE and DEPLOY_QML. Set to 1 enable, 0 disable
-					 Set QT_DIR if the system Qt directory in LIB_DIR has a different name.
+	  ADD_HOOKS           List of hooks (colon-separated) to deploy with the application.
+	  DESKTOP             Path or URL to a .desktop file to include.
+	  ICON                Path or URL to an icon file to include.
+	  OUTPUT_APPIMAGE     Set to 1 to turn the deployed AppDir into an AppImage.
+	  DEPLOY_QT           Set to 1 to force deployment of Qt. Will determine to deploy
+	                        QtWebEngine and Qml as well, these can be controlled with
+	                        DEPLOY_QT_WEB_ENGINE and DEPLOY_QML. Set to 1 enable, 0 disable
+	                        Set QT_DIR if the system Qt directory in LIB_DIR has a different name.
 	  DEPLOY_SDL          Set to 1 to force deployment of SDL.
 	  DEPLOY_GTK          Set to 1 to force deployment of GTK.
 	  DEPLOY_GDK          Set to 1 to force deployment of gdk-pixbuf.
@@ -218,42 +218,56 @@ _help_msg() {
 	  DEPLOY_LIBHEIF      Set to 1 to force deployment of libheif.
 	  DEPLOY_GEGL         Set to 1 to force deployment of GEGL.
 	  DEPLOY_BABL         Set to 1 to force deployment of babl.
+	  DEPLOY_GLIBC        Set to 1 to force the deployment of glibc and gconv.
+	  DEPLOY_LOCALE       Set to 1 to deploy locale data.
+	  DEPLOY_PYTHON       Set to 1 to deploy system Python. Will remove all
+	                        pycache files, set DEBLOAT_PYTHON to 0 to prevent this.
 	  DEPLOY_P11KIT       Set to 1 to force deployment of p11-kit.
 	  DEPLOY_PIPEWIRE     Set to 1 to force deployment of Pipewire.
 	  DEPLOY_PULSE        Set to 1 to force deployment of pulseaudio.
 	  DEPLOY_GSTREAMER    Set to 1 to force deployment of GStreamer. By default
-	                several gstreamer plugins are removed, set DEPLOY_GSTREAMER_ALL=1
-	                if you can to deploy ALL Gstreamer plugins. (Very bloated).
-	  DEPLOY_LOCALE       Set to 1 to deploy locale data.
-	  DEPLOY_PYTHON   Set to 1 to deploy system Python. Will remove all pycache
-	                  files, set DEBLOAT_PYTHON to 0 to prevent this.
-
+	                        several gstreamer plugins are removed, set DEPLOY_GSTREAMER_ALL=1
+	                        if you want to deploy ALL Gstreamer plugins. (Very bloated).
 	  LIB_DIR          Set source library directory if autodetection fails.
 	  NO_STRIP         Disable stripping binaries and libraries if set.
 	  APPDIR           Destination AppDir (default: ./AppDir).
 	  ANYLINUX_LIB     Preloads a library that unsets environment variables known to
-	                   cause problems to child processes. Set to 0 to disable.
-	                   Additionally you can set ANYLINUX_DO_NOT_LOAD_LIBS to a
-	                   list of colon separated libraries to prevent from being
-	                   dlopened, the entries support simple globbing, example:
-	                     export ANYLINUX_DO_NOT_LOAD_LIBS='libpipewire-0.3.so*'
-	                   Useful for applications that will try to dlopen several
-	                   optional dependencies that you do not want to include.
-
+	                     cause problems to child processes. Set to 0 to disable.
+	                     Additionally you can set ANYLINUX_DO_NOT_LOAD_LIBS to a
+	                     list of colon separated libraries to prevent from being
+	                     dlopened, the entries support simple globbing, example:
+	                       export ANYLINUX_DO_NOT_LOAD_LIBS='libpipewire-0.3.so*'
+	                     Useful for applications that will try to dlopen several
+	                     optional dependencies that you do not want to include.
 	  ALWAYS_SOFTWARE  Set to 1 to enable. Sets several env variables to make
-	                   applications use software rendering, use this option when
-	                   you do not want hardware acceleration.
-	                   Will fail if the application makes use of mesa during deployment.
-
+	                     applications use software rendering only, use this option
+	                     when you do not want hardware acceleration.
+	                     Will fail if application makes use of mesa during deployment.
+	  STRACE_MODE      Sets the strace mode, the mechanism quick-sharun uses
+	                     to find and deploy the libraries the application loads
+	                     at runtime via dlopen. Enabled by default, set to 0 to
+	                     disable it. Disabling may result in a non-working AppImage
+	                     because important dlopened libraries may not be bundled!
+	  STRACE_TIME      Seconds to run the application for during strace mode
+	                     to discover dlopened libraries (default: 5).
+	  STRACE_BINARY    Space or newline-separated list of binaries to trace dlopen
+	                     during strace mode. By default ALL given binaries
+	                     are traced. Use this to trace only specific binaries.
+	  STRACE_FLAGS     Arguments passed to STRACE_BINARY.
 	  PATH_MAPPING    Configures and preloads pathmap.
-	                  Set this variable if the application is hardcoded to look
-	                  into /usr and similar locations, example:
-	                    export PATH_MAPPING='
-	                      /usr/lib/myapp_libs:\${SHARUN_DIR}/lib/myapp_libs
-	                      /etc/myapp.conf:\${SHARUN_DIR}/etc/myapp.conf
-	                    '
-	                  \${SHARUN_DIR} here must NOT expand!
-	                  The braces in the variable are mandatory!
+	                    Set this variable if the application is hardcoded to look
+	                    into /usr and similar locations, example:
+	                      export PATH_MAPPING='
+	                        /usr/lib/myapp_libs:\${SHARUN_DIR}/lib/myapp_libs
+	                        /etc/myapp.conf:\${SHARUN_DIR}/etc/myapp.conf
+	                      '
+	                    \${SHARUN_DIR} here must NOT expand!
+	                    The braces in the variable are mandatory!
+	  QUICK_SHARUN_SKIP_DEPS_FOR   Space or newline-separated list of libraries which
+	                                 direct dependencies are NOT deployed.
+	                                 Useful to avoid pulling in unwanted optional deps.
+	                                 'libqgtk3.so' is skipped by default to prevent
+	                                 deploying GTK in Qt apps. Simple globbing is supported.
 
 	  NOTE:
 	  Several of these options get turned on automatically based on what is being deployed.
@@ -262,10 +276,11 @@ _help_msg() {
 	  DEPLOY_OPENGL=1 ./quick-sharun.sh /path/to/myapp
 	  DESKTOP=/path/to/app.desktop ICON=/path/to/icon.png ./quick-sharun.sh /path/to/myapp
 	  ADD_HOOKS="self-updater.hook:fix-namespaces.hook" ./quick-sharun.sh /path/to/myapp
+	  STRACE_BINARY=myapp STRACE_FLAGS=https://67.com ./quick-sharun.sh /path/to/myapp
 
 	  SEE ALSO:
-	  sharun  (https://github.com/VHSgunzo/sharun)
-	  pathmap (https://github.com/VHSgunzo/pathmap)
+	    * sharun  - https://github.com/pkgforge-dev/Anylinux-sharun
+	    * pathmap - https://github.com/VHSgunzo/pathmap
 	EOF
 	exit 1
 }
