@@ -287,7 +287,7 @@ But isn't this a lot of work to find and set all the env variables that my appli
 
 There is a solution for this, originally made by @VHSGunzo called sharun. This project uses a [fork of sharun](https://github.com/pkgforge-dev/Anylinux-sharun).
 
-<https://github.com/pkgforge-dev/Anylinux-sharun>
+<https://github.com/VHSGunzo/sharun>
 
 - sharun is able to find all the libraries that your application needs, **including those that are dlopened**. It turns out that a lot of applications depend on dlopened libraries; those are the libraries that you cannot easily find with just `ldd`. **UPDATE:** Library deployment and strace-based dlopen detection have been integrated directly into `quick-sharun`, so there is no longer a separate deployment script — it all happens automatically when you run `quick-sharun`.
 
