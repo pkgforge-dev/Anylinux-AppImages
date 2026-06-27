@@ -1531,10 +1531,6 @@ _handle_bins_scripts() {
 		done
 	fi
 
-	if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
-		_try_cp /usr/share/"$QT_DIR"/resources "$DST_LIB_DIR"/"$QT_DIR"/resources
-	fi
-
 	# handle shell scripts
 	set -- "$DST_BIN_DIR"/*
 	for s do
@@ -2992,6 +2988,9 @@ for lib do case "$lib" in
 		;;
 	*/libpipewire-*.so*)
 		_try_cp /usr/share/pipewire "$APPDIR"/share/pipewire
+		;;
+	*/*libQt*WebEngineCore.so*)
+		_try_cp /usr/share/"$QT_DIR"/resources "$DST_LIB_DIR"/"$QT_DIR"/resources
 		;;
 	# this hook is a common false positive, because a lot of applications
 	# execute the system sh and that links to this library, deploying these files
