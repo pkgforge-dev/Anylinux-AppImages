@@ -2917,7 +2917,7 @@ set -- "$DST_LIB_DIR"/libpipewire-0.3.so*
 [ -f "$1" ] || no_pipewire=1
 
 # we need to do the same for libdecor
-set -- "$DST_LIB_DIR"/libdecor-0.so.0
+set -- "$DST_LIB_DIR"/libdecor-0.so*
 [ -f "$1" ] || no_libdecor=1
 
 set -- \
@@ -3095,7 +3095,6 @@ for lib do case "$lib" in
 		_try_cp "$src_vklayer_icd" "$dst_vklayer_icd"
 		sed -i -e 's|/usr/lib.*/||g' "$dst_vklayer_icd" || :
 		;;
-
 	*/qt*/plugins/*.so)
 		f=$DST_BIN_DIR/qt.conf
 		if [ ! -f "$f" ]; then
@@ -3120,8 +3119,6 @@ for lib do case "$lib" in
 		rm -f "$dst_qt_trans"/assistant*.qm
 		rm -f "$dst_qt_trans"/designer*.qm
 		rm -f "$dst_qt_trans"/linguist*.qm
-		;;
-
 		;;
 	*/libgirepository-*.so*)
 		_girver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
@@ -3300,18 +3297,7 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/libpipewire-*.so*)
-		src_pipewire_config_dir=/usr/share/pipewire
-		dst_pipewire_config_dir=$APPDIR/share/pipewire
-		if [ -d "$src_pipewire_config_dir" ] && [ ! -d "$dst_pipewire_config_dir" ]; then
-			cp -r "$src_pipewire_config_dir" "$dst_pipewire_config_dir"
-
-			cat <<-'EOF' > "$DST_BIN_DIR"/01-pipewire-config.hook
-			_pipewire_dir=$APPDIR/share/pipewire
-			if [ ! -d /usr/share/pipewire ] && [ -d "$_pipewire_dir" ]; then
-				export PIPEWIRE_CONFIG_DIR="$_pipewire_dir"
-			fi
-			EOF
-		fi
+		_try_cp /usr/share/pipewire "$APPDIR"/share/pipewire
 		;;
 	esac
 done
