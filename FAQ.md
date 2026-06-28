@@ -94,3 +94,13 @@ Because it causes more issues than it solves.
 * `$APPDIR/usr` makes no sense, it just causes projects to code exceptions for appimage that do something alone these lines: `getenv(APPDIR)` + `usr` + `xyz`. Instead we make `APPDIR` the installation prefix directly. **This means we can take any application and patch away the `/usr` prefix for `$APPDIR` and make them portable without the need for projects to support AppImage.** Here are some examples where projects checking for `$APPDIR` just made things worse: [1](https://github.com/kem-a/AppManager/issues/41#issuecomment-3905238762) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/330#issuecomment-3939566890)
 
 * **NOTE:** `$APPDIR/shared` is the a internal directory that sharun uses for itself, **you should never copy anything manually there.**
+
+# How do I run a different binary bundled in the AppImage?
+
+Some AppImages bundle more than one program (the packager passes the extra
+binaries to `quick-sharun`). The one named in the `.desktop` `Exec=` runs by
+default. To run one of the others, select it by the first argument or by the
+name the AppImage is invoked as:
+
+* **First argument** (simplest): `./myapp.AppImage myapp-server [args...]`
+* **Symlink** named after the binary: `ln -s ./myapp.AppImage myapp-server && ./myapp-server`
