@@ -1338,7 +1338,7 @@ _lib4bin_collect_ldd() {
 # STRACE_BINARY=space/newline-separated binary names to trace (default: all)
 _lib4bin_collect_strace() {
 	[ "$STRACE_MODE" = 1 ] || return 0
-	STRACED_LIBS=""
+
 	libs=""
 	for b do
 		[ -f "$b" ]  || continue
