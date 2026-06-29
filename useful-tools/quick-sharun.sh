@@ -1340,7 +1340,7 @@ _lib4bin_collect_strace() {
 	libs=""
 	for b do
 		[ -f "$b" ]  || continue
-		_is_elf "$b" || continue
+		_is_elf "$b" || _is_script "$b" || continue
 		[ -x "$b" ]  || continue
 		if _is_so "$b"; then
 			continue
