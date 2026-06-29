@@ -18,6 +18,7 @@ if [ "$QUICK_SHARUN_DEBUG" = 1 ]; then
 fi
 
 _START_TIME=$(date +%s) || :
+STRACED_LIBS=""
 APPIMAGE_ARCH=$(uname -m)
 ARCH=${ARCH:-$APPIMAGE_ARCH}
 TMPDIR=${TMPDIR:-/tmp}
@@ -58,6 +59,7 @@ DEPENDENCIES="
 	awk
 	cc
 	cp
+	env
 	find
 	grep
 	ldd
@@ -1364,7 +1366,7 @@ _lib4bin_collect_strace() {
 		_echo "STRACE: [$b] ..."
 		set -m
 		if [ -n "$XVFB_CMD" ]; then
-			$XVFB_CMD LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
+			$XVFB_CMD env LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
 		else
 			LD_DEBUG=libs "$b" $flags >/dev/null 2>"$dlopened" &
 		fi
@@ -1387,7 +1389,7 @@ _lib4bin_collect_strace() {
 		[ -n "$out" ] || continue
 		libs=$(printf '%s\n%s' "$libs" "$out")
 	done
-	echo "$libs" | sort -u | sed '/^$/d'
+	STRACED_LIBS=$(echo "$libs" | sort -u | sed '/^$/d')
 }
 
 # deploy shared libraries to DST_LIB_DIR
@@ -1505,13 +1507,12 @@ _lib4bin_main() {
 	_echo "Collecting dependencies..."
 	ldd_libs=$(_lib4bin_collect_ldd "$@")
 
-	strace_libs=''
 	if [ "$STRACE_MODE" = 1 ]; then
 		_echo "Collecting dlopen libraries via LD_DEBUG=libs..."
-		strace_libs="$(_lib4bin_collect_strace "$@")"
+		_lib4bin_collect_strace "$@"
 	fi
 
-	all_libs=$(printf '%s\n%s' "$ldd_libs" "$strace_libs" | sort -u | sed '/^$/d')
+	all_libs=$(printf '%s\n%s' "$ldd_libs" "$STRACED_LIBS" | sort -u | sed '/^$/d')
 
 	_echo "Deploying shared libraries..."
 	_lib4bin_deploy_shared_libs $all_libs
