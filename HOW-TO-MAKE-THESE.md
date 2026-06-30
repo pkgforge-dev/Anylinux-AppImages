@@ -42,7 +42,7 @@ title: How To Make These
 
 You'll need:
 
-- A Linux system (preferably Arch Linux for building)
+- A Linux system (preferably Arch Linux for building) **do not use fedora or other distros that put 32bit libraries in `/usr/lib`**.
 - Basic shell scripting knowledge
 - The application you want to package (very preferably installed to /usr)
 
