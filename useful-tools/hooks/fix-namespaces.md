@@ -31,7 +31,7 @@ Before their common usage what was done to isolate applications was using SUID b
 
 Today pretty much all applications use namespaces for their own sandboxing or for sandboxing other apps, more importantly it is used by both chrome/firefox and all electron apps for their internal sandbox.
 
-Even if you think what ubuntu is doing here is right in some way, the current restriction is insanely flawed and can be exploited easily, not to mention that any possible exploit would require local access to the machine, **which is already very bad** since at that point any malware can do anything that the regular user of the system can, including deleting all of`HOME` contents or sending them to a random sever.
+Even if you think what ubuntu is doing here is right in some way, the current restriction is insanely flawed and can be exploited easily, not to mention that any possible exploit would require local access to the machine, **which is already very bad** since at that point any malware can do anything that the regular user of the system can, including deleting all of `HOME`'s contents or sending them to a random server.
 
 
 For more details see:
