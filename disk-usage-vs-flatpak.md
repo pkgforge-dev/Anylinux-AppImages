@@ -98,7 +98,7 @@ Worthy note:
 
 In the end, a lot of the flatpak bloat comes from the fact that flatpak suffers from something that I call flatpak-hell, flatpak-hell is when one application depends on runtime version 2.2.0 but application B depends on a runtime version 2.2.1 so that means that both runtimes need to be downloaded and installed.
 
-Lets assume flatpak manages to fix this issue (will never happen), how will that look? Well we can simulate that using alpine linux:
+Let's assume flatpak manages to fix this issue (will never happen), how will that look? Well we can simulate that using alpine linux:
 
 <div align="center" markdown="1">
 
@@ -127,7 +127,7 @@ sudo apk upgrade
 
 After doing this `podman ps -a --size --filter "name=alpine"` reports a container size of `535MB (virtual 560MB)`.
 
-Now lets add the applications, even after upgrading to the edge repo a lot of applications are not available, I was only able to install the following 12 applications:
+Now let's add the applications, even after upgrading to the edge repo a lot of applications are not available, I was only able to install the following 12 applications:
 
 - Note: These 12 applications as AppImage use **1.5 GiB**.
 
@@ -151,4 +151,4 @@ sudo apk add \
 
 * chromium is the closest thing we have here to cromite.
 
-After adding those 12 applications the container size increase **`3.27GB (virtual 3.29GB)`.** So yeah we also use less storage than Alpine, note however I think this size does not take Btrfs compression into account, I tried to get the value but couldn't (running `btrfs filesystem du -s` on the alpine container reported 7 MIb which is just impossible lol).
+After adding those 12 applications the container size increased to **`3.27GB (virtual 3.29GB)`.** So yeah we also use less storage than Alpine, note however I think this size does not take Btrfs compression into account, I tried to get the value but couldn't (running `btrfs filesystem du -s` on the alpine container reported 7 MIb which is just impossible lol).
