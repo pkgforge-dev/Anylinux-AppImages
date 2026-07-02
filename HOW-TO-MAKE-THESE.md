@@ -181,7 +181,7 @@ For a long time the suggested practice to make AppImages has been to bundle most
 
 This approach has two big issues:
 
-- It forces the developer to build on an old version of glibc to guarantee that the application works on most linux distros being used, because glibc sucks. This is specially problematic if your application needs something new like QT6 or GTK4 which is not available on such old distros.
+- It forces the developer to build on an old version of glibc to guarantee that the application works on most linux distros being used, because glibc sucks. This is especially problematic if your application needs something new like QT6 or GTK4 which is not available on such old distros.
 
 - It also means the application cannot work on musl libc systems.
 
@@ -232,7 +232,7 @@ However this has a small issue that `/proc/self/exe` will be `ld-linux-x86-64.so
 
 2. Second issue to overcome:
 
-Now that we have our own dynamic linker, how do we tell it that we can to use all the libraries we have in our own `lib` directory?
+Now that we have our own dynamic linker, how do we tell it that we want to use all the libraries we have in our own `lib` directory?
 
 - `LD_LIBRARY_PATH` ❌ Nope, terrible idea. **NEVER USE THIS VARIABLE**, it causes a lot of headaches because it is inherited by child processes, which means everything being launched by our application will try to use our libraries, and this causes insanely broken behaviours that are hard to catch. [For example](https://github.com/zen-browser/desktop/issues/2748), this issue lasted several months and no one had an idea what was going on until I [removed](https://github.com/zen-browser/desktop/pull/6156/files) the usage of `LD_LIBRARY_PATH`, which the application didn't even need to have it set in this case. Also see: [LD_LIBRARY_PATH – or: How to get yourself into trouble!](https://www.hpc.dtu.dk/?page_id=1180)
 
@@ -313,7 +313,7 @@ Any application made with sharun ends up being able to work **on any linux distr
 
 Not really, if your application isn't hardware accelerated, bundling all the libraries will usually only increase the size of the application by less than 6 MiB.
 
-**UPDATE:** We are actually now able to build mesa without linking to LLVM, so AppImages are even smaller as result, **fully hardware accelerated Qt/GTK apps can be made while being less than 35 MiB in the final size.**
+**UPDATE:** We are actually now able to build mesa without linking to LLVM, so AppImages are even smaller as a result, **fully hardware accelerated Qt/GTK apps can be made while being less than 35 MiB in the final size.**
 
 For applications that are hardware accelerated, there is the problem that mesa links to `libLLVM.so`, which is a huge +130 MiB library that's used for a lot of things. Distros by default build it with support for the following:
 
@@ -343,7 +343,7 @@ When for most applications you only need llvm to support AMDGPU and X86/AArch64.
 
 We already make such version of llvm here: <https://github.com/pkgforge-dev/archlinux-pkgs-debloated> which reduces the size of libLLVM.so down to 66 MiB.
 
-Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results a **50 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things.
+Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results in a **50 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things.
 
 -----------------------------------
 
@@ -353,7 +353,7 @@ Such package and other debloated packages we have are used by [Goverlay](https:/
 
 ### *What about nvidia?*
 
-Nvidia releases its proprietary driver as a binary blob that is already widely compatible on its own, it's only requirement is a new enough version of glibc, which the appimages made here will do as long as you build them on a glibc distro. Then you just need to add the nvidia icds to `VK_DRIVER_FILES` to be able to use it without problem.
+Nvidia releases its proprietary driver as a binary blob that is already widely compatible on its own, its only requirement is a new enough version of glibc, which the appimages made here will do as long as you build them on a glibc distro. Then you just need to add the nvidia icds to `VK_DRIVER_FILES` to be able to use it without problem.
 
 If you don't have the proprietary nvidia driver, mesa already includes nouveau support for the few GPUs where this driver actually works (NVIDIA GTX 16 series or newer).
 
