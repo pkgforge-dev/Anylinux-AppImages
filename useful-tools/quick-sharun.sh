@@ -1407,9 +1407,11 @@ _lib4bin_deploy_shared_libs() {
 			readlink_path=$(readlink -f "$l") || continue
 			readlink_path_name=${readlink_path##*/}
 			dst_dir=$(_lib4bin_get_lib_dst_dir "$readlink_path")
+			sym_dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
 		else
 			readlink_path_name=""
 			dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
+			sym_dst_dir="$dst_dir"
 		fi
 
 		if [ -n "$readlink_path_name" ]; then
@@ -1425,9 +1427,13 @@ _lib4bin_deploy_shared_libs() {
 		# example: libfltk.so.1.3.11 -> fltk1.3/libfltk.so.1.3.11 on archlinux
 		# but sharun adds all subdirs to --library-path, so nothing should break
 		# note: original lib4bin actually made broken symlinks when this happened
+		#
+		# UPDATE, things actually broke, because stuff like radeonsi_drv_video.so
+		# need to be inside the dri subdir and cannot be in lib!
 		if [ -n "$readlink_path_name" ] \
 		  && [ "$l_name" != "$readlink_path_name" ]; then
-			ln -sf "$readlink_path_name" "$dst_dir"/"$l_name"
+			mkdir -p "$sym_dst_dir"
+			ln -sfrv "$dst" "$sym_dst_dir"/"$l_name"
 		fi
 	done
 }
