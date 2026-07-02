@@ -2427,6 +2427,11 @@ _add_hooks_library() {
 	                        if [ -d "$_cache_dir" ] || mkdir -p "$_cache_dir" 2>/dev/null; then
 	                                export XDG_CACHE_HOME="$_cache_dir"
 	                        fi
+	                        # we still need to share thumbnails cache
+	                        # since thubmanilers will place them at original location
+	                        if [ ! -L "$_cache_dir"/thumbnails ] && mkdir -p "$CACHEDIR"/thumbnails 2>/dev/null; then
+	                                ln -sfn "$CACHEDIR"/thumbnails "$_cache_dir"/thumbnails 2>/dev/null || :
+	                        fi
 	                        ;;
 	        esac
 	fi
