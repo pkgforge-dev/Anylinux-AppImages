@@ -20,15 +20,15 @@ There was only one [problem](https://github.com/libsdl-org/SDL/issues/14887) whi
 
 # Excellent - iced and GLFW
 
-We haven't had do anything to deploying these without issue, they are just copy and paste pretty much, just bundle OpenGL and vulkan since it can use both. Also since iced is used by rust apps and those compile mostly static it makes them super easy to deploy in general. These two are mentioned together since we haven't deployed that many applications that use these libraries.
+We haven't had to do anything to deploy these without issue, they are just copy and paste pretty much, just bundle OpenGL and vulkan since it can use both. Also since iced is used by rust apps and those compile mostly static it makes them super easy to deploy in general. These two are mentioned together since we haven't deployed that many applications that use these libraries.
 
 # Excellent - Chromium/Electron
 
-These are already very portable on their own and very very easy to deploy as result. The only issue we have encountered is that sometimes these load some binaries as libraries and we have to careful in those cases.
+These are already very portable on their own and very very easy to deploy as result. The only issue we have encountered is that sometimes these load some binaries as libraries and we have to be careful in those cases.
 
 # Excellent - Flutter
 
-These are relocatable always, in fact distros often need to put the application in dedicated directory in `/usr/share` or `/usr/lib` since they need a relative `lib` directory next to the binary to work.
+These are relocatable always, in fact distros often need to put the application in a dedicated directory in `/usr/share` or `/usr/lib` since they need a relative `lib` directory next to the binary to work.
 
 # Excellent - Mesa
 
@@ -38,7 +38,7 @@ Very easy to deploy, plenty of env variables to configure it, lots of build opti
 
 Needs `PIPEWIRE_MODULE_DIR` and `SPA_PLUGIN_DIR` to be made relocatable, it does have some performance issues but with pipewire-jack though.
 
-Pipewire depends on configuration files usually in `/usr/share/pipewire`, it doesn't check `XDG_DATA_DIRS`, which means we have to set `PIPEWIRE_CONFIG_DIR` when `/usr/share/pipewire` is not present. Which causes pipewire stop loading user configuration files in `XDG_CONFIG_HOME` which is problematic.
+Pipewire depends on configuration files usually in `/usr/share/pipewire`, it doesn't check `XDG_DATA_DIRS`, which means we have to set `PIPEWIRE_CONFIG_DIR` when `/usr/share/pipewire` is not present. Which causes pipewire to stop loading user configuration files in `XDG_CONFIG_HOME` which is problematic.
 
 # Good - Qt
 
@@ -50,7 +50,7 @@ Qt also often links to libicudata (30 MiB lib) even though the vast majority of 
 
 # Good - .NET
 
-Surprisingly easy to deploy. We do not need to set environments variable to make it relocable, applications already rely on relative paths. Often times however dotnet apps need to be launched by a shell script with hardcoded paths that needs to be edited, as it is usually something like `exec dotnet /usr/lib/app.dll "$@"`.
+Surprisingly easy to deploy. We do not need to set environment variables to make it relocatable, applications already rely on relative paths. Often times however dotnet apps need to be launched by a shell script with hardcoded paths that needs to be edited, as it is usually something like `exec dotnet /usr/lib/app.dll "$@"`.
 
 # Good - libdecor
 
@@ -64,7 +64,7 @@ We do not have to do anything to make this relocatable, it just works™, Howeve
 
 This is a bit odd but I will mention it, **we never need to bundle the NVIDIA drivers**, NVIDIA releases its driver linking to a +10yo version of glibc, that means we can use that driver without issue. [The only issues we have had NVIDIA specific are distros breaking stuff...](https://github.com/pkgforge-dev/Citron-AppImage/issues/67) and also that we need to make sure some [ancient libs](https://github.com/VHSgunzo/sharun/issues/34) are present lol
 
-I still see this idea on relying on host libraries as flawed, who knows what will happen in the future. Also a good chunk of the issues at sharun are issues related to the logic we have to use the nvidia driver, [it has been a pain](https://github.com/VHSgunzo/sharun/issues/90).
+I still see this idea of relying on host libraries as flawed, who knows what will happen in the future. Also a good chunk of the issues at sharun are issues related to the logic we have to use the nvidia driver, [it has been a pain](https://github.com/VHSgunzo/sharun/issues/90).
 
 # Mediocre - LLVM
 
@@ -100,17 +100,17 @@ WebKit is hardcoded to load some binaries in `/usr/lib` which makes no sense and
 
 **The library needs matching versions between server and client to work** [1](https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/issues/1001#note_323464727)
 
-`pipewire-jack` is often suggested as an alternative, but that has performance issues, so yeah you are very screwed up here. We do have a hook that lets use use the host jack2 when needed, but I cannot guarantee if this will keep working in the future.
+`pipewire-jack` is often suggested as an alternative, but that has performance issues, so yeah you are very screwed up here. We do have a hook that lets us use the host jack2 when needed, but I cannot guarantee if this will keep working in the future.
 
 # Garbage - GTK
 
 Where do I even start?
 
-* Every single GTK app has the path to its locales hardcoded at the prefix (`/usr/share/locale`) and there no env variable to change this.
+* Every single GTK app has the path to its locales hardcoded at the prefix (`/usr/share/locale`) and there is no env variable to change this.
 
-* it depends on stuff like Gio, gdk-pixbuf, glycin, which bloats the final application. And those projects have their own set of issues when made relocable. And in the case of glycin it is a [total disaster.](https://github.com/VHSgunzo/sharun/issues/68).
+* it depends on stuff like Gio, gdk-pixbuf, glycin, which bloats the final application. And those projects have their own set of issues when made relocatable. And in the case of glycin it is a [total disaster.](https://github.com/VHSgunzo/sharun/issues/68).
 
-* The vulkan backend was [totally broken wayland with intel gpus](https://www.phoronix.com/news/Mesa-25.3.3-Released), before that we had to fix it by building GTK4 without the vulkan backend, as sometimes `GSK_RENDERER=gl` just did not work as it ignores the variable, and in fact it looks like we will keep building GTK4 without vulkan as long as possible, because we also had an incident with one user on a super old intel laptop that does not support vulkan where gnome apps did not just work even with `GSK_RENDERER=gl` while the apppimages we make did.
+* The vulkan backend was [totally broken on wayland with intel gpus](https://www.phoronix.com/news/Mesa-25.3.3-Released), before that we had to fix it by building GTK4 without the vulkan backend, as sometimes `GSK_RENDERER=gl` just did not work as it ignores the variable, and in fact it looks like we will keep building GTK4 without vulkan as long as possible, because we also had an incident with one user on a super old intel laptop that does not support vulkan where gnome apps did not just work even with `GSK_RENDERER=gl` while the apppimages we make did.
 
 * All GTK apps also have a useless dependency to a 30 MiB libicudata library, which is needed by libxml which is needed by libappstream which why would you even need to link to libappstream at all?? This is used to make AppStream metadata used in software stores, dafuck?
 
@@ -120,7 +120,7 @@ At least more recently they are looking into adding [svg support into GTK4](http
 
 # Utter Garbage - Python
 
-* Applications break horribly with the sightless version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215)
+* Applications break horribly with the slightest version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215)
 * cpython running `/sbin/ldconfig -p` to find libraries, super broken. [1](https://github.com/python/cpython/issues/112417) [2](https://github.com/python/cpython/issues/142020) [3](https://github.com/python/cpython/issues/142020#issuecomment-3590632764)
 * [uv python breaks if you strip it](https://github.com/VHSgunzo/sharun/blob/9ced775c762193ab525acfb9a9497b17945db8de/lib4bin#L182-L184) 😹
 * Builds randomly began to fail **on the same python uv version** and had to use [this to it](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage/commit/e6a5601eeb7a3c4013b9452ca9c01eda7c5ec9e0)
