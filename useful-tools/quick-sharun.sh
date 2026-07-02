@@ -2951,7 +2951,8 @@ set -- \
 	"$DST_LIB_DIR"/*/*/*/*/*.so* \
 	"$DST_LIB_DIR"/*/*/*/*/*/*.so*
 
-for lib do
+# include binaries in this check, since apps may statically link SDL and try dlopen pipewire
+for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 	[ -f "$lib" ] || continue
 	# make sure to remove any full rpath from the libs
 	if patchelf --print-rpath "$lib" | grep -q '^/'; then
