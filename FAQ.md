@@ -39,9 +39,9 @@ title: Frequently Asked Questions
 
 # How come this only became possible in 2024?
 
-* For application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
+* For an application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
 * It turns out it is not possible to have a relative dynamic linker with executables. 
-* polyfill glibc attempted to [fix this issue](https://github.com/corsix/polyfill-glibc/blob/main/docs/Command_line_options.md#elf-interpreter---print-interpreter---set-interpreter) with a experimental tool that replaces `PT_INTERP` with `PT_LOAD` and have the payload look for the relative dynamic linker but this never got finished.
+* polyfill glibc attempted to [fix this issue](https://github.com/corsix/polyfill-glibc/blob/main/docs/Command_line_options.md#elf-interpreter---print-interpreter---set-interpreter) with an experimental tool that replaces `PT_INTERP` with `PT_LOAD` and has the payload look for the relative dynamic linker but this never got finished.
 * **We can execute the dynamic linker** first and then pass the binary to launch to bypass this limitation, **go-appimage had been doing this since ~2019.**
 * [But that runs into issues with `/proc/self/exe`](https://github.com/probonopd/go-appimage/issues/49).
 * [sharun](https://github.com/VHSgunzo/sharun) had to be made to fix the `/proc/self/exe` issues. And as far as I know, [brioche had been using the same approach before sharun as well](https://brioche.dev/blog/portable-dynamically-linked-packages-on-linux/).
@@ -65,7 +65,7 @@ We only use musl where it is very useful, that is when making static binaries.
 * That is super hard, some libraries are not meant to be statically linked as well and that means a ton of patches are needed.
 * Statically linking everything means **we are not able to dlopen any library from the host**, even optional ones like the example I just gave about dlopening the host GTK from Qt apps to follow the system theme.
 * **It means goodbye to the proprietary nvidia driver.**
-* **It means you are no longer able use vulkan layers like mangohud or lsfg-vk.**
+* **It means you are no longer able to use vulkan layers like mangohud or lsfg-vk.**
 * **It means you are forever stuck with the version of MESA that was statically linked.** Remember, you can use the host Mesa if needed by setting `SHARUN_ALLOW_SYS_VKICD=1` and that is something you will want to do if you plan on using the same AppImage for several years in the future.
 * Static linking some dependencies is still desired however, as that reduces the final size of the AppImage, **but a fully static binary is a very bad idea.**
 
@@ -93,4 +93,4 @@ Because it causes more issues than it solves.
 
 * `$APPDIR/usr` makes no sense, it just causes projects to code exceptions for appimage that do something along these lines: `getenv(APPDIR)` + `usr` + `xyz`. Instead we make `APPDIR` the installation prefix directly. **This means we can take any application and patch away the `/usr` prefix for `$APPDIR` and make them portable without the need for projects to support AppImage.** Here are some examples where projects checking for `$APPDIR` just made things worse: [1](https://github.com/kem-a/AppManager/issues/41#issuecomment-3905238762) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/330#issuecomment-3939566890)
 
-* **NOTE:** `$APPDIR/shared` is the a internal directory that sharun uses for itself, **you should never copy anything manually there.**
+* **NOTE:** `$APPDIR/shared` is an internal directory that sharun uses for itself, **you should never copy anything manually there.**
