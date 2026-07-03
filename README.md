@@ -278,7 +278,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced) |
 | [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage) |
 | [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage) |
-| [OpenTubeX](https://github.com/pkgforge-dev/OpenTubeX-Appimage-Enhanced) |
 | [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage) |
 | [OpenXRay](https://github.com/pkgforge-dev/OpenXRay-AppImage) |
 | [OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage) |
@@ -464,6 +463,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [GPU-T](https://github.com/lseurttyuu/GPU-T) |
 | [interstellar](https://github.com/interstellar-app/interstellar) |
 | [lba2-classic-community](https://github.com/LBALab/lba2-classic-community) |
+| [OpenTubeX](https://github.com/OpenTubeX/OpenTubeX) |
 | [PPSSPP](https://github.com/hrydgard/PPSSPP) |
 | [QDash](https://git.crueter.xyz/QFRC/QDash) |
 | [RSS Guard](https://github.com/martinrotter/rssguard) |
