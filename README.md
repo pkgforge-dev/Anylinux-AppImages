@@ -363,6 +363,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [SkyEmu](https://github.com/pkgforge-dev/SkyEmu-AppImage) |
 | [Slack](https://github.com/pkgforge-dev/Slack-AppImage) |
 | [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced) |
+| [SnowboardKids2Recomp](https://github.com/pkgforge-dev/SnowboardKids2Recomp-AppImage) |
 | [Solaar](https://github.com/pkgforge-dev/Solaar-AppImage) |
 | [SongRec](https://github.com/pkgforge-dev/SongRec-AppImage) |
 | [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced) |
