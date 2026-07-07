@@ -288,6 +288,14 @@ static char* const* create_cleaned_env(char* const* original_env) {
 					should_copy = 0;
 					break;
 				}
+				// Also unset LD_PRELOAD if it contains anylinux.so
+				// since this variable can contain the lib name only without APPDIR path
+				if (strcmp(*var, "LD_PRELOAD") == 0 &&
+				    strstr(value, "anylinux.so") != NULL) {
+					DEBUG_PRINT("Unset LD_PRELOAD containing anylinux.so (value: %s)\n", value);
+					should_copy = 0;
+					break;
+				}
 			}
 		}
 		if (should_copy) {
