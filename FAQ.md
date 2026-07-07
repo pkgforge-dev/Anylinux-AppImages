@@ -85,6 +85,12 @@ Because we use DwarFS instead of SquashFS, you need an AppImage thumbnailer that
 * [appimage-thumbnailer](https://github.com/kem-a/appimage-thumbnailer)
 * [simple-appimage-thumbnailer](https://github.com/Samueru-sama/simple-appimage-thumbnailer)
 
+# I get `ERROR: Can't find a valid SQUASHFS superblock` in NixOS
+
+Once again this is because we use DwarFS instead of SquashFS, NixOS has something called `appimage-run` which lets you run old type appimages that need an FHS env and some host libraries, `appimage-run` manually mounts the appimage instead of letting it execute itself which results in that error since it expects it to be SquashFS. 
+
+**None of this is needed for our appimages, they run directly in NixOS, so all you have to do is disable `appimage-run`.**
+
 # Why is there no `usr` directory in the AppImages?
 
 Because it causes more issues than it solves.
