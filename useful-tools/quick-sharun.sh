@@ -3354,6 +3354,13 @@ case "$LIB_DIR" in
 		;;
 esac
 
+# electron apps ship an updater that is useless since we provide our own
+a=$DST_BIN_DIR/resources/app-update.yml
+if [ -f "$a" ]; then
+	rm -f "$a"
+	_echo "removed $a"
+fi
+
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
