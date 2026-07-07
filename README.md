@@ -269,6 +269,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OpenBoardView](https://github.com/pkgforge-dev/OpenBoardView-AppImage) |
 | [OpenClaw](https://github.com/pkgforge-dev/OpenClaw-AppImage) |
 | [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced) |
+| [opencode-cli](https://github.com/pkgforge-dev/opencode-cli-AppImage) |
 | [OpenGothic](https://github.com/pkgforge-dev/OpenGothic-AppImage) |
 | [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage) |
 | [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage) |
