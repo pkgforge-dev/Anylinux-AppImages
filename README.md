@@ -361,6 +361,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage) |
 | [SimpleX Chat](https://github.com/pkgforge-dev/SimpleX-Chat-AppImage-Enhanced) |
 | [Simutrans](https://github.com/pkgforge-dev/Simutrans-AppImage) |
+| [SiriKali](https://github.com/pkgforge-dev/SiriKali-AppImage) |
 | [SkyEmu](https://github.com/pkgforge-dev/SkyEmu-AppImage) |
 | [Slack](https://github.com/pkgforge-dev/Slack-AppImage) |
 | [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced) |
