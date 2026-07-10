@@ -26,6 +26,7 @@ pacman -Syu --noconfirm \
 	libxrandr        \
 	libxtst          \
 	lxqt-qtplugin    \
+	patchelf         \
 	qt6ct            \
 	qt6-tools        \
 	wget             \

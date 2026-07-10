@@ -27,7 +27,7 @@ title: Frequently Asked Questions
 
 <details>
   <summary>Here is <code>aarch64</code> <a href="https://github.com/pkgforge-dev/Trelby-AppImage">Trelby</a> running on <b>32-bit</b> ARM debian 👀</summary>
-  This is possible because this system had a 64bit kernel and CPU, <b>We do not depend on the host userland besides a shell in <code>/bin/sh</code></b>
+  This is possible because this system had a 64bit kernel and CPU. <b>We barely depend on the host userland</b> besides some POSIX utils like <code>sh</code>.
   <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a76e02d2-8b8b-411c-92e0-07aa9c6c75aa" />
 </details>
 
@@ -39,11 +39,11 @@ title: Frequently Asked Questions
 
 # How come this only became possible in 2024?
 
-* For application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
+* For an application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
 * It turns out it is not possible to have a relative dynamic linker with executables. 
-* polyfill glibc attempted to [fix this issue](https://github.com/corsix/polyfill-glibc/blob/main/docs/Command_line_options.md#elf-interpreter---print-interpreter---set-interpreter) with a experimental tool that replaces `PT_INTERP` with `PT_LOAD` and have the payload look for the relative dynamic linker but this never got finished.
+* polyfill glibc attempted to [fix this issue](https://github.com/corsix/polyfill-glibc/blob/main/docs/Command_line_options.md#elf-interpreter---print-interpreter---set-interpreter) with an experimental tool that replaces `PT_INTERP` with `PT_LOAD` and has the payload look for the relative dynamic linker but this never got finished.
 * **We can execute the dynamic linker** first and then pass the binary to launch to bypass this limitation, **go-appimage had been doing this since ~2019.**
-* [But that runs into isues with `/proc/self/exe`](https://github.com/probonopd/go-appimage/issues/49).
+* [But that runs into issues with `/proc/self/exe`](https://github.com/probonopd/go-appimage/issues/49).
 * [sharun](https://github.com/VHSgunzo/sharun) had to be made to fix the `/proc/self/exe` issues. And as far as I know, [brioche had been using the same approach before sharun as well](https://brioche.dev/blog/portable-dynamically-linked-packages-on-linux/).
 * Once all the pieces were ready, the next step was changing the way we deploy AppImages and sorting all the bugs that came with that, AppImage was originally made with the idea of relying on the host glibc and a set of libraries that always had to come from the host. 
 
@@ -65,8 +65,8 @@ We only use musl where it is very useful, that is when making static binaries.
 * That is super hard, some libraries are not meant to be statically linked as well and that means a ton of patches are needed.
 * Statically linking everything means **we are not able to dlopen any library from the host**, even optional ones like the example I just gave about dlopening the host GTK from Qt apps to follow the system theme.
 * **It means goodbye to the proprietary nvidia driver.**
-* **It means you are no longer able use vulkan layers like mangohud or lsfg-vk.**
-* **It means you are forever stuck with the version of MESA that was statically linked.** Remember with you can use the host Mesa if needed by setting `SHARUN_ALLOW_SYS_VKICD=1` and that is something you will want to do if you plan on using the same AppImage for several years in the future.
+* **It means you are no longer able to use vulkan layers like mangohud or lsfg-vk.**
+* **It means you are forever stuck with the version of MESA that was statically linked.** Remember, you can use the host Mesa if needed by setting `SHARUN_ALLOW_SYS_VKICD=1` and that is something you will want to do if you plan on using the same AppImage for several years in the future.
 * Static linking some dependencies is still desired however, as that reduces the final size of the AppImage, **but a fully static binary is a very bad idea.**
 
 # Why DwarFS instead of SquashFS?
@@ -85,12 +85,18 @@ Because we use DwarFS instead of SquashFS, you need an AppImage thumbnailer that
 * [appimage-thumbnailer](https://github.com/kem-a/appimage-thumbnailer)
 * [simple-appimage-thumbnailer](https://github.com/Samueru-sama/simple-appimage-thumbnailer)
 
+# I get `ERROR: Can't find a valid SQUASHFS superblock` in NixOS
+
+Once again this is because we use DwarFS instead of SquashFS, NixOS has something called `appimage-run` which lets you run old type appimages that need an FHS env and some host libraries, `appimage-run` manually mounts the appimage instead of letting it execute itself which results in that error since it expects it to be SquashFS. 
+
+**None of this is needed for our appimages, they run directly in NixOS, so all you have to do is disable `appimage-run`.**
+
 # Why is there no `usr` directory in the AppImages?
 
 Because it causes more issues than it solves.
 
 * `/usr` is the typical installation prefix for an application. 
 
-* `$APPDIR/usr` makes no sense, it just causes projects to code exceptions for appimage that do something alone these lines: `getenv(APPDIR)` + `usr` + `xyz`. Instead we make `APPDIR` the installation prefix directly. **This means we can take any application and patch away the `/usr` prefix for `$APPDIR` and make them portable without the need for projects to support AppImage.** Here are some examples where projects checking for `$APPDIR` just made things worse: [1](https://github.com/kem-a/AppManager/issues/41#issuecomment-3905238762) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/330#issuecomment-3939566890)
+* `$APPDIR/usr` makes no sense, it just causes projects to code exceptions for appimage that do something along these lines: `getenv(APPDIR)` + `usr` + `xyz`. Instead we make `APPDIR` the installation prefix directly. **This means we can take any application and patch away the `/usr` prefix for `$APPDIR` and make them portable without the need for projects to support AppImage.** Here are some examples where projects checking for `$APPDIR` just made things worse: [1](https://github.com/kem-a/AppManager/issues/41#issuecomment-3905238762) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/330#issuecomment-3939566890)
 
-* **NOTE:** `$APPDIR/shared` is the a internal directory that sharun uses for itself, **you should never copy anything manually there.**
+* **NOTE:** `$APPDIR/shared` is an internal directory that sharun uses for itself, **you should never copy anything manually there.**

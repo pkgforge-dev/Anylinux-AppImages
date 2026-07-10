@@ -14,6 +14,9 @@
  * It also offers the ability to block specific libraries from being loaded via dlopen
  * by setting ANYLINUX_DO_NOT_LOAD_LIBS to a colon-separated list of glob patterns
  *
+ * It also overrides __nss_configure_lookup to prevent glibc from dlopening
+ * nss libs that are not bundled in the AppImage
+ *
  * It also overrides bindtextdomain calls to /usr/share/locale to TEXTDOMAINDIR
  * which sharun automatically sets to our bundled locale dir
  *
@@ -99,7 +102,7 @@ static void init_locale(void) {
 		DEBUG_PRINT("Locale fixed via LOCPATH to /usr/share/locale\n");
 		return;
 	}
-	
+
 	// set LOCPATH to our bundled locales
 	const char *appdir = getenv("APPDIR");
 	if (appdir && *appdir) {
@@ -196,8 +199,11 @@ static int should_block_library(const char *filename) {
 
 // problematic vars to check
 static const char* vars_to_unset[] = {
+	"ALSA_CONFIG_PATH",
 	"BABL_PATH",
 	"__EGL_VENDOR_LIBRARY_DIRS",
+	"__EGL_VENDOR_LIBRARY_FILENAMES",
+	"FOLKS_BACKEND_PATH",
 	"FREI0R_PATH",
 	"GBM_BACKENDS_PATH",
 	"GCONV_PATH",
@@ -235,6 +241,7 @@ static const char* vars_to_unset[] = {
 	"MLT_PRESETS_PATH",
 	"MLT_PROFILES_PATH",
 	"MLT_REPOSITORY",
+	"OPENSSL_CONF",
 	"PERLLIB",
 	"PIPEWIRE_CONFIG_DIR",
 	"PIPEWIRE_MODULE_DIR",
@@ -244,6 +251,10 @@ static const char* vars_to_unset[] = {
 	"TCL_LIBRARY",
 	"TEXTDOMAINDIR",
 	"TK_LIBRARY",
+	"VK_DRIVER_FILES",
+	"WEBKIT_EXEC_PATH",
+	"WEBKIT_INJECTED_BUNDLE_PATH",
+	"QT_XKB_CONFIG_ROOT",
 	"XKB_CONFIG_ROOT",
 	"XTABLES_LIBDIR",
 	NULL
@@ -274,6 +285,14 @@ static char* const* create_cleaned_env(char* const* original_env) {
 				// unset if the value contains APPDIR
 				if (strstr(value, appdir) != NULL) {
 					DEBUG_PRINT("Unset %s (value: %s)\n", *var, value);
+					should_copy = 0;
+					break;
+				}
+				// Also unset LD_PRELOAD if it contains anylinux.so
+				// since this variable can contain the lib name only without APPDIR path
+				if (strcmp(*var, "LD_PRELOAD") == 0 &&
+				    strstr(value, "anylinux.so") != NULL) {
+					DEBUG_PRINT("Unset LD_PRELOAD containing anylinux.so (value: %s)\n", value);
 					should_copy = 0;
 					break;
 				}
@@ -338,6 +357,19 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 			DEBUG_PRINT("Restored XDG_CACHE_HOME to %s\n", real_cache);
 		else
 			DEBUG_PRINT("Failed to restore XDG_CACHE_HOME to %s\n", real_cache);
+	}
+
+	// we always set XDG_CACHE_HOME to a new location to prevent conflicts with
+	// the host cache, restore XDG_CACHE_HOME to the original value
+	const char *use_host_cache = getenv("USE_HOST_XDG_CACHE_HOME");
+	if (!use_host_cache || strcmp(use_host_cache, "1") != 0) {
+		const char *host_cache = getenv("HOST_XDG_CACHE_HOME");
+		if (host_cache && *host_cache) {
+			if (setenv("XDG_CACHE_HOME", host_cache, 1) == 0)
+				DEBUG_PRINT("Restored XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
+			else
+				DEBUG_PRINT("Failed to restore XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
+		}
 	}
 
 	const char *real_home = getenv("REAL_HOME");
@@ -457,6 +489,57 @@ VISIBLE int execvpe(const char *filename, char *const argv[], char *const envp[]
 VISIBLE int execvp(const char *filename, char *const argv[]) {
 	DEBUG_PRINT("execvp hijacked: %s\n", filename);
 	return execvpe(filename, argv, environ);
+}
+
+// Force NSS to only use the modules we bundle. Without this, glibc reads the
+// host /etc/nsswitch.conf at runtime and may try to dlopen NSS modules
+// (libnss_mdns4_minimal.so.2) that are not in the AppImage causing crashes.
+//
+// Use "files" for user/group/shadow lookups and "files dns" for host resolution.
+// These correspond to libnss_files.so and libnss_dns.so, bundled by glibc deployment.
+__attribute__((constructor(101)))
+static void init_nssfix(void) {
+	typedef int (*nss_configure_fn)(const char *, const char *);
+
+	nss_configure_fn nss_configure_lookup = (nss_configure_fn)dlsym(RTLD_DEFAULT, "__nss_configure_lookup");
+
+	if (!nss_configure_lookup) {
+		DEBUG_PRINT("nssfix: __nss_configure_lookup not found, skipping\n");
+		return;
+	}
+
+	static const struct {
+		const char *dbname;
+		const char *service_line;
+	} nss_overrides[] = {
+		{ "aliases",    "files" },
+		{ "ethers",     "files" },
+		{ "group",      "files" },
+		{ "gshadow",    "files" },
+		{ "hosts",      "files dns" },
+		{ "initgroups", "files" },
+		{ "netgroup",   "files" },
+		{ "networks",   "files" },
+		{ "passwd",     "files" },
+		{ "protocols",  "files" },
+		{ "publickey",  "files" },
+		{ "rpc",        "files" },
+		{ "services",   "files" },
+		{ "shadow",     "files" },
+		{ NULL, NULL }
+	};
+
+	for (size_t i = 0; nss_overrides[i].dbname; i++) {
+		int rc = nss_configure_lookup(
+			nss_overrides[i].dbname,
+			nss_overrides[i].service_line);
+		if (rc != 0) {
+			DEBUG_PRINT("nssfix: \"%s\" -> \"%s\" FAILED\n",
+				    nss_overrides[i].dbname,
+				    nss_overrides[i].service_line);
+		}
+	}
+	DEBUG_PRINT("nssfix: Ignoring host nsswitch.conf, using only files+dns\n");
 }
 
 // Intercept dlopen to block loading of specific libraries

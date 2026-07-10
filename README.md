@@ -10,7 +10,7 @@ permalink: /
 
 Designed to run seamlessly on any Linux distribution, including very very old distributions and musl-based ones. Our AppImages bundle all the needed dependencies and do not depend on host libraries to work, unlike most other AppImages, **all while being significantly smaller thanks to [DwarFS](https://github.com/mhx/dwarfs) and [optimized packages](https://github.com/pkgforge-dev/archlinux-pkgs-debloated)**.
 
-Most of the AppImages are made with [sharun](https://github.com/VHSgunzo/sharun). We also use an alternative better [runtime](https://github.com/VHSgunzo/uruntime).
+Most of the AppImages are made with [sharun](https://github.com/pkgforge-dev/Anylinux-sharun). We also use an alternative better [runtime](https://github.com/VHSgunzo/uruntime).
 
 The uruntime [automatically falls back to using namespaces](https://github.com/VHSgunzo/uruntime?tab=readme-ov-file#built-in-configuration) if FUSE is not available at all, and if namespaces are not possible it falls back to extract and run, so we **truly have 0 requirements:**
 
@@ -19,7 +19,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 | Traditional AppImages (made by linuxdeploy or similar tools) | **Hard dependency on glibc** (rarely works on distros older than 4 years), also has a soft dependency on **FUSE** since the user has to manually extract when FUSE is unavailable, they also need an FHS compliant system to work. |
 | Flatpak | **Hard dependency on bubblewrap and FUSE**. Must be supported by your distribution or be manually built and installed systemwide which requires elevated rights. |
 | Snap | Similar requirements to flatpak minus bubblewrap, has a **hard dependency on systemd**. |
-| **AnyLinux AppImages** (made with sharun) | Use **FUSE if available**, else **fallback to using namespaces** and if that is not possible then we automatically extract to `TMPDIR` and run with post cleanup, we **do not need an FHS filesystem** and **do not depend on the host libc**, so eh make sure you have `/bin/sh` and write access to `/tmp`??? (If you can boot to a graphical session you already met those requirements). **How is this possible?** See: [How to guide](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/HOW-TO-MAKE-THESE.md) |
+| **AnyLinux AppImages** (made with sharun) | Use **FUSE if available**, else **fallback to using namespaces** and if that is not possible then we automatically extract to `TMPDIR` and run with post cleanup, we **do not need an FHS filesystem** and **do not depend on the host libc**, so eh make sure you have write access to `/tmp`??? (If you can boot to a graphical session you already met those requirements). **How is this possible?** See: [How to guide](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/HOW-TO-MAKE-THESE.md) |
 | **AnyLinux AppImages** (made with RunImage) | Similar to sharun AppImages but have a **Hard dependency on namespaces**, Lutris and virt-manager are the only ones that use this method, pending migration to sharun. |
 
 For more useful documentation about Anylinux-AppImages, see the pages below:
@@ -269,6 +269,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OpenBoardView](https://github.com/pkgforge-dev/OpenBoardView-AppImage) |
 | [OpenClaw](https://github.com/pkgforge-dev/OpenClaw-AppImage) |
 | [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced) |
+| [opencode-cli](https://github.com/pkgforge-dev/opencode-cli-AppImage) |
 | [OpenGothic](https://github.com/pkgforge-dev/OpenGothic-AppImage) |
 | [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage) |
 | [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage) |
@@ -278,7 +279,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced) |
 | [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage) |
 | [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage) |
-| [OpenTubeX](https://github.com/pkgforge-dev/OpenTubeX-Appimage-Enhanced) |
 | [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage) |
 | [OpenXRay](https://github.com/pkgforge-dev/OpenXRay-AppImage) |
 | [OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage) |
@@ -307,6 +307,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [polybar](https://github.com/pkgforge-dev/polybar-AppImage) |
 | [POSTAL](https://github.com/pkgforge-dev/POSTAL-AppImage) |
 | [Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage) |
+| [PrimeHack](https://github.com/pkgforge-dev/PrimeHack-AppImage) |
 | [PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced) |
 | [Protontricks](https://github.com/pkgforge-dev/Protontricks-AppImage) |
 | [Ptyxis](https://github.com/pkgforge-dev/Ptyxis-AppImage) |
@@ -353,15 +354,18 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [SDLPoP](https://github.com/pkgforge-dev/SDLPoP-AppImage) |
 | [Secrets](https://github.com/pkgforge-dev/Secrets-AppImage) |
 | [servo](https://github.com/pkgforge-dev/servo-AppImage) |
+| [Shiru](https://github.com/pkgforge-dev/Shiru-AppImage) |
 | [Shockolate](https://github.com/pkgforge-dev/Shockolate-AppImage) |
 | [Shotwell](https://github.com/pkgforge-dev/Shotwell-AppImage) |
 | [Signal](https://github.com/pkgforge-dev/Signal-AppImage-Enhanced) |
 | [Simitone](https://github.com/pkgforge-dev/Simitone-AppImage) |
 | [SimpleX Chat](https://github.com/pkgforge-dev/SimpleX-Chat-AppImage-Enhanced) |
 | [Simutrans](https://github.com/pkgforge-dev/Simutrans-AppImage) |
+| [SiriKali](https://github.com/pkgforge-dev/SiriKali-AppImage) |
 | [SkyEmu](https://github.com/pkgforge-dev/SkyEmu-AppImage) |
 | [Slack](https://github.com/pkgforge-dev/Slack-AppImage) |
 | [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced) |
+| [SnowboardKids2Recomp](https://github.com/pkgforge-dev/SnowboardKids2Recomp-AppImage) |
 | [Solaar](https://github.com/pkgforge-dev/Solaar-AppImage) |
 | [SongRec](https://github.com/pkgforge-dev/SongRec-AppImage) |
 | [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced) |
@@ -462,6 +466,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [GPU-T](https://github.com/lseurttyuu/GPU-T) |
 | [interstellar](https://github.com/interstellar-app/interstellar) |
 | [lba2-classic-community](https://github.com/LBALab/lba2-classic-community) |
+| [OpenTubeX](https://github.com/OpenTubeX/OpenTubeX) |
 | [PPSSPP](https://github.com/hrydgard/PPSSPP) |
 | [QDash](https://git.crueter.xyz/QFRC/QDash) |
 | [RSS Guard](https://github.com/martinrotter/rssguard) |

@@ -42,7 +42,7 @@ title: How To Make These
 
 You'll need:
 
-- A Linux system (preferably Arch Linux for building)
+- A Linux system (preferably Arch Linux for building) **do not use fedora or other distros that put 32bit libraries in `/usr/lib`**.
 - Basic shell scripting knowledge
 - The application you want to package (very preferably installed to /usr)
 
@@ -154,9 +154,10 @@ All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook
 - `ANYLINUX_LIB=1`    - Preloads library that fixes several common issues that affect AppImage (default: enabled).
 - `GTK_CLASS_FIX=1`   - Bundles a small shim that fixes the WM_CLASS for GTK apps (default: disabled).
 - `OPTIMIZE_LAUNCH=1` - Speeds up AppImage launch time using a DWARFS profile image (default: disabled). This is very similar to PGO optimizations in compilers. You often do not need to enable this, since DWARFS on its own is many times faster than SquashFS. In many cases, launch times are near-identical to those of native applications (±300 ms on a system with a 2016 CPU).
-- `STRACE_MODE=1` - Uses strace to find dynamically loaded libraries (default: enabled)
+- `STRACE_MODE=1` - Uses strace to find dynamically loaded libraries (default: enabled). To control which binaries are traced and with what flags, use `STRACE_BINARY` (space/newline-separated binary names) and `STRACE_FLAGS` instead of the old positional argument approach.
 - `STRIP=1` - Strips debug symbols to reduce size (default: enabled unless `NO_STRIP` is set)
 - `DEBLOAT_LOCALE=1` - Removes unneeded locale files to reduce size (default: enabled)
+- `QUICK_SHARUN_SKIP_DEPS_FOR` - Space/newline-separated list of library names to skip dependency deployment for (e.g., `libqgtk3.so`). By default `libqgtk3.so` is always included to avoid deploying GTK3 in Qt apps when `QT_QPA_PLATFORMTHEME=fusion` is set.
 
 -----------------------------------
 
@@ -180,7 +181,7 @@ For a long time the suggested practice to make AppImages has been to bundle most
 
 This approach has two big issues:
 
-- It forces the developer to build on an old version of glibc to guarantee that the application works on most linux distros being used, because glibc sucks. This is specially problematic if your application needs something new like QT6 or GTK4 which is not available on such old distros.
+- It forces the developer to build on an old version of glibc to guarantee that the application works on most linux distros being used, because glibc sucks. This is especially problematic if your application needs something new like QT6 or GTK4 which is not available on such old distros.
 
 - It also means the application cannot work on musl libc systems.
 
@@ -231,7 +232,7 @@ However this has a small issue that `/proc/self/exe` will be `ld-linux-x86-64.so
 
 2. Second issue to overcome:
 
-Now that we have our own dynamic linker, how do we tell it that we can to use all the libraries we have in our own `lib` directory?
+Now that we have our own dynamic linker, how do we tell it that we want to use all the libraries we have in our own `lib` directory?
 
 - `LD_LIBRARY_PATH` ❌ Nope, terrible idea. **NEVER USE THIS VARIABLE**, it causes a lot of headaches because it is inherited by child processes, which means everything being launched by our application will try to use our libraries, and this causes insanely broken behaviours that are hard to catch. [For example](https://github.com/zen-browser/desktop/issues/2748), this issue lasted several months and no one had an idea what was going on until I [removed](https://github.com/zen-browser/desktop/pull/6156/files) the usage of `LD_LIBRARY_PATH`, which the application didn't even need to have it set in this case. Also see: [LD_LIBRARY_PATH – or: How to get yourself into trouble!](https://www.hpc.dtu.dk/?page_id=1180)
 
@@ -284,21 +285,17 @@ But isn't this a lot of work to find and set all the env variables that my appli
 
 ### *Sharun*
 
-There is a solution for this, made by @VHSGunzo called sharun:
+There is a solution for this, originally made by @VHSGunzo called sharun. This project uses a [fork of sharun](https://github.com/pkgforge-dev/Anylinux-sharun).
 
-<https://github.com/VHSgunzo/sharun>
+<https://github.com/VHSGunzo/sharun>
 
-- sharun is able to find all the libraries that your application needs, **including those that are dlopened**. It turns out that a lot of applications depend on dlopened libraries; those are the libraries that you cannot easily find with just `ldd`. Sharun uses a deployment script called `lib4bin` that has the strace mode; **that mode makes `lib4bin` open the application with strace to check all the dlopened libraries and then bundle them.**
+- sharun is able to find all the libraries that your application needs, **including those that are dlopened**. It turns out that a lot of applications depend on dlopened libraries; those are the libraries that you cannot easily find with just `ldd`. **UPDATE:** Library deployment and strace-based dlopen detection have been integrated directly into `quick-sharun`, so there is no longer a separate deployment script — it all happens automatically when you run `quick-sharun`.
 
-- sharun also detects and sets a ton of [env variables](https://github.com/VHSgunzo/sharun?tab=readme-ov-file#environment-variables-that-are-set-if-sharun-finds-a-directory-or-file.) that the application needs to work.
+- sharun also detects and sets a ton of env variables that the application needs to work.
 
 - it also fixes the issue of  `/proc/self/exe` being `ld-linux-x86-64.so.2` 👀 For this issue, what it does is it places all the shared libraries and binaries in `shared/{lib,bin}` and then hardlinks itself to the `bin` directory of our `AppDir`; then when you call `bin/app`, it automatically calls the bundled dynamic linker and runs the binary with the name of the hardlink, while giving the path to our bundled libraries with `--library-path`
 
-- sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it, **this means we no longer depend on the host shell to get our application to launch.**
-
-- sharun is not just for the AppImages, you can also use it anywhere you need to make any sort of application portable. You can even make pseudo-static binaries from existing dynamic binaries, which sharun does with the help of wrappe.
-
-- sharun even has hooks to fix applications that aren't relocatable, like webkit2gtk which is hardcoded to look for some binaries in `/usr/lib`, it fixes this with patching all automatically for you.
+- sharun also doubles as the `AppRun` and additional env variables can be added by making a `.env` file next to it.
 
 Any application made with sharun ends up being able to work **on any linux distro**, be it ubuntu 14.04, musl distros and even directly in NixOS without any wrapper (non FHS environment).
 
@@ -316,7 +313,7 @@ Any application made with sharun ends up being able to work **on any linux distr
 
 Not really, if your application isn't hardware accelerated, bundling all the libraries will usually only increase the size of the application by less than 6 MiB.
 
-**UPDATE:** We are actually now able to build mesa without linking to LLVM, so AppImages are even smaller as result, **fully hardware accelerated Qt/GTK apps can be made while being less than 35 MiB in the final size.**
+**UPDATE:** We are actually now able to build mesa without linking to LLVM, so AppImages are even smaller as a result, **fully hardware accelerated Qt/GTK apps can be made while being less than 35 MiB in the final size.**
 
 For applications that are hardware accelerated, there is the problem that mesa links to `libLLVM.so`, which is a huge +130 MiB library that's used for a lot of things. Distros by default build it with support for the following:
 
@@ -346,7 +343,7 @@ When for most applications you only need llvm to support AMDGPU and X86/AArch64.
 
 We already make such version of llvm here: <https://github.com/pkgforge-dev/archlinux-pkgs-debloated> which reduces the size of libLLVM.so down to 66 MiB.
 
-Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results a **50 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things.
+Such package and other debloated packages we have are used by [Goverlay](https://github.com/benjamimgois/goverlay), which results in a **50 MiB** AppImage that works on any linux system, which is surprisingly small considering this application bundles **Qt** and **mesa**  (vulkan) among other things.
 
 -----------------------------------
 
@@ -356,7 +353,7 @@ Such package and other debloated packages we have are used by [Goverlay](https:/
 
 ### *What about nvidia?*
 
-Nvidia releases its proprietary driver as a binary blob that is already widely compatible on its own, it's only requirement is a new enough version of glibc, which the appimages made here will do as long as you build them on a glibc distro. Then you just need to add the nvidia icds to `VK_DRIVER_FILES` to be able to use it without problem.
+Nvidia releases its proprietary driver as a binary blob that is already widely compatible on its own, its only requirement is a new enough version of glibc, which the appimages made here will do as long as you build them on a glibc distro. Then you just need to add the nvidia icds to `VK_DRIVER_FILES` to be able to use it without problem.
 
 If you don't have the proprietary nvidia driver, mesa already includes nouveau support for the few GPUs where this driver actually works (NVIDIA GTX 16 series or newer).
 
