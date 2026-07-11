@@ -451,6 +451,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage) |
 | [Zod-Engine](https://github.com/pkgforge-dev/Zod-Engine-AppImage) |
 | [ZSNES](https://github.com/pkgforge-dev/ZSNES-AppImage) |
+
 ---
 
 <!-- APPS_LIST_END -->
