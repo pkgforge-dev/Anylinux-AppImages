@@ -91,6 +91,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Claws Mail](https://github.com/pkgforge-dev/Claws-Mail-AppImage) |
 | [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage) |
 | [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage) |
+| [CloneHero](https://github.com/pkgforge-dev/CloneHero-AppImage) |
 | [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage) |
 | [CollaboraOffice](https://github.com/pkgforge-dev/CollaboraOffice-AppImage) |
 | [Collision](https://github.com/pkgforge-dev/Collision-AppImage) |
