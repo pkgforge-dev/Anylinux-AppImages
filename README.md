@@ -383,6 +383,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Starfox64Recomp](https://github.com/pkgforge-dev/Starfox64Recomp-AppImage) |
 | [Stella](https://github.com/pkgforge-dev/Stella-AppImage) |
 | [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage) |
+| [Stoat](https://github.com/pkgforge-dev/Stoat-AppImage) |
 | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage) |
 | [Streamlink](https://github.com/pkgforge-dev/Streamlink-AppImage) |
 | [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage) |
