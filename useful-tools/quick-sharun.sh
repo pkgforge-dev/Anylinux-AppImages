@@ -1383,7 +1383,9 @@ _lib4bin_collect_strace() {
 		                                                     -e '/nvidia/d'      \
 		                                                     -e '/libcuda/d'     \
 		                                                     -e '/lib-dynload/d' \
-		                                                     -e '/_internal/d'
+		                                                     -e '/_internal/d'   \
+		                                                     -e '/libncurses/d'  \
+		                                                     -e '/libcurses/d'
 		)
 		rm -f "$dlopened"
 		[ -n "$out" ] || continue
@@ -3020,8 +3022,6 @@ for lib do case "$lib" in
 	*/*libQt*WebEngineCore.so*)
 		_try_cp /usr/share/"$QT_DIR"/resources "$DST_LIB_DIR"/"$QT_DIR"/resources
 		;;
-	# this hook is a common false positive, because a lot of applications
-	# execute the system sh and that links to this library, deploying these files
 	*/libncursesw.so*|*/libcursesw.so*|*/libcurses.so*)
 		_try_cp /usr/share/terminfo "$APPDIR"/share/terminfo
 		_try_cp /usr/share/tabset   "$APPDIR"/share/tabset
