@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <spawn.h>
 #include <sys/param.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -328,7 +329,11 @@ static int is_external_process(const char *filename) {
 	return external;
 }
 
-static int exec_common(execve_func_t function, const char *filename, char* const argv[], char* const envp[]) {
+// Builds the environment to hand to a child process: restores the portable dirs
+// into the current environ, strips bundle-pointing variables from envp for
+// external processes, and guarantees PATH contains APPDIR/bin. If the returned
+// pointer is not envp, the caller must env_free() it after the exec/spawn call.
+static char* const* prepare_child_env(const char *filename, char* const envp[]) {
 	DEBUG_PRINT("Preparing to exec: %s\n", filename);
 
 	char *fullpath = canonicalize_file_name(filename);
@@ -449,11 +454,17 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 		}
 	}
 
+	if (fullpath && fullpath != filename) free(fullpath);
+	return env;
+}
+
+static int exec_common(execve_func_t function, const char *filename, char* const argv[], char* const envp[]) {
+	char* const *env = prepare_child_env(filename, envp);
+
 	DEBUG_PRINT("Calling exec for %s\n", filename);
 	int ret = function(filename, argv, env);
 
 	if (ret == -1) DEBUG_PRINT("Underlying exec returned -1, errno=%d (%s)\n", errno, strerror(errno));
-	if (fullpath && fullpath != filename) free(fullpath);
 	if (env != envp) env_free(env);
 
 	return ret;
@@ -489,6 +500,45 @@ VISIBLE int execvpe(const char *filename, char *const argv[], char *const envp[]
 VISIBLE int execvp(const char *filename, char *const argv[]) {
 	DEBUG_PRINT("execvp hijacked: %s\n", filename);
 	return execvpe(filename, argv, environ);
+}
+
+// glibc's posix_spawn/posix_spawnp exec through an internal path, not the
+// interposable execve symbol, so the exec* wrappers above never fire for them.
+// CPython's subprocess uses posix_spawn by default, so without these wrappers a
+// Python AppImage leaks bundle-pointing vars (e.g. VK_DRIVER_FILES) into child
+// processes. Clean envp the same way exec_common does before spawning.
+typedef int (*posix_spawn_func_t)(pid_t *restrict, const char *restrict,
+	const posix_spawn_file_actions_t *restrict, const posix_spawnattr_t *restrict,
+	char *const [restrict], char *const [restrict]);
+
+static int spawn_common(const char *symbol, pid_t *restrict pid, const char *restrict path,
+		const posix_spawn_file_actions_t *restrict file_actions,
+		const posix_spawnattr_t *restrict attrp,
+		char *const argv[restrict], char *const envp[restrict]) {
+	DEBUG_PRINT("%s hijacked: %s\n", symbol, path);
+	posix_spawn_func_t orig = dlsym(RTLD_NEXT, symbol);
+	if (!orig) {
+		DEBUG_PRINT("Error getting original %s symbol: %s\n", symbol, dlerror());
+		return ENOSYS;
+	}
+	char* const *env = prepare_child_env(path, envp);
+	int ret = orig(pid, path, file_actions, attrp, argv, env);
+	if (env != envp) env_free(env);
+	return ret;
+}
+
+VISIBLE int posix_spawn(pid_t *restrict pid, const char *restrict path,
+		const posix_spawn_file_actions_t *restrict file_actions,
+		const posix_spawnattr_t *restrict attrp,
+		char *const argv[restrict], char *const envp[restrict]) {
+	return spawn_common("posix_spawn", pid, path, file_actions, attrp, argv, envp);
+}
+
+VISIBLE int posix_spawnp(pid_t *restrict pid, const char *restrict file,
+		const posix_spawn_file_actions_t *restrict file_actions,
+		const posix_spawnattr_t *restrict attrp,
+		char *const argv[restrict], char *const envp[restrict]) {
+	return spawn_common("posix_spawnp", pid, file, file_actions, attrp, argv, envp);
 }
 
 // Force NSS to only use the modules we bundle. Without this, glibc reads the
