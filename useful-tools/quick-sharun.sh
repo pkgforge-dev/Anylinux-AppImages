@@ -54,6 +54,7 @@ LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
 
 STRACE_MODE=${STRACE_MODE:-1}
 STRACE_TIME=${STRACE_TIME:-5}
+COPY_ONLY_DIRS=${COPY_ONLY_DIRS:-}
 
 DEPENDENCIES="
 	awk
@@ -256,6 +257,8 @@ _help_msg() {
 	                     during strace mode. By default ALL given binaries
 	                     are traced. Use this to trace only specific binaries.
 	  STRACE_FLAGS     Arguments passed to STRACE_BINARY.
+	  COPY_ONLY_DIRS    Directories to copy without duplicating their executable
+	                      files in AppDir/bin.
 	  PATH_MAPPING    Configures and preloads pathmap.
 	                    Set this variable if the application is hardcoded to look
 	                    into /usr and similar locations, example:
@@ -1238,6 +1241,12 @@ _make_deployment_array() {
 		while read -r d; do
 			if [ -d "$d" ]; then
 				_echo " - $d"
+				# Copy these directories later without flattening executables into bin.
+				for copy_only_dir in $COPY_ONLY_DIRS; do
+					if [ "$copy_only_dir" = "$d" ]; then
+						continue 2
+					fi
+				done
 				for f in \
 					"$d"/*          \
 					"$d"/*/*        \
