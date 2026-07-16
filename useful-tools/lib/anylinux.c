@@ -500,6 +500,7 @@ VISIBLE int posix_spawn(pid_t *pid, const char *path,
 		const posix_spawn_file_actions_t *file_actions,
 		const posix_spawnattr_t *attrp, char *const argv[],
 		char *const envp[]) {
+	DEBUG_PRINT("posix_spawn call hijacked: %s\n", path);
 	posix_spawn_func_t posix_spawn_orig = dlsym(RTLD_NEXT, "posix_spawn");
 	if (!posix_spawn_orig)
 		return ENOSYS;
