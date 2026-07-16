@@ -31,6 +31,7 @@
 #include <fnmatch.h>
 #include <limits.h>
 #include <locale.h>
+#include <spawn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,6 +42,10 @@
 #include <errno.h>
 
 typedef int (*execve_func_t)(const char *filename, char *const argv[], char *const envp[]);
+typedef int (*posix_spawn_func_t)(pid_t *pid, const char *path,
+		const posix_spawn_file_actions_t *file_actions,
+		const posix_spawnattr_t *attrp, char *const argv[],
+		char *const envp[]);
 typedef void *(*dlopen_func_t)(const char *filename, int flags);
 
 #define VISIBLE __attribute__ ((visibility ("default")))
@@ -489,6 +494,28 @@ VISIBLE int execvpe(const char *filename, char *const argv[], char *const envp[]
 VISIBLE int execvp(const char *filename, char *const argv[]) {
 	DEBUG_PRINT("execvp hijacked: %s\n", filename);
 	return execvpe(filename, argv, environ);
+}
+
+VISIBLE int posix_spawn(pid_t *pid, const char *path,
+		const posix_spawn_file_actions_t *file_actions,
+		const posix_spawnattr_t *attrp, char *const argv[],
+		char *const envp[]) {
+	DEBUG_PRINT("posix_spawn call hijacked: %s\n", path);
+	posix_spawn_func_t posix_spawn_orig = dlsym(RTLD_NEXT, "posix_spawn");
+	if (!posix_spawn_orig)
+		return ENOSYS;
+
+	char *fullpath = canonicalize_file_name(path);
+	const char *path_to_check = fullpath ? fullpath : path;
+	char *const *env = envp;
+	if (is_external_process(path_to_check))
+		env = create_cleaned_env(envp);
+
+	int ret = posix_spawn_orig(pid, path, file_actions, attrp, argv, env);
+	if (env != envp)
+		env_free(env);
+	free(fullpath);
+	return ret;
 }
 
 // Force NSS to only use the modules we bundle. Without this, glibc reads the
