@@ -200,6 +200,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Identity](https://github.com/pkgforge-dev/Identity-AppImage) |
 | [iloader](https://github.com/pkgforge-dev/iloader-AppImage-Enhanced) |
 | [ImageMagick](https://github.com/pkgforge-dev/ImageMagick-AppImage) |
+| [img2pdf](https://github.com/pkgforge-dev/img2pdf-AppImage) |
 | [Impression](https://github.com/pkgforge-dev/Impression-AppImage) |
 | [innoextract](https://github.com/pkgforge-dev/innoextract-AppImage) |
 | [ioquake3](https://github.com/pkgforge-dev/ioquake3-AppImage) |
