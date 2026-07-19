@@ -333,6 +333,35 @@ static int is_external_process(const char *filename) {
 	return external;
 }
 
+static int spawn_common(posix_spawn_func_t fn,
+						const char *path, pid_t *pid,
+						const posix_spawn_file_actions_t *file_actions,
+						const posix_spawnattr_t *attrp,
+						char *const argv[], char *const envp[])
+{
+	char *fullpath = canonicalize_file_name(path);
+	const char *path_to_check = fullpath ? fullpath : path;
+
+	char *const *env = envp;
+	if (is_external_process(path_to_check)) {
+		DEBUG_PRINT("External process detected; cleaning environment\n");
+		env = create_cleaned_env(envp);
+
+		if (!env) {
+			DEBUG_PRINT("Error creating cleaned environment; using original env\n");
+			env = envp;
+		}
+	}
+
+	int ret = fn(pid, path, file_actions, attrp, argv, env);
+
+	if (env != envp)
+		env_free(env);
+	free(fullpath);
+
+	return ret;
+}
+
 static int exec_common(execve_func_t function, const char *filename, char* const argv[], char* const envp[]) {
 	DEBUG_PRINT("Preparing to exec: %s\n", filename);
 
@@ -501,21 +530,23 @@ VISIBLE int posix_spawn(pid_t *pid, const char *path,
 		const posix_spawnattr_t *attrp, char *const argv[],
 		char *const envp[]) {
 	DEBUG_PRINT("posix_spawn call hijacked: %s\n", path);
-	posix_spawn_func_t posix_spawn_orig = dlsym(RTLD_NEXT, "posix_spawn");
-	if (!posix_spawn_orig)
+	posix_spawn_func_t fn = dlsym(RTLD_NEXT, "posix_spawn");
+	if (!fn)
 		return ENOSYS;
 
-	char *fullpath = canonicalize_file_name(path);
-	const char *path_to_check = fullpath ? fullpath : path;
-	char *const *env = envp;
-	if (is_external_process(path_to_check))
-		env = create_cleaned_env(envp);
+	return spawn_common(fn, path, pid, file_actions, attrp, argv, envp);
+}
 
-	int ret = posix_spawn_orig(pid, path, file_actions, attrp, argv, env);
-	if (env != envp)
-		env_free(env);
-	free(fullpath);
-	return ret;
+VISIBLE int posix_spawnp(pid_t *pid, const char *file,
+		const posix_spawn_file_actions_t *file_actions,
+		const posix_spawnattr_t *attrp, char *const argv[],
+		char *const envp[]) {
+	DEBUG_PRINT("posix_spawnp call hijacked: %s\n", file);
+	posix_spawn_func_t fn = dlsym(RTLD_NEXT, "posix_spawnp");
+	if (!fn)
+		return ENOSYS;
+
+	return spawn_common(fn, file, pid, file_actions, attrp, argv, envp);
 }
 
 // Force NSS to only use the modules we bundle. Without this, glibc reads the
