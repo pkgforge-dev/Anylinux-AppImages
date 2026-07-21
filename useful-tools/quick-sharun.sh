@@ -2351,6 +2351,12 @@ _add_apprun() {
 	export PATH=$APPDIR/bin:$PATH
 	export ARG0 APPDIR PATH
 
+	# HACK: Preserve ALT Linux's NVIDIA selection until sharun respects ld.so.cache order.
+	if [ -d /etc/libnvidiacurrent ]; then
+	        SHARUN_EXTRA_LIBRARY_PATH=/etc/libnvidiacurrent${SHARUN_EXTRA_LIBRARY_PATH:+:$SHARUN_EXTRA_LIBRARY_PATH}
+	        export SHARUN_EXTRA_LIBRARY_PATH
+	fi
+
 	# Allow users to set env variables for specific AppImage
 	# This feature only works with the uruntime
 	if [ "$1" = '--appimage-add-env' ]; then
