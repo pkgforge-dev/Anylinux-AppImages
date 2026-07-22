@@ -405,6 +405,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Taradino](https://github.com/pkgforge-dev/Taradino-AppImage) |
 | [Tauon](https://github.com/pkgforge-dev/Tauon-AppImage) |
 | [Telegram](https://github.com/pkgforge-dev/Telegram-AppImage) |
+| [Themix](https://github.com/pkgforge-dev/Themix-AppImage) |
 | [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage) |
 | [TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage) |
 | [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage) |
