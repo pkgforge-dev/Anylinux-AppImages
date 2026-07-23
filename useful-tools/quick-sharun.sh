@@ -676,7 +676,6 @@ _determine_what_to_deploy() {
 							;;
 						*)
 							DEPLOY_GLYCIN=${DEPLOY_GLYCIN:-1}
-							GTK_CLASS_FIX=1
 							GNOME_GLYCIN=1
 							;;
 					esac
@@ -1671,6 +1670,65 @@ _add_gtk_class_fix() {
 	echo "GTK_WINDOW_CLASS=$class"  >> "$APPDIR"/.env
 	echo "gtk-class-fix.so"         >> "$APPDIR"/.preload
 	_echo "* gtk-class-fix.so successfully added!"
+}
+
+_fix_broken_gnome_glycin() {
+	cfile=$APPDIR/.fix-gnome-glycin.c
+	target=$DST_LIB_DIR/fix-gnome-glycin.so
+
+	if [ -f "$target" ]; then
+		return 0
+	fi
+
+	cat <<-'EOF' > "$cfile"
+	/*
+	 * Glycin forces sandboxing which fails 100% of the time here because the
+	 * library is horribly written and does not resolve the full path of the
+	 * binaries it passes to bwrap, it does not even check if bwrap is present!
+	 */
+
+	#define _GNU_SOURCE
+	#include <dlfcn.h>
+	#include <stddef.h>
+
+	#ifndef GLY_SANDBOX_SELECTOR_NOT_SANDBOXED
+	#define GLY_SANDBOX_SELECTOR_NOT_SANDBOXED 3
+	#endif
+
+	static void force_not_sandboxed(void *loader) {
+	    if (!loader) return;
+	    void (*set_sandbox)(void*, int) = dlsym(RTLD_DEFAULT, "gly_loader_set_sandbox_selector");
+	    if (set_sandbox)
+	        set_sandbox(loader, GLY_SANDBOX_SELECTOR_NOT_SANDBOXED);
+	}
+
+	#define GLY_LOADER_WRAPPER(name) \
+	    void* gly_##name(void* arg) { \
+	        static void* (*real)(void*) = NULL; \
+	        if (!real) { \
+	            real = dlsym(RTLD_NEXT, "gly_" #name); \
+	            if (!real) real = dlsym(RTLD_DEFAULT, "gly_" #name); \
+	        } \
+	        void *loader = real ? real(arg) : NULL; \
+	        force_not_sandboxed(loader); \
+	        return loader; \
+	    }
+
+	GLY_LOADER_WRAPPER(loader_new)
+	GLY_LOADER_WRAPPER(loader_new_for_stream)
+	GLY_LOADER_WRAPPER(loader_new_for_bytes)
+	EOF
+
+	set -- -shared -fPIC -O2 "$cfile" -o "$target" -ldl
+	if [ "$LIB32" = 1 ]; then
+		set -- -m32 "$@"
+	fi
+	cc "$@"
+
+	if ! grep -q 'fix-gnome-glycin.so' "$APPDIR"/.preload 2>/dev/null; then
+		echo "fix-gnome-glycin.so" >> "$APPDIR"/.preload
+	fi
+	_err_msg "* detected gnome glycin was added and fixed it with a preload hack"
 }
 
 _check_always_software() {
@@ -3113,6 +3171,7 @@ for lib do case "$lib" in
 		if [ "$GNOME_GLYCIN" != 1 ]; then
 			continue # only GNOME glycin needs handling
 		fi
+		_fix_broken_gnome_glycin
 		_add_bwrap_wrapper
 		src_glycin_conf_dir=/usr/share/glycin-loaders
 		dst_glycin_conf_dir=$APPDIR/share/glycin-loaders
