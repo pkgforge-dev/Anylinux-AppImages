@@ -1,14 +1,10 @@
 /*
- * GTK Window Class Override + Glycin Sandbox Disable
+ * GTK Window Class Override
  * ===================================================
  *
  * PURPOSE:
  *  GNOME made the window class of applications different between x11 and
  *  wayland, breaking desktop integration of appimages as result.
- *
- *  Glycin forces sandboxing which fails 100% of the time here because the
- *  library is horribly written and does not resolve the full path of the
- *  binaries it passes to bwrap, it does not even check if bwrap is present!
  *
  * USAGE:
  *   GTK_WINDOW_CLASS=fuck.gnome LD_PRELOAD=./gtk-class-fix.so /path/to/app
