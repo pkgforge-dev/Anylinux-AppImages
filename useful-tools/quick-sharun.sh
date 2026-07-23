@@ -1680,8 +1680,6 @@ _fix_broken_gnome_glycin() {
 		return 0
 	fi
 
-	_echo "* Building fix-gnome-glycin.so"
-
 	cat <<-'EOF' > "$cfile"
 	/*
 	 * Glycin forces sandboxing which fails 100% of the time here because the
