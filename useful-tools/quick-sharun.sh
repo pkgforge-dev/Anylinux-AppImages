@@ -1339,7 +1339,7 @@ _lib4bin_collect_ldd() {
 	# and we end up with a broken application
 	#
 	# Verify with patchelf --print-needed and find the library instead
-	for b in $libs "$@"; do
+	for b do
 		_is_elf "$b" || continue
 		for s in $(patchelf --print-needed "$b" 2>/dev/null); do
 			if [ -e "$LIB_DIR"/"$s" ]; then
