@@ -1339,10 +1339,17 @@ _lib4bin_collect_ldd() {
 	# and we end up with a broken application
 	#
 	# Verify with patchelf --print-needed and find the library instead
+	#
+	libs_basename=$(echo "$libs" | awk -F'/' '{print $NF}')
 	for b do
-		_is_elf "$b" || continue
+		if _is_so "$b" || ! _is_elf "$b"; then
+			continue
+		fi
 		for s in $(patchelf --print-needed "$b" 2>/dev/null); do
-			if [ -e "$LIB_DIR"/"$s" ]; then
+			if echo "$libs_basename" | grep -Fxq "$s"; then
+				continue # already included
+			elif [ -e "$LIB_DIR"/"$s" ]; then
+				# Was not found by ldd / LD_DEBUG=libs
 				libs=$(printf '%s\n%s' "$libs" "$LIB_DIR"/"$s")
 			fi
 		done
