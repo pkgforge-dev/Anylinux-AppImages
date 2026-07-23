@@ -1331,6 +1331,30 @@ _lib4bin_collect_ldd() {
 			libs=$(printf '%s\n%s' "$libs" "$b")
 		fi
 	done
+
+	# It turns out you can have one library act as multiple libraries via
+	# symlinks, for example libtinfo.so.5 -> libncurses.so.5
+	# Since they are the same file, ldd and LD_DEBUG=libs will only report
+	# ONE library name, meaning we miss copying the other library
+	# and we end up with a broken application
+	#
+	# Verify with patchelf --print-needed and find the library instead
+	#
+	libs_basename=$(echo "$libs" | awk -F'/' '{print $NF}')
+	for b do
+		if _is_so "$b" || ! _is_elf "$b"; then
+			continue
+		fi
+		for s in $(patchelf --print-needed "$b" 2>/dev/null); do
+			if echo "$libs_basename" | grep -Fxq "$s"; then
+				continue # already included
+			elif [ -e "$LIB_DIR"/"$s" ]; then
+				# Was not found by ldd / LD_DEBUG=libs
+				libs=$(printf '%s\n%s' "$libs" "$LIB_DIR"/"$s")
+			fi
+		done
+	done
+
 	echo "$libs" | sort -u | sed '/^$/d'
 }
 
