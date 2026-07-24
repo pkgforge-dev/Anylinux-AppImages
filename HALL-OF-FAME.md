@@ -118,6 +118,20 @@ Where do I even start?
 
 At least more recently they are looking into adding [svg support into GTK4](https://www.phoronix.com/news/GTK-4.22-Native-SVG), which hopefully means they will get rid of the gdk-pixbuf and glycin dependency.
 
+# Garbage - Wayland
+
+Broken incomplete mess, what's crazy is that the Wayland issues are problems that should not affect us, they are problems for the implemenations, clients and drivers, yet Wayland is so broken that we often waste time at bug reports because there is no way an application can be having this issue **and it turns out that is true!**
+
+* GNOME in their infinite wisdom decided to make the Vulkan renderer the default in Wayland and **it was totally broken with Intel GPUs**, [you would just get a whitescreen](https://gitlab.freedesktop.org/mesa/mesa/-/work_items/13319) and good luck figuring out what is going on, no warning what was happening or anything. [MESA had to fix it with a workaround](https://www.phoronix.com/news/Mesa-25.3.3-Released) and this even had its own news article! But before that this trap that you would run into was barely mentioned anywhere and you basically had to dig into the Mesa issue tracker to find of that by default GTK4 on Wayland was totally broken on Intel and that wasn't urgent or anything like that. [In fact people at r/linux reddit would even downplay the issue](https://imgur.com/a/Fk6JYtI)
+
+* The other incident was this nonsense that mutter would crash applications when using the vulkan, **in this case the entire session would go down.** [1](https://codeberg.org/pkgforge-dev/Citron-AppImage/issues/50) [2](https://github.com/azahar-emu/azahar/issues/1162) [3](https://github.com/Eden-CI/Workflow/commit/beb2c4e87592f13c52c018838e32f903dfcdaff9)
+
+* Mutter doesn't support server side decorations, **so that means you have to make sure the application will draw decorations instead!** And all the pain that has created... [1](https://github.com/libsdl-org/SDL/issues/14887) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/e9414c02f713359b551bcfa3832576d2992b13da/useful-tools/hooks/fix-gnome-csd.hook#L3-L18) [3](https://gitlab.freedesktop.org/libdecor/libdecor/-/work_items/36) 
+
+* [More pain](https://github.com/pkgforge-dev/Stirling-PDF-AppImage/issues/5#issuecomment-3968424195)
+
+* I used to think that Wayland would be fixed if everyone used a common library like wlroots, but [guess what](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/212#issuecomment-3734437530) 😹
+
 # Utter Garbage - Python
 
 * Applications break horribly with the slightest version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215)
