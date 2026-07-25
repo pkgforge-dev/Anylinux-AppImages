@@ -418,6 +418,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage) |
 | [Unity Hub](https://github.com/pkgforge-dev/UnityHub-AppImage) |
 | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage) |
+| [Unnamed SDVX clone](https://github.com/pkgforge-dev/Unnamed-SDVX-clone-AppImage) |
 | [Varia](https://github.com/pkgforge-dev/Varia-AppImage) |
 | [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage) |
 | [VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage) |
