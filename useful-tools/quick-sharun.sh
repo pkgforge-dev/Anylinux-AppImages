@@ -1148,7 +1148,6 @@ _make_deployment_array() {
 		(
 			if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
 				cd "$DST_LIB_DIR"/"${d##*/}"
-				find ./ -type f -name '*.a' -delete || :
 				for f in $(find ./ -type f -name '*.pyc' -print); do
 					case "$f" in
 						*/"$MAIN_BIN"*) :;;
@@ -2384,6 +2383,13 @@ _sort_env_file() {
 	fi
 }
 
+_remove_static_libs() {
+	if [ "$KEEP_STATIC_LIBS" != 1 ]; then
+		find "$APPDIR"/lib*/ -type f -name '*.a' -delete || :
+		_echo "* removed static libraries"
+	fi
+}
+
 _strip_bins_and_libs() {
 	if [ "$NO_STRIP" = 1 ]; then
 		return 0
@@ -3460,6 +3466,7 @@ if [ -f "$a" ]; then
 	_echo "removed $a"
 fi
 
+_remove_static_libs
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
