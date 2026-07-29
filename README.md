@@ -78,7 +78,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage) |
 | [CatacombGL](https://github.com/pkgforge-dev/CatacombGL-AppImage) |
 | [Catfish](https://github.com/pkgforge-dev/Catfish-AppImage) |
-| [C-Dogs_SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage) |
+| [C-Dogs_SDL](https://github.com/pkgforge-dev/C-Dogs_SDL-AppImage) |
 | [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
 | [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
@@ -90,16 +90,16 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage) |
 | [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage) |
 | [CloneHero](https://github.com/pkgforge-dev/CloneHero-AppImage) |
-| [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage) |
+| [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage-Enhanced) |
 | [CollaboraOffice](https://github.com/pkgforge-dev/CollaboraOffice-AppImage) |
 | [Collision](https://github.com/pkgforge-dev/Collision-AppImage) |
 | [Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage) |
 | [Constrict](https://github.com/pkgforge-dev/Constrict-AppImage) |
 | [Contour](https://github.com/pkgforge-dev/contour-AppImage) |
 | [CopyQ](https://github.com/pkgforge-dev/CopyQ-AppImage) |
-| [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage) |
+| [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage-Enhanced) |
 | [Crispy Doom](https://github.com/pkgforge-dev/Crispy-Doom-AppImage) |
-| [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage) |
+| [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage-Enhanced) |
 | [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage) |
 | [Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage) |
 | [Cubyz](https://github.com/pkgforge-dev/Cubyz-AppImage) |
@@ -155,7 +155,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [foot](https://github.com/pkgforge-dev/foot-AppImage) |
 | [fooyin](https://github.com/pkgforge-dev/fooyin-AppImage) |
 | [freac](https://github.com/pkgforge-dev/freac-AppImage-Enhanced) |
-| [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage) |
+| [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage-Enhanced) |
 | [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage) |
 | [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage) |
 | [gamescope](https://github.com/pkgforge-dev/gamescope-AppImage) |
@@ -174,7 +174,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage) |
 | [gImageReader](https://github.com/pkgforge-dev/gImageReader-AppImage) |
 | [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage) |
-| [GitHub Desktop](https://github.com/pkgforge-dev/GitHub-Desktop-AppImage-Enhanced) |
+| [GitHub Desktop Plus](https://github.com/pkgforge-dev/GitHub-Desktop-Plus-AppImage-Enhanced) |
 | [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage) |
 | [Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage) |
 | [Gnome System Monitor](https://github.com/pkgforge-dev/Gnome-System-Monitor-AppImage) |
@@ -234,7 +234,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [LibreWolf](https://github.com/pkgforge-dev/LibreWolf-AppImage-Enhanced) |
 | [LightZone](https://github.com/pkgforge-dev/LightZone-AppImage) |
 | [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage) |
-| [LMMS](https://github.com/pkgforge-dev/LMMS-AppImage) |
+| [LMMS](https://github.com/pkgforge-dev/LMMS-AppImage-Enhanced) |
 | [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage) |
 | [Luanti](https://github.com/pkgforge-dev/Luanti-AppImage) |
 | [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage) |

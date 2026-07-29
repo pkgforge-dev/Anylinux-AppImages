@@ -63,7 +63,7 @@ Quickshell-AppImage: 7
 Mousai-AppImage: 7
 Luanti-AppImage: 7
 Haruna-AppImage: 7
-FreeTube-Appimage: 7
+FreeTube-Appimage-Enhanced: 7
 DuckStation-GPL-AppImage-Enhanced: 7
 DeSmuME-AppImage: 7
 BigPEmu-AppImage: 7
@@ -100,7 +100,7 @@ Eyedropper-AppImage: 5
 ExtremeTuxRacer-AppImage: 5
 DOSBox-Pure-Unleashed-AppImage: 5
 DNZHRecomp-AppImage: 5
-CorsixTH-AppImage: 5
+CorsixTH-AppImage-Enhanced: 5
 Clementine-AppImage: 5
 Audacity-AppImage-Enhanced: 5
 Asphyxia-CORE-AppImage: 5
@@ -140,7 +140,7 @@ EasyTAG-AppImage: 4
 DevilutionX-AppImage-Enhanced: 4
 DOOM64EXUltra-AppImage: 4
 D2X-Rebirth-AppImage: 4
-CroMagRally-AppImage: 4
+CroMagRally-AppImage-Enhanced: 4
 CopyQ-AppImage: 4
 Audio-Sharing-AppImage: 4
 Akhenaten-AppImage: 4
@@ -321,7 +321,7 @@ KMines-AppImage: 1
 KMahjongg-AppImage: 1
 Flacon-AppImage-Enhanced: 1
 Clapper-AppImage: 1
-CDogs-SDL-AppImage: 1
+C-Dogs_SDL-AppImage: 1
 BetterMediaInfo-AppImage-Enhanced: 1
 AAAAXY-AppImage-Enhanced: 1
 xournalpp-AppImage-Enhanced: 0
@@ -396,17 +396,17 @@ Mini-vMac-AppImage: 0
 ManiaDrive-AppImage: 0
 MESA-AppImage: 0
 MATE-Calculator-AppImage: 0
-LMMS-AppImage: 0
+LMMS-AppImage-Enhanced: 0
 KTouch-AppImage: 0
 KCalc-AppImage: 0
-GitHub-Desktop-AppImage-Enhanced: 0
+GitHub-Desktop-Plus-AppImage-Enhanced: 0
 Ghostscript-AppImage: 0
 Dwarf-Fortress-AppImage: 0
 Dorion-AppImage-Enhanced: 0
 Cursor-AppImage-enhanced: 0
 Constrict-AppImage: 0
 Commander-Genius-AppImage: 0
-ClownMDEmu-AppImage: 0
+ClownMDEmu-AppImage-Enhanced: 0
 CloneHero-AppImage: 0
 Claws-Mail-AppImage: 0
 Citron-AppImage: 0
