@@ -52,7 +52,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [anki](https://github.com/pkgforge-dev/anki-AppImage) |
 | [Antigravity](https://github.com/pkgforge-dev/Antigravity-AppImage) |
 | [Antigravity IDE](https://github.com/pkgforge-dev/Antigravity-IDE-AppImage) |
-| [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition) |
 | [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage) |
 | [Arx Libertatis](https://github.com/pkgforge-dev/Arx-Libertatis-AppImage) |
 | [Asphyxia CORE](https://github.com/pkgforge-dev/Asphyxia-CORE-AppImage) |
@@ -82,7 +81,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [C-Dogs_SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage) |
 | [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
 | [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
-| [Citron](https://github.com/pkgforge-dev/Citron-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
 | [ClassicImageViewer](https://github.com/pkgforge-dev/ClassicImageViewer-AppImage-Enhanced) |
 | [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage) |
@@ -391,7 +389,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Stoat](https://github.com/pkgforge-dev/Stoat-AppImage) |
 | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage) |
 | [Streamlink](https://github.com/pkgforge-dev/Streamlink-AppImage) |
-| [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage) |
 | [Super Mario War](https://github.com/pkgforge-dev/Supermariowar-AppImage) |
 | [Supermodel](https://github.com/pkgforge-dev/Supermodel-AppImage) |
 | [SuperTux](https://github.com/pkgforge-dev/SuperTux-AppImage-Enhanced) |
