@@ -30,6 +30,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 - [Size comparison](disk-usage-vs-flatpak.md)
 - [Build tools and scripts](useful-tools/)
 - [appimagetool](https://github.com/pkgforge-dev/appimagetool)
+- [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate)
 
 <!-- APPS_LIST_START -->
 
