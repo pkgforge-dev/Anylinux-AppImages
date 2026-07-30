@@ -31,7 +31,7 @@ Bitwarden-AppImage-Enhanced: 125
 Blender-AppImage: 1330
 Brave-Origin-AppImage: 1121
 Bulky-AppImage: 918
-CDogs-SDL-AppImage: 510
+C-Dogs_SDL-AppImage: 510
 CLK-AppImage: 330
 Cannonball-AppImage: 550
 Cartridges-AppImage: 1157
@@ -47,15 +47,15 @@ Claude-Desktop-AppImage: 41
 Claws-Mail-AppImage: 82
 Clementine-AppImage: 1965
 CloneHero-AppImage: 18
-ClownMDEmu-AppImage: 526
+ClownMDEmu-AppImage-Enhanced: 526
 CollaboraOffice-AppImage: 949
 Collision-AppImage: 1574
 Commander-Genius-AppImage: 395
 Constrict-AppImage: 87
 CopyQ-AppImage: 623
-CorsixTH-AppImage: 500
+CorsixTH-AppImage-Enhanced: 500
 Crispy-Doom-AppImage: 385
-CroMagRally-AppImage: 437
+CroMagRally-AppImage-Enhanced: 437
 Cromite-AppImage: 6722
 Cuberite-AppImage: 363
 Cubyz-AppImage: 96
@@ -102,7 +102,7 @@ Flacon-AppImage-Enhanced: 120
 Flashrom-AppImage: 89
 Flycast-AppImage-Enhanced: 823
 Foobillardpp-AppImage: 373
-FreeTube-Appimage: 2010
+FreeTube-Appimage-Enhanced: 2010
 Fretboard-AppImage: 652
 GCAP2025-AppImage: 217
 GCAP2026-AppImage: 225
@@ -119,7 +119,7 @@ Gearlynx-AppImage: 316
 Gearsystem-AppImage: 595
 Ghostscript-AppImage: 3
 Ghostship-AppImage-Enhanced: 1265
-GitHub-Desktop-AppImage-Enhanced: 134
+GitHub-Desktop-Plus-AppImage-Enhanced: 134
 Gnome-Calculator-AppImage: 2878
 Gnome-System-Monitor-AppImage: 1114
 Gnome-Text-Editor-AppImage: 1169
@@ -159,7 +159,7 @@ Kid3-AppImage: 1615
 Knights-AppImage: 288
 KolourPaint-AppImage: 309
 Kronos-AppImage: 1067
-LMMS-AppImage: 586
+LMMS-AppImage-Enhanced: 586
 Libation-AppImage: 3461
 LibreCAD-AppImage: 546
 LibreWolf-AppImage-Enhanced: 761

@@ -30,6 +30,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 - [Size comparison](disk-usage-vs-flatpak.md)
 - [Build tools and scripts](useful-tools/)
 - [appimagetool](https://github.com/pkgforge-dev/appimagetool)
+- [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate)
 
 <!-- APPS_LIST_START -->
 
@@ -52,7 +53,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [anki](https://github.com/pkgforge-dev/anki-AppImage) |
 | [Antigravity](https://github.com/pkgforge-dev/Antigravity-AppImage) |
 | [Antigravity IDE](https://github.com/pkgforge-dev/Antigravity-IDE-AppImage) |
-| [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate-Enhanced-Edition) |
 | [ares-emu](https://github.com/pkgforge-dev/ares-emu-appimage) |
 | [Arx Libertatis](https://github.com/pkgforge-dev/Arx-Libertatis-AppImage) |
 | [Asphyxia CORE](https://github.com/pkgforge-dev/Asphyxia-CORE-AppImage) |
@@ -79,10 +79,9 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage) |
 | [CatacombGL](https://github.com/pkgforge-dev/CatacombGL-AppImage) |
 | [Catfish](https://github.com/pkgforge-dev/Catfish-AppImage) |
-| [C-Dogs_SDL](https://github.com/pkgforge-dev/CDogs-SDL-AppImage) |
+| [C-Dogs_SDL](https://github.com/pkgforge-dev/C-Dogs_SDL-AppImage) |
 | [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
 | [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
-| [Citron](https://github.com/pkgforge-dev/Citron-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
 | [ClassicImageViewer](https://github.com/pkgforge-dev/ClassicImageViewer-AppImage-Enhanced) |
 | [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage) |
@@ -92,16 +91,16 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage) |
 | [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage) |
 | [CloneHero](https://github.com/pkgforge-dev/CloneHero-AppImage) |
-| [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage) |
+| [ClownMDEmu](https://github.com/pkgforge-dev/ClownMDEmu-AppImage-Enhanced) |
 | [CollaboraOffice](https://github.com/pkgforge-dev/CollaboraOffice-AppImage) |
 | [Collision](https://github.com/pkgforge-dev/Collision-AppImage) |
 | [Commander-Genius](https://github.com/pkgforge-dev/Commander-Genius-AppImage) |
 | [Constrict](https://github.com/pkgforge-dev/Constrict-AppImage) |
 | [Contour](https://github.com/pkgforge-dev/contour-AppImage) |
 | [CopyQ](https://github.com/pkgforge-dev/CopyQ-AppImage) |
-| [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage) |
+| [CorsixTH](https://github.com/pkgforge-dev/CorsixTH-AppImage-Enhanced) |
 | [Crispy Doom](https://github.com/pkgforge-dev/Crispy-Doom-AppImage) |
-| [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage) |
+| [CroMagRally](https://github.com/pkgforge-dev/CroMagRally-AppImage-Enhanced) |
 | [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage) |
 | [Cuberite](https://github.com/pkgforge-dev/Cuberite-AppImage) |
 | [Cubyz](https://github.com/pkgforge-dev/Cubyz-AppImage) |
@@ -157,7 +156,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [foot](https://github.com/pkgforge-dev/foot-AppImage) |
 | [fooyin](https://github.com/pkgforge-dev/fooyin-AppImage) |
 | [freac](https://github.com/pkgforge-dev/freac-AppImage-Enhanced) |
-| [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage) |
+| [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage-Enhanced) |
 | [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage) |
 | [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage) |
 | [gamescope](https://github.com/pkgforge-dev/gamescope-AppImage) |
@@ -176,7 +175,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Ghostty](https://github.com/pkgforge-dev/ghostty-appimage) |
 | [gImageReader](https://github.com/pkgforge-dev/gImageReader-AppImage) |
 | [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage) |
-| [GitHub Desktop](https://github.com/pkgforge-dev/GitHub-Desktop-AppImage-Enhanced) |
+| [GitHub Desktop Plus](https://github.com/pkgforge-dev/GitHub-Desktop-Plus-AppImage-Enhanced) |
 | [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage) |
 | [Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage) |
 | [Gnome System Monitor](https://github.com/pkgforge-dev/Gnome-System-Monitor-AppImage) |
@@ -236,7 +235,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [LibreWolf](https://github.com/pkgforge-dev/LibreWolf-AppImage-Enhanced) |
 | [LightZone](https://github.com/pkgforge-dev/LightZone-AppImage) |
 | [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage) |
-| [LMMS](https://github.com/pkgforge-dev/LMMS-AppImage) |
+| [LMMS](https://github.com/pkgforge-dev/LMMS-AppImage-Enhanced) |
 | [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage) |
 | [Luanti](https://github.com/pkgforge-dev/Luanti-AppImage) |
 | [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage) |
@@ -391,7 +390,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Stoat](https://github.com/pkgforge-dev/Stoat-AppImage) |
 | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage) |
 | [Streamlink](https://github.com/pkgforge-dev/Streamlink-AppImage) |
-| [Sudachi](https://github.com/pkgforge-dev/Sudachi-AppImage) |
 | [Super Mario War](https://github.com/pkgforge-dev/Supermariowar-AppImage) |
 | [Supermodel](https://github.com/pkgforge-dev/Supermodel-AppImage) |
 | [SuperTux](https://github.com/pkgforge-dev/SuperTux-AppImage-Enhanced) |

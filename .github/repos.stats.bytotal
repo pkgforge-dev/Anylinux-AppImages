@@ -48,7 +48,7 @@ Extension-Manager-AppImage: 2127
 kdenlive-AppImage-Enhanced: 2091
 Audacity-AppImage-Enhanced: 2058
 Gapless-AppImage: 2012
-FreeTube-Appimage: 2010
+FreeTube-Appimage-Enhanced: 2010
 Clementine-AppImage: 1965
 EasyTAG-AppImage: 1942
 Qimgv-AppImage: 1940
@@ -194,7 +194,7 @@ PokeMMO-AppImage: 597
 Gearsystem-AppImage: 595
 vcmi-AppImage: 593
 VeraCrypt-AppImage: 592
-LMMS-AppImage: 586
+LMMS-AppImage-Enhanced: 586
 yt-dlp-AppImage: 581
 Rednukem-AppImage: 576
 Qmmp-AppImage: 575
@@ -216,7 +216,7 @@ Stella-AppImage: 534
 SUPER-ZSNES-AppImage: 531
 BasiliskII-AppImage-Enhanced: 531
 OpenTyrian2000-AppImage: 528
-ClownMDEmu-AppImage: 526
+ClownMDEmu-AppImage-Enhanced: 526
 dhewm3-AppImage: 523
 DarkPlaces-AppImage: 522
 Awakened-POE-Trade-AppImage-Enhanced: 520
@@ -225,13 +225,13 @@ KeePassXC-AppImage-Enhanced: 516
 Geargrafx-AppImage: 514
 vokoscreenNG-AppImage: 512
 Daggerfall-Unity-AppImage: 510
-CDogs-SDL-AppImage: 510
+C-Dogs_SDL-AppImage: 510
 Defold-AppImage: 509
 OpenRCT2-AppImage-Enhanced: 507
 Protontricks-AppImage: 504
 Signal-AppImage-Enhanced: 503
 PCSX2-AppImage-Enhanced: 501
-CorsixTH-AppImage: 500
+CorsixTH-AppImage-Enhanced: 500
 Mini-vMac-AppImage: 496
 RSDKv3-AppImage: 492
 PCSX-Redux-AppImage-Enhanced: 492
@@ -250,7 +250,7 @@ Rigs-of-Rods-AppImage: 449
 Iris-AppImage-Enhanced: 447
 QTerminal-AppImage: 445
 Supermariowar-AppImage: 437
-CroMagRally-AppImage: 437
+CroMagRally-AppImage-Enhanced: 437
 RSDKv4-AppImage: 436
 Exult-AppImage: 436
 Play-AppImage-Enhanced: 428
@@ -368,7 +368,7 @@ tachoparser-AppImage: 140
 Dillo-AppImage: 140
 Denise-AppImage: 140
 Slack-AppImage: 139
-GitHub-Desktop-AppImage-Enhanced: 134
+GitHub-Desktop-Plus-AppImage-Enhanced: 134
 ClassicImageViewer-AppImage-Enhanced: 130
 OCRmyPDF-AppImage: 129
 lba2-classic-community-AppImage: 127
