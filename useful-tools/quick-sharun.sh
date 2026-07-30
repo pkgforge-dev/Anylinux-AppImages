@@ -958,6 +958,7 @@ _make_deployment_array() {
 		DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 		DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 		DEPLOY_VULKAN=${DEPLOY_VULKAN:-1}
+		DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
 		set -- "$@" \
 			"$LIB_DIR"/libnss*.so*        \
 			"$LIB_DIR"/libsoftokn3.so*    \
