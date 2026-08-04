@@ -31,6 +31,7 @@ static const char *override_id = NULL;
 static GApplication *(*real_g_application_new)(const char *, GApplicationFlags);
 static GApplication *(*real_gtk_application_new)(const char *, GApplicationFlags);
 static void (*real_g_application_set_application_id)(GApplication *, const char *);
+static const char *(*real_g_application_get_application_id)(GApplication *);
 static void (*real_g_set_prgname)(const char *);
 static const char *(*real_g_get_prgname)(void);
 static void (*real_gdk_surface_set_app_id)(void *surface, const char *app_id);
@@ -52,6 +53,7 @@ static void gtk_init(void) {
 	real_g_application_new = dlsym(RTLD_NEXT, "g_application_new");
 	real_gtk_application_new = dlsym(RTLD_NEXT, "gtk_application_new");
 	real_g_application_set_application_id = dlsym(RTLD_NEXT, "g_application_set_application_id");
+	real_g_application_get_application_id = dlsym(RTLD_NEXT, "g_application_get_application_id");
 	real_g_set_prgname = dlsym(RTLD_NEXT, "g_set_prgname");
 	real_g_get_prgname = dlsym(RTLD_NEXT, "g_get_prgname");
 	real_gdk_surface_set_app_id = dlsym(RTLD_NEXT, "gdk_surface_set_app_id");
@@ -86,6 +88,12 @@ void g_set_prgname(const char *prgname) {
 	if (real_g_set_prgname) {
 		real_g_set_prgname(effective_id(prgname));
 	}
+}
+
+const char *g_application_get_application_id(GApplication *app) {
+	gtk_init();
+	if (override_id) return override_id;
+	return real_g_application_get_application_id ? real_g_application_get_application_id(app) : NULL;
 }
 
 const char *g_get_prgname(void) {
