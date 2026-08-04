@@ -2787,7 +2787,7 @@ _add_hooks_library() {
 _handle_nested_bins() {
 	# wrap any executable in lib with sharun
 	for b in $(find "$DST_LIB_DIR"/ -type f ! -name '*.so*'); do
-		if [ -x "$b" ] && [ -x "$SHARUN_BIN_DIR"/"${b##*/}" ]; then
+		if [ -x "$b" ] && _is_elf "$b" && [ -x "$SHARUN_BIN_DIR"/"${b##*/}" ]; then
 			rm -f "$b"
 			ln "$APPDIR"/sharun "$b"
 			_echo "* Wrapped lib executable '$b' with sharun"
@@ -2796,7 +2796,7 @@ _handle_nested_bins() {
 
 	# do the same for possible nested binaries in bin
 	for b in $(find "$DST_BIN_DIR"/*/ -type f ! -name '*.so*' 2>/dev/null); do
-		if [ -x "$b" ] && [ -x "$SHARUN_BIN_DIR"/"${b##*/}" ]; then
+		if [ -x "$b" ] && _is_elf "$b" && [ -x "$SHARUN_BIN_DIR"/"${b##*/}" ]; then
 			rm -f "$b"
 			ln "$APPDIR"/sharun "$b"
 			_echo "* Wrapped nested bin executable '$b' with sharun"
