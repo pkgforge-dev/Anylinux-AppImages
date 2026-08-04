@@ -3295,10 +3295,10 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/ld-linux*.so*|*/ld-musl*.so*)
-		# patch away the dynamic linker /etc to disable /etc/ld.so.preload
+		# do not let the dynamic linker read /etc ever
 		if grep -qa -m 1 '/etc' "$lib"; then
-			sed -i -e 's|/etc/ld.so.preload|/XXX/ld.so.preload|g' "$lib"
-			_echo "* patched away ${lib##*/} /etc/ld.so.preload"
+			sed -i -e 's|/etc|/KEK|g' "$lib"
+			_echo "* patched away /etc from ${lib##*/}"
 		fi
 		;;
 	*/libgegl*.so*)
