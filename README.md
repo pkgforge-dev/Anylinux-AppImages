@@ -211,6 +211,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [isle-portable](https://github.com/pkgforge-dev/isle-portable-AppImage-Enhanced) |
 | [ITGmania](https://github.com/pkgforge-dev/ITGmania-AppImage) |
 | [ITR2025](https://github.com/pkgforge-dev/ITR2025-AppImage) |
+| [Joplin Desktop](https://github.com/pkgforge-dev/Joplin-Desktop-AppImage) |
 | [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage) |
 | [KBlocks](https://github.com/pkgforge-dev/KBlocks-AppImage) |
 | [KCalc](https://github.com/pkgforge-dev/KCalc-AppImage) |
