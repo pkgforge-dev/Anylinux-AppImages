@@ -2305,7 +2305,7 @@ _check_hardcoded_lib_dirs() {
 			locale      |\
 			pipewire*   |\
 			pulseaudio  |\
-			qt*         |\
+			qt|qt?|qt?? |\
 			spa*        |\
 			vdpau       )
 				continue
@@ -3231,7 +3231,7 @@ for lib do case "$lib" in
 		_try_cp "$src_vklayer_icd" "$dst_vklayer_icd"
 		sed -i -e 's|/usr/lib.*/||g' "$dst_vklayer_icd" || :
 		;;
-	*/qt*/plugins/*.so)
+	*/qt/plugins/*.so|*/qt?/plugins/*.so|*/qt??/plugins/*.so)
 		f=$DST_BIN_DIR/qt.conf
 		if [ ! -f "$f" ]; then
 			_qtdir=${lib#$DST_LIB_DIR/} # leaves qt*
