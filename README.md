@@ -304,6 +304,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage) |
 | [Piglit](https://github.com/pkgforge-dev/Piglit-AppImage) |
 | [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage) |
+| [Pinta-GTK3](https://github.com/pkgforge-dev/Pinta-GTK3-AppImage) |
 | [Pixelpulse2](https://github.com/pkgforge-dev/Pixelpulse2-AppImage) |
 | [Planify](https://github.com/pkgforge-dev/Planify-AppImage) |
 | [Play!](https://github.com/pkgforge-dev/Play-AppImage-Enhanced) |
