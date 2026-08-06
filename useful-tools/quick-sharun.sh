@@ -3264,10 +3264,20 @@ for lib do case "$lib" in
 		src_qt_trans=/usr/share/$QT_DIR/translations
 		dst_qt_trans=$DST_LIB_DIR/$QT_DIR/translations
 		_try_cp "$src_qt_trans" "$dst_qt_trans"
-		# debloat a bit since we don't need all of them
-		rm -f "$dst_qt_trans"/assistant*.qm
-		rm -f "$dst_qt_trans"/designer*.qm
-		rm -f "$dst_qt_trans"/linguist*.qm
+		# remove translations that we do not need
+		for b in assistant designer linguist; do
+			[ -f "$SHARUN_BIN_DIR"/"$b" ] || rm -f "$dst_qt_trans"/"$b"*.qm
+		done
+		(
+			set -- "$DST_LIB_DIR"/libQt*Multimedia.so*
+			  [ -f "$1" ] || rm -f "$dst_qt_trans"/qtmultimedia*.qm
+			set -- "$DST_LIB_DIR"/libQt*WebEngineCore.so*
+			  [ -f "$1" ] || rm -f "$dst_qt_trans"/qtwebengine*.qm
+			set -- "$DST_LIB_DIR"/libQt*SerialPort.so*
+			  [ -f "$1" ] || rm -f "$dst_qt_trans"/qtserialport*.qm
+			set -- "$DST_LIB_DIR"/libQt*WebSockets.so*
+			  [ -f "$1" ] || rm -f "$dst_qt_trans"/qtwebsockets*.qm
+		)
 		;;
 	*/libgirepository-*.so*)
 		_girver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
