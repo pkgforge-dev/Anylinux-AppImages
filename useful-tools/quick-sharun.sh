@@ -3277,6 +3277,12 @@ for lib do case "$lib" in
 			  [ -f "$1" ] || rm -f "$dst_qt_trans"/qtserialport*.qm
 			set -- "$DST_LIB_DIR"/libQt*WebSockets.so*
 			  [ -f "$1" ] || rm -f "$dst_qt_trans"/qtwebsockets*.qm
+			set -- "$DST_LIB_DIR"/libQt*Qml.so* "$DST_LIB_DIR"/libQt*Quick.so*
+			  [ -f "$1" ] || [ -f "$2" ] || rm -f "$dst_qt_trans"/qtdeclarative*.qm
+			set -- "$DST_LIB_DIR"/libQt*Positioning.so* "$DST_LIB_DIR"/libQt*Location.so*
+			  [ -f "$1" ] || [ -f "$2" ] || rm -f "$dst_qt_trans"/qtlocation*.qm
+			set -- "$DST_LIB_DIR"/libQt*Bluetooth.so* "$DST_LIB_DIR"/libQt*Nfc.so*
+			  [ -f "$1" ] || [ -f "$2" ] || rm -f "$dst_qt_trans"/qtconnectivity*.qm
 		)
 		;;
 	*/libgirepository-*.so*)
