@@ -74,10 +74,6 @@ Easy to deploy but it is insanely bloated, to the point that [Valve had to make 
 
 alsa doesn't check `XDG_DATA_DIRS` to find its data directory, we have to set `ALSA_CONFIG_PATH` to the configuration file in that directory, which is hardcoded to look into `/usr/share/alsa` anyway lol and fixing that issue is a total mess since the file does not accept relative paths to its location, so you have to get the value of some env variable using what syntax this is, [like this](https://github.com/alsa-project/alsa-lib/blob/5f7fe33002d2d98d84f72e381ec2cccc0d5d3d40/src/conf/alsa.conf#L17-L26)
 
-# Bad - Glibc
-
-glibc supports the `LOCPATH` env variable but this doesn't work with locale archives, This problem affects NixOS and they have to [patch](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/libraries/glibc/nix-locale-archive.patch) it so that locale-archives can be made relocatable. We also have to set `GCONV_PATH` and good luck figuring out which gconv plugin your app exactly needs, and when the plugin is missing there is no error about it, [it is just totally random what happens](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20)
-
 # Bad - GStreamer
 
 It is insane how you can screw up a system that is modular? First it is very difficult to determine what Gstreamer plugin an application needs unless you already know it before hand since you built it, Gstreamer uses something called `gst-plugin-scanner` which opens every single gstreamer plugin on the system, so we cannot easily determine using `strace` what plugin an application needs. It needs 4 env variables to be made relocatable `GST_PLUGIN_PATH`, `GST_PLUGIN_SYSTEM_PATH`, `GST_PLUGIN_SYSTEM_PATH_1_0` (lol?), and `GST_PLUGIN_SCANNER`.
@@ -91,6 +87,12 @@ This is a general failure of linux that there is no standard path to the certifi
 # Horrible - p11kit
 
 [You need to recompile the library to enable environment variables to make it relocatable.](https://github.com/p11-glue/p11-kit/issues/700) And none of the vars are documented!
+
+# Horrible - Glibc
+
+glibc supports the `LOCPATH` env variable but this doesn't work with locale archives, This problem affects NixOS and they have to [patch](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/libraries/glibc/nix-locale-archive.patch) it so that locale-archives can be made relocatable. We also have to set `GCONV_PATH` and good luck figuring out which gconv plugin your app exactly needs, and when the plugin is missing there is no error about it, [it is just totally random what happens](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20)
+
+We also have to patch `ld-linux.so` to preven it from reading `/etc/ld.so.cache` because otherwise [it would segfault instantly on some systems](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/766#issuecomment-5182230177) 
 
 # Horrible - WebKit
 
