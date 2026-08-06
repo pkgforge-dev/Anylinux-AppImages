@@ -1012,10 +1012,21 @@ _make_deployment_array() {
 	if [ "$DEPLOY_PIPEWIRE" = 1 ]; then
 		_echo "* Deploying pipewire"
 		DEPLOY_PULSE=${DEPLOY_PULSE:-1}
+		# only deploy what pipewire CLIENTS need
+		# filter-graph spa plugins are skipped on purpose: only effect hosts
+		# like carla need them, pass /spa-*/filter-graph/*.so* if that ever happens
 		set -- "$@" \
-			"$LIB_DIR"/pipewire-*/* \
-			"$LIB_DIR"/spa-*/*      \
-			"$LIB_DIR"/spa-*/*/*    \
+			"$LIB_DIR"/pipewire-*/*-module-adapter.so*            \
+			"$LIB_DIR"/pipewire-*/*-module-client-device.so*      \
+			"$LIB_DIR"/pipewire-*/*-module-client-node.so*        \
+			"$LIB_DIR"/pipewire-*/*-module-metadata.so*           \
+			"$LIB_DIR"/pipewire-*/*-module-protocol-native.so*    \
+			"$LIB_DIR"/pipewire-*/*-module-rt.so*                 \
+			"$LIB_DIR"/pipewire-*/*-module-session-manager.so*    \
+			"$LIB_DIR"/spa-*/audioconvert/libspa-audioconvert.so* \
+			"$LIB_DIR"/spa-*/support/libspa-dbus.so*              \
+			"$LIB_DIR"/spa-*/support/libspa-support.so*           \
+			"$LIB_DIR"/spa-*/videoconvert/libspa-videoconvert.so* \
 			"$LIB_DIR"/alsa-lib/*pipewire*.so*
 	fi
 	if [ "$DEPLOY_PULSE" = 1 ]; then
