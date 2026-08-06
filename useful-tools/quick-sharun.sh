@@ -3170,6 +3170,9 @@ for lib do case "$lib" in
 		# apps may crash when the host has no mime database
 		_try_cp /usr/share/mime "$APPDIR"/share/mime
 		rm -rf "$APPDIR"/share/mime/packages # bloat
+		# only the compiled mime database (mime.cache/magic/globs) is read by apps
+		# the *.xml files are used to generate them via update-mime-database
+		find "$APPDIR"/share/mime -type f -name '*.xml' -delete || :
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
