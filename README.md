@@ -260,6 +260,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [NeoChat](https://github.com/pkgforge-dev/NeoChat-AppImage) |
 | [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage) |
 | [Neverball](https://github.com/pkgforge-dev/Neverball-AppImage) |
+| [NewPipe](https://github.com/pkgforge-dev/NewPipe-AppImage) |
 | [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage) |
 | [NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage) |
 | [Nitrogen](https://github.com/pkgforge-dev/Nitrogen-AppImage) |
