@@ -1434,7 +1434,9 @@ _lib4bin_collect_strace() {
 		                                                     -e '/lib-dynload/d' \
 		                                                     -e '/_internal/d'   \
 		                                                     -e '/libncurses/d'  \
-		                                                     -e '/libcurses/d'
+		                                                     -e '/libcurses/d'   \
+		                                                     -e '/pipewire/d'    \
+		                                                     -e '/libspa/d'
 		)
 		rm -f "$dlopened"
 		[ -n "$out" ] || continue
