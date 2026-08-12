@@ -225,12 +225,7 @@ if [ "$ADD_MESA" = 1 ]; then
 fi
 
 if [ "$ADD_OPENGL" = 1 ]; then
-	# mesa zink conflicts with regular mesa
-	if echo "$ADD_PACKAGES" | grep -q 'mesa-zink'; then
-		set -- "$@" mesa-zink-mini
-	else
-		set -- "$@" mesa-"$PKG_TYPE"
-	fi
+	set -- "$@" mesa-"$PKG_TYPE"
 fi
 
 if [ "$ADD_VULKAN" = 1 ]; then
