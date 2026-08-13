@@ -20,7 +20,6 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 | Flatpak | **Hard dependency on bubblewrap and FUSE**. Must be supported by your distribution or be manually built and installed systemwide which requires elevated rights. |
 | Snap | Similar requirements to flatpak minus bubblewrap, has a **hard dependency on systemd**. |
 | **AnyLinux AppImages** (made with sharun) | Use **FUSE if available**, else **fallback to using namespaces** and if that is not possible then we automatically extract to `TMPDIR` and run with post cleanup, we **do not need an FHS filesystem** and **do not depend on the host libc**, so eh make sure you have write access to `/tmp`??? (If you can boot to a graphical session you already met those requirements). **How is this possible?** See: [How to guide](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/HOW-TO-MAKE-THESE.md) |
-| **AnyLinux AppImages** (made with RunImage) | Similar to sharun AppImages but have a **Hard dependency on namespaces**, Lutris and virt-manager are the only ones that use this method, pending migration to sharun. |
 
 For more useful documentation about Anylinux-AppImages, see the pages below:
 
@@ -86,7 +85,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ClassicImageViewer](https://github.com/pkgforge-dev/ClassicImageViewer-AppImage-Enhanced) |
 | [ClassiCube](https://github.com/pkgforge-dev/ClassiCube-AppImage) |
 | [Claude Code](https://github.com/pkgforge-dev/claude-code-AppImage) |
-| [Claude Desktop](https://github.com/pkgforge-dev/Claude-Desktop-AppImage) | 
+| [Claude Desktop](https://github.com/pkgforge-dev/Claude-Desktop-AppImage) |
 | [Claws Mail](https://github.com/pkgforge-dev/Claws-Mail-AppImage) |
 | [Clementine](https://github.com/pkgforge-dev/Clementine-AppImage) |
 | [Clock Signal](https://github.com/pkgforge-dev/CLK-AppImage) |
@@ -241,7 +240,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [LMMS](https://github.com/pkgforge-dev/LMMS-AppImage-Enhanced) |
 | [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage) |
 | [Luanti](https://github.com/pkgforge-dev/Luanti-AppImage) |
-| [Lutris](https://github.com/pkgforge-dev/Lutris-AppImage) |
 | [MAME](https://github.com/pkgforge-dev/MAME-AppImage) |
 | [ManiaDrive](https://github.com/pkgforge-dev/ManiaDrive-AppImage) |
 | [MarioKart64Recomp](https://github.com/pkgforge-dev/MarioKart64Recomp-AppImage) |
@@ -430,7 +428,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Viber](https://github.com/pkgforge-dev/Viber-AppImage-Enhanced) |
 | [VICE](https://github.com/pkgforge-dev/VICE-AppImage) |
 | [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage) |
-| [virt-manager](https://github.com/pkgforge-dev/virt-manager-AppImage) |
 | [Visual Studio Code](https://github.com/pkgforge-dev/Visual-Studio-Code-AppImage) |
 | [VisualBoyAdvance-M](https://github.com/pkgforge-dev/VisualBoyAdvance-M-AppImage) |
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
