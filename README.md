@@ -183,6 +183,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Gnome Text Editor](https://github.com/pkgforge-dev/Gnome-Text-Editor-AppImage) |
 | [Gnome Web](https://github.com/pkgforge-dev/Gnome-Web-AppImage) |
 | [GNU FreeDink](https://github.com/pkgforge-dev/GNU-FreeDink-AppImage) |
+| [GNU Octave](https://github.com/pkgforge-dev/GNU-Octave-AppImage) |
 | [Godot](https://github.com/pkgforge-dev/Godot-AppImage) |
 | [GoldenDict-ng](https://github.com/pkgforge-dev/GoldenDict-ng-AppImage) |
 | [Gopher64](https://github.com/pkgforge-dev/Gopher64-AppImage) |
