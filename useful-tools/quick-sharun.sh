@@ -786,7 +786,9 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/CP*.so*      \
 			"$LIB_DIR"/gconv/LATIN*.so*   \
 			"$LIB_DIR"/gconv/UNICODE*.so* \
-			"$LIB_DIR"/gconv/ISO8859*.so*
+			"$LIB_DIR"/gconv/ISO8859*.so* \
+			"$LIB_DIR"/gconv/SJIS*.so*    \
+			"$LIB_DIR"/gconv/EUC-*.so*
 	fi
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
 		DEPLOY_OPENGL=0
@@ -3131,7 +3133,8 @@ for lib do case "$lib" in
 		_try_cp /usr/share/ghostscript "$APPDIR"/share/ghostscript
 		;;
 	*/gconv/*.so)
-		_try_cp "$LIB_DIR"/gconv/gconv-modules "$DST_LIB_DIR"/gconv/gconv-modules
+		_try_cp "$LIB_DIR"/gconv/gconv-modules   "$DST_LIB_DIR"/gconv/gconv-modules
+		_try_cp "$LIB_DIR"/gconv/gconv-modules.d "$DST_LIB_DIR"/gconv/gconv-modules.d
 		;;
 	*/libpipewire-*.so*)
 		_try_cp /usr/share/pipewire "$APPDIR"/share/pipewire
