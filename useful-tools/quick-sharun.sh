@@ -788,7 +788,9 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/UNICODE*.so* \
 			"$LIB_DIR"/gconv/ISO8859*.so* \
 			"$LIB_DIR"/gconv/SJIS*.so*    \
-			"$LIB_DIR"/gconv/EUC-*.so*
+			"$LIB_DIR"/gconv/EUC-JP.so*   \
+			"$LIB_DIR"/gconv/EUC-KR.so*   \
+			"$LIB_DIR"/gconv/EUC-CN.so*
 	fi
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
 		DEPLOY_OPENGL=0
