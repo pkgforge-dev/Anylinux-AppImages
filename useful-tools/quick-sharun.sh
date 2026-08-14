@@ -2820,12 +2820,15 @@ _handle_nested_bins() {
 	done
 }
 
-# sometimes developers add stuff like /bin/sh or env as the Exec= key of the
-# desktop entry, 99.99% of the time this is not wanted, so we have to error that
-_check_main_bin() {
+# MAIN_BIN needs to be set early for DEBLOAT_PYTHON to work correctly
+_set_main_bin() {
 	if [ -z "$MAIN_BIN" ]; then
 		MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$DESKTOP_ENTRY" | tr -d "\"'")
 		MAIN_BIN=${MAIN_BIN##*/}
+
+		# sometimes developers add stuff like /bin/sh or env in the
+		# Exec= key of the desktop file, MAIN_BIN is derived from that
+		# 99.99% of the time this is not wanted, so error that
 		case "$MAIN_BIN" in
 			env|sh|bash)
 				_err_msg "Main binary is '$MAIN_BIN', it is unlikely you"
@@ -2836,7 +2839,9 @@ _check_main_bin() {
 				;;
 		esac
 	fi
+}
 
+_check_main_bin() {
 	if [ -f "$DST_BIN_DIR"/"$MAIN_BIN" ]; then
 		return 0
 	fi
@@ -2979,6 +2984,7 @@ esac
 _sanity_check
 _get_desktop
 _get_icon
+_set_main_bin
 
 _echo "------------------------------------------------------------"
 _echo "Starting deployment, checking if extra libraries need to be added..."
