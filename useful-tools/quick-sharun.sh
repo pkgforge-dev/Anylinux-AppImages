@@ -858,7 +858,7 @@ _make_deployment_array() {
 
 		if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
 			if ! enginebin=$(find "${QT_LOCATION:-$LIB_DIR}" -type f \
-			  -name 'QtWebEngineProcess' -print -quit 2>/dev/null); then
+			  -name 'QtWebEngineProcess' -print 2>/dev/null | head -n 1); then
 				_err_msg "Cannot find QtWebEngineProcess!"
 				exit 1
 			fi
@@ -1120,7 +1120,7 @@ _make_deployment_array() {
 		# On ubuntu and alpine the gstreamer binaries are on a different dir
 		if [ ! -f "$GST_DIR"/gst-plugin-scanner ]; then
 			gst_bin_path=$(find /usr/lib* -type f \
-				-name 'gst-plugin-scanner' -print -quit)
+				-name 'gst-plugin-scanner' -print | head -n 1)
 			gst_bin_dir=${gst_bin_path%/*}
 			set -- "$@" \
 				"$gst_bin_dir"/gst*scanner \
@@ -2036,7 +2036,7 @@ _deploy_locale() {
 					set -- "$@" ! -name "*$f*"
 				fi
 			done
-			find "$APPDIR"/share/locale "$@" \( -type f -o -type l \) -delete
+			find "$APPDIR"/share/locale "$@" \( -type f -o -type l \) -exec rm -f {} +
 			_remove_empty_dirs "$APPDIR"/share/locale
 		fi
 		echo ""
@@ -2402,7 +2402,7 @@ _sort_env_file() {
 
 _remove_static_libs() {
 	if [ "$KEEP_STATIC_LIBS" != 1 ]; then
-		find "$APPDIR"/lib*/ -type f -name '*.a' -delete || :
+		find "$APPDIR"/lib*/ -type f -name '*.a' -exec rm -f {} + || :
 		_echo "* removed static libraries"
 	fi
 }
@@ -3013,7 +3013,7 @@ if [ "$DEPLOY_FLUTTER" = 1 ]; then
 	# flutter apps need to have a relative lib and data directory
 	# we need to find the directory that contains libapp.so
 	if libapp=$(cd "$DST_BIN_DIR" \
-	  && find ../lib/ -type f -name 'libapp.so' -print -quit); then
+	  && find ../lib/ -type f -name 'libapp.so' -print | head -n 1); then
 		d=${libapp%/*}
 		if [ ! -d "$DST_BIN_DIR"/"${d##*/}" ]; then
 			ln -s "$d" "$DST_BIN_DIR"/"${d##*/}"
@@ -3161,7 +3161,7 @@ for lib do case "$lib" in
 		# sharun only checks for $SHARUN_DIR/share/file/misc/magic.mgc
 		# but on ubuntu for example, the file is located in /usr/share/file/magic.mgc
 		# so we need to find the magic.mgc file and copy it to dst
-		src_magic_file=$(find -L /usr/share/file -type f -name magic.mgc -print -quit) || :
+		src_magic_file=$(find -L /usr/share/file -type f -name magic.mgc -print | head -n 1) || :
 		dst_magic_file=$APPDIR/share/file/misc/magic.mgc
 		_try_cp "$src_magic_file" "$dst_magic_file"
 		;;
@@ -3185,7 +3185,7 @@ for lib do case "$lib" in
 		rm -rf "$APPDIR"/share/mime/packages # bloat
 		# only the compiled mime database (mime.cache/magic/globs) is read by apps
 		# the *.xml files are used to generate them via update-mime-database
-		find "$APPDIR"/share/mime -type f -name '*.xml' -delete || :
+		find "$APPDIR"/share/mime -type f -name '*.xml' -exec rm -f {} + || :
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
