@@ -3333,6 +3333,16 @@ for lib do case "$lib" in
 			localedef --prefix /tmp --no-archive -i en_US -f UTF-8 en_US.UTF-8 || :
 			if cp -r /tmp/usr/lib/locale/en_US.utf8 "$DST_LIB_DIR"/locale; then
 				_echo "* added en_US.UTF-8 locale"
+				# the LC_COLLATE fromen_US.UTF-8 is massive (2.5 MiB)
+				# We can just replace it with the C LC_COLLATE file
+				# The bundled en_US.UTF-8 is only used as an emergency
+				# fallback for systems without glibc locales
+				src_collate_dir=$DST_LIB_DIR/locale/C.utf8/LC_COLLATE
+				dst_collate_dir=$dst_en_locale_dir/LC_COLLATE
+				if [ -f "$src_collate_dir" ] && [ -f "$dst_collate_dir" ]; then
+					rm -f "$dst_collate_dir"
+					_try_cp "$src_collate_dir" "$dst_collate_dir"
+				fi
 			fi
 		fi
 		;;
