@@ -2137,6 +2137,33 @@ _add_bwrap_wrapper() {
 	fi
 }
 
+_fix_electron_libc_nonsense() {
+	[ "$DEPLOY_ELECTRON" = 1 ] || [ "$DEPLOY_CHROMIUM" = 1 ] || return 0
+	# electron apps may attempt to determine if the host has glibc or musl
+	# they do so by reading /usr/bin/ldd, /etc/alpine-release or exec `ldd --version`
+	#
+	# This causes apps to crash because they think their libc is musl when it is not
+	#
+	set -- $(find "$APPDIR"/ -type f \( -name 'app.asar' -o -name '*.js' \) -print 2>/dev/null)
+	for f do
+		_patched=""
+		[ -f "$f" ] || continue
+		# string has to be the same length
+		if grep -aq -m 1 '/usr/bin/ldd' "$f"; then _patched=1
+			sed -i -e 's|/usr/bin/ldd|/XXX/YYY/ZZZ|g' "$f"
+		fi
+		if grep -aq -m 1 'ldd --version' "$f"; then _patched=1
+			sed -i -e 's|ldd --version|___ --version|g' "$f"
+		fi
+		if grep -aq -m 1 '/etc/alpine-release' "$f"; then _patched=1
+			sed -i -e 's|/etc/alpine-release|/XXX/alpine-release|g' "$f"
+		fi
+		if [ "$_patched" = 1 ]; then
+			_echo "* patched away host libc detection from $f"
+		fi
+	done
+}
+
 _fix_cpython_ldconfig_mess() {
 	# cpython runs ldconfig -p to determine library names, this is
 	# super flawed because ldconfig -p is going to print host libraries
@@ -3519,6 +3546,7 @@ if [ -f "$a" ]; then
 	_echo "removed $a"
 fi
 
+_fix_electron_libc_nonsense
 _remove_static_libs
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
