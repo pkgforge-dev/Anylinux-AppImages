@@ -3337,11 +3337,11 @@ for lib do case "$lib" in
 				# We can just replace it with the C LC_COLLATE file
 				# The bundled en_US.UTF-8 is only used as an emergency
 				# fallback for systems without glibc locales
-				src_collate_dir=$DST_LIB_DIR/locale/C.utf8/LC_COLLATE
-				dst_collate_dir=$dst_en_locale_dir/LC_COLLATE
-				if [ -f "$src_collate_dir" ] && [ -f "$dst_collate_dir" ]; then
-					rm -f "$dst_collate_dir"
-					_try_cp "$src_collate_dir" "$dst_collate_dir"
+				src_collate_file=$DST_LIB_DIR/locale/C.utf8/LC_COLLATE
+				dst_collate_file=$dst_en_locale_dir/LC_COLLATE
+				if [ -f "$src_collate_file" ] && [ -f "$dst_collate_file" ]; then
+					rm -f "$dst_collate_file"
+					_try_cp "$src_collate_file" "$dst_collate_file"
 				fi
 			fi
 		fi
