@@ -30,7 +30,7 @@ title: How To Make These
 
 ## *Quick Start Guide*
 
-**TL;DR:** Use `quick-sharun.sh` to bundle your application with all its dependencies into a truly portable AppImage that works on any Linux system.
+**TL;DR:** Use [quick-sharun.sh](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/quick-sharun.sh) to bundle your application with all its dependencies into a truly portable AppImage that works on any Linux system.
 
 -----------------------------------
 
@@ -57,7 +57,7 @@ You'll need:
 Creating an AppImage with quick-sharun involves these steps:
 
 1. **Install your application** and its dependencies on your build system
-2. **Download quick-sharun.sh** from this repository
+2. **Download [quick-sharun.sh](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/quick-sharun.sh)** from this repository
 3. **Set environment variables** to configure `quick-sharun`
 4. **Run quick-sharun** with your application's binary (and libraries) path to deploy.
 5. **Generate the AppImage** with `--make-appimage` flag
