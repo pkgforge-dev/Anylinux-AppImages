@@ -30,7 +30,7 @@ title: How To Make These
 
 ## *Quick Start Guide*
 
-**TL;DR:** Use [quick-sharun.sh](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/quick-sharun.sh) to bundle your application with all its dependencies into a truly portable AppImage that works on any Linux system.
+**TL;DR:** Use [quick-sharun.sh](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/quick-sharun.sh) to bundle your application with all its dependencies into a truly portable AppImage that works on any Linux system. Start with this [template](https://github.com/pkgforge-dev/TEMPLATE-AppImage).
 
 -----------------------------------
 
