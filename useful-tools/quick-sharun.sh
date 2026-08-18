@@ -1511,12 +1511,6 @@ _lib4bin_deploy_binaries() {
 				cp -fv "$b" "$dst"
 				chmod 755 "$dst"
 			fi
-			for i in python bash sh ash zsh fish dash perl ruby go node; do
-				if grep -qo "^#!.*bin/$i" "$dst"; then
-					sed -i "1s|^#!.*bin/$i|#!/usr/bin/env $i|" "$dst"
-					break
-				fi
-			done
 			continue
 		fi
 
@@ -1616,9 +1610,6 @@ _handle_bins_scripts() {
 		if ! head -c 20 "$s" | grep -q '#!.*sh'; then
 			continue
 		fi
-		# some very very old distros do not have /usr/bin/env
-		# so it is better to always use #!/bin/sh shebang instead
-		sed -i -e 's|/usr/bin/env sh|/bin/sh|' "$s"
 
 		# patch away hardcoded paths from dotnet scripts
 		if grep -q 'dotnet' "$s"; then
@@ -1626,6 +1617,26 @@ _handle_bins_scripts() {
 		fi
 	done
 
+}
+
+_fix_shebangs() {
+	while IFS="" read -r s; do
+		[ -x "$s" ]     || continue
+		_is_script "$s" || continue
+		for i in python bash sh ash zsh fish dash perl ruby go node; do
+			if grep -q "^#!.*bin/$i" "$s"; then
+				sed -i "1s|^#!.*bin/$i|#!/usr/bin/env $i|" "$s"
+				break
+			fi
+		done
+		# some very very old distros do not have /usr/bin/env, so for
+		# sh scripts it is better to always use #!/bin/sh instead
+		if grep -q '^#.*/usr/bin/env sh' "$s"; then
+			sed -i "1s|/usr/bin/env sh|/bin/sh|" "$s"
+		fi
+	done <<-EOF
+	$(find "$APPDIR"/ -type f ! -name '*.so*' -print 2>/dev/null)
+	EOF
 }
 
 _add_anylinux_lib() {
@@ -3663,6 +3674,7 @@ $ADD_DIR
 EOF
 
 _handle_nested_bins
+_fix_shebangs
 
 if [ -n "$ANYLINUX_DO_NOT_LOAD_LIBS" ]; then
 	echo "ANYLINUX_DO_NOT_LOAD_LIBS=$ANYLINUX_DO_NOT_LOAD_LIBS:\${ANYLINUX_DO_NOT_LOAD_LIBS}" >> "$APPENV"
