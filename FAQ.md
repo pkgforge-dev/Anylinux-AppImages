@@ -69,6 +69,20 @@ We only use musl where it is very useful, that is when making static binaries.
 * **It means you are forever stuck with the version of MESA that was statically linked.** Remember, you can use the host Mesa if needed by setting `SHARUN_ALLOW_SYS_VKICD=1` and that is something you will want to do if you plan on using the same AppImage for several years in the future.
 * Static linking some dependencies is still desired however, as that reduces the final size of the AppImage, **but a fully static binary is a very bad idea.**
 
+# Why not use [solo](https://github.com/pg83/solo) or [detour](https://github.com/graphitemaster/detour)?
+
+These solutions allow statically linked programs to dlopen host libraries, amazing no? Well that runs into several problems: 
+
+* What happens if my application needs OpenGL 4.6 but the host Mesa only supports OpenGL 4.5? [Sadness.](https://github.com/PixelGuys/Cubyz/issues/2975#issuecomment-4315191567)
+* What happens if I end up statically linking LLVM and the host's Mesa links to a different version of LLVM? [More problems.](https://www.gfxstrand.net/faith/blog/2022/01/in-defense-of-nir/)
+* Also it seems none of the solutions implement `dlmopen`, so you are likely to run into a lot of symbol collisions with host libraries depending on what you end up building.
+
+Using the host Mesa you are also going to run into bugs that had already been fixed in Mesa, we used to allow our AppImage to use the host vulkan drivers along with the bundled drivers, [that ended up being a bad idea.](https://codeberg.org/pkgforge-dev/Citron-AppImage/issues/14)
+
+Also you are not forced to use our bundled drivers always, you can always set `USE_HOST_MESA_DRIVERS=1`, this will help if you plan to use the same AppImage several years into the future, but it is not guaranteed to work forever due to glibc symbol nonsense.
+
+We don't run into these problems with Nvidia, because Nvidia releases its proprietary driver linking to super old versions of glibc so you can be certain it will always work.
+
 # Why DwarFS instead of SquashFS?
 
 DwarFS is a lot faster than SquashFS while being smaller at the same time.
