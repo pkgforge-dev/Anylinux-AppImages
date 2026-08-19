@@ -79,6 +79,10 @@ These solutions allow statically linked programs to dlopen host libraries, amazi
 
 Using the host Mesa you are also going to run into bugs that had already been fixed in Mesa, we used to allow our AppImage to use the host vulkan drivers along with the bundled drivers, [that ended up being a bad idea.](https://codeberg.org/pkgforge-dev/Citron-AppImage/issues/14)
 
+Also you are not forced to use our bundled drivers always, you can always set `USE_HOST_MESA_DRIVERS=1`, this will help if you plan to use the same AppImage several years into the future, but it is not guaranteed to work forever due to glibc symbol nonsense.
+
+We don't run into these problems with Nvidia, because Nvidia releases its proprietary driver linking to super old versions of glibc so you can be certain it will always work.
+
 # Why DwarFS instead of SquashFS?
 
 DwarFS is a lot faster than SquashFS while being smaller at the same time.
