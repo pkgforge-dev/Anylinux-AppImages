@@ -158,6 +158,9 @@ const setRect = (x, y, w, h) => {
 	rect.setInt32(12, h, true);
 };
 
+// DVD-screensaver style bouncing '67' on a color cycling background
+let x = 0, y = 0, dx = 3, dy = 2;
+
 outer: for (let frame = 0; ; frame++) {
 	// SDL_PollEvent writes into the event buffer, type is the first Uint32
 	while (SDL.SDL_PollEvent(eventPtr) !== 0) {
@@ -167,12 +170,13 @@ outer: for (let frame = 0; ; frame++) {
 	SDL.SDL_SetRenderDrawColor(ren, frame % 256, (frame * 2) % 256, (frame * 4) % 256, 255);
 	SDL.SDL_RenderClear(ren);
 
-	const c = Math.cos(frame * 0.025);
-	const vw = Math.round(Math.abs(c) * tw);
-	if (vw > 0) {
-		setRect((640 - vw) / 2, (480 - th) / 2, vw, th);
-		SDL.SDL_RenderCopy(ren, tex, 0, rectPtr);
-	}
+	x += dx;
+	y += dy;
+	if (x < 0 || x > 640 - tw) dx = -dx;
+	if (y < 0 || y > 480 - th) dy = -dy;
+
+	setRect(x, y, tw, th);
+	SDL.SDL_RenderCopy(ren, tex, 0, rectPtr);
 
 	SDL.SDL_RenderPresent(ren);
 	SDL.SDL_Delay(16);
