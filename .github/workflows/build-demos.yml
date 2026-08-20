@@ -69,6 +69,12 @@ jobs:
             script: sdl-demo-appimage
           - arch: x86_64
             runs-on: ubuntu-24.04
+            script: bun-demo-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: bun-demo-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
             script: webkit2gtk4-demo-appimage
           - arch: aarch64
             runs-on: ubuntu-24.04-arm
