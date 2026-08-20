@@ -589,6 +589,15 @@ _is_pyinstaller_binary() {
 	grep -aq -m 1 'pydata' "$1"
 }
 
+# .NET can come in multiple forms:
+# * Framework-Dependent        - Needs DEPLOY_DOTNET=1, works fine.
+# * Self-Contained             - Does not need DEPLOY_DOTNET=1, works fine.
+# * Native AOT                 - Does not need DEPLOY_DOTNET=1, works fine.
+# * Single-File-Self-Contained - Broken, we need to check for it here
+_is_dotnet_single_file_self_contained_binary() {
+	grep -aq -m 1 'DOTNET_BUNDLE_EXTRACT_BASE_DIR' "$1"
+}
+
 _determine_what_to_deploy() {
 	for bin do
 		# ignore flags
@@ -2473,6 +2482,8 @@ _strip_bins_and_libs() {
 				continue # bun binaries are delicate
 			elif _is_pyinstaller_binary "$f"; then
 				continue # same story as bun binaries
+			elif _is_dotnet_single_file_self_contained_binary "$f"; then
+				continue # same story as bun binaries
 			fi
 			case "$f" in
 				*/python*) continue;; # python interpreter also breaks
@@ -3578,10 +3589,12 @@ for bin do
 		_echo "* Detected hardcoded path to $p in $bin"
 		_patch_away_usr_lib_dir "$bin" || :
 	fi
-	if _is_bun_binary "$bin" || _is_pyinstaller_binary "$bin"; then
-		# bun/pyisntaller binaries cannot be executed with the
-		# dynamic linker directly, so we will change PT_INTERP to
-		# /tmp/.ld-sharun.so.67, sharun will copy it there at runtime
+	if _is_bun_binary "$bin" \
+	  || _is_pyinstaller_binary "$bin" \
+	  || _is_dotnet_single_file_self_contained_binary "$bin"; then
+		# bun/pyinstaller/.NET-single-file binaries cannot be executed
+		# with the dynamic linker directly, so we will change PT_INTERP
+		# to /tmp/.ld-sharun.so.67, sharun will copy it there at runtime
 		patchelf --set-interpreter /tmp/.ld-sharun.so.67 "$bin"
 		_echo "* Set interpreter to /tmp/.ld-sharun.so.67 for $bin"
 	fi
