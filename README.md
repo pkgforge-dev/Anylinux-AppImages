@@ -469,6 +469,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [AM-GUI](https://github.com/Shikakiben/AM-GUI) |
 | [AppManager](https://github.com/kem-a/AppManager) |
 | [Citron Neo](https://github.com/citron-neo) |
+| [cli-chess](https://github.com/trevorbayless/cli-chess/) |
 | [Converseen](https://github.com/Faster3ck/Converseen) |
 | [CPU-X](https://github.com/TheTumultuousUnicornOfDarkness/CPU-X) |
 | [Eden](https://git.eden-emu.dev/eden-emu/eden) |
