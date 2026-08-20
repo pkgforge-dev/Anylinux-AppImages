@@ -2047,6 +2047,11 @@ _deploy_locale() {
 					set -- "$@" ! -name "*$f*"
 				fi
 			done
+			# include the .desktop name since some projects use reversed
+			# dns naming for the .mo files which won't match the binary name
+			f=${DESKTOP_ENTRY##*/}
+			f=${f%.desktop}
+			set -- "$@" ! -name "*$f*"
 			find "$APPDIR"/share/locale "$@" \( -type f -o -type l \) -exec rm -f {} +
 			_remove_empty_dirs "$APPDIR"/share/locale
 		fi
