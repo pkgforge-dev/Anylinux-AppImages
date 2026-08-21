@@ -333,42 +333,7 @@ static int is_external_process(const char *filename) {
 	return external;
 }
 
-static int spawn_common(posix_spawn_func_t fn,
-						const char *path, pid_t *pid,
-						const posix_spawn_file_actions_t *file_actions,
-						const posix_spawnattr_t *attrp,
-						char *const argv[], char *const envp[])
-{
-	char *fullpath = canonicalize_file_name(path);
-	const char *path_to_check = fullpath ? fullpath : path;
-
-	char *const *env = envp;
-	if (is_external_process(path_to_check)) {
-		DEBUG_PRINT("External process detected; cleaning environment\n");
-		env = create_cleaned_env(envp);
-
-		if (!env) {
-			DEBUG_PRINT("Error creating cleaned environment; using original env\n");
-			env = envp;
-		}
-	}
-
-	int ret = fn(pid, path, file_actions, attrp, argv, env);
-
-	if (env != envp)
-		env_free(env);
-	free(fullpath);
-
-	return ret;
-}
-
-static int exec_common(execve_func_t function, const char *filename, char* const argv[], char* const envp[]) {
-	DEBUG_PRINT("Preparing to exec: %s\n", filename);
-
-	char *fullpath = canonicalize_file_name(filename);
-	DEBUG_PRINT("canonicalize file: %s -> %s\n", filename, fullpath ? fullpath : "(null)");
-
-	// Restore portable dirs values
+static void restore_portable_dirs(void) {
 	const char *real_data = getenv("REAL_XDG_DATA_HOME");
 	if (real_data && *real_data) {
 		if (setenv("XDG_DATA_HOME", real_data, 1) == 0)
@@ -413,6 +378,42 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 		else
 			DEBUG_PRINT("Failed to restore HOME to %s\n", real_home);
 	}
+}
+
+static int spawn_common(posix_spawn_func_t fn,
+						const char *path, pid_t *pid,
+						const posix_spawn_file_actions_t *file_actions,
+						const posix_spawnattr_t *attrp,
+						char *const argv[], char *const envp[])
+{
+	char *fullpath = canonicalize_file_name(path);
+	const char *path_to_check = fullpath ? fullpath : path;
+
+	char *const *env = envp;
+	if (is_external_process(path_to_check)) {
+		DEBUG_PRINT("External process detected; cleaning environment\n");
+		env = create_cleaned_env(envp);
+
+		if (!env) {
+			DEBUG_PRINT("Error creating cleaned environment; using original env\n");
+			env = envp;
+		}
+	}
+
+	int ret = fn(pid, path, file_actions, attrp, argv, env);
+
+	if (env != envp)
+		env_free(env);
+	free(fullpath);
+
+	return ret;
+}
+
+static int exec_common(execve_func_t function, const char *filename, char* const argv[], char* const envp[]) {
+	DEBUG_PRINT("Preparing to exec: %s\n", filename);
+
+	char *fullpath = canonicalize_file_name(filename);
+	DEBUG_PRINT("canonicalize file: %s -> %s\n", filename, fullpath ? fullpath : "(null)");
 
 	// always unset LD_DEBUG to child processes to help when
 	// troubleshooting with APPIMAGE_DEBUG=1
@@ -423,6 +424,9 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 	const char* path_to_check = fullpath ? fullpath : filename;
 	if (is_external_process(path_to_check)) {
 		DEBUG_PRINT("External process detected; cleaning environment\n");
+
+		restore_portable_dirs();
+
 		env = create_cleaned_env(envp);
 		if (!env) {
 			DEBUG_PRINT("Error creating cleaned environment; using original env\n");
@@ -433,6 +437,9 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 		basename = basename ? basename + 1 : filename;
 		if (strcmp(basename, "xdg-open") == 0 || strcmp(basename, "gio-launch-desktop") == 0) {
 			DEBUG_PRINT("Internal process detected (%s); cleaning environment anyway since this is needed\n", basename);
+
+			restore_portable_dirs();
+
 			env = create_cleaned_env(envp);
 			if (!env) {
 				DEBUG_PRINT("Error creating cleaned environment; using original env\n");
