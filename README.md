@@ -32,6 +32,10 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 - [AppImageUpdate](https://github.com/pkgforge-dev/AppImageUpdate)
 
 <!-- APPS_LIST_START -->
+<div id="Application"></div>
+<div id="application"></div>
+<div id="Applications"></div>
+<div id="applications"></div>
 
 ---
 
