@@ -146,6 +146,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ePSXe](https://github.com/pkgforge-dev/ePSXe-AppImage) |
 | [ET Legacy](https://github.com/pkgforge-dev/ETLegacy-AppImage) |
 | [Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage) |
+| [ExtremeGRecomp](https://github.com/pkgforge-dev/ExtremeGRecomp-AppImage) |
 | [ExtremeTuxRacer](https://github.com/pkgforge-dev/ExtremeTuxRacer-AppImage) |
 | [Exult](https://github.com/pkgforge-dev/Exult-AppImage) |
 | [Eyedropper](https://github.com/pkgforge-dev/Eyedropper-AppImage) |
