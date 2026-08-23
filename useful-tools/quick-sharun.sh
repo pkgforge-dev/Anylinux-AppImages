@@ -804,14 +804,18 @@ _make_deployment_array() {
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
 		DEPLOY_OPENGL=0
 		DEPLOY_VULKAN=0
-		echo 'GSK_RENDERER=cairo'        >> "$APPENV"
-		echo 'GDK_DISABLE=gl,vulkan'     >> "$APPENV"
-		echo 'GDK_GL=disable'            >> "$APPENV"
-		echo 'QT_QUICK_BACKEND=software' >> "$APPENV"
+		echo 'GSK_RENDERER=cairo'                        >> "$APPENV"
+		echo 'GDK_DISABLE=gl,vulkan'                     >> "$APPENV"
+		echo 'GDK_GL=disable'                            >> "$APPENV"
+		echo 'QT_QUICK_BACKEND=software'                 >> "$APPENV"
+		echo 'QT_XCB_GL_INTEGRATION=none'                >> "$APPENV"
+		echo 'QT_WAYLAND_CLIENT_BUFFER_INTEGRATION=none' >> "$APPENV"
 		export GSK_RENDERER=cairo
 		export GDK_DISABLE=gl,vulkan
 		export GDK_GL=disable
 		export QT_QUICK_BACKEND=software
+		export QT_XCB_GL_INTEGRATION=none
+		export QT_WAYLAND_CLIENT_BUFFER_INTEGRATION=none
 
 		ANYLINUX_DO_NOT_LOAD_LIBS="libgallium-*:libvulkan*:libGLX_mesa.so*:libGLX_indirect.so*${ANYLINUX_DO_NOT_LOAD_LIBS:+:$ANYLINUX_DO_NOT_LOAD_LIBS}"
 	fi
