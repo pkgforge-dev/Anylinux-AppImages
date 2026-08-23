@@ -395,6 +395,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [SRB2Kart](https://github.com/pkgforge-dev/SRB2Kart-AppImage) |
 | [st](https://github.com/pkgforge-dev/st-AppImage) |
 | [Starfox64Recomp](https://github.com/pkgforge-dev/Starfox64Recomp-AppImage) |
+| [Starship](https://github.com/pkgforge-dev/Starship-AppImage-Enhanced) |
 | [Stella](https://github.com/pkgforge-dev/Stella-AppImage) |
 | [stirling-pdf](https://github.com/pkgforge-dev/Stirling-PDF-AppImage) |
 | [strawberry](https://github.com/pkgforge-dev/strawberry-AppImage) |
