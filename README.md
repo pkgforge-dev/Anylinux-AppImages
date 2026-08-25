@@ -464,7 +464,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Zen Browser](https://github.com/pkgforge-dev/Zen-Browser-AppImage-Enhanced) |
 | [Zenity](https://github.com/pkgforge-dev/Zenity-GTK3-AppImage) |
 | [Zod-Engine](https://github.com/pkgforge-dev/Zod-Engine-AppImage) |
-| [Zrythm-AppImage](https://github.com/pkgforge-dev/Zrythm-AppImage) |
+| [Zrythm](https://github.com/pkgforge-dev/Zrythm-AppImage) |
 | [ZSNES](https://github.com/pkgforge-dev/ZSNES-AppImage) |
 
 ---
