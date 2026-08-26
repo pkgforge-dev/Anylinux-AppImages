@@ -46,7 +46,7 @@ DST_BIN_DIR=$APPDIR/bin
 SHARUN_BIN_DIR=$APPDIR/shared/bin
 MAIN_BIN=${MAIN_BIN##*/}
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/2.2.7/sharun-$APPIMAGE_ARCH}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/2.3.0/sharun-$APPIMAGE_ARCH}
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/latest/download/onelf-$APPIMAGE_ARCH-linux}
 HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
@@ -62,6 +62,7 @@ ANYLINUX_LIB=${ANYLINUX_LIB:-1}
 ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
 GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
+CROSS_LIBC_DLOPEN_REPO=${CROSS_LIBC_DLOPEN_REPO:-https://github.com/pkgforge-dev/cross-libc-dlopen.git}
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
@@ -261,6 +262,10 @@ _help_msg() {
 	                     applications use software rendering only, use this option
 	                     when you do not want hardware acceleration.
 	                     Will fail if application makes use of mesa during deployment.
+	  USE_HOST_DRIVERS_EXPERIMENTAL  Set to 1 to ship zero gpu drivers, we use the
+	                     host drivers instead via a experimental cross libc dlopen
+	                     feature (cross-libc-dlopen) that allows use host drivers
+	                     regardless of what libc they link against.
 	  STRACE_MODE      Sets the strace mode, the mechanism quick-sharun uses
 	                     to find and deploy the libraries the application loads
 	                     at runtime via dlopen. Enabled by default, set to 0 to
@@ -800,6 +805,16 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/EUC-JP.so*   \
 			"$LIB_DIR"/gconv/EUC-KR.so*   \
 			"$LIB_DIR"/gconv/EUC-CN.so*
+	fi
+	# LIB32 builds always bundle their drivers, 32bit driver stacks are not
+	# something users have installed for these apps
+	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] && [ "$LIB32" != 1 ]; then
+		if [ "$ANYLINUX_LIB" != 1 ]; then
+			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires ANYLINUX_LIB=1"
+			exit 1
+		fi
+		DEPLOY_OPENGL=0
+		DEPLOY_VULKAN=0
 	fi
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
 		DEPLOY_OPENGL=0
@@ -1455,6 +1470,30 @@ _lib4bin_collect_strace() {
 		                                                     -e '/pipewire/d'    \
 		                                                     -e '/libspa/d'
 		)
+		# keep driver bits on the host, pairs with foreign dlopen in
+		# anylinux.so, ldd collected libs are unaffected. Note that every
+		# unwanted lib needs its own pattern, filtering a parent does not
+		# stop LD_DEBUG from listing its dependencies as separate lines
+		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+			out=$(printf '%s\n' "$out" | sed \
+				-e '/\/dri\//d'      \
+				-e '/_dri\.so/d'     \
+				-e '/gbm/d'          \
+				-e '/libgallium/d'   \
+				-e '/libglapi/d'     \
+				-e '/libLLVM/d'      \
+				-e '/libclang/d'     \
+				-e '/libSPIRV/d'     \
+				-e '/libsensors/d'   \
+				-e '/libelf\.so/d'   \
+				-e '/libdrm_/d'      \
+				-e '/libVkLayer/d'   \
+				-e '/libvulkan_/d'   \
+				-e '/libEGL_/d'      \
+				-e '/libGLX_/d'      \
+				-e '/_icd/d'         \
+				-e '/vdpau_/d')
+		fi
 		rm -f "$dlopened"
 		[ -n "$out" ] || continue
 		libs=$(printf '%s\n%s' "$libs" "$out")
@@ -1674,6 +1713,40 @@ _add_anylinux_lib() {
 	fi
 
 	_echo "* anylinux.so successfully added!"
+}
+
+_add_foreign_dlopen_lib() {
+	[ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] || return 0
+	target=$DST_LIB_DIR/cross-libc-dlopen.so
+	CLD_SRC=$TMPDIR/cross-libc-dlopen
+
+	if [ ! -f "$target" ]; then
+		deps="git make"
+		if ! _is_cmd $deps; then
+			_err_msg "ERROR: Building cross-libc-dlopen requires $deps"
+			exit 1
+		fi
+
+		_echo "* Cloning $CROSS_LIBC_DLOPEN_REPO..."
+		rm -rf "$CLD_SRC"
+		git clone "$CROSS_LIBC_DLOPEN_REPO" "$CLD_SRC" && (
+			cd "$CLD_SRC"/src
+			# -fcf-protection=full is not supported on all gcc targets
+			# and has no functional benefit so it is removed
+			sed -i -e 's/ -fcf-protection=full//' Makefile
+			make
+		)
+
+		_echo "* Adding cross-libc-dlopen..."
+		for lib in cross-libc-dlopen.so gl-fwd.so egl-fwd.so gles-fwd.so; do
+			cp -v "$CLD_SRC"/src/"$lib" "$DST_LIB_DIR"
+			if ! grep -q "$lib" "$APPDIR"/.preload 2>/dev/null; then
+				echo "$lib" >> "$APPDIR"/.preload
+			fi
+		done
+		_echo "* cross-libc-dlopen successfully added!"
+	fi
+	:> "$APPDIR"/.foreign-dlopen-enabled
 }
 
 _add_gtk_class_fix() {
@@ -3110,6 +3183,7 @@ _check_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
+_add_foreign_dlopen_lib
 _check_window_class
 _add_gtk_class_fix
 
@@ -3292,6 +3366,9 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/libEGL_mesa.so*)
+		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+			continue
+		fi
 		src_glvnd_dir=/usr/share/glvnd/egl_vendor.d
 		dst_glvnd_dir=$APPDIR/share/glvnd/egl_vendor.d
 		_try_cp "$src_glvnd_dir" "$dst_glvnd_dir"
@@ -3299,6 +3376,9 @@ for lib do case "$lib" in
 		_try_cp /usr/share/drirc.d "$APPDIR"/share/drirc.d
 		;;
 	*/libvulkan.so*)
+		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+			continue
+		fi
 		src_vulkan_dir=/usr/share/vulkan/icd.d
 		dst_vulkan_dir=$APPDIR/share/vulkan/icd.d
 		if [ -d "$src_vulkan_dir" ] && [ ! -d "$dst_vulkan_dir" ]; then
