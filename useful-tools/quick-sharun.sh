@@ -1470,8 +1470,8 @@ _lib4bin_collect_strace() {
 		                                                     -e '/pipewire/d'    \
 		                                                     -e '/libspa/d'
 		)
-		# keep driver bits on the host, pairs with foreign dlopen in
-		# anylinux.so, ldd collected libs are unaffected. Note that every
+		# keep driver bits on the host, pairs with cross-libc-dlopen,
+		# ldd collected libs are unaffected. Note that every
 		# unwanted lib needs its own pattern, filtering a parent does not
 		# stop LD_DEBUG from listing its dependencies as separate lines
 		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
@@ -1715,7 +1715,7 @@ _add_anylinux_lib() {
 	_echo "* anylinux.so successfully added!"
 }
 
-_add_foreign_dlopen_lib() {
+_add_cross_libc_dlopen_lib() {
 	[ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] || return 0
 	target=$DST_LIB_DIR/cross-libc-dlopen.so
 	CLD_SRC=$TMPDIR/cross-libc-dlopen
@@ -3183,7 +3183,7 @@ _check_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
-_add_foreign_dlopen_lib
+_add_cross_libc_dlopen_lib
 _check_window_class
 _add_gtk_class_fix
 

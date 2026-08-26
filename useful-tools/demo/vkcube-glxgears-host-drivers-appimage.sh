@@ -11,7 +11,6 @@ ARCH="$(uname -m)"
 SHARUN="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/quick-sharun.sh"
 EXTRA_PACKAGES="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 
-export CROSS_LIBC_DLOPEN_REPO="https://github.com/pkgforge-dev/cross-libc-dlopen.git"
 export ICON=DUMMY
 export DESKTOP=DUMMY
 export OUTPATH=./dist
