@@ -262,10 +262,26 @@ _help_msg() {
 	                     applications use software rendering only, use this option
 	                     when you do not want hardware acceleration.
 	                     Will fail if application makes use of mesa during deployment.
-	  USE_HOST_DRIVERS_EXPERIMENTAL  Set to 1 to ship zero gpu drivers, we use the
-	                     host drivers instead via a experimental cross libc dlopen
-	                     feature (cross-libc-dlopen) that allows use host drivers
-	                     regardless of what libc they link against.
+	  USE_HOST_DRIVERS_EXPERIMENTAL  Set to 1 to ship zero gpu drivers, the drivers
+	                     are instead loaded from the host system at runtime with
+	                     the help of cross-libc-dlopen that allows using the host
+	                     drivers regardless of what libc they link against.
+	                     Only use this option if the application meets the
+	                     following conditions:
+	                     * The application does not depend on a recent version of
+	                       OpenGL. (A good test is checking if the application
+	                       works with the 'softpipe' driver since that only
+	                       supports OpenGL 3.3)
+	                     * The application does not have a hard dependency on
+	                       vulkan. (Most vulkan apps require relatively new
+	                       versions of vulkan (1.2 or newer) which only began to
+	                       show up in Mesa 20.0 ~Ubuntu 20.04).
+	                     * The application has a fallback software renderer. Who
+	                       knows what can happen in the future, it is likely for
+	                       example that OpenGL might not be installed by default
+	                       anymore in the next decade and then we will have
+	                       applications that no longer work.
+	                     TLDR: DO NOT USE THIS FEATURE WITH EMULATORS!!!
 	  STRACE_MODE      Sets the strace mode, the mechanism quick-sharun uses
 	                     to find and deploy the libraries the application loads
 	                     at runtime via dlopen. Enabled by default, set to 0 to
