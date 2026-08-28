@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 _deny_soundfonts_file=$CACHEDIR/.no-soundfont-${APPIMAGE##*/}
-XDG_DATA_DIRS=$DATADIR:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}
+XDG_DATA_DIRS=$DATADIR:$APPDIR/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}
 export XDG_DATA_DIRS
 
 _sound_font_src=https://deb.debian.org/debian/pool/main/f/fluid-soundfont/fluid-soundfont_3.1.orig.tar.gz
