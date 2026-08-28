@@ -83,6 +83,18 @@ Also you are not forced to use our bundled drivers always, you can always set `U
 
 We don't run into these problems with Nvidia, because Nvidia releases its proprietary driver linking to super old versions of glibc so you can be certain it will always work.
 
+---
+
+**UPDATE: We now have a similar feature via [cross-libc-dlopen](https://github.com/pkgforge-dev/cross-libc-dlopen)**, enabled via `USE_HOST_DRIVERS_EXPERIMENTAL=1` in `quick-sharun`.
+
+This feature is only going to be used if the applications meets the following conditions:
+
+* The application doesn't depend on a recent version of OpenGL. (A good test is checking if the application works with the `softpipe` driver since that only supports OpenGL 3.3)
+* The application does not have a hard dependency on vulkan. (Most vulkan apps require relative new versions of vulkan (1.2 or newer) which only began to show up in Mesa 20.0 ~Ubuntu 20.04).
+* The application has a fallback software renderer. Who knows what can happen in future, it is likely for example that OpenGL might not be installed by default anymore in the next decade and now we have applications that no longer work.
+
+---
+
 # Why DwarFS instead of SquashFS?
 
 DwarFS is a lot faster than SquashFS while being smaller at the same time.
