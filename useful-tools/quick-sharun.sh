@@ -1380,7 +1380,11 @@ _lib4bin_get_lib_dst_dir() {
 
 # collect ldd library dependencies
 _lib4bin_collect_ldd() {
-	libs=""
+	# accumulate in a temp file instead of a variable since the variable
+	# ends up being way slower with applications that have +300 libs
+	_libs_list=$TMPDIR/.libs.$$
+	:> "$_libs_list"
+
 	for b do
 		[ -f "$b" ]  || continue
 		_is_elf "$b" || continue
@@ -1397,11 +1401,11 @@ _lib4bin_collect_ldd() {
 		EOF
 
 		if [ -z "$skip" ]; then
-			libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
+			_lib4bin_ldd_libs "$b" >> "$_libs_list"
 		fi
 
 		if _is_so "$b"; then
-			libs=$(printf '%s\n%s' "$libs" "$b")
+			printf '%s\n' "$b" >> "$_libs_list"
 		fi
 	done
 
@@ -1413,7 +1417,7 @@ _lib4bin_collect_ldd() {
 	#
 	# Verify with patchelf --print-needed and find the library instead
 	#
-	libs_basename=$(echo "$libs" | awk -F'/' '{print $NF}')
+	libs_basename=$(awk -F'/' '{print $NF}' "$_libs_list" | sort -u)
 	for b do
 		if _is_so "$b" || ! _is_elf "$b"; then
 			continue
@@ -1423,12 +1427,13 @@ _lib4bin_collect_ldd() {
 				continue # already included
 			elif [ -e "$LIB_DIR"/"$s" ]; then
 				# Was not found by ldd / LD_DEBUG=libs
-				libs=$(printf '%s\n%s' "$libs" "$LIB_DIR"/"$s")
+				printf '%s\n' "$LIB_DIR"/"$s" >> "$_libs_list"
 			fi
 		done
 	done
 
-	echo "$libs" | sort -u | sed '/^$/d'
+	sort -u "$_libs_list" | sed '/^$/d'
+	rm -f "$_libs_list"
 }
 
 # collect dlopen libraries via LD_DEBUG=libs
