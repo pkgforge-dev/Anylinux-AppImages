@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # Demonstration that bundles a simple Qt6 app that interacts with dbus
-
-# this version deploys without hardware acceleration which results in a smaller
-# appimage, good for simple apps that do not really need hardware acceleration
+# without shipping a single gpu driver, the drivers are loaded from
+# the HOST system at runtime with the help of cross-libc-dlopen
+# https://github.com/pkgforge-dev/cross-libc-dlopen
 
 set -eux
 
@@ -15,9 +15,11 @@ export ICON=/usr/share/doc/qt6/global/template/images/Qt-logo.png
 export DESKTOP=DUMMY
 export MAIN_BIN=qdbusviewer6
 export OUTPATH=./dist
-export OUTNAME=Qt6+dbus-demo-onlysoftware-"$ARCH".AppImage
-# disable hardware accel
-export ALWAYS_SOFTWARE=1
+export OUTNAME=Qt6+dbus-demo-host-drivers-"$ARCH".AppImage
+# ship zero gpu drivers, quick-sharun excludes everything the binaries
+# merely dlopen at runtime (dri plugins, gallium, vulkan layers, etc)
+# while libraries linked directly like libvulkan.so stay bundled
+export USE_HOST_DRIVERS_EXPERIMENTAL=1
 
 pacman -Syu --noconfirm \
 	base-devel       \

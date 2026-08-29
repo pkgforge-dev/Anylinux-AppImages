@@ -1,9 +1,9 @@
 #!/bin/sh
 
-# Demonstration that bundles gtk4 demo app
-
-# this version deploys without hardware acceleration which results in a smaller
-# appimage, good for simple apps that do not really need hardware acceleration
+# Demonstration that bundles vkcube (vulkan) and glxgears (opengl)
+# without shipping a single gpu driver, the drivers are loaded from
+# the HOST system at runtime using with the help of cross-libc-dlopen
+# https://github.com/pkgforge-dev/cross-libc-dlopen
 
 set -eux
 
@@ -11,19 +11,24 @@ ARCH="$(uname -m)"
 SHARUN="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/quick-sharun.sh"
 EXTRA_PACKAGES="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 
-export ICON=/usr/share/icons/hicolor/scalable/apps/org.gtk.Demo4.svg
-export DESKTOP=/usr/share/applications/org.gtk.Demo4.desktop
+export ICON=DUMMY
+export DESKTOP=DUMMY
 export OUTPATH=./dist
-export OUTNAME=gtk4-demo-onlysoftware-"$ARCH".AppImage
-export STARTUPWMCLASS=fuck.gnome
-export GTK_CLASS_FIX=1
-# disable hardware accel
-export ALWAYS_SOFTWARE=1
+export OUTNAME=vkcube+glxgears-host-drivers-demo-"$ARCH".AppImage
+export MAIN_BIN=vkcube
+# ship zero gpu drivers, quick-sharun excludes everything the binaries
+# merely dlopen at runtime (dri plugins, gallium, vulkan layers, etc)
+# while libraries linked directly like libvulkan.so stay bundled
+export USE_HOST_DRIVERS_EXPERIMENTAL=1
+# vkmark is hardcoded to look in /usr/share/vkmark and /usr/lib/vkmark
+export PATH_MAPPING='
+	/usr/share/vkmark:${SHARUN_DIR}/share/vkmark
+	/usr/lib/vkmark:${SHARUN_DIR}/lib/vkmark
+'
 
 pacman -Syu --noconfirm \
 	base-devel       \
 	git              \
-	gtk4-demos       \
 	libxcb           \
 	libxcursor       \
 	libxi            \
@@ -31,8 +36,12 @@ pacman -Syu --noconfirm \
 	libxkbcommon-x11 \
 	libxrandr        \
 	libxtst          \
+	mesa-utils       \
 	patchelf         \
+	vkmark           \
+	vulkan-tools     \
 	wget             \
+	xcb-util-wm      \
 	xorg-server-xvfb \
 	zsync
 
@@ -40,15 +49,18 @@ echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$EXTRA_PACKAGES" -O ./get-debloated-pkgs.sh
 chmod +x ./get-debloated-pkgs.sh
-./get-debloated-pkgs.sh --add-common --prefer-nano
+./get-debloated-pkgs.sh --add-mesa --prefer-nano libdecor-mini
 
 echo "Bundling AppImage..."
 echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
-./quick-sharun /usr/bin/gtk4-demo*
+./quick-sharun /usr/bin/vkcube /usr/*/vkmark /usr/bin/glxgears /usr/bin/eglgears*
 
 ./quick-sharun --make-appimage
+
+# CI has no available gpu for the test
+pacman -S --noconfirm vulkan-swrast
 
 # test the final app
 ./quick-sharun --test ./dist/*.AppImage

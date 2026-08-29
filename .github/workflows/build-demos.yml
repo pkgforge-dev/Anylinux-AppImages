@@ -27,6 +27,12 @@ jobs:
             script: vkcube-glxgears-appimage
           - arch: x86_64
             runs-on: ubuntu-24.04
+            script: vkcube-glxgears-host-drivers-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: vkcube-glxgears-host-drivers-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
             script: gtk3-demo-appimage
           - arch: aarch64
             runs-on: ubuntu-24.04-arm
@@ -39,10 +45,10 @@ jobs:
             script: gtk4-demo-appimage
           - arch: x86_64
             runs-on: ubuntu-24.04
-            script: gtk4-demo-onlysoftware-appimage
+            script: gtk4-demo-host-drivers-appimage
           - arch: aarch64
             runs-on: ubuntu-24.04-arm
-            script: gtk4-demo-onlysoftware-appimage
+            script: gtk4-demo-host-drivers-appimage
           - arch: x86_64
             runs-on: ubuntu-24.04
             script: gtk2-demo-appimage
@@ -57,16 +63,22 @@ jobs:
             script: qt6-dbus-demo-appimage
           - arch: x86_64
             runs-on: ubuntu-24.04
-            script: qt6-dbus-demo-onlysoftware-appimage
+            script: qt6-dbus-demo-host-drivers-appimage
           - arch: aarch64
             runs-on: ubuntu-24.04-arm
-            script: qt6-dbus-demo-onlysoftware-appimage
+            script: qt6-dbus-demo-host-drivers-appimage
           - arch: x86_64
             runs-on: ubuntu-24.04
             script: sdl-demo-appimage
           - arch: aarch64
             runs-on: ubuntu-24.04-arm
             script: sdl-demo-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: sdl-demo-host-drivers-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: sdl-demo-host-drivers-appimage
           - arch: x86_64
             runs-on: ubuntu-24.04
             script: bun-demo-appimage
@@ -85,7 +97,7 @@ jobs:
 
       - name: Make AppImage
         run: |
-          sleep 5 # wait 5 seconds since github sometimes uses the file from the previous commit
+          sleep 10 # wait 10 seconds since github sometimes uses the file from the previous commit
           sh ./useful-tools/demo/${{ matrix.script }}.sh
 
       - name: Upload artifact
