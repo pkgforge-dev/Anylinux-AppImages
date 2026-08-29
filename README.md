@@ -234,6 +234,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Knights](https://github.com/pkgforge-dev/Knights-AppImage) |
 | [KolourPaint](https://github.com/pkgforge-dev/KolourPaint-AppImage) |
 | [KPatience](https://github.com/pkgforge-dev/KPatience-AppImage) |
+| [Krita](https://github.com/pkgforge-dev/Krita-AppImage-Enhanced) |
 | [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage) |
 | [KStars](https://github.com/pkgforge-dev/KStars-AppImage) |
 | [KTorrent](https://github.com/pkgforge-dev/KTorrent-AppImage) |
