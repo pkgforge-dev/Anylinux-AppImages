@@ -824,9 +824,12 @@ _make_deployment_array() {
 	fi
 	# LIB32 builds always bundle their drivers, 32bit driver stacks are not
 	# something users have installed for these apps
-	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] && [ "$LIB32" != 1 ]; then
+	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
 		if [ "$ANYLINUX_LIB" != 1 ]; then
 			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires ANYLINUX_LIB=1"
+			exit 1
+		elif [ "$LIB32" = 1 ]; then
+			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL cannot be used with 32bit applications!"
 			exit 1
 		fi
 		DEPLOY_OPENGL=0
