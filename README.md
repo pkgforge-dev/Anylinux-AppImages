@@ -149,6 +149,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [FeatherPad](https://github.com/pkgforge-dev/FeatherPad-AppImage) |
 | [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage) |
 | [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage) |
+| [Firefox](https://github.com/pkgforge-dev/Firefox-AppImage) |
 | [Flacon](https://github.com/pkgforge-dev/Flacon-AppImage-Enhanced) |
 | [Flashrom](https://github.com/pkgforge-dev/Flashrom-AppImage) |
 | [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced) |
