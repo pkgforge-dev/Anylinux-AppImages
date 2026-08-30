@@ -266,6 +266,8 @@ _help_msg() {
 	                     are instead loaded from the host system at runtime with
 	                     the help of cross-libc-dlopen that allows using the host
 	                     drivers regardless of what libc they link against.
+	                     Only supported when deploying GTK or Qt applications,
+	                     for any other toolkit it automatically becomes a no-op.
 	                     Only use this option if the application meets the
 	                     following conditions:
 	                     * The application does not depend on a recent version of
@@ -825,15 +827,20 @@ _make_deployment_array() {
 	# LIB32 builds always bundle their drivers, 32bit driver stacks are not
 	# something users have installed for these apps
 	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
-		if [ "$ANYLINUX_LIB" != 1 ]; then
-			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires ANYLINUX_LIB=1"
-			exit 1
-		elif [ "$LIB32" = 1 ]; then
-			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL cannot be used with 32bit applications!"
-			exit 1
+		if [ "$DEPLOY_GTK" != 1 ] && [ "$DEPLOY_QT" != 1 ]; then
+			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is only supported when deploying Qt/GTK applications, ignoring it!"
+			USE_HOST_DRIVERS_EXPERIMENTAL=0
+		else
+			if [ "$ANYLINUX_LIB" != 1 ]; then
+				_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires ANYLINUX_LIB=1"
+				exit 1
+			elif [ "$LIB32" = 1 ]; then
+				_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL cannot be used with 32bit applications!"
+				exit 1
+			fi
+			DEPLOY_OPENGL=0
+			DEPLOY_VULKAN=0
 		fi
-		DEPLOY_OPENGL=0
-		DEPLOY_VULKAN=0
 	fi
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
 		DEPLOY_OPENGL=0
