@@ -127,6 +127,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Discord](https://github.com/pkgforge-dev/Discord-AppImage) |
 | [DNZHRecomp](https://github.com/pkgforge-dev/DNZHRecomp-AppImage) |
 | [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage) |
+| [DonkeyKong64Recomp](https://github.com/pkgforge-dev/DonkeyKong64Recomp-AppImage) |
 | [DOOM64EXUltra](https://github.com/pkgforge-dev/DOOM64EXUltra-AppImage) |
 | [Dorion](https://github.com/pkgforge-dev/Dorion-AppImage-Enhanced) |
 | [DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage) |
