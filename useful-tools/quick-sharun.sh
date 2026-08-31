@@ -1780,7 +1780,7 @@ _add_cross_libc_dlopen_lib() {
 
 		for lib in "$cld_dir"/*.so; do
 			lib=${lib##*/}
-			if ! grep -q "$lib" "$APPDIR"/.preload 2>/dev/null; then
+			if ! grep -qxF "$lib" "$APPDIR"/.preload 2>/dev/null; then
 				echo "$lib" >> "$APPDIR"/.preload
 			fi
 		done
