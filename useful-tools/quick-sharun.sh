@@ -62,7 +62,7 @@ ANYLINUX_LIB=${ANYLINUX_LIB:-1}
 ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
 GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
-CROSS_LIBC_DLOPEN_REPO=${CROSS_LIBC_DLOPEN_REPO:-https://github.com/pkgforge-dev/cross-libc-dlopen.git}
+CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/latest/download/cross-libc-dlopen-portable-$APPIMAGE_ARCH.tar}
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
@@ -1748,29 +1748,38 @@ _add_anylinux_lib() {
 
 _add_cross_libc_dlopen_lib() {
 	[ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] || return 0
-	target=$DST_LIB_DIR/cross-libc-dlopen.so
-	CLD_SRC=$TMPDIR/cross-libc-dlopen
+	cld_tar=$TMPDIR/cross-libc-dlopen-portable-$APPIMAGE_ARCH.tar
+	cld_dir=$DST_LIB_DIR/cross-libc-dlopen
+	target=$cld_dir/cross-libc-dlopen.so
 
 	if [ ! -f "$target" ]; then
-		deps="git make"
-		if ! _is_cmd $deps; then
-			_err_msg "ERROR: Building cross-libc-dlopen requires $deps"
+		if ! _is_cmd tar; then
+			_err_msg "ERROR: Deploying cross-libc-dlopen requires tar"
 			exit 1
 		fi
 
-		_echo "* Cloning $CROSS_LIBC_DLOPEN_REPO..."
-		rm -rf "$CLD_SRC"
-		git clone "$CROSS_LIBC_DLOPEN_REPO" "$CLD_SRC" && (
-			cd "$CLD_SRC"/src
-			# -fcf-protection=full is not supported on all gcc targets
-			# and has no functional benefit so it is removed
-			sed -i -e 's/ -fcf-protection=full//' Makefile
-			make
-		)
+		if [ ! -f "$cld_tar" ]; then
+			_echo "* Downloading cross-libc-dlopen..."
+			_download "$cld_tar" "$CROSS_LIBC_DLOPEN_LINK"
+		fi
+
+		if ! tar -tf "$cld_tar" >/dev/null 2>&1; then
+			_err_msg "ERROR: unable to extract $cld_tar!"
+			_err_msg "This is usually caused by network issues"
+			rm -f "$cld_tar"
+			exit 1
+		fi
 
 		_echo "* Adding cross-libc-dlopen..."
-		for lib in cross-libc-dlopen.so gl-fwd.so egl-fwd.so gles-fwd.so; do
-			cp -v "$CLD_SRC"/src/"$lib" "$DST_LIB_DIR"
+		mkdir -p "$cld_dir"
+		tar -xf "$cld_tar" -C "$cld_dir"
+		rm -f "$cld_tar"
+
+		# runtime-select is not used by us
+		rm -f "$cld_dir"/runtime-select
+
+		for lib in "$cld_dir"/*.so; do
+			lib=${lib##*/}
 			if ! grep -q "$lib" "$APPDIR"/.preload 2>/dev/null; then
 				echo "$lib" >> "$APPDIR"/.preload
 			fi
@@ -1778,6 +1787,10 @@ _add_cross_libc_dlopen_lib() {
 		_echo "* cross-libc-dlopen successfully added!"
 	fi
 	:> "$APPDIR"/.foreign-dlopen-enabled
+
+	if ! grep -q 'CROSS_LIBC_DLOPEN_ROOT=' "$APPENV" 2>/dev/null; then
+		echo 'CROSS_LIBC_DLOPEN_ROOT=${SHARUN_DIR}' >> "$APPENV"
+	fi
 }
 
 _add_gtk_class_fix() {
