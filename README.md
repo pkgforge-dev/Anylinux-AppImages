@@ -442,6 +442,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage) |
 | [Visual Studio Code](https://github.com/pkgforge-dev/Visual-Studio-Code-AppImage) |
 | [VisualBoyAdvance-M](https://github.com/pkgforge-dev/VisualBoyAdvance-M-AppImage) |
+| [Vita3K](https://github.com/pkgforge-dev/Vita3K-AppImage-Enhanced) |
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
 | [Warp](https://github.com/pkgforge-dev/Warp-AppImage) |
 | [Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced) |
