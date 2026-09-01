@@ -923,6 +923,7 @@ _make_deployment_array() {
 			for lib in $NEEDED_LIBS; do
 				case "$lib" in
 					*libKF*KIOCore*.so*)
+						_kf_kio=1
 						# KIO workers, without KIO apps cannot open ny file or URL,
 						# and the uri filters used when parsing typed URLs
 						set -- "$@" \
@@ -955,6 +956,19 @@ _make_deployment_array() {
 						;;
 				esac
 			done
+
+			if [ "$_kf_kio" = 1 ]; then
+				while IFS="" read -r b; do
+					case "$b" in
+						*/kioworker|*/kioslave|*/kioexec|*/kiod?)
+							[ -x "$b" ] || continue
+							set -- "$@" "$b"
+							;;
+					esac
+				done <<-EOF
+				$(find "$LIB_DIR"/kf? "$LIB_DIR"/libexec/kf? "$LIB_DIR"/*/libexec/kf? -type f 2>/dev/null)
+				EOF
+			fi
 		fi
 
 		if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
