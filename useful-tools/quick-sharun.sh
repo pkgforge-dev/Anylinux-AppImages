@@ -827,8 +827,8 @@ _make_deployment_array() {
 	# LIB32 builds always bundle their drivers, 32bit driver stacks are not
 	# something users have installed for these apps
 	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
-		if [ "$DEPLOY_GTK" != 1 ] && [ "$DEPLOY_QT" != 1 ]; then
-			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is only supported when deploying Qt/GTK applications, ignoring it!"
+		if [ "$DEPLOY_SDL" = 1 ] && [ "$DEPLOY_GTK" != 1 ] && [ "$DEPLOY_QT" != 1 ]; then
+			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is not supported for SDL applications, ignoring it!"
 			USE_HOST_DRIVERS_EXPERIMENTAL=0
 		else
 			if [ "$ANYLINUX_LIB" != 1 ]; then
