@@ -80,6 +80,7 @@ static void spoof_argv0(int argc, char **argv) {
 // we save both here and construct a PATH with APPDIR/bin first at exec time.
 static char saved_appdir[PATH_MAX] = "";
 static char saved_path[PATH_MAX] = "";
+static char interposer_path[PATH_MAX] = "";
 
 __attribute__((constructor))
 static void capture_appdir_and_path(void) {
@@ -89,6 +90,17 @@ static void capture_appdir_and_path(void) {
 	const char *p = getenv("PATH");
 	if (p)
 		strncpy(saved_path, p, sizeof(saved_path) - 1);
+
+	/* A script is replaced by its #! interpreter in the kernel.  Keep an
+	 * absolute path to this DSO so that an external interpreter can inherit
+	 * the interposer and perform the real AppImage-boundary cleanup later. */
+	Dl_info dso;
+	if (dladdr((void *)capture_appdir_and_path, &dso) && dso.dli_fname) {
+		char *absolute = realpath(dso.dli_fname, NULL);
+		const char *source = absolute ? absolute : dso.dli_fname;
+		strncpy(interposer_path, source, sizeof(interposer_path) - 1);
+		free(absolute);
+	}
 }
 
 // Fix host locale issues; mirrors the locale-check logic previously in AppRun-generic
@@ -321,6 +333,119 @@ static void env_free(char* const *env) {
 	free((char**)env);
 }
 
+static int path_belongs_to_appdir(const char *path) {
+	const char *appdir = getenv("APPDIR");
+	if (!appdir || !*appdir || !path || !*path) return 0;
+
+	char *absolute = realpath(path, NULL);
+	if (!absolute) return 0;
+
+	size_t appdir_len = strlen(appdir);
+	int belongs = strncmp(absolute, appdir, appdir_len) == 0 &&
+			(absolute[appdir_len] == '/' || absolute[appdir_len] == '\0');
+	free(absolute);
+	return belongs;
+}
+
+static int path_command_belongs_to_appdir(const char *command) {
+	if (!command || !*command) return 0;
+	if (strchr(command, '/')) return path_belongs_to_appdir(command);
+
+	const char *search = saved_path[0] ? saved_path : getenv("PATH");
+	char *copy = strdup(search && *search ? search : "/usr/bin:/bin");
+	if (!copy) return 0;
+
+	int belongs = 0;
+	char *state = NULL;
+	for (char *directory = strtok_r(copy, ":", &state); directory;
+			directory = strtok_r(NULL, ":", &state)) {
+		char candidate[PATH_MAX];
+		if (snprintf(candidate, sizeof(candidate), "%s/%s",
+				*directory ? directory : ".", command) >= (int)sizeof(candidate))
+			continue;
+		if (access(candidate, X_OK) == 0) {
+			belongs = path_belongs_to_appdir(candidate);
+			break;
+		}
+	}
+	free(copy);
+	return belongs;
+}
+
+/* Return true when executing this internal script makes the kernel start a
+ * host interpreter.  /usr/bin/env needs special handling because its first
+ * non-option argument, rather than env itself, is the final interpreter. */
+static int script_hands_off_to_host(const char *filename) {
+	FILE *script = fopen(filename, "re");
+	if (!script) return 0;
+
+	char header[PATH_MAX + 4];
+	int host_handoff = 0;
+	if (fgets(header, sizeof(header), script) &&
+			header[0] == '#' && header[1] == '!') {
+		char *cursor = header + 2;
+		while (*cursor == ' ' || *cursor == '\t') cursor++;
+
+		char *interpreter = strsep(&cursor, " \t\r\n");
+		while (cursor && (*cursor == ' ' || *cursor == '\t')) cursor++;
+		const char *final_command = interpreter;
+
+		const char *base = interpreter ? strrchr(interpreter, '/') : NULL;
+		base = base ? base + 1 : interpreter;
+		if (base && strcmp(base, "env") == 0 && cursor) {
+			char *token;
+			do {
+				token = strsep(&cursor, " \t\r\n");
+			} while (token && (!*token || token[0] == '-'));
+			final_command = token;
+		}
+
+		host_handoff = interpreter && *interpreter &&
+				!path_belongs_to_appdir(interpreter) &&
+				!path_command_belongs_to_appdir(final_command);
+		DEBUG_PRINT("Shebang for '%s' hands off to %s interpreter '%s'\n",
+				filename, host_handoff ? "HOST" : "APPDIR", interpreter);
+	}
+	fclose(script);
+	return host_handoff;
+}
+
+static char *const *add_interposer_to_env(char *const envp[]) {
+	if (!interposer_path[0]) return envp;
+
+	size_t count = 0;
+	const char *previous = NULL;
+	for (; envp[count]; count++) {
+		if (strncmp(envp[count], "LD_PRELOAD=", 11) == 0)
+			previous = envp[count] + 11;
+	}
+	if (previous && strstr(previous, interposer_path)) return envp;
+
+	char **result = calloc(count + 2, sizeof(char *));
+	if (!result) return envp;
+
+	size_t output = 0;
+	for (size_t i = 0; i < count; i++) {
+		if (strncmp(envp[i], "LD_PRELOAD=", 11) != 0)
+			result[output++] = strdup(envp[i]);
+	}
+
+	size_t length = 12 + strlen(interposer_path) +
+			(previous && *previous ? strlen(previous) + 1 : 0);
+	result[output] = malloc(length);
+	if (!result[output]) {
+		env_free(result);
+		return envp;
+	}
+	snprintf(result[output++], length, "LD_PRELOAD=%s%s%s",
+			interposer_path, previous && *previous ? ":" : "",
+			previous && *previous ? previous : "");
+	result[output] = NULL;
+	DEBUG_PRINT("Preserving interposer across external shebang: %s\n",
+			interposer_path);
+	return result;
+}
+
 static int is_external_process(const char *filename) {
 	const char *appdir = getenv("APPDIR");
 	if (!appdir) {
@@ -398,6 +523,8 @@ static int spawn_common(posix_spawn_func_t fn,
 			DEBUG_PRINT("Error creating cleaned environment; using original env\n");
 			env = envp;
 		}
+	} else if (script_hands_off_to_host(path_to_check)) {
+		env = add_interposer_to_env(envp);
 	}
 
 	int ret = fn(pid, path, file_actions, attrp, argv, env);
@@ -445,6 +572,8 @@ static int exec_common(execve_func_t function, const char *filename, char* const
 				DEBUG_PRINT("Error creating cleaned environment; using original env\n");
 				env = envp;
 			}
+		} else if (script_hands_off_to_host(path_to_check)) {
+			env = add_interposer_to_env(envp);
 		} else
 			DEBUG_PRINT("Internal process; leaving environment unchanged\n");
 	}
