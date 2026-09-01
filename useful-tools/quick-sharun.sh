@@ -227,6 +227,10 @@ _help_msg() {
 	                        QtWebEngine and Qml as well, these can be controlled with
 	                        DEPLOY_QT_WEB_ENGINE and DEPLOY_QML. Set to 1 enable, 0 disable
 	                        Set QT_DIR if the system Qt directory in LIB_DIR has a different name.
+	  DEPLOY_KF           Set to 0 to disable bundling of the KDE Frameworks
+	                        plugins 'plugins/kf{5,6}'. By default only plugins of the
+	                        KF frameworks the app links against are bundled.
+	                        Additional plugins may still need to be added manually.
 	  DEPLOY_SDL          Set to 1 to force deployment of SDL.
 	  DEPLOY_GTK          Set to 1 to force deployment of GTK.
 	  DEPLOY_GDK          Set to 1 to force deployment of gdk-pixbuf.
@@ -683,6 +687,9 @@ _determine_what_to_deploy() {
 					DEPLOY_QT_WEB_ENGINE=${DEPLOY_QT_WEB_ENGINE:-1}
 					DEPLOY_ELECTRON=${DEPLOY_ELECTRON:-1}
 					;;
+				*libKF5*.so*|*libKF6*.so*)
+					DEPLOY_KF=${DEPLOY_KF:-1}
+					;;
 				*libgtk-x11-*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-2.0
@@ -909,6 +916,46 @@ _make_deployment_array() {
 					;;
 			esac
 		done
+
+		# Try to deploy only the KF plugins that we link against.
+		if [ "$DEPLOY_KF" = 1 ]; then
+			_echo "* Deploying KDE Frameworks plugins"
+			for lib in $NEEDED_LIBS; do
+				case "$lib" in
+					*libKF*KIOCore*.so*)
+						# KIO workers, without KIO apps cannot open ny file or URL,
+						# and the uri filters used when parsing typed URLs
+						set -- "$@" \
+							"$plugindir"/kf?/kio/* \
+							"$plugindir"/kf?/urifilters/*
+						;;
+					*libKF*KIO*Widgets*.so*|*libKF*KIOGui*.so*)
+						set -- "$@" \
+							"$plugindir"/kf?/kio_dnd/* \
+							"$plugindir"/kf?/kfileitemaction/*
+						;;
+					*libKF*TextEditor*.so*)
+						set -- "$@" "$plugindir"/kf?/ktexteditor/*
+						;;
+					*libKF*Parts*.so*)
+						set -- "$@" "$plugindir"/kf?/parts/*
+						;;
+					*libKF*Sonnet*.so*)
+						set -- "$@" "$plugindir"/kf?/sonnet/*
+						;;
+					*libKF*Auth*.so*)
+						# kauth is two levels deep: kauth/backend and kauth/helper
+						set -- "$@" "$plugindir"/kf?/kauth/*/*
+						;;
+					*libKF*Purpose*.so*)
+						set -- "$@" "$plugindir"/kf?/purpose/*
+						;;
+					*libKF*KFileMetaData*.so*)
+						set -- "$@" "$plugindir"/kf?/kfilemetadata/*
+						;;
+				esac
+			done
+		fi
 
 		if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
 			if ! enginebin=$(find "${QT_LOCATION:-$LIB_DIR}" -type f \
