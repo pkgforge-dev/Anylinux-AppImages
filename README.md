@@ -222,6 +222,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ITR2026](https://github.com/pkgforge-dev/ITR2026-AppImage) |
 | [Joplin Desktop](https://github.com/pkgforge-dev/Joplin-Desktop-AppImage) |
 | [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage) |
+| [Kate](https://github.com/pkgforge-dev/Kate-AppImage-Enhanced) |
 | [KBlocks](https://github.com/pkgforge-dev/KBlocks-AppImage) |
 | [KCalc](https://github.com/pkgforge-dev/KCalc-AppImage) |
 | [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage) |
