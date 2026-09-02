@@ -193,8 +193,11 @@ _download() {
 	while [ "$COUNT" -lt 5 ]; do
 		if "$DOWNLOAD_CMD" "$@"; then
 			return 0
+		else
+			status=$?
+			_err_msg "'$DOWNLOAD_CMD $*' exited with $status"
+			_err_msg "Trying again..."
 		fi
-		_err_msg "Download failed! Trying again..."
 		COUNT=$((COUNT + 1))
 		sleep 5
 	done
@@ -2242,6 +2245,19 @@ _deploy_locale() {
 			f=${DESKTOP_ENTRY##*/}
 			f=${f%.desktop}
 			set -- "$@" ! -name "*$f*"
+
+			# also preserve gtk and libadwaita locales
+			case "$GTK_DIR" in
+				gtk-2.0) set -- "$@" ! -name 'gtk20.mo';;
+				gtk-3.0) set -- "$@" ! -name 'gtk30.mo';;
+				gtk-4.0) set -- "$@" ! -name 'gtk40.mo';;
+			esac
+
+			l=$(set -- "$DST_LIB_DIR"/libadwaita* && echo "$1")
+			if [ -f "$l" ]; then
+				set -- "$@" ! -name 'libadwaita.mo'
+			fi
+
 			find "$APPDIR"/share/locale "$@" \( -type f -o -type l \) -exec rm -f {} +
 			_remove_empty_dirs "$APPDIR"/share/locale
 		fi
