@@ -3430,14 +3430,20 @@ for lib do case "$lib" in
 		_glibver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
 		src_glib_schema_dir=/usr/share/glib-$_glibver/schemas
 		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
-
 		_try_cp "$src_glib_schema_dir" "$dst_glib_schema_dir"
+		;;
+	*/libQt*Core.so*|*/libglib-*.so*)
 		# apps may crash when the host has no mime database
-		_try_cp /usr/share/mime "$APPDIR"/share/mime
-		rm -rf "$APPDIR"/share/mime/packages # bloat
-		# only the compiled mime database (mime.cache/magic/globs) is read by apps
-		# the *.xml files are used to generate them via update-mime-database
-		find "$APPDIR"/share/mime -type f -name '*.xml' -exec rm -f {} + || :
+		src_mime_dir=/usr/share/mime
+		dst_mime_dir=$APPDIR/share/mime
+		_try_cp "$src_mime_dir" "$dst_mime_dir"
+
+		[ -z "$_mime_updated" ] || continue
+		[ -d "$dst_mime_dir" ]  || continue
+		if update-mime-database "$dst_mime_dir" 2>/dev/null; then
+			find "$APPDIR"/share/mime -type f -name '*.xml' -exec rm -f {} + || :
+			_mime_updated=1
+		fi
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
