@@ -1849,7 +1849,6 @@ _add_cross_libc_dlopen_lib() {
 		done
 		_echo "* cross-libc-dlopen successfully added!"
 	fi
-	:> "$APPDIR"/.foreign-dlopen-enabled
 
 	if ! grep -q 'CROSS_LIBC_DLOPEN_ROOT=' "$APPENV" 2>/dev/null; then
 		echo 'CROSS_LIBC_DLOPEN_ROOT=${SHARUN_DIR}' >> "$APPENV"
