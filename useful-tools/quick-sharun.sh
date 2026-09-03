@@ -1002,9 +1002,7 @@ _make_deployment_array() {
 			"$LIB_DIR"/gio/modules/libdconfsettings.so
 
 		case "$GTK_DIR" in
-			*4*)
-				DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
-				;;
+			*4*) DEPLOY_OPENGL=${DEPLOY_OPENGL:-1};;
 		esac
 
 		if [ "$DEPLOY_WEBKIT2GTK" = 1 ]; then
@@ -2795,20 +2793,23 @@ _add_hooks_library() {
 	# always change XDG_CACHE_HOME to our own dedicated location
 	# using the host XDG_CACHE_HOME has been a source of issues
 	# See: https://github.com/pkgforge-dev/Anylinux-AppImages/issues/657
-	# APPIMAGE_PORTABLE_MODE=1: the runtime already pointed the XDG dirs
-	# at the portable dirs, keep XDG_CACHE_HOME as is
-	if [ "$USE_HOST_XDG_CACHE_HOME" != 1 ] && [ -n "$APPIMAGE" ] \
-	   && [ "$APPIMAGE_PORTABLE_MODE" != 1 ]; then
-	        export HOST_XDG_CACHE_HOME="$CACHEDIR"
-	        _cache_dir=$CACHEDIR/AppImage-Cache
-	        if [ -d "$_cache_dir" ] || mkdir -p "$_cache_dir" 2>/dev/null; then
-	                export XDG_CACHE_HOME="$_cache_dir"
-	        fi
-	        # we still need to share thumbnails cache
-	        # since thubmanilers will place them at original location
-	        if [ ! -L "$_cache_dir"/thumbnails ] && mkdir -p "$CACHEDIR"/thumbnails 2>/dev/null; then
-	                ln -sfn "$CACHEDIR"/thumbnails "$_cache_dir"/thumbnails 2>/dev/null || :
-	        fi
+	if [ "$USE_HOST_XDG_CACHE_HOME" != 1 ] && [ -n "$APPIMAGE" ]; then
+	        case "$XDG_CACHE_HOME" in
+	                *"$APPIMAGE"*) # make sure we are not using the portable cache first
+	                        :
+	                        ;;
+	                *)
+	                        _cache_dir=$CACHEDIR/AppImage-Cache
+	                        if [ -d "$_cache_dir" ] || mkdir -p "$_cache_dir" 2>/dev/null; then
+	                                export XDG_CACHE_HOME="$_cache_dir"
+	                        fi
+	                        # we still need to share thumbnails cache
+	                        # since thubmanilers will place them at original location
+	                        if [ ! -L "$_cache_dir"/thumbnails ] && mkdir -p "$CACHEDIR"/thumbnails 2>/dev/null; then
+	                                ln -sfn "$CACHEDIR"/thumbnails "$_cache_dir"/thumbnails 2>/dev/null || :
+	                        fi
+	                        ;;
+	        esac
 	fi
 
 	err_msg(){
