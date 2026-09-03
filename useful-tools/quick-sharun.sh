@@ -2799,6 +2799,7 @@ _add_hooks_library() {
 	# at the portable dirs, keep XDG_CACHE_HOME as is
 	if [ "$USE_HOST_XDG_CACHE_HOME" != 1 ] && [ -n "$APPIMAGE" ] \
 	   && [ "$APPIMAGE_PORTABLE_MODE" != 1 ]; then
+	        export HOST_XDG_CACHE_HOME="$CACHEDIR"
 	        _cache_dir=$CACHEDIR/AppImage-Cache
 	        if [ -d "$_cache_dir" ] || mkdir -p "$_cache_dir" 2>/dev/null; then
 	                export XDG_CACHE_HOME="$_cache_dir"
