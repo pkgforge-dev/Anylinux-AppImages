@@ -1849,7 +1849,6 @@ _add_cross_libc_dlopen_lib() {
 		done
 		_echo "* cross-libc-dlopen successfully added!"
 	fi
-	:> "$APPDIR"/.foreign-dlopen-enabled
 
 	if ! grep -q 'CROSS_LIBC_DLOPEN_ROOT=' "$APPENV" 2>/dev/null; then
 		echo 'CROSS_LIBC_DLOPEN_ROOT=${SHARUN_DIR}' >> "$APPENV"
@@ -3441,7 +3440,18 @@ for lib do case "$lib" in
 		[ -z "$_mime_updated" ] || continue
 		[ -d "$dst_mime_dir" ]  || continue
 		if update-mime-database "$dst_mime_dir" 2>/dev/null; then
-			find "$APPDIR"/share/mime -type f -name '*.xml' -exec rm -f {} + || :
+			# while glib can work with just the mime.cache, this is
+			# not the case with Qt, they still end up parsing the
+			# individual .xml files. So in a system without
+			# mime database Qt apps fail to recognize file formats
+			# Keep the audio/image/video .xml for that case
+			for d in "$dst_mime_dir"/*; do
+				[ -d "$d" ] || continue
+				case "$d" in
+					*/audio|*/image|*/video) continue;;
+					*) rm -rf "$d";;
+				esac
+			done
 			_mime_updated=1
 		fi
 		;;
