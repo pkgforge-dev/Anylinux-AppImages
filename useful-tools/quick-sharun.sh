@@ -3446,7 +3446,7 @@ for lib do case "$lib" in
 			# individual .xml files. So in a system without
 			# mime database Qt apps fail to recognize file formats
 			# Keep the audio/image/video .xml for that case
-			for d in "$APPDIR"/share/mime/*; do
+			for d in "$dst_mime_dir"/*; do
 				[ -d "$d" ] || continue
 				case "$d" in
 					*/audio|*/image|*/video) continue;;
