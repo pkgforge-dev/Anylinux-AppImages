@@ -9,6 +9,10 @@
  * be inherited by other processes launched by the appimage in portable mode
  * causing them to start using the fake .home dir instead of the real home
  *
+ * It also sets GSETTINGS_BACKEND=keyfile when portable mode is in use, so
+ * gsettings are stored inside the portable dirs, while keeping the host
+ * backend (dconf) otherwise
+ *
  * It also offers the option to change argv0 of the running binary
  *
  * It also offers the ability to block specific libraries from being loaded via dlopen
@@ -80,6 +84,35 @@ static void spoof_argv0(int argc, char **argv) {
 // we save both here and construct a PATH with APPDIR/bin first at exec time.
 static char saved_appdir[PATH_MAX] = "";
 static char saved_path[PATH_MAX] = "";
+
+// Portable mode is active when the runtime redirected HOME/XDG dirs into
+// the portable dirs. New runtimes set APPIMAGE_PORTABLE_MODE, older ones
+// only leave the REAL_* vars behind, so fall back to those.
+static int portable_mode_active(void) {
+	if (getenv("APPIMAGE_PORTABLE_MODE"))
+		return 1;
+	return getenv("REAL_HOME") != NULL ||
+	       getenv("REAL_XDG_DATA_HOME") != NULL ||
+	       getenv("REAL_XDG_CONFIG_HOME") != NULL ||
+	       getenv("REAL_XDG_CACHE_HOME") != NULL;
+}
+
+// Only set the keyfile backend in portable mode so gsettings stay inside the
+// portable config dir. Outside portable mode nothing is set: apps must use
+// the host backend (dconf) and terminals must not leak it into user shells.
+// The injected value must never reach external processes, which get their
+// real HOME/XDG dirs restored, see create_cleaned_env().
+static int injected_gsettings_keyfile = 0;
+
+__attribute__((constructor))
+static void init_gsettings_backend(void) {
+	if (!portable_mode_active() || getenv("GSETTINGS_BACKEND"))
+		return; // not portable, or the user set their own backend: keep it
+	if (setenv("GSETTINGS_BACKEND", "keyfile", 1) == 0) {
+		injected_gsettings_keyfile = 1;
+		DEBUG_PRINT("Portable mode: set GSETTINGS_BACKEND=keyfile\n");
+	}
+}
 
 __attribute__((constructor))
 static void capture_appdir_and_path(void) {
@@ -302,6 +335,13 @@ static char* const* create_cleaned_env(char* const* original_env) {
 					break;
 				}
 			}
+		}
+		// our injected keyfile backend must not leak into external processes,
+		// they run with the real HOME/XDG dirs and host backend restored
+		if (injected_gsettings_keyfile &&
+		    strcmp(original_env[i], "GSETTINGS_BACKEND=keyfile") == 0) {
+			DEBUG_PRINT("Unset GSETTINGS_BACKEND (injected keyfile) for external process\n");
+			should_copy = 0;
 		}
 		if (should_copy) {
 			new_env[new_env_index] = strdup(original_env[i]);

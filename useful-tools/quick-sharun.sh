@@ -1004,7 +1004,6 @@ _make_deployment_array() {
 		case "$GTK_DIR" in
 			*4*)
 				DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
-				echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
 				;;
 		esac
 
