@@ -1004,7 +1004,7 @@ _make_deployment_array() {
 		case "$GTK_DIR" in
 			*4*)
 				DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
-				echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
+				_add_gsettings_hook
 				;;
 		esac
 
@@ -2006,6 +2006,20 @@ _add_p11kit_cert_hook() {
 	fi
 	EOF
 	chmod +x "$cert_check"
+}
+
+_add_gsettings_hook() {
+	gsettings_hook=$APPDIR/bin/set-gsettings-backend.hook
+	if [ -f "$gsettings_hook" ]; then
+		return 0
+	fi
+
+	cat <<-'EOF' > "$gsettings_hook"
+	# this forces GTK apps to use keyfile when using portable home/config mode
+	if [ -d "$APPIMAGE".config ] || [ -d "$APPIMAGE".home ]; then
+	        export GSETTINGS_BACKEND=keyfile
+	fi
+	EOF
 }
 
 _map_paths_ld_preload_open() {
