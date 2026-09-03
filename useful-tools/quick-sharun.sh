@@ -3793,7 +3793,6 @@ if [ -f "$a" ]; then
 fi
 
 _fix_electron_libc_nonsense
-_remove_static_libs
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
@@ -3911,6 +3910,7 @@ done <<-EOF
 $ADD_DIR
 EOF
 
+_remove_static_libs
 _handle_nested_bins
 _fix_shebangs
 
