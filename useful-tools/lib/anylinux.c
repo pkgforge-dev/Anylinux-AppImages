@@ -87,11 +87,13 @@ static char saved_appdir[PATH_MAX] = "";
 static char saved_path[PATH_MAX] = "";
 
 // Portable mode is active when the runtime redirected HOME/XDG dirs into
-// the portable dirs. New runtimes set APPIMAGE_PORTABLE_MODE, older ones
-// only leave the REAL_* vars behind, so fall back to those.
+// the portable dirs. New runtimes set APPIMAGE_PORTABLE_MODE (any value
+// other than 1 forces it off), older ones only leave the REAL_* vars
+// behind, so fall back to those.
 static int portable_mode_active(void) {
-	if (getenv("APPIMAGE_PORTABLE_MODE"))
-		return 1;
+	const char *v = getenv("APPIMAGE_PORTABLE_MODE");
+	if (v)
+		return strcmp(v, "1") == 0;
 	return getenv("REAL_HOME") != NULL ||
 	       getenv("REAL_XDG_DATA_HOME") != NULL ||
 	       getenv("REAL_XDG_CONFIG_HOME") != NULL ||
@@ -369,6 +371,25 @@ static int is_external_process(const char *filename) {
 }
 
 static void restore_portable_dirs(void) {
+	if (!portable_mode_active()) {
+		// the portable cache is not in use, so AppRun.lib moved
+		// XDG_CACHE_HOME to a dedicated location: give host processes
+		// the original cache back
+		const char *use_host_cache = getenv("USE_HOST_XDG_CACHE_HOME");
+		if (!use_host_cache || strcmp(use_host_cache, "1") != 0) {
+			const char *host_cache = getenv("HOST_XDG_CACHE_HOME");
+			if (host_cache && *host_cache) {
+				if (setenv("XDG_CACHE_HOME", host_cache, 1) == 0)
+					DEBUG_PRINT("Restored XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
+				else
+					DEBUG_PRINT("Failed to restore XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
+			}
+		}
+		return;
+	}
+
+	// HOME/XDG dirs were redirected into the portable dirs, restore the
+	// real values for host processes
 	const char *real_data = getenv("REAL_XDG_DATA_HOME");
 	if (real_data && *real_data) {
 		if (setenv("XDG_DATA_HOME", real_data, 1) == 0)
@@ -391,19 +412,6 @@ static void restore_portable_dirs(void) {
 			DEBUG_PRINT("Restored XDG_CACHE_HOME to %s\n", real_cache);
 		else
 			DEBUG_PRINT("Failed to restore XDG_CACHE_HOME to %s\n", real_cache);
-	}
-
-	// we always set XDG_CACHE_HOME to a new location to prevent conflicts with
-	// the host cache, restore XDG_CACHE_HOME to the original value
-	const char *use_host_cache = getenv("USE_HOST_XDG_CACHE_HOME");
-	if (!use_host_cache || strcmp(use_host_cache, "1") != 0) {
-		const char *host_cache = getenv("HOST_XDG_CACHE_HOME");
-		if (host_cache && *host_cache) {
-			if (setenv("XDG_CACHE_HOME", host_cache, 1) == 0)
-				DEBUG_PRINT("Restored XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
-			else
-				DEBUG_PRINT("Failed to restore XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
-		}
 	}
 
 	const char *real_home = getenv("REAL_HOME");
