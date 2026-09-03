@@ -383,31 +383,18 @@ static int is_external_process(const char *filename) {
 
 
 static void restore_portable_dirs(void) {
-	if (portable_mode_active()) {
-		// HOME/XDG dirs were redirected into the portable dirs, restore
-		// the real values for host processes
-		for (size_t i = 0; i < sizeof(portable_vars) / sizeof(portable_vars[0]); i++) {
-			const char *real = getenv(portable_vars[i].real_var);
-			if (real && *real) {
-				if (setenv(portable_vars[i].var, real, 1) == 0)
-					DEBUG_PRINT("Restored %s to %s\n", portable_vars[i].var, real);
-				else
-					DEBUG_PRINT("Failed to restore %s to %s\n", portable_vars[i].var, real);
-			}
-		}
+	if (!portable_mode_active())
 		return;
-	}
-
-	// the portable cache is not in use, so AppRun.lib moved XDG_CACHE_HOME
-	// to a dedicated location: give host processes the original cache back
-	const char *use_host_cache = getenv("USE_HOST_XDG_CACHE_HOME");
-	if (!use_host_cache || strcmp(use_host_cache, "1") != 0) {
-		const char *host_cache = getenv("HOST_XDG_CACHE_HOME");
-		if (host_cache && *host_cache) {
-			if (setenv("XDG_CACHE_HOME", host_cache, 1) == 0)
-				DEBUG_PRINT("Restored XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
+	// HOME/XDG dirs were redirected into the portable dirs, restore the
+	// real values for host processes. The portable cache, if in use, is
+	// restored through REAL_XDG_CACHE_HOME like the rest.
+	for (size_t i = 0; i < sizeof(portable_vars) / sizeof(portable_vars[0]); i++) {
+		const char *real = getenv(portable_vars[i].real_var);
+		if (real && *real) {
+			if (setenv(portable_vars[i].var, real, 1) == 0)
+				DEBUG_PRINT("Restored %s to %s\n", portable_vars[i].var, real);
 			else
-				DEBUG_PRINT("Failed to restore XDG_CACHE_HOME to %s (from HOST_XDG_CACHE_HOME)\n", host_cache);
+				DEBUG_PRINT("Failed to restore %s to %s\n", portable_vars[i].var, real);
 		}
 	}
 }
