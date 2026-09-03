@@ -11,7 +11,8 @@
  *
  * It also sets GSETTINGS_BACKEND=keyfile when portable mode is in use, so
  * gsettings are stored inside the portable dirs, while keeping the host
- * backend (dconf) otherwise
+ * backend (dconf) otherwise, and never passes GSETTINGS_BACKEND to
+ * external processes
  *
  * It also offers the option to change argv0 of the running binary
  *
@@ -97,21 +98,16 @@ static int portable_mode_active(void) {
 	       getenv("REAL_XDG_CACHE_HOME") != NULL;
 }
 
-// Only set the keyfile backend in portable mode so gsettings stay inside the
-// portable config dir. Outside portable mode nothing is set: apps must use
-// the host backend (dconf) and terminals must not leak it into user shells.
-// The injected value must never reach external processes, which get their
-// real HOME/XDG dirs restored, see create_cleaned_env().
-static int injected_gsettings_keyfile = 0;
-
+// Set the keyfile backend only in portable mode and only when it is empty,
+// so gsettings stay inside the portable config dir while a user-provided
+// backend is kept as is. Outside portable mode nothing is set: apps use the
+// host backend (dconf) and terminals do not leak it into user shells.
 __attribute__((constructor))
 static void init_gsettings_backend(void) {
 	if (!portable_mode_active() || getenv("GSETTINGS_BACKEND"))
-		return; // not portable, or the user set their own backend: keep it
-	if (setenv("GSETTINGS_BACKEND", "keyfile", 1) == 0) {
-		injected_gsettings_keyfile = 1;
+		return;
+	if (setenv("GSETTINGS_BACKEND", "keyfile", 1) == 0)
 		DEBUG_PRINT("Portable mode: set GSETTINGS_BACKEND=keyfile\n");
-	}
 }
 
 __attribute__((constructor))
@@ -336,11 +332,10 @@ static char* const* create_cleaned_env(char* const* original_env) {
 				}
 			}
 		}
-		// our injected keyfile backend must not leak into external processes,
-		// they run with the real HOME/XDG dirs and host backend restored
-		if (injected_gsettings_keyfile &&
-		    strcmp(original_env[i], "GSETTINGS_BACKEND=keyfile") == 0) {
-			DEBUG_PRINT("Unset GSETTINGS_BACKEND (injected keyfile) for external process\n");
+		// external processes run with the real HOME/XDG dirs, they must
+		// also use the host gsettings backend: never pass GSETTINGS_BACKEND
+		if (strncmp(original_env[i], "GSETTINGS_BACKEND=", 18) == 0) {
+			DEBUG_PRINT("Unset GSETTINGS_BACKEND for external process\n");
 			should_copy = 0;
 		}
 		if (should_copy) {
