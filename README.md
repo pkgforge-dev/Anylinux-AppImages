@@ -246,6 +246,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
 | [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
 | [LibreWolf](https://github.com/pkgforge-dev/LibreWolf-AppImage-Enhanced) |
+| [Lighthouse](https://github.com/pkgforge-dev/Lighthouse-AppImage-Enhanced) |
 | [LightZone](https://github.com/pkgforge-dev/LightZone-AppImage) |
 | [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage) |
 | [LMMS](https://github.com/pkgforge-dev/LMMS-AppImage-Enhanced) |
