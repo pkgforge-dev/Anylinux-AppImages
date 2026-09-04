@@ -339,6 +339,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage) |
 | [Qmmp](https://github.com/pkgforge-dev/Qmmp-AppImage) |
 | [QMPlay2](https://github.com/pkgforge-dev/QMPlay2-AppImage-Enhanced) |
+| [QOwnNotes](https://github.com/pkgforge-dev/QOwnNotes-AppImage) |
 | [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage) |
 | [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage) |
 | [QuantumLauncher](https://github.com/pkgforge-dev/QuantumLauncher-AppImage-Enhanced) |
