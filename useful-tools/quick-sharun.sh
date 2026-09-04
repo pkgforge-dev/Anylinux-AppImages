@@ -2004,6 +2004,7 @@ _add_check_ca_certs_hook() {
 	        fi
 	fi
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_gsettings_backend_hook() {
@@ -2018,6 +2019,7 @@ _add_gsettings_backend_hook() {
 	        export GSETTINGS_BACKEND=keyfile
 	fi
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_path_mapping_hardcoded_hook() {
@@ -2047,6 +2049,7 @@ _add_path_mapping_hardcoded_hook() {
 	        LC_ALL=C ln -sfn "$APPDIR"/share /tmp/"$_tmp_share" || :
 	fi
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_fix_gnome_csd_hook() {
@@ -2107,6 +2110,7 @@ _add_fix_gnome_csd_hook() {
 	        _find_host_libdecor_plugins_dir
 	fi
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_fix_namespaces_hook() {
@@ -2205,8 +2209,8 @@ _add_fix_namespaces_hook() {
 	}
 
 	check_and_fix_userns || :
-
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_get_yt_dlp_hook() {
@@ -2245,6 +2249,7 @@ _add_get_yt_dlp_hook() {
 	        fi
 	fi
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_host_libjack_hook() {
@@ -2309,6 +2314,7 @@ _add_host_libjack_hook() {
 	        fi
 	fi
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_sdl_soundfonts_hook() {
@@ -2378,6 +2384,7 @@ _add_sdl_soundfonts_hook() {
 	        _find_soundfont
 	fi
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_self_updater_hook() {
@@ -2495,7 +2502,6 @@ _add_self_updater_hook() {
 	        fi
 	}
 
-
 	run_updater() {
 	        export PATH="$PATH:$BINDIR"
 	        _updater_sanity_check
@@ -2517,9 +2523,9 @@ _add_self_updater_hook() {
 	        fi
 	}
 
-
 	run_updater &
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_udev_installer_hook() {
@@ -2620,6 +2626,7 @@ _add_udev_installer_hook() {
 
 	install_udev_rules || :
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_vulkan_check_hook() {
@@ -2884,6 +2891,7 @@ _add_vulkan_check_hook() {
 	        export SHARUN_MESA_PATH
 	fi
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_wayland_is_broken_hook() {
@@ -2910,6 +2918,7 @@ _add_wayland_is_broken_hook() {
 	        unset WAYLAND_DISPLAY
 	fi
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_x86_64_v3_check_hook() {
@@ -2939,8 +2948,8 @@ _add_x86_64_v3_check_hook() {
 	                err_msg "============================================================"
 	        fi
 	fi
-
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_x86_64_v4_check_hook() {
@@ -2970,8 +2979,8 @@ _add_x86_64_v4_check_hook() {
 	                err_msg "============================================================"
 	        fi
 	fi
-
 	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _add_qs_hooks() {
@@ -2992,10 +3001,6 @@ _add_qs_hooks() {
 			hook=${hook%.hook}
 			hook=${hook}.hook
 
-			if [ -f "$hook_dst"/"$hook" ] || [ -f "$hook_dst"/[0-9][0-9]-"$hook" ]; then
-				continue
-			fi
-
 			case "$hook" in
 				*fix-gnome-csd.hook)      _add_fix_gnome_csd_hook;;
 				*fix-namespaces.hook)     _add_fix_namespaces_hook;;
@@ -3014,7 +3019,6 @@ _add_qs_hooks() {
 					exit 1
 					;;
 			esac
-			_echo "* Added $hook"
 		done
 	fi
 }
