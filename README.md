@@ -296,6 +296,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OpenRA](https://github.com/pkgforge-dev/OpenRA-AppImage-Enhanced) |
 | [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced) |
 | [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage) |
+| [OpenTESArena](https://github.com/pkgforge-dev/OpenTESArena-AppImage) |
 | [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage) |
 | [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage) |
 | [OpenXRay](https://github.com/pkgforge-dev/OpenXRay-AppImage) |
