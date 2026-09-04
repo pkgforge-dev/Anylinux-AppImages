@@ -1,5 +1,7 @@
 # Available hooks
 
+These hooks are bundled inside `quick-sharun.sh` and deployed when their names are added to the `ADD_HOOKS` variable, they no longer need to be downloaded separately.
+
 | Hook | Description |
 |------|-------------|
 | `self-updater.hook` | Makes the AppImage self-updatable using appimageupdatetool |
@@ -13,7 +15,6 @@
 | `wayland-is-broken.hook` | Forces X11 fallback for applications with known Wayland issues |
 | `sdl-soundfonts.hook` | Downloads and installs a SoundFont (FluidR3) when the application needs one |
 | `get-yt-dlp.hook` | Downloads `yt-dlp` when the application requires it to play online videos |
-| `qt-theme.hook` | Applies a custom Qt stylesheet via `APPIMAGE_QT_THEME` or a `.stylesheet` sidecar file |
 
 Hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only normalized for compatibility, so new examples should use plain `.hook` names.
 
