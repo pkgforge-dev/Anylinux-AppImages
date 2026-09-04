@@ -160,6 +160,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Flacon](https://github.com/pkgforge-dev/Flacon-AppImage-Enhanced) |
 | [Flashrom](https://github.com/pkgforge-dev/Flashrom-AppImage) |
 | [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced) |
+| [foobar2000](https://github.com/pkgforge-dev/foobar2000-AppImage) |
 | [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage) |
 | [foot](https://github.com/pkgforge-dev/foot-AppImage) |
 | [fooyin](https://github.com/pkgforge-dev/fooyin-AppImage) |
