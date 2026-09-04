@@ -5,9 +5,10 @@
 # You can also force their deployment by setting the respective env variables
 # for example set DEPLOY_OPENGL=1 to force opengl to be deployed
 
-# Set ADD_HOOKS var to deploy the several hooks of this repository
+# Set ADD_HOOKS var to deploy the several hooks bundled in quick-sharun
 # Example: ADD_HOOKS="self-updater.hook:fix-namespaces.hook" ./quick-sharun.sh
-# Using the hooks automatically downloads a generic AppRun if no AppRun is present
+# Do not use the ADD_HOOKS for your own provided hooks
+# in that case just add the *.hook files to APPDIR/bin/ directly
 
 # Set DESKTOP and ICON to the path of top level .desktop and icon to deploy them
 
@@ -48,7 +49,6 @@ MAIN_BIN=${MAIN_BIN##*/}
 
 SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/2.3.0/sharun-$APPIMAGE_ARCH}
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/latest/download/onelf-$APPIMAGE_ARCH-linux}
-HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/hooks}
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
 OUTPATH=${OUTPATH:-$PWD}
@@ -104,7 +104,7 @@ export QT_QPA_PLATFORMTHEME=${QT_QPA_PLATFORMTHEME:-fusion}
 PATH_MAPPING_SCRIPT=$DST_BIN_DIR/01-path-mapping-hardcoded.hook
 
 if [ -f "$PATH_MAPPING_SCRIPT" ]; then
-	while IFS= read -r line; do
+	while IFS="" read -r line; do
 		case "$line" in
 			_tmp_*) eval "$line";;
 		esac
@@ -1004,7 +1004,7 @@ _make_deployment_array() {
 		case "$GTK_DIR" in
 			*4*)
 				DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
-				_add_gsettings_hook
+				ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}gsettings-backend.hook"
 				;;
 		esac
 
@@ -1964,13 +1964,13 @@ _check_always_software() {
 	fi
 }
 
-_add_p11kit_cert_hook() {
-	cert_check=$DST_BIN_DIR/01-check-ca-certs.hook
-	if [ -f "$cert_check" ]; then
+_add_check_ca_certs_hook() {
+	hook=$DST_BIN_DIR/01-check-ca-certs.hook
+	if [ -f "$hook" ]; then
 		return 0
 	fi
 
-	cat <<-'EOF' > "$cert_check"
+	cat <<-'QS_HOOK' > "$hook"
 	#!/bin/sh
 
 	_possible_certs='
@@ -1983,43 +1983,1050 @@ _add_p11kit_cert_hook() {
 	'
 
 	for c in $_possible_certs; do
-	    if [ -f "$c" ]; then
-	        break
-	    fi
+	        if [ -f "$c" ]; then
+	                break
+	        fi
 	done
 
 	if [ -f "$c" ]; then
-	    # With p11kit we have to make a symlink in /tmp because the meme
-	    # library does not check any of these variables set by sharun:
-	    #
-	    # REQUESTS_CA_BUNDLE
-	    # CURL_CA_BUNDLE
-	    # SSL_CERT_FILE
-	    #
-	    # So we had to patch it to a path in /tmp and now symlink to the
-	    # found certificate at runtime...
-	    _host_cert=/tmp/.___host-certs/ca-certificates.crt
-	    if [ -d "$APPDIR"/lib/pkcs11 ] && [ ! -f "$_host_cert" ]; then
-	        mkdir -p /tmp/.___host-certs || :
-	        ln -sfn "$c" "$_host_cert" || :
-	    fi
+	        # With p11kit we have to make a symlink in /tmp because the meme
+	        # library does not check any of these variables set by sharun:
+	        #
+	        # REQUESTS_CA_BUNDLE
+	        # CURL_CA_BUNDLE
+	        # SSL_CERT_FILE
+	        #
+	        # So we had to patch it to a path in /tmp and now symlink to the
+	        # found certificate at runtime...
+	        _host_cert=/tmp/.___host-certs/ca-certificates.crt
+	        if [ -d "$APPDIR"/lib/pkcs11 ] && [ ! -f "$_host_cert" ]; then
+	                mkdir -p /tmp/.___host-certs || :
+	                ln -sfn "$c" "$_host_cert" || :
+	        fi
 	fi
-	EOF
-	chmod +x "$cert_check"
+	QS_HOOK
+	_echo "* Added $hook"
 }
 
-_add_gsettings_hook() {
-	gsettings_hook=$APPDIR/bin/set-gsettings-backend.hook
-	if [ -f "$gsettings_hook" ]; then
+_add_gsettings_backend_hook() {
+	hook=$DST_BIN_DIR/05-gsettings-backend.hook
+	if [ -f "$hook" ]; then
 		return 0
 	fi
 
-	cat <<-'EOF' > "$gsettings_hook"
+	cat <<-'QS_HOOK' > "$hook"
 	# this forces GTK apps to use keyfile when using portable home/config mode
 	if [ -d "$APPIMAGE".config ] || [ -d "$APPIMAGE".home ]; then
 	        export GSETTINGS_BACKEND=keyfile
 	fi
-	EOF
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_path_mapping_hardcoded_hook() {
+	hook=$PATH_MAPPING_SCRIPT
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+
+	# this script makes symnlinks to hardcoded random dirs that
+	# were patched away by quick-sharun when hardcoded paths are
+	# detected or when 'PATH_MAPPING_HARDCODED' is used
+
+	_tmp_bin=""
+	_tmp_lib=""
+	_tmp_share=""
+
+	if [ -n "$_tmp_bin" ]; then
+	        LC_ALL=C ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin" || :
+	fi
+	if [ -n "$_tmp_lib" ]; then
+	        LC_ALL=C ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib" || :
+	fi
+	if [ -n "$_tmp_share" ]; then
+	        LC_ALL=C ln -sfn "$APPDIR"/share /tmp/"$_tmp_share" || :
+	fi
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_fix_gnome_csd_hook() {
+	hook=$DST_BIN_DIR/05-fix-gnome-csd.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# GNOME in their infinite wisdom decided that applications must provide their
+	# own window decorations on wayland, as result we would need to bundle
+	# 7 MiB of garbage in the AppImage just to "fix" this nonsense
+	#
+	# And those 7 MiB are best a case scenario when using the libdecor cairo
+	# plugin which looks horrible in GNOME anyway, way more with the gtk plugin...
+	#
+	# This is not a problem on Windows, macOS and the rest of linux including
+	# x11 GNOME, just utter nonsense from an organization that also tried
+	# to sabotage letting applications to draw their own icons???
+	# https://gitlab.freedesktop.org/wayland/wayland-protocols/-/merge_requests/269#note_2233724
+	#
+	# So instead lets try to use the host libdecor plugins, since libdecor
+	# should fail safe if anything goes wrong here, worst case scenario you wont
+	# have decorations in wayland which but the application will still work
+	#
+
+	_find_host_libdecor_plugins_dir() {
+	        # We only want to do this in GNOME Wayland, so check first
+	        case "$XDG_CURRENT_DESKTOP" in
+	                *GNOME*|*gnome*|*Gnome*) :;;
+	                *) return 0;;
+	        esac
+	        case "$XDG_SESSION_TYPE" in
+	                *Wayland*|*wayland*|*WAYLAND*) :;;
+	                *) return 0;;
+	        esac
+	        set -- \
+	          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libdecor/plugins-* \
+	          /usr/lib64/libdecor/plugins-* \
+	          /usr/lib/libdecor/plugins-* \
+	          /nix/store/*/lib/libdecor/plugins-*
+	        for d do
+	                if [ -d "$d" ]; then
+	                        export LIBDECOR_PLUGIN_DIR="$d"
+	                        break
+	                fi
+	        done
+	}
+
+	if [ "$DO_NOT_USE_LIBDECOR_FFS" = 1 ] || [ -f "$APPDIR"/.disable-libdecor ]; then
+	        # set the var to a non existing location when not wanted
+	        # since libdecor may still try to load at its original prefix
+	        export LIBDECOR_PLUGIN_DIR=/XXX/YYY/ZZZ
+	        export SDL_VIDEO_WAYLAND_ALLOW_LIBDECOR=0
+	else
+	        _find_host_libdecor_plugins_dir
+	fi
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_fix_namespaces_hook() {
+	hook=$DST_BIN_DIR/05-fix-namespaces.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# Script that disables unbuntu's nonsense of restricting namespaces
+	# This is mostly needed by web browsers and electorn apps
+	# Also if you have an application that uses bubblewrap internally
+
+	_userns_check_msg="
+	unprivileged user-namespaces are disabled!
+
+	Unprivileged user-namespaces are required to use this application.
+
+	Certain Linux distributions like Ubuntu since v24.04 and secureblue disable unprivileged user-namespaces by default due to safety concerns.
+	This is what prevents the applications to utilize sandboxing.
+	Unprivileged user-namespaces are safe and a vital part of the security model of all web browsers, flatpak, electron apps, etc.
+
+	For more details, see: https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/fix-namespaces.md#why
+	"
+	_userns_check_msg_no_fix="$_userns_check_msg
+	We do not have an automated way to enable unprivileged user-namespaces for your Linux distribution at the moment, so you will have to enable those manually.
+	"
+	_userns_check_msg_with_fix="$_userns_check_msg
+	To fix this issue, I will need a permission to disable this restriction, like all the other Linux distributions do and several Ubuntu forks had to undo.
+	"
+	_userns_check_msg_apparmor="$_userns_check_msg_with_fix
+	If you later wish to undo this change, remove: '/etc/sysctl.d/20-fix-namespaces.conf'
+	and then run 'sysctl -w kernel.apparmor_restrict_unprivileged_userns=1' or reboot.
+	"
+	_userns_check_msg_secureblue="$_userns_check_msg_with_fix
+	If you later wish to undo this change, run this command: 'ujust set-unconfined-userns off'.
+	Changes are immediate, there is no need to reboot.
+	"
+
+	_disable_namespace_check=$CACHEDIR/.disable-namespaces-check
+
+	_is_userns_possible() {
+	        unshare --help 2>&1 | grep -q -- '--user'
+	        # userns need kernel major 4 or higher
+	        _kernel_ver=$(uname -r)
+	        [ ${_kernel_ver%%.*} -ge 4 ]
+	}
+
+	_check_userns() {
+	        unshare -Urm /bin/true
+	}
+
+	_is_apparmor() {
+	        sysctl -a | grep -q -m 1 'kernel.apparmor_restrict_unprivileged_userns.*1'
+
+	}
+
+	_is_secureblue() {
+	        ujust | grep -q -m 1 'set-unconfined-userns'
+	}
+
+	_fix_userns() {
+	        if _is_apparmor 2>/dev/null; then
+	                if notify -dq "$_userns_check_msg_apparmor"; then
+	                        run_gui_sudo /bin/sh -c "
+	                          echo 'kernel.apparmor_restrict_unprivileged_userns = 0' \
+	                          | tee /etc/sysctl.d/20-fix-namespaces.conf
+	                          sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+	                        "
+	                        return 0
+	                fi
+	        elif _is_secureblue 2>/dev/null; then
+	                if notify -dq "$_userns_check_msg_secureblue"; then
+	                        ujust set-unconfined-userns on
+	                        return 0
+	                fi
+	        else
+	                notify -di "$_userns_check_msg_no_fix"
+	        fi
+	        return 1
+	}
+
+	_do_not_ask_again() {
+	        if notify -dq "Do you wish to not see this message again?"; then
+	                mkdir -p "$CACHEDIR"
+	                :> "$_disable_namespace_check"
+	        fi
+	}
+
+	check_and_fix_userns() {
+	        if [ ! -f "$_disable_namespace_check" ] && _is_userns_possible; then
+	                _check_userns || _fix_userns || _do_not_ask_again
+	        fi
+	}
+
+	check_and_fix_userns || :
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_get_yt_dlp_hook() {
+	hook=$DST_BIN_DIR/05-get-yt-dlp.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# Use this hook for applications that require yt-dlp
+
+	_denyfile=$CACHEDIR/.no-ytdlp-${APPIMAGE##*/}
+	PATH=$PATH:$BINDIR
+	export PATH
+
+	_yt_dlp_message="${APPIMAGE##*/} needs yt-dlp to play online videos, but yt-dlp is not installed on your system. Do you want to download and install it now? You can also install it using your distro’s package manager."
+
+	_get_ytdlp() {
+	        mkdir -p "$BINDIR"
+	        _ytdlp_link=$(download - https://api.github.com/repos/pkgforge-dev/yt-dlp-AppImage/releases \
+	          | sed 's/[()",{} ]/\n/g' | grep -oi "https.*$APPIMAGE_ARCH.*AppImage$" | head -n 1)
+	        >&2 echo "Downloading '$_ytdlp_link'..."
+	        download "$BINDIR"/yt-dlp "$_ytdlp_link"
+	        chmod +x "$BINDIR"/yt-dlp
+	}
+
+
+	if ! command -v yt-dlp 1>/dev/null && [ ! -f "$_denyfile" ]; then
+	        if notify -dq "$_yt_dlp_message"; then
+	                _get_ytdlp || notify -de 'Something went wrong downloading yt-dlp'
+	        else
+	                mkdir -p "$CACHEDIR"
+	                :> "$_denyfile"
+	        fi
+	fi
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_host_libjack_hook() {
+	hook=$DST_BIN_DIR/05-host-libjack.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# this hook allows attempting to use the host libjack.so
+	# jack has a big issue that clients and servers need to be using the same
+	# libjack.so to guarantee functionality
+	#
+	# flatpak and similar solve this issue by using pipewire-jack
+	# which provides a drop in replacement of libjack.so that does not have this
+	# limitation of needing matching library versions between clients and server
+	#
+	# however pipewirejack often has performance issues that real libjack does not
+	# have,so it is good to at least attempt to use the host libjack if needed
+	#
+	# https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/issues/1001#note_323464727
+	# https://github.com/flatpak/flatpak/issues/1509#issuecomment-3315750411
+	# https://discourse.ardour.org/t/ardour-pipewire-sound-stuttering-crackling-popping-when-adjusting-system-volume/109054/3
+
+	# hook is enabled by default
+	USE_HOST_LIBJACK=${USE_HOST_LIBJACK:-1}
+
+	_find_host_libjack() (
+	        if [ ! -d "$HOST_LIBJACK_DIR" ]; then
+	                # attempt to find where the host libjack is located
+	                set -- /usr/lib/$APPIMAGE_ARCH-linux-gnu /usr/lib64 /usr/lib
+	                for d do
+	                        set -- "$d"/libjack.so*
+	                        if [ ! -f "$1" ]; then
+	                                continue
+	                        # skip libjack if it links to pipewire since that is
+	                        # pipewirejack and there is no point in trying to use it
+	                        elif grep -aq 'libpipewire' "$1"; then
+	                                continue
+	                        else
+	                                mkdir -p "$HOST_LIBJACK_DIR"
+	                                cp -L "$d"/libjack.so* "$HOST_LIBJACK_DIR"
+	                                return 0
+	                        fi
+	                done
+	        else
+	                return 0
+	        fi
+	        return 1
+	)
+
+	if [ "$USE_HOST_LIBJACK" = 1 ]; then
+	        HOST_LIBJACK_DIR=${HOST_LIBJACK_DIR:-${TMPDIR:-/tmp}/.hostlibjack}
+
+	        if _find_host_libjack; then
+	                export SHARUN_EXTRA_LIBRARY_PATH="${HOST_LIBJACK_DIR}${SHARUN_EXTRA_LIBRARY_PATH:+:$SHARUN_EXTRA_LIBRARY_PATH}"
+	        else
+	                err_msg "host-libjack: ERROR: libjack.so not found on this system"
+	                err_msg "or it is pipewire-jack, which is not useful here. Aborting..."
+	        fi
+	fi
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_sdl_soundfonts_hook() {
+	hook=$DST_BIN_DIR/05-sdl-soundfonts.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	_deny_soundfonts_file=$CACHEDIR/.no-soundfont-${APPIMAGE##*/}
+	XDG_DATA_DIRS=$DATADIR:$APPDIR/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}
+	export XDG_DATA_DIRS
+
+	_sound_font_src=https://deb.debian.org/debian/pool/main/f/fluid-soundfont/fluid-soundfont_3.1.orig.tar.gz
+	_sound_font_msg="${APPIMAGE##*/} requires a SoundFont to work properly. Do you wish to download FluidR3 SoundFont?"
+
+	_get_soundfont() (
+	        if [ -f "$_deny_soundfonts_file" ]; then
+	                return 1
+	        elif notify -dq "$_sound_font_msg"; then
+	                _dst=$DATADIR/soundfonts
+	                mkdir -p "$_dst"/.tmp
+	                cd "$_dst"/.tmp
+	                if download ./tmp.tar.gz "$_sound_font_src"; then
+	                        tar xvf ./tmp.tar.gz
+	                        mv -v ./*/*.sf2 "$_dst"
+	                        rm -rf "$_dst"/.tmp
+	                else
+	                        notify -de 'Something went wrong downloading SoundFont'
+	                        return 1
+	                fi
+	        else
+	                mkdir -p "${_deny_soundfonts_file%/*}"
+	                :> "$_deny_soundfonts_file"
+	        fi
+	)
+
+	_find_soundfont() {
+	        set --
+	        _old_ifs=$IFS
+	        IFS=:
+	        for d in $XDG_DATA_DIRS; do
+	                set -- "$@" \
+	                  "$d"/soundfonts/*.sf2 \
+	                  "$d"/sounds/sf2/*.sf2 \
+	                  "$d"/soundfonts/*.sf3 \
+	                  "$d"/sounds/sf3/*.sf3
+	        done
+	        IFS=$_old_ifs
+
+	        for soundfont do
+	                if [ -f "$soundfont" ]; then
+	                        SDL_SOUNDFONTS=${SDL_SOUNDFONTS:+$SDL_SOUNDFONTS:}$soundfont
+	                fi
+	        done
+
+	        if [ -n "$SDL_SOUNDFONTS" ]; then
+	                export SDL_SOUNDFONTS
+	        elif _get_soundfont; then
+	                _find_soundfont
+	        fi
+	}
+
+	if [ -z "$SDL_SOUNDFONTS" ]; then
+	        _find_soundfont
+	fi
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_self_updater_hook() {
+	hook=$DST_BIN_DIR/10-self-updater.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# Helper script in POSIX shell to self update appimages in place
+	# depends on appimageupdatetool which will be downloaded if not available
+
+
+	_desktop_entry=$(set -- "$APPDIR"/*.desktop; echo "${1##*/}")
+	_desktop_entry=${_desktop_entry%.desktop}
+	_updater_policy_dir=${UPDATE_POLICY_CONFIGDIR:-$HOST_XDG_CONFIG_HOME/auto-updates-policy}
+	_updater_policy_file=${_updater_policy_dir}/${_desktop_entry}-update-setting
+	_updater_appname=${APPIMAGE##*/}
+
+	APPIMAGEUPDATETOOL_LINK=${APPIMAGEUPDATETOOL_LINK:-https://github.com/pkgforge-dev/AppImageUpdate/releases/latest/download/appimageupdate-$APPIMAGE_ARCH-linux}
+
+	# make sure we can update the thing
+	_updater_sanity_check() {
+	        if [ -f "$_updater_policy_dir"/no_updatecheck ] \
+	          || [ -f "$HOST_XDG_DATA_HOME"/appimagekit/no_updatecheck ]; then
+	                return 1
+	        elif [ "$DISABLE_AUTO_UPDATES" = 1 ]; then
+	                return 1
+	        elif [ -z "$APPIMAGE" ] || [ -z "$APPDIR" ]; then
+	                return 1
+	        elif [ ! -w "$APPIMAGE" ]; then
+	                return 1
+	        elif [ "$DO_NOT_CHECK_FOR_OTHER_APPIMAGE_MANAGERS" != 1 ]; then
+	                # check for other appimage managers
+	                # skip appimaged/appimagelauncher because they cannot integrate DWARFS appimages
+	                # we also do not check for gearlever because with gearlever the user
+	                # has to be manually giving urls to update appimages which is terrible
+	                # it is also not able to do delta updates at the time of writting this
+	                if is_cmd --any am appman app-manager dbin soar; then
+	                        return 1
+	                fi
+	        fi
+
+	        if [ ! -d "$_updater_policy_dir" ]; then
+	                mkdir -p "$_updater_policy_dir"
+	        fi
+	}
+
+	_get_appimageupdatetool() {
+	        if is_cmd appimageupdatetool; then
+	                return 0
+	        fi
+
+	        if notify -dq "We require 'AppImageUpdate'. Do you wish to download it?"; then
+	                mkdir -p "$BINDIR"
+	                if download "$BINDIR"/appimageupdatetool "$APPIMAGEUPDATETOOL_LINK"; then
+	                        chmod +x "$BINDIR"/appimageupdatetool
+	                        return 0
+	                else
+	                        notify -dq "Something went wrong downloading appimageupdatetool"
+	                fi
+	        fi
+	        return 1
+	}
+
+	_check_for_update() {
+	        set +e
+	        appimageupdatetool -j "$APPIMAGE"
+	        r=$?
+	        set -e
+	        # exit code >1 likely indicates the app was not correctly packaged
+	        case "$r" in
+	                0) >&2 echo " $_updater_appname is up to date"; return 1;;
+	                1) >&2 echo " $_updater_appname update is available"; return 0;;
+	                *) >&2 echo " $_updater_appname update check failed"; return 1;;
+	        esac
+	}
+
+	_update() {
+	        _updater_perform_update_msg="A new version of $_updater_appname is available. Do you wish to update?"
+	        if notify -dq "$_updater_perform_update_msg"; then
+	                if appimageupdatetool -Or "$APPIMAGE"; then
+	                        notify "$_updater_appname updated successfully!"
+	                else
+	                        notify -de "Something went wrong updating $_updater_appname"
+	                fi
+	        else
+	                return 1
+	        fi
+	}
+
+	_make_configfile() {
+	        if [ ! -f "$_updater_policy_file" ]; then
+	                echo "2" > "$_updater_policy_file"
+	                # do not ask the first time we are launched
+	                # because that just annoys people
+	                return 1
+	        fi
+	}
+
+	_enable_update_checking() {
+	        if notify -dq "Allow $_updater_appname to check for updates?"; then
+	                echo "1" > "$_updater_policy_file"
+	        else
+	                # disable without asking
+	                echo "0" > "$_updater_policy_file"
+	        fi
+	}
+
+	_disable_update_checking() {
+	        if notify -dq "Do you wish to disable update checks and not see this message again?"; then
+	                echo "0" > "$_updater_policy_file"
+	        fi
+	}
+
+	run_updater() {
+	        export PATH="$PATH:$BINDIR"
+	        _updater_sanity_check
+	        _make_configfile
+
+	        read -r _status < "$_updater_policy_file"
+
+	        if [ "$_status" = 0 ]; then
+	                >&2 echo "self updates disabled by $_updater_policy_file"
+	                return 0
+	        elif [ "$_status" = 1 ]; then
+	                _get_appimageupdatetool || _disable_update_checking
+	                if _check_for_update; then
+	                        _update || _disable_update_checking
+	                fi
+	        else
+	                sleep 5
+	                _enable_update_checking
+	        fi
+	}
+
+	run_updater &
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_udev_installer_hook() {
+	hook=$DST_BIN_DIR/07-udev-installer.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# Helper script in POSIX shell to install udev rules
+
+	# checks if the bundled udev rules are installed, checks in multiple places
+	# to make sure they were not installed by other means, then informs the user
+	# that the udev rules need to be installed, then it will
+	# use pkexec or lxqt-sudo to gain rights to install them
+	# at /usr/local/lib/udev
+
+	# Note this will only install udev rules, nothing else, some rules require the
+	# user to be in a group, in that case you will need to change this script
+
+	_disable_udev=$CACHEDIR/.${APPIMAGE##*/}-udev-check-disabled
+	_udev_install_msg="${APPIMAGE##*/} needs udev rules in order to work. Do you wish to install them?"
+
+	# make sure we have the needed deps
+	_udev_installer_check() {
+	        if [ "$CI" = 'true' ]; then
+	                return 1
+	        elif [ -f "$_disable_udev" ] || [ -z "$APPDIR" ] || [ -z "$APPIMAGE" ]; then
+	                return 1
+	        elif ! is_cmd cp mkdir; then
+	                return 1
+	        elif ! run_gui_sudo --check; then
+	                return 1
+	        fi
+
+	        for d in "$APPDIR"/etc/udev/rules.d "$APPDIR"/lib/udev/rules.d; do
+	                if [ -d "$d" ]; then
+	                        _bundled_udev_rules=$d
+	                        return 0
+	                fi
+	        done
+
+	        return 1
+	}
+
+	_is_rule_already_installed() {
+	        # Add any possible udev files in the array
+	        set -- "$_bundled_udev_rules"/*
+
+	        # check if it is already installed on the host, check in multiple
+	        # places since they could be installed by distro or other means
+	        for f do
+	                if [ -f /etc/udev/rules.d/"${f##*/}" ] \
+	                  || [ -f /usr/lib/udev/rules.d/"${f##*/}" ] \
+	                  || [ -f /usr/local/lib/udev/rules.d/"${f##*/}" ]; then
+	                        shift
+	                fi
+	        done
+
+	        # bundled udev rules are already installed if the array is empty
+	        [ -n "$1" ] || return 1
+	}
+
+	_install_udev() {
+	        # due to some weird issue I noticed in kubuntu, we do not have
+	        # permission to copy the dir from the FUSE filesystem to /usr/local
+	        # we need to instead copy the dir first to /tmp and then
+	        # copy it over to /usr/local...
+
+	        # just in case there is something funny there already
+	        _tmp_udev_dir=${TMPDIR:-/tmp}/.tmp-udev-rules-${APPDIR##*/}
+	        rm -rf "$_tmp_udev_dir"
+	        mkdir -p "$_tmp_udev_dir"
+	        cp -rv "$_bundled_udev_rules"/* "$_tmp_udev_dir"
+
+	        run_gui_sudo /bin/sh -c "
+	          mkdir -p /usr/local/lib/udev/rules.d
+	          cp -v '$_tmp_udev_dir'/* /usr/local/lib/udev/rules.d
+	          command -v udevadm && udevadm control --reload-rules
+	        "
+	        notify "udev rules successfully installed!"
+	}
+
+	install_udev_rules() {
+	        _udev_installer_check || return 0
+	        _is_rule_already_installed || return 0
+	        if notify --display-question "$_udev_install_msg"; then
+	                _install_udev
+	        else
+	                if notify -dq "Do you wish to not see this message again?"; then
+	                        mkdir -p "$CACHEDIR"
+	                        :> "$_disable_udev"
+	                fi
+	        fi
+	}
+
+	install_udev_rules || :
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_vulkan_check_hook() {
+	hook=$DST_BIN_DIR/05-vulkan-check.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# hook that checks several potential issues vulkan related
+
+	# On aarch64 device drivers are all over the place and often they ship with
+	# modifications not upstreamed to mesa, so we need to allow the host vulkan
+
+	_vulkan_hook_dir=${TMPDIR:-/tmp}/.vulkan-hook
+
+	if [ "$APPIMAGE_ARCH" = 'aarch64' ]; then
+	        export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
+	fi
+
+	# TODO remove once sharun does this automatically
+	XDG_DATA_DIRS=${XDG_DATA_DIRS:+$XDG_DATA_DIRS:}/usr/local/share:/usr/share:/etc
+	export XDG_DATA_DIRS
+
+	_nvidia_check() (
+	        # wtf makes this file? I cannot find any info related to it!
+	        nonsense=/usr/share/vulkan/icd.d/nvidia_icd.json_inactive
+	        if [ -f "$nonsense" ]; then
+	                err_msg ""
+	                err_msg "WARNING: Nvidia vulkan driver disabled by '$nonsense'"
+	                err_msg ""
+	                return 1
+	        fi
+
+	        # debian likes to split the nvidia driver into several packages
+	        # so there is a lot of people that only have the nvidia opengl driver installed
+	        # that then come complain that X vulkan app does not work because there is
+	        # no nvidia vulkan driver installed on their system.
+	        set -- /usr/share/glvnd/egl_vendor.d/10_nvidia.json /usr/share/vulkan/icd.d/*nvidia*.json
+	        if [ -f "$1" ] && [ ! -f "$2" ]; then
+	                err_msg ""
+	                err_msg "============================================================"
+	                err_msg ""
+	                err_msg "YOU HAVE AN INCOMPLETE NVIDIA DRIVER INSTALLATION!"
+	                err_msg ""
+	                err_msg "There is no nvidia vulkan loader at: /usr/share/vulkan/icd.d"
+	                err_msg "This usually happens when you are using a distro that splits"
+	                err_msg "the nvidia driver into several packages such as debian"
+	                err_msg "Run 'sudo apt install nvidia-vulkan-icd' to fix this issue"
+	                err_msg ""
+	                err_msg "MAKE SURE YOUR VULKAN DRIVER WORKS BEFORE REPORTING BUGS"
+	                err_msg "You can check that by testing with vkcube"
+	                err_msg ""
+	                err_msg "============================================================"
+	                err_msg ""
+	        elif [ -f "$1" ] || [ -f "$2" ]; then
+	                return 0
+	        fi
+	        return 1
+	)
+
+	_nvidia_check || :
+
+	# It is possible for a vulkan layer to have a path with '$LIB' which is a token
+	# used by the dynamic linker that expands to locations like lib and lib32
+	# the problem here is that debian  has lib/x86_64-linux-gnu instead
+	# so we need to check and patch '$LIB' for the real path to the lib instead
+	_check_vulkan_json_path() (
+	        implicit_dir=$_vulkan_hook_dir/vulkan/implicit_layer.d
+	        explicit_dir=$_vulkan_hook_dir/vulkan/explicit_layer.d
+
+	        is_cmd grep sed mkdir || return 1
+
+	        for f in /usr/share/vulkan/explicit_layer.d/*; do
+	                if [ -f "$f" ] && layer_path=$(grep -o '"/usr.*$LIB.*"' "$f"); then
+	                        for p in lib/"$APPIMAGE_ARCH"-linux-gnu lib64 lib; do
+	                                test_path=$(echo "$layer_path" | sed "s|\"||g; s|\$LIB|$p|")
+	                                if [ -e "$test_path" ]; then
+	                                        mkdir -p "$explicit_dir"
+	                                        # sed -i is not POSIX
+	                                        __tmp_sed=$(sed "s|\$LIB|$p|" "$f")
+	                                        echo "$__tmp_sed" > "$explicit_dir"/"${f##*/}"
+	                                        >&2 echo "vulkan-check: Handled \$LIB path in $f"
+	                                        break
+	                                fi
+	                        done
+	                fi
+	        done
+
+	        for f in /usr/share/vulkan/implicit_layer.d/*; do
+	                if [ -f "$f" ] && layer_path=$(grep -o '"/usr.*$LIB.*"' "$f"); then
+	                        for p in lib/"$APPIMAGE_ARCH"-linux-gnu lib64 lib; do
+	                                test_path=$(echo "$layer_path" | sed "s|\"||g; s|\$LIB|$p|")
+	                                if [ -e "$test_path" ]; then
+	                                        mkdir -p "$implicit_dir"
+	                                        # sed -i is not POSIX
+	                                        __tmp_sed=$(sed "s|\$LIB|$p|" "$f")
+	                                        echo "$__tmp_sed" > "$implicit_dir"/"${f##*/}"
+	                                        >&2 echo "vulkan-check: Handled \$LIB path in $f"
+	                                        break
+	                                fi
+	                        done
+	                fi
+	        done
+	)
+
+	if _check_vulkan_json_path && [ -d "$_vulkan_hook_dir" ]; then
+	        export XDG_CONFIG_DIRS="$_vulkan_hook_dir:${XDG_CONFIG_DIRS:-/etc/xdg}"
+	fi
+
+	_start_virtualization() {
+	        set -- /dev/dri/render*
+	        gpu=$1
+
+	        set -- "$APPDIR"/share/vulkan/icd.d/virtio_icd*.json
+	        virtio_icd=$1
+
+	        set -- "$APPDIR"/share/glvnd/egl_vendor.d/*_mesa.json
+	        mesa_icd=$1
+
+	        if ! command -v virgl_test_server 1>/dev/null; then
+	                err_msg "ERROR: No virgl_test_server binary found!"
+	                return 1
+	        elif [ ! -e "$gpu" ]; then
+	                err_msg "ERROR: There is no gpu in this system!"
+	                return 1
+	        elif [ ! -e "$virtio_icd" ]; then
+	                err_msg "ERROR: Vulkan virtio was not bundled! Cannot continue."
+	                return 1
+	        elif [ ! -e "$mesa_icd" ]; then
+	                err_msg "ERROR: Mesa gallium was not bundled! Cannot continue."
+	                return 1
+	        fi
+
+	        socket=${TMPDIR:-/tmp}/virgl.socket
+	        virgl_test_server --venus --use-gles --socket-path "$socket" --rendernode "$gpu" &
+
+	        export VTEST_SOCKET_NAME="$socket"
+	        export VK_DRIVER_FILES="$virtio_icd"
+	        export __GLX_VENDOR_LIBRARY_NAME=mesa
+	        export __EGL_VENDOR_LIBRARY_FILENAMES="$mesa_icd"
+	        export MESA_LOADER_DRIVER_OVERRIDE=zink
+	        export SHARUN_ALLOW_SYS_VKICD=0
+
+	        # TODO: Improve this check, this is only a problem that affects the amdgpu ddx
+	        case "$XDG_SESSION_TYPE" in
+	                x11|X11) export LIBGL_KOPPER_DRI2=1;;
+	        esac
+	}
+
+	if [ "$ENABLE_VIRTUALIZATION_THIS_IS_EXPERIMENTAL_KEK" = 1 ]; then
+	        >&2 echo "Starting virtualization"
+	        _start_virtualization || :
+	fi
+
+	_use_host_mesa() {
+	        SHARUN_MESA_PATH=$TMPDIR/.HOST_MESA
+
+	        if [ ! -d "$SHARUN_MESA_PATH" ]; then
+	                set -- /usr/lib/$APPIMAGE_ARCH-linux-gnu/dri /usr/lib64/dri /usr/lib/dri /run/opengl-driver/lib/dri
+	                for d do
+	                        if [ -d "$d" ]; then
+	                                HOST_LIB_DIR=${HOST_LIB_DIR:-${d%/dri}}
+	                                break
+	                        fi
+	                done
+
+	                # We need to only expose the host mesa drivers and nothing else
+	                if [ ! -d "$HOST_LIB_DIR" ]; then
+	                        err_msg "ERROR: Could not find host main library libs location"
+	                        err_msg "Searched for:"
+	                        err_msg " - /usr/lib/$APPIMAGE_ARCH-linux-gnu/dri "
+	                        err_msg " - /usr/lib64/dri"
+	                        err_msg " - /usr/lib/dri"
+	                        err_msg " - /run/opengl-driver/lib/dri"
+	                        err_msg "Set HOST_LIB_DIR to where you have your drivers"
+	                        return 1
+	                fi
+	                mkdir -p "$SHARUN_MESA_PATH"/lib "$SHARUN_MESA_PATH"/share
+
+	                _libraries_to_expose="
+	                        gbm
+	                        dri
+	                        libdrm_*.so*
+	                        libEGL_mesa.so*
+	                        libEGL.so*
+	                        libgallium*.so*
+	                        libgbm.so*
+	                        libglapi.so*
+	                        libGLdispatch.so*
+	                        libGLESv2.so*
+	                        libGL.so*
+	                        libGLX_indirect.so*
+	                        libGLX_mesa.so*
+	                        libGLX.so*
+	                        libva-drm.so*
+	                        libva.so*
+	                        libva-wayland.so*
+	                        libva-x11.so*
+	                        libvulkan*gfxstream.so*
+	                        libwayland-client.so*
+	                        libwayland-cursor.so*
+	                        libwayland-egl.so*
+	                        libwayland-server.so*
+	                        libX11.so*
+	                        libX11-xcb.so*
+	                        libXau.so*
+	                        libxcb-dri2.so*
+	                        libxcb-dri3.so*
+	                        libxcb-glx.so*
+	                        libxcb-present.so*
+	                        libxcb-randr.so*
+	                        libxcb-shm.so*
+	                        libxcb.so*
+	                        libxcb-sync.so*
+	                        libxcb-xfixes.so*
+	                        libXdamage.so*
+	                        libXdmcp.so*
+	                        libXext.so*
+	                        libXfixes.so*
+	                "
+
+	                _data_dirs_to_expose="
+	                        drirc.d
+	                        glvnd
+	                        libdrm
+	                        vulkan
+	                        X11
+	                "
+
+	                for i in $_libraries_to_expose; do
+	                        set -- "$HOST_LIB_DIR"/$i
+	                        for l do
+	                                if [ -e "$l" ]; then
+	                                        ln -sf "$l" "$SHARUN_MESA_PATH"/lib/
+	                                fi
+	                        done
+	                done
+
+	                for d in /run/opengl-driver/share /usr/share; do
+	                        if [ -d "$d" ]; then
+	                                _share=$d
+	                                break
+	                        fi
+	                done
+
+	                for d in $_data_dirs_to_expose; do
+	                        d=$_share/$d
+	                        if [ -d "$d" ]; then
+	                                ln -sf "$d" "$SHARUN_MESA_PATH"/share/
+	                        fi
+	                done
+	        fi
+
+	        [ -d "$SHARUN_MESA_PATH" ]
+	}
+
+	if [ "$USE_HOST_MESA_DRIVERS" = 1 ] && _use_host_mesa; then
+	        >&2 echo "Using host mesa drivers"
+	        export SHARUN_MESA_PATH
+	fi
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_wayland_is_broken_hook() {
+	hook=$DST_BIN_DIR/05-wayland-is-broken.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# add this hook if the application you are using has known issues with wayland
+	# note that you need to check that indeed wayland is broken before adding this
+
+	if [ "$I_WANT_A_BROKEN_WAYLAND_UI" != 1 ]; then
+	        if [ "$XDG_SESSION_TYPE" = 'wayland' ]; then
+	                >&2 echo "Wayland is disabled due to known issues"
+	                >&2 echo "set I_WANT_A_BROKEN_WAYLAND_UI=1 if you still want to use it"
+	        fi
+	        export SDL_VIDEO_DRIVER=x11
+	        export QT_QPA_PLATFORM=xcb
+	        export GDK_BACKEND=x11
+	        export XDG_SESSION_TYPE=x11
+	        unset WAYLAND_DISPLAY
+	fi
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_x86_64_v3_check_hook() {
+	hook=$DST_BIN_DIR/05-x86-64-v3-check.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# add this hook if your application was compiled for x86-64-v3
+	# see https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels
+	# this way the user is aware and we don't waste time debugging nonsense
+
+	if [ "$APPIMAGE_ARCH" = 'x86_64' ] && [ -r /proc/cpuinfo ]; then
+	        v3cpu=0
+	        while IFS="" read -r line; do
+	                case "$line" in
+	                        *fma*|*FMA*) v3cpu=1; break;;
+	                esac
+	        done </proc/cpuinfo
+
+	        if [ "$v3cpu" != 1 ]; then
+	                err_msg "============================================================"
+	                err_msg "UNSUPPORTED CPU! You need a cpu that supports x86-64-v3!"
+	                err_msg "============================================================"
+	        fi
+	fi
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_x86_64_v4_check_hook() {
+	hook=$DST_BIN_DIR/05-x86-64-v4-check.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	set -e
+	# add this hook if your application was compiled for x86-64-v4
+	# see https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels
+	# this way the user is aware and we don't waste time debugging nonsense
+
+	if [ "$APPIMAGE_ARCH" = 'x86_64' ] && [ -r /proc/cpuinfo ]; then
+	        v4cpu=0
+	        while IFS="" read -r line; do
+	                case "$line" in
+	                        *avx512*|*AVX512*) v4cpu=1; break;;
+	                esac
+	        done </proc/cpuinfo
+
+	        if [ "$v4cpu" != 1 ]; then
+	                err_msg "============================================================"
+	                err_msg "UNSUPPORTED CPU! You need a cpu that supports x86-64-v4!"
+	                err_msg "============================================================"
+	        fi
+	fi
+	QS_HOOK
+	_echo "* Added $hook"
+}
+
+_add_qs_hooks() {
+	if [ -n "$ADD_HOOKS" ]; then
+		old_ifs="$IFS"
+		IFS=':'
+		set -- $ADD_HOOKS
+		IFS="$old_ifs"
+		for hook do
+			# hooks used to be executed differently depending on the suffix
+			# this was dropped and now all hooks are sourced
+			# remove old suffixes so that we don't break existing scripts
+			hook=${hook%.bg.hook}
+			hook=${hook%.src.hook}
+			# also remove .hook before adding it again
+			# this allows declaring a hook without the suffix in ADD_HOOKS
+			hook=${hook%.hook}
+			hook=${hook}.hook
+
+			# Just in case for the people were using this wrong and set
+			# ADD_HOOKS to their own custom hooks already in APPDIR/bin
+			if [ -f "$DST_BIN_DIR"/"$hook" ]; then
+				continue
+			fi
+
+			case "$hook" in
+				*fix-gnome-csd.hook)      _add_fix_gnome_csd_hook;;
+				*fix-namespaces.hook)     _add_fix_namespaces_hook;;
+				*get-yt-dlp.hook)         _add_get_yt_dlp_hook;;
+				*host-libjack.hook)       _add_host_libjack_hook;;
+				*sdl-soundfonts.hook)     _add_sdl_soundfonts_hook;;
+				*self-updater.hook)       _add_self_updater_hook;;
+				*udev-installer.hook)     _add_udev_installer_hook;;
+				*vulkan-check.hook)       _add_vulkan_check_hook;;
+				*wayland-is-broken.hook)  _add_wayland_is_broken_hook;;
+				*x86-64-v3-check.hook)    _add_x86_64_v3_check_hook;;
+				*x86-64-v4-check.hook)    _add_x86_64_v4_check_hook;;
+				*gsettings-backend.hook)  _add_gsettings_backend_hook;;
+				*)
+					_err_msg "ERROR: Unknown hook '$hook'!"
+					exit 1
+					;;
+			esac
+		done
+	fi
 }
 
 _map_paths_ld_preload_open() {
@@ -2085,7 +3092,7 @@ _map_paths_binary_patch() {
 	fi
 }
 
-_deploy_datadir() {
+_deploy_datadirs() {
 	if [ "$DEPLOY_DATADIR" = 1 ]; then
 		# find if there is a datadir that matches bundled binary name
 		set -- "$DST_BIN_DIR"/*
@@ -2224,7 +3231,71 @@ _deploy_datadir() {
 			esac
 		done
 		sed -i -e 's|/usr/.*/||g' "$dst_dbus_dir"/* 2>/dev/null || :
+
+		# copy the entire hicolor icons dir
+		# by default the hicolor icon theme ships no icons, this
+		# means any present icon is likely needed by the application
+		if [ -d /usr/share/icons/hicolor ]; then
+			mkdir -p "$APPDIR"/share/icons
+			cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
+			_remove_empty_dirs "$APPDIR"/share/icons/hicolor
+		fi
 	fi
+}
+
+_deploy_directories() {
+	# deploy directories
+	while read -r d; do
+		if [ -d "$d" ]; then
+			case "$d" in
+				"$LIB_DIR"/*)
+					if [ "$LIB32" = 1 ]; then
+						dst_path="$APPDIR"/lib32/"${d##*$LIB_DIR/}"
+					else
+						dst_path="$APPDIR"/lib/"${d##*$LIB_DIR/}"
+					fi
+					;;
+				*/share/*)
+					dst_path="$APPDIR"/share/"${d##*/share/}"
+					;;
+				*/etc/*)
+					dst_path="$APPDIR"/etc/"${d##*/etc/}"
+					;;
+				*/lib/*)
+					dst_path="$APPDIR"/lib/"${d##*/lib/}"
+					;;
+				*/lib32/*)
+					dst_path="$APPDIR"/lib32/"${d##*/lib32/}"
+					;;
+				"$APPDIR"/*|./"${APPDIR##*/}"/*|"${APPDIR##*/}"/*)
+					_err_msg "Skipping deployment of $d (already in '$APPDIR')"
+					continue
+					;;
+				*)
+					_err_msg "Skipping deployment of $d"
+					_err_msg "Valid directories to deploy are:"
+					_err_msg "Any dir from: $LIB_DIR"
+					_err_msg "Any dir with /lib/ in its path"
+					_err_msg "Any dir with /share/ in its path"
+					_err_msg "Any dir with /etc/ in its path"
+					continue
+					;;
+			esac
+			mkdir -p "${dst_path%/*}"
+			if cp -Lrn "$d"/. "$dst_path"; then
+				_echo "* Added $d to $dst_path"
+			else
+				# do not stop the script if the copy fails, because
+				# since lib4bin skips directories automatically we do
+				# not want CIs to fail because suddenly now we are
+				# trying to copy some directory that we did not have
+				# read access to that lib4bin was previously skipping
+				_err_msg "Failed to add $d to $dst_path/${d##*/}"
+			fi
+		fi
+	done <<-EOF
+	$ADD_DIR
+	EOF
 }
 
 _deploy_locale() {
@@ -2490,33 +3561,6 @@ _fix_cpython_ldconfig_mess() {
 	_echo "* fixed pysdl broken mess... this may not work always!"
 }
 
-_add_path_mapping_hardcoded() {
-	if [ -f "$PATH_MAPPING_SCRIPT" ]; then
-		return 0
-	fi
-	cat <<-'EOF' > "$PATH_MAPPING_SCRIPT"
-	#!/bin/sh
-
-	# this script makes symnlinks to hardcoded random dirs that
-	# were patched away by quick-sharun when hardcoded paths are
-	# detected or when 'PATH_MAPPING_HARDCODED' is used
-
-	_tmp_bin=""
-	_tmp_lib=""
-	_tmp_share=""
-
-	if [ -n "$_tmp_bin" ]; then
-	        LC_ALL=C ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin" || :
-	fi
-	if [ -n "$_tmp_lib" ]; then
-	        LC_ALL=C ln -sfn "$APPDIR"/lib /tmp/"$_tmp_lib" || :
-	fi
-	if [ -n "$_tmp_share" ]; then
-	        LC_ALL=C ln -sfn "$APPDIR"/share /tmp/"$_tmp_share" || :
-	fi
-	EOF
-	_echo "* Added $PATH_MAPPING_SCRIPT"
-}
 
 _patch_away_usr_bin_dir() {
 	set -- "$(readlink -f "$1")"
@@ -2527,7 +3571,7 @@ _patch_away_usr_bin_dir() {
 	sed -i -e "s|/usr/bin|/tmp/$_tmp_bin|g" "$1"
 
 	_echo "* patched away /usr/bin from $1"
-	_add_path_mapping_hardcoded || exit 1
+	_add_path_mapping_hardcoded_hook || exit 1
 
 	sed -i -e "s|_tmp_bin=.*|_tmp_bin=$_tmp_bin|g" "$PATH_MAPPING_SCRIPT"
 }
@@ -2541,7 +3585,7 @@ _patch_away_usr_lib_dir() {
 	sed -i -e "s|/usr/lib|/tmp/$_tmp_lib|g" "$1"
 
 	_echo "* patched away /usr/lib from $1"
-	_add_path_mapping_hardcoded || exit 1
+	_add_path_mapping_hardcoded_hook || exit 1
 
 	sed -i -e "s|_tmp_lib=.*|_tmp_lib=$_tmp_lib|g" "$PATH_MAPPING_SCRIPT"
 }
@@ -2555,7 +3599,7 @@ _patch_away_usr_share_dir() {
 	sed -i -e "s|/usr/share|/tmp/$_tmp_share|g" "$1"
 
 	_echo "* patched away /usr/share from $1"
-	_add_path_mapping_hardcoded || exit 1
+	_add_path_mapping_hardcoded_hook || exit 1
 
 	sed -i -e "s|_tmp_share=.*|_tmp_share=$_tmp_share|g" "$PATH_MAPPING_SCRIPT"
 }
@@ -3701,7 +4745,7 @@ for lib do case "$lib" in
 			continue # TODO add more possible problematic paths
 		fi
 
-		_add_p11kit_cert_hook
+		_add_check_ca_certs_hook
 
 		_echo "* fixed path to /etc/ssl/certs in $lib"
 		_patch_away_usr_share_dir "$lib" || continue
@@ -3774,17 +4818,7 @@ for lib do case "$lib" in
 	esac
 done
 
-_deploy_datadir
-
-# copy the entire hicolor icons dir
-# by default the hicolor icon theme ships no icons, this
-# means any present icon is likely needed by the application
-if [ -d /usr/share/icons/hicolor ]; then
-	mkdir -p "$APPDIR"/share/icons
-	cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
-	_remove_empty_dirs "$APPDIR"/share/icons/hicolor
-fi
-
+_deploy_datadirs
 _deploy_locale
 
 # make the lib.path file. Very important for sharun to discover bundled libs!
@@ -3837,93 +4871,12 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
-if [ -n "$ADD_HOOKS" ]; then
-	old_ifs="$IFS"
-	IFS=':'
-	set -- $ADD_HOOKS
-	IFS="$old_ifs"
-	hook_dst=$DST_BIN_DIR
-	for hook do
-		# hooks used to be executed differently depending on the suffix
-		# this was dropped and now all hooks are sourced
-		# remove old suffixes so that we don't break existing scripts
-		hook=${hook%.bg.hook}
-		hook=${hook%.src.hook}
-		# also remove .hook before adding it again
-		# this allows declaring a hook without the suffix in ADD_HOOKS
-		hook=${hook%.hook}
-		hook=${hook}.hook
-
-		if [ -f "$hook_dst"/"$hook" ]; then
-			continue
-		elif _download "$hook_dst"/"$hook" "$HOOKSRC"/"$hook"; then
-			_echo "* Added $hook"
-		else
-			_err_msg "ERROR: Failed to download $hook, valid link?"
-			_err_msg "$HOOKSRC/$hook"
-			exit 1
-		fi
-	done
-fi
 
 _add_hooks_library
 _add_apprun
-
 chmod +x "$APPDIR"/AppRun.sh "$APPDIR"/AppRun || :
-
-# deploy directories
-while read -r d; do
-	if [ -d "$d" ]; then
-		case "$d" in
-			"$LIB_DIR"/*)
-				if [ "$LIB32" = 1 ]; then
-					dst_path="$APPDIR"/lib32/"${d##*$LIB_DIR/}"
-				else
-					dst_path="$APPDIR"/lib/"${d##*$LIB_DIR/}"
-				fi
-				;;
-			*/share/*)
-				dst_path="$APPDIR"/share/"${d##*/share/}"
-				;;
-			*/etc/*)
-				dst_path="$APPDIR"/etc/"${d##*/etc/}"
-				;;
-			*/lib/*)
-				dst_path="$APPDIR"/lib/"${d##*/lib/}"
-				;;
-			*/lib32/*)
-				dst_path="$APPDIR"/lib32/"${d##*/lib32/}"
-				;;
-			"$APPDIR"/*|./"${APPDIR##*/}"/*|"${APPDIR##*/}"/*)
-				_err_msg "Skipping deployment of $d (already in '$APPDIR')"
-				continue
-				;;
-			*)
-				_err_msg "Skipping deployment of $d"
-				_err_msg "Valid directories to deploy are:"
-				_err_msg "Any dir from: $LIB_DIR"
-				_err_msg "Any dir with /lib/ in its path"
-				_err_msg "Any dir with /share/ in its path"
-				_err_msg "Any dir with /etc/ in its path"
-				continue
-				;;
-		esac
-		mkdir -p "${dst_path%/*}"
-		if cp -Lrn "$d"/. "$dst_path"; then
-			_echo "* Added $d to $dst_path"
-		else
-			# do not stop the script if the copy fails, because
-			# since lib4bin skips directories automatically we do
-			# not want CIs to fail because suddenly now we are
-			# trying to copy some directory that we did not have
-			# read access to that lib4bin was previously skipping
-			_err_msg "Failed to add $d to $dst_path/${d##*/}"
-		fi
-	fi
-done <<-EOF
-$ADD_DIR
-EOF
-
+_add_qs_hooks
+_deploy_directories
 _remove_static_libs
 _handle_nested_bins
 _fix_shebangs
