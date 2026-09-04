@@ -18,6 +18,8 @@ These hooks are bundled inside `quick-sharun.sh` and deployed when their names a
 
 Hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook` suffixes are only normalized for compatibility, so new examples should use plain `.hook` names.
 
+When deployed, hook filenames are prefixed with a number that controls the order they are sourced (Example `05-fix-namespaces.hook`, `10-self-updater.hook`). You do not have to specify the prefix in `ADD_HOOKS`.
+
 Additional hooks can be placed in `$APPDIR/bin` and will be used automatically.
 
 ---

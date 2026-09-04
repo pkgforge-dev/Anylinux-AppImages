@@ -5,9 +5,10 @@
 # You can also force their deployment by setting the respective env variables
 # for example set DEPLOY_OPENGL=1 to force opengl to be deployed
 
-# Set ADD_HOOKS var to deploy the several hooks of this repository
+# Set ADD_HOOKS var to deploy the several hooks bundled in quick-sharun
 # Example: ADD_HOOKS="self-updater.hook:fix-namespaces.hook" ./quick-sharun.sh
-# Using the hooks automatically downloads a generic AppRun if no AppRun is present
+# Do not use the ADD_HOOKS for your own provided hooks
+# in that case just add the *.hook files to APPDIR/bin/ directly
 
 # Set DESKTOP and ICON to the path of top level .desktop and icon to deploy them
 
@@ -2989,7 +2990,6 @@ _add_qs_hooks() {
 		IFS=':'
 		set -- $ADD_HOOKS
 		IFS="$old_ifs"
-		hook_dst=$DST_BIN_DIR
 		for hook do
 			# hooks used to be executed differently depending on the suffix
 			# this was dropped and now all hooks are sourced
@@ -3000,6 +3000,12 @@ _add_qs_hooks() {
 			# this allows declaring a hook without the suffix in ADD_HOOKS
 			hook=${hook%.hook}
 			hook=${hook}.hook
+
+			# Just in case for the people were using this wrong and set
+			# ADD_HOOKS to their own custom hooks already in APPDIR/bin
+			if [ -f "$DST_BIN_DIR"/"$hook" ]; then
+				continue
+			fi
 
 			case "$hook" in
 				*fix-gnome-csd.hook)      _add_fix_gnome_csd_hook;;
