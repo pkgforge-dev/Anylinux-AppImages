@@ -52,17 +52,16 @@ HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppIm
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
 OUTPATH=${OUTPATH:-$PWD}
-DWARFS_COMP="${DWARFS_COMP:-zstd:level=22 -S26 -B6}"
 OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
 
-APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/latest/download/appimagetool-$APPIMAGE_ARCH-linux}
+APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.3.6/appimagetool-$APPIMAGE_ARCH-linux}
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
 
 ANYLINUX_LIB=${ANYLINUX_LIB:-1}
 ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
 GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
-CROSS_LIBC_DLOPEN_REPO=${CROSS_LIBC_DLOPEN_REPO:-https://github.com/pkgforge-dev/cross-libc-dlopen.git}
+CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/latest/download/cross-libc-dlopen-portable-$APPIMAGE_ARCH.tar}
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
@@ -194,8 +193,11 @@ _download() {
 	while [ "$COUNT" -lt 5 ]; do
 		if "$DOWNLOAD_CMD" "$@"; then
 			return 0
+		else
+			status=$?
+			_err_msg "'$DOWNLOAD_CMD $*' exited with $status"
+			_err_msg "Trying again..."
 		fi
-		_err_msg "Download failed! Trying again..."
 		COUNT=$((COUNT + 1))
 		sleep 5
 	done
@@ -227,6 +229,10 @@ _help_msg() {
 	                        QtWebEngine and Qml as well, these can be controlled with
 	                        DEPLOY_QT_WEB_ENGINE and DEPLOY_QML. Set to 1 enable, 0 disable
 	                        Set QT_DIR if the system Qt directory in LIB_DIR has a different name.
+	  DEPLOY_KF           Set to 0 to disable bundling of the KDE Frameworks
+	                        plugins 'plugins/kf{5,6}'. By default only plugins of the
+	                        KF frameworks the app links against are bundled.
+	                        Additional plugins may still need to be added manually.
 	  DEPLOY_SDL          Set to 1 to force deployment of SDL.
 	  DEPLOY_GTK          Set to 1 to force deployment of GTK.
 	  DEPLOY_GDK          Set to 1 to force deployment of gdk-pixbuf.
@@ -266,6 +272,8 @@ _help_msg() {
 	                     are instead loaded from the host system at runtime with
 	                     the help of cross-libc-dlopen that allows using the host
 	                     drivers regardless of what libc they link against.
+	                     Only supported when deploying GTK or Qt applications,
+	                     for any other toolkit it automatically becomes a no-op.
 	                     Only use this option if the application meets the
 	                     following conditions:
 	                     * The application does not depend on a recent version of
@@ -681,6 +689,9 @@ _determine_what_to_deploy() {
 					DEPLOY_QT_WEB_ENGINE=${DEPLOY_QT_WEB_ENGINE:-1}
 					DEPLOY_ELECTRON=${DEPLOY_ELECTRON:-1}
 					;;
+				*libKF5*.so*|*libKF6*.so*)
+					DEPLOY_KF=${DEPLOY_KF:-1}
+					;;
 				*libgtk-x11-*.so*)
 					DEPLOY_GTK=${DEPLOY_GTK:-1}
 					GTK_DIR=gtk-2.0
@@ -824,13 +835,21 @@ _make_deployment_array() {
 	fi
 	# LIB32 builds always bundle their drivers, 32bit driver stacks are not
 	# something users have installed for these apps
-	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] && [ "$LIB32" != 1 ]; then
-		if [ "$ANYLINUX_LIB" != 1 ]; then
-			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires ANYLINUX_LIB=1"
-			exit 1
+	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+		if [ "$DEPLOY_SDL" = 1 ] && [ "$DEPLOY_GTK" != 1 ] && [ "$DEPLOY_QT" != 1 ]; then
+			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is not supported for SDL applications, ignoring it!"
+			USE_HOST_DRIVERS_EXPERIMENTAL=0
+		else
+			if [ "$ANYLINUX_LIB" != 1 ]; then
+				_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires ANYLINUX_LIB=1"
+				exit 1
+			elif [ "$LIB32" = 1 ]; then
+				_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL cannot be used with 32bit applications!"
+				exit 1
+			fi
+			DEPLOY_OPENGL=0
+			DEPLOY_VULKAN=0
 		fi
-		DEPLOY_OPENGL=0
-		DEPLOY_VULKAN=0
 	fi
 	if [ "$ALWAYS_SOFTWARE" = 1 ]; then
 		DEPLOY_OPENGL=0
@@ -900,6 +919,60 @@ _make_deployment_array() {
 			esac
 		done
 
+		# Try to deploy only the KF plugins that we link against.
+		if [ "$DEPLOY_KF" = 1 ]; then
+			_echo "* Deploying KDE Frameworks plugins"
+			for lib in $NEEDED_LIBS; do
+				case "$lib" in
+					*libKF*KIOCore*.so*)
+						_kf_kio=1
+						# KIO workers, without KIO apps cannot open ny file or URL,
+						# and the uri filters used when parsing typed URLs
+						set -- "$@" \
+							"$plugindir"/kf?/kio/* \
+							"$plugindir"/kf?/urifilters/*
+						;;
+					*libKF*KIO*Widgets*.so*|*libKF*KIOGui*.so*)
+						set -- "$@" \
+							"$plugindir"/kf?/kio_dnd/* \
+							"$plugindir"/kf?/kfileitemaction/*
+						;;
+					*libKF*TextEditor*.so*)
+						set -- "$@" "$plugindir"/kf?/ktexteditor/*
+						;;
+					*libKF*Parts*.so*)
+						set -- "$@" "$plugindir"/kf?/parts/*
+						;;
+					*libKF*Sonnet*.so*)
+						set -- "$@" "$plugindir"/kf?/sonnet/*
+						;;
+					*libKF*Auth*.so*)
+						# kauth is two levels deep: kauth/backend and kauth/helper
+						set -- "$@" "$plugindir"/kf?/kauth/*/*
+						;;
+					*libKF*Purpose*.so*)
+						set -- "$@" "$plugindir"/kf?/purpose/*
+						;;
+					*libKF*KFileMetaData*.so*)
+						set -- "$@" "$plugindir"/kf?/kfilemetadata/*
+						;;
+				esac
+			done
+
+			if [ "$_kf_kio" = 1 ]; then
+				while IFS="" read -r b; do
+					case "$b" in
+						*/kioworker|*/kioslave|*/kioexec|*/kiod?)
+							[ -x "$b" ] || continue
+							set -- "$@" "$b"
+							;;
+					esac
+				done <<-EOF
+				$(find "$LIB_DIR"/kf? "$LIB_DIR"/libexec/kf? "$LIB_DIR"/*/libexec/kf? -type f 2>/dev/null)
+				EOF
+			fi
+		fi
+
 		if [ "$DEPLOY_QT_WEB_ENGINE" = 1 ]; then
 			if ! enginebin=$(find "${QT_LOCATION:-$LIB_DIR}" -type f \
 			  -name 'QtWebEngineProcess' -print 2>/dev/null | head -n 1); then
@@ -931,7 +1004,7 @@ _make_deployment_array() {
 		case "$GTK_DIR" in
 			*4*)
 				DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
-				echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
+				_add_gsettings_hook
 				;;
 		esac
 
@@ -1380,7 +1453,11 @@ _lib4bin_get_lib_dst_dir() {
 
 # collect ldd library dependencies
 _lib4bin_collect_ldd() {
-	libs=""
+	# accumulate in a temp file instead of a variable since the variable
+	# ends up being way slower with applications that have +300 libs
+	_libs_list=$TMPDIR/.libs.$$
+	:> "$_libs_list"
+
 	for b do
 		[ -f "$b" ]  || continue
 		_is_elf "$b" || continue
@@ -1397,11 +1474,11 @@ _lib4bin_collect_ldd() {
 		EOF
 
 		if [ -z "$skip" ]; then
-			libs=$(printf '%s\n%s' "$libs" "$(_lib4bin_ldd_libs "$b")")
+			_lib4bin_ldd_libs "$b" >> "$_libs_list"
 		fi
 
 		if _is_so "$b"; then
-			libs=$(printf '%s\n%s' "$libs" "$b")
+			printf '%s\n' "$b" >> "$_libs_list"
 		fi
 	done
 
@@ -1413,7 +1490,7 @@ _lib4bin_collect_ldd() {
 	#
 	# Verify with patchelf --print-needed and find the library instead
 	#
-	libs_basename=$(echo "$libs" | awk -F'/' '{print $NF}')
+	libs_basename=$(awk -F'/' '{print $NF}' "$_libs_list" | sort -u)
 	for b do
 		if _is_so "$b" || ! _is_elf "$b"; then
 			continue
@@ -1423,12 +1500,13 @@ _lib4bin_collect_ldd() {
 				continue # already included
 			elif [ -e "$LIB_DIR"/"$s" ]; then
 				# Was not found by ldd / LD_DEBUG=libs
-				libs=$(printf '%s\n%s' "$libs" "$LIB_DIR"/"$s")
+				printf '%s\n' "$LIB_DIR"/"$s" >> "$_libs_list"
 			fi
 		done
 	done
 
-	echo "$libs" | sort -u | sed '/^$/d'
+	sort -u "$_libs_list" | sed '/^$/d'
+	rm -f "$_libs_list"
 }
 
 # collect dlopen libraries via LD_DEBUG=libs
@@ -1733,36 +1811,48 @@ _add_anylinux_lib() {
 
 _add_cross_libc_dlopen_lib() {
 	[ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] || return 0
-	target=$DST_LIB_DIR/cross-libc-dlopen.so
-	CLD_SRC=$TMPDIR/cross-libc-dlopen
+	cld_tar=$TMPDIR/cross-libc-dlopen-portable-$APPIMAGE_ARCH.tar
+	cld_dir=$DST_LIB_DIR/cross-libc-dlopen
+	target=$cld_dir/cross-libc-dlopen.so
 
 	if [ ! -f "$target" ]; then
-		deps="git make"
-		if ! _is_cmd $deps; then
-			_err_msg "ERROR: Building cross-libc-dlopen requires $deps"
+		if ! _is_cmd tar; then
+			_err_msg "ERROR: Deploying cross-libc-dlopen requires tar"
 			exit 1
 		fi
 
-		_echo "* Cloning $CROSS_LIBC_DLOPEN_REPO..."
-		rm -rf "$CLD_SRC"
-		git clone "$CROSS_LIBC_DLOPEN_REPO" "$CLD_SRC" && (
-			cd "$CLD_SRC"/src
-			# -fcf-protection=full is not supported on all gcc targets
-			# and has no functional benefit so it is removed
-			sed -i -e 's/ -fcf-protection=full//' Makefile
-			make
-		)
+		if [ ! -f "$cld_tar" ]; then
+			_echo "* Downloading cross-libc-dlopen..."
+			_download "$cld_tar" "$CROSS_LIBC_DLOPEN_LINK"
+		fi
+
+		if ! tar -tf "$cld_tar" >/dev/null 2>&1; then
+			_err_msg "ERROR: unable to extract $cld_tar!"
+			_err_msg "This is usually caused by network issues"
+			rm -f "$cld_tar"
+			exit 1
+		fi
 
 		_echo "* Adding cross-libc-dlopen..."
-		for lib in cross-libc-dlopen.so gl-fwd.so egl-fwd.so gles-fwd.so; do
-			cp -v "$CLD_SRC"/src/"$lib" "$DST_LIB_DIR"
-			if ! grep -q "$lib" "$APPDIR"/.preload 2>/dev/null; then
+		mkdir -p "$cld_dir"
+		tar -xf "$cld_tar" -C "$cld_dir"
+		rm -f "$cld_tar"
+
+		# runtime-select is not used by us
+		rm -f "$cld_dir"/runtime-select
+
+		for lib in "$cld_dir"/*.so; do
+			lib=${lib##*/}
+			if ! grep -qxF "$lib" "$APPDIR"/.preload 2>/dev/null; then
 				echo "$lib" >> "$APPDIR"/.preload
 			fi
 		done
 		_echo "* cross-libc-dlopen successfully added!"
 	fi
-	:> "$APPDIR"/.foreign-dlopen-enabled
+
+	if ! grep -q 'CROSS_LIBC_DLOPEN_ROOT=' "$APPENV" 2>/dev/null; then
+		echo 'CROSS_LIBC_DLOPEN_ROOT=${SHARUN_DIR}' >> "$APPENV"
+	fi
 }
 
 _add_gtk_class_fix() {
@@ -1916,6 +2006,20 @@ _add_p11kit_cert_hook() {
 	fi
 	EOF
 	chmod +x "$cert_check"
+}
+
+_add_gsettings_hook() {
+	gsettings_hook=$APPDIR/bin/set-gsettings-backend.hook
+	if [ -f "$gsettings_hook" ]; then
+		return 0
+	fi
+
+	cat <<-'EOF' > "$gsettings_hook"
+	# this forces GTK apps to use keyfile when using portable home/config mode
+	if [ -d "$APPIMAGE".config ] || [ -d "$APPIMAGE".home ]; then
+	        export GSETTINGS_BACKEND=keyfile
+	fi
+	EOF
 }
 
 _map_paths_ld_preload_open() {
@@ -2154,6 +2258,19 @@ _deploy_locale() {
 			f=${DESKTOP_ENTRY##*/}
 			f=${f%.desktop}
 			set -- "$@" ! -name "*$f*"
+
+			# also preserve gtk and libadwaita locales
+			case "$GTK_DIR" in
+				gtk-2.0) set -- "$@" ! -name 'gtk20.mo';;
+				gtk-3.0) set -- "$@" ! -name 'gtk30.mo';;
+				gtk-4.0) set -- "$@" ! -name 'gtk40.mo';;
+			esac
+
+			l=$(set -- "$DST_LIB_DIR"/libadwaita* && echo "$1")
+			if [ -f "$l" ]; then
+				set -- "$@" ! -name 'libadwaita.mo'
+			fi
+
 			find "$APPDIR"/share/locale "$@" \( -type f -o -type l \) -exec rm -f {} +
 			_remove_empty_dirs "$APPDIR"/share/locale
 		fi
@@ -3326,14 +3443,31 @@ for lib do case "$lib" in
 		_glibver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
 		src_glib_schema_dir=/usr/share/glib-$_glibver/schemas
 		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
-
 		_try_cp "$src_glib_schema_dir" "$dst_glib_schema_dir"
+		;;
+	*/libQt*Core.so*|*/libglib-*.so*)
 		# apps may crash when the host has no mime database
-		_try_cp /usr/share/mime "$APPDIR"/share/mime
-		rm -rf "$APPDIR"/share/mime/packages # bloat
-		# only the compiled mime database (mime.cache/magic/globs) is read by apps
-		# the *.xml files are used to generate them via update-mime-database
-		find "$APPDIR"/share/mime -type f -name '*.xml' -exec rm -f {} + || :
+		src_mime_dir=/usr/share/mime
+		dst_mime_dir=$APPDIR/share/mime
+		_try_cp "$src_mime_dir" "$dst_mime_dir"
+
+		[ -z "$_mime_updated" ] || continue
+		[ -d "$dst_mime_dir" ]  || continue
+		if update-mime-database "$dst_mime_dir" 2>/dev/null; then
+			# while glib can work with just the mime.cache, this is
+			# not the case with Qt, they still end up parsing the
+			# individual .xml files. So in a system without
+			# mime database Qt apps fail to recognize file formats
+			# Keep the audio/image/video .xml for that case
+			for d in "$dst_mime_dir"/*; do
+				[ -d "$d" ] || continue
+				case "$d" in
+					*/audio|*/image|*/video) continue;;
+					*) rm -rf "$d";;
+				esac
+			done
+			_mime_updated=1
+		fi
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
@@ -3673,7 +3807,6 @@ if [ -f "$a" ]; then
 fi
 
 _fix_electron_libc_nonsense
-_remove_static_libs
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
@@ -3791,6 +3924,7 @@ done <<-EOF
 $ADD_DIR
 EOF
 
+_remove_static_libs
 _handle_nested_bins
 _fix_shebangs
 

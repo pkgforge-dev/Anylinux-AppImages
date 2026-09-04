@@ -127,6 +127,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Discord](https://github.com/pkgforge-dev/Discord-AppImage) |
 | [DNZHRecomp](https://github.com/pkgforge-dev/DNZHRecomp-AppImage) |
 | [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage) |
+| [DonkeyKong64Recomp](https://github.com/pkgforge-dev/DonkeyKong64Recomp-AppImage) |
 | [DOOM64EXUltra](https://github.com/pkgforge-dev/DOOM64EXUltra-AppImage) |
 | [Dorion](https://github.com/pkgforge-dev/Dorion-AppImage-Enhanced) |
 | [DOSBox-X](https://github.com/pkgforge-dev/DOSBox-X-AppImage) |
@@ -155,6 +156,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [FeatherPad](https://github.com/pkgforge-dev/FeatherPad-AppImage) |
 | [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage) |
 | [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage) |
+| [Firefox](https://github.com/pkgforge-dev/Firefox-AppImage) |
 | [Flacon](https://github.com/pkgforge-dev/Flacon-AppImage-Enhanced) |
 | [Flashrom](https://github.com/pkgforge-dev/Flashrom-AppImage) |
 | [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced) |
@@ -220,6 +222,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [ITR2026](https://github.com/pkgforge-dev/ITR2026-AppImage) |
 | [Joplin Desktop](https://github.com/pkgforge-dev/Joplin-Desktop-AppImage) |
 | [kaffeine](https://github.com/pkgforge-dev/kaffeine-AppImage) |
+| [Kate](https://github.com/pkgforge-dev/Kate-AppImage-Enhanced) |
 | [KBlocks](https://github.com/pkgforge-dev/KBlocks-AppImage) |
 | [KCalc](https://github.com/pkgforge-dev/KCalc-AppImage) |
 | [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage) |
@@ -234,6 +237,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Knights](https://github.com/pkgforge-dev/Knights-AppImage) |
 | [KolourPaint](https://github.com/pkgforge-dev/KolourPaint-AppImage) |
 | [KPatience](https://github.com/pkgforge-dev/KPatience-AppImage) |
+| [Krita](https://github.com/pkgforge-dev/Krita-AppImage-Enhanced) |
 | [Kronos](https://github.com/pkgforge-dev/Kronos-AppImage) |
 | [KStars](https://github.com/pkgforge-dev/KStars-AppImage) |
 | [KTorrent](https://github.com/pkgforge-dev/KTorrent-AppImage) |
@@ -335,6 +339,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Qimgv](https://github.com/pkgforge-dev/Qimgv-AppImage) |
 | [Qmmp](https://github.com/pkgforge-dev/Qmmp-AppImage) |
 | [QMPlay2](https://github.com/pkgforge-dev/QMPlay2-AppImage-Enhanced) |
+| [QOwnNotes](https://github.com/pkgforge-dev/QOwnNotes-AppImage) |
 | [QtCreator](https://github.com/pkgforge-dev/QtCreator-AppImage) |
 | [QTerminal](https://github.com/pkgforge-dev/QTerminal-AppImage) |
 | [QuantumLauncher](https://github.com/pkgforge-dev/QuantumLauncher-AppImage-Enhanced) |
@@ -439,6 +444,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage) |
 | [Visual Studio Code](https://github.com/pkgforge-dev/Visual-Studio-Code-AppImage) |
 | [VisualBoyAdvance-M](https://github.com/pkgforge-dev/VisualBoyAdvance-M-AppImage) |
+| [Vita3K](https://github.com/pkgforge-dev/Vita3K-AppImage-Enhanced) |
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
 | [Warp](https://github.com/pkgforge-dev/Warp-AppImage) |
 | [Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced) |
@@ -448,6 +454,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [WhatSie](https://github.com/pkgforge-dev/WhatSie-AppImage) |
 | [wine](https://github.com/pkgforge-dev/wine-AppImage) |
 | [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage) |
+| [WiVRn](https://github.com/pkgforge-dev/WiVRn-AppImage) |
 | [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced) |
 | [xclock](https://github.com/pkgforge-dev/xclock-AppImage) |
 | [xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced) |
