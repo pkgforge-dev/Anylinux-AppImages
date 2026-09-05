@@ -447,6 +447,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [VisualBoyAdvance-M](https://github.com/pkgforge-dev/VisualBoyAdvance-M-AppImage) |
 | [Vita3K](https://github.com/pkgforge-dev/Vita3K-AppImage-Enhanced) |
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
+| [VypressChat](https://github.com/pkgforge-dev/VypressChat-AppImage) |
 | [Warp](https://github.com/pkgforge-dev/Warp-AppImage) |
 | [Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced) |
 | [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage) |
