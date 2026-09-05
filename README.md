@@ -84,6 +84,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Catfish](https://github.com/pkgforge-dev/Catfish-AppImage) |
 | [C-Dogs_SDL](https://github.com/pkgforge-dev/C-Dogs_SDL-AppImage) |
 | [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
+| [Chrome](https://github.com/pkgforge-dev/Chrome-Appimage) |
 | [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
 | [ClassicImageViewer](https://github.com/pkgforge-dev/ClassicImageViewer-AppImage-Enhanced) |
