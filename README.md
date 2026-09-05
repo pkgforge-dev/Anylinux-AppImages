@@ -84,6 +84,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Catfish](https://github.com/pkgforge-dev/Catfish-AppImage) |
 | [C-Dogs_SDL](https://github.com/pkgforge-dev/C-Dogs_SDL-AppImage) |
 | [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
+| [Chrome](https://github.com/pkgforge-dev/Chrome-Appimage) |
 | [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
 | [ClassicImageViewer](https://github.com/pkgforge-dev/ClassicImageViewer-AppImage-Enhanced) |
@@ -160,6 +161,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Flacon](https://github.com/pkgforge-dev/Flacon-AppImage-Enhanced) |
 | [Flashrom](https://github.com/pkgforge-dev/Flashrom-AppImage) |
 | [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced) |
+| [foobar2000](https://github.com/pkgforge-dev/foobar2000-AppImage) |
 | [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage) |
 | [foot](https://github.com/pkgforge-dev/foot-AppImage) |
 | [fooyin](https://github.com/pkgforge-dev/fooyin-AppImage) |
@@ -246,6 +248,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
 | [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
 | [LibreWolf](https://github.com/pkgforge-dev/LibreWolf-AppImage-Enhanced) |
+| [Lighthouse](https://github.com/pkgforge-dev/Lighthouse-AppImage-Enhanced) |
 | [LightZone](https://github.com/pkgforge-dev/LightZone-AppImage) |
 | [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage) |
 | [LMMS](https://github.com/pkgforge-dev/LMMS-AppImage-Enhanced) |
@@ -296,6 +299,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OpenRA](https://github.com/pkgforge-dev/OpenRA-AppImage-Enhanced) |
 | [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced) |
 | [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage) |
+| [OpenTESArena](https://github.com/pkgforge-dev/OpenTESArena-AppImage) |
 | [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage) |
 | [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage) |
 | [OpenXRay](https://github.com/pkgforge-dev/OpenXRay-AppImage) |
@@ -446,6 +450,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [VisualBoyAdvance-M](https://github.com/pkgforge-dev/VisualBoyAdvance-M-AppImage) |
 | [Vita3K](https://github.com/pkgforge-dev/Vita3K-AppImage-Enhanced) |
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
+| [VypressChat](https://github.com/pkgforge-dev/VypressChat-AppImage) |
 | [Warp](https://github.com/pkgforge-dev/Warp-AppImage) |
 | [Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced) |
 | [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage) |
