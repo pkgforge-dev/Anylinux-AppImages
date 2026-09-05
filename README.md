@@ -458,6 +458,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [WhatsDesk](https://github.com/pkgforge-dev/WhatsDesk-AppImage) |
 | [WhatSie](https://github.com/pkgforge-dev/WhatSie-AppImage) |
 | [wine](https://github.com/pkgforge-dev/wine-AppImage) |
+| [wine32-cli](https://github.com/pkgforge-dev/wine32-cli-AppImage) |
 | [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage) |
 | [WiVRn](https://github.com/pkgforge-dev/WiVRn-AppImage) |
 | [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced) |
