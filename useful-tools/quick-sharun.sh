@@ -468,6 +468,27 @@ _sanity_check() {
 	done
 }
 
+# If set -m fails to work in strace mode it will result in a CI hang
+# so recursively look for all childs and kill them
+_kill_tree() {
+	for c in $(cat /proc/"$2"/task/"$2"/children 2>/dev/null); do
+		_kill_tree "$1" "$c"
+	done
+	kill -s "$1" "$2" 2>/dev/null || :
+}
+
+_kill_traced() {
+	if kill -0 -"$1" 2>/dev/null; then
+		kill -TERM -"$1" 2>/dev/null || :
+		sleep 1
+		kill -KILL -"$1" 2>/dev/null || :
+	else
+		_kill_tree TERM "$1"
+		sleep 1
+		_kill_tree KILL "$1"
+	fi
+}
+
 # do a basic test to make sure at least the application is not totally broken
 # like when libraries are missing symbols and similar stuff
 _test_appimage() {
@@ -512,9 +533,7 @@ _test_appimage() {
 		_echo "------------------------------------------------------------"
 		_echo "Test went OK."
 		_echo "------------------------------------------------------------"
-		kill -TERM -$pid 2>/dev/null || :
-		sleep 1
-		kill -KILL -$pid 2>/dev/null || :
+		_kill_traced $pid
 		exit 0
 	else
 		# process exited before timeout, something went wrong.
@@ -547,9 +566,7 @@ _simple_test_appimage() {
 	set +m
 
 	sleep 7
-	kill -TERM -$pid 2>/dev/null || :
-	sleep 1
-	kill -KILL -$pid 2>/dev/null || :
+	_kill_traced $pid
 
 	test="$(cat "$log")"
 	case "$test" in
@@ -1550,9 +1567,7 @@ _lib4bin_collect_strace() {
 		set +m
 
 		sleep "$STRACE_TIME"
-		kill -TERM -$pid 2>/dev/null || :
-		sleep 1
-		kill -KILL -$pid 2>/dev/null || :
+		_kill_traced $pid
 		wait $pid 2>/dev/null || :
 
 		out=$(awk '/calling init/{print $NF}' "$dlopened" | sed \
