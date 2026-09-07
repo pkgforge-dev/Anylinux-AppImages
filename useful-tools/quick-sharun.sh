@@ -471,24 +471,21 @@ _sanity_check() {
 # If set -m fails to work in strace mode it will result in a CI hang
 # so recursively look for all childs and kill them
 _kill_tree() {
-	sig=$1
-	pid=$2
-	for c in $(cat /proc/$pid/task/$pid/children 2>/dev/null); do
-		_kill_tree "$sig" "$c"
+	for c in $(cat /proc/"$2"/task/"$2"/children 2>/dev/null); do
+		_kill_tree "$1" "$c"
 	done
-	kill -s "$sig" "$pid" 2>/dev/null || :
+	kill -s "$1" "$2" 2>/dev/null || :
 }
 
 _kill_traced() {
-	pid=$1
-	if kill -0 -$pid 2>/dev/null; then
-		kill -TERM -$pid 2>/dev/null || :
+	if kill -0 -"$1" 2>/dev/null; then
+		kill -TERM -"$1" 2>/dev/null || :
 		sleep 1
-		kill -KILL -$pid 2>/dev/null || :
+		kill -KILL -"$1" 2>/dev/null || :
 	else
-		_kill_tree TERM "$pid"
+		_kill_tree TERM "$1"
 		sleep 1
-		_kill_tree KILL "$pid"
+		_kill_tree KILL "$1"
 	fi
 }
 
