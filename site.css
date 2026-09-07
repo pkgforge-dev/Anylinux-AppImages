@@ -553,10 +553,6 @@ div[align="center"] {
     min-width: 0;
   }
 
-  nav > a span {
-    display: none;
-  }
-
   nav .nav-toggle-label {
     display: inline-flex;
     align-items: center;
