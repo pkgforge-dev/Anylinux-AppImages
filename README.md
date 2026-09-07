@@ -335,6 +335,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [PrimeHack](https://github.com/pkgforge-dev/PrimeHack-AppImage) |
 | [PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced) |
 | [Protontricks](https://github.com/pkgforge-dev/Protontricks-AppImage) |
+| [PrusaSlicer](https://github.com/pkgforge-dev/PrusaSlicer-AppImage) |
 | [Ptyxis](https://github.com/pkgforge-dev/Ptyxis-AppImage) |
 | [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage) |
 | [Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage) |
