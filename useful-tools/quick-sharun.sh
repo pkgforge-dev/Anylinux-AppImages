@@ -1451,7 +1451,7 @@ _get_sharun() {
 
 _deploy_libs() {
 	# now merge the deployment array
-	eval set -- "$TO_DEPLOY_ARRAY" "$@"
+	eval set -- "$TO_DEPLOY_ARRAY" "$(_save_array "$@")"
 	_lib4bin_main "$@"
 }
 
