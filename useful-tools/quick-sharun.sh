@@ -61,7 +61,8 @@ ANYLINUX_LIB=${ANYLINUX_LIB:-1}
 ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
 GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
 GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
-CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/latest/download/cross-libc-dlopen-portable-$APPIMAGE_ARCH.tar}
+CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/latest/download/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
+CROSS_LIBC_DLOPEN_LIB_LINK=${CROSS_LIBC_DLOPEN_LIB_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/latest/download/$APPIMAGE_ARCH-cross-libc-dlopen.so}
 
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
@@ -1825,9 +1826,9 @@ _add_anylinux_lib() {
 	_echo "* anylinux.so successfully added!"
 }
 
-_add_cross_libc_dlopen_lib() {
+_use_host_drivers_experimental() {
 	[ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] || return 0
-	cld_tar=$TMPDIR/cross-libc-dlopen-portable-$APPIMAGE_ARCH.tar
+	cld_tar=$TMPDIR/cross-libc-dlopen-$APPIMAGE_ARCH.tar
 	cld_dir=$DST_LIB_DIR/cross-libc-dlopen
 	target=$cld_dir/cross-libc-dlopen.so
 
@@ -1864,6 +1865,59 @@ _add_cross_libc_dlopen_lib() {
 			fi
 		done
 		_echo "* cross-libc-dlopen successfully added!"
+	fi
+
+	if ! grep -q 'CROSS_LIBC_DLOPEN_ROOT=' "$APPENV" 2>/dev/null; then
+		echo 'CROSS_LIBC_DLOPEN_ROOT=${SHARUN_DIR}' >> "$APPENV"
+	fi
+}
+
+_add_cross_libc_dlopen() {
+	# _use_host_drivers_experimental already deploys cross-libc-dlopen
+	# together with the GL forwarders, nothing to do here
+	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] || [ "$NO_CROSS_LIBC_DLOPEN" = 1 ]; then
+		return 0
+	fi
+
+	cld_lib=$TMPDIR/cross-libc-dlopen.so
+	target=$DST_LIB_DIR/cross-libc-dlopen.so
+
+	# cross-libc-dlopen is always preloaded since it allows dlopening host
+	# libs that were built against a different libc than the bundled one.
+	#
+	# Normally we don't allow this, but there is one common exception:
+	# A Qt app that ships libqgtk3.so but does not bundle GTK3
+	# will end up using the host's GTK3. On newer Alpine Linux GTK3 uses
+	# glycin for image decoding, and glycin runs its image decoders in a
+	# bwrap sandbox. glycin builds that sandbox with std::fs::canonicalize,
+	# which on musl calls realpath(/lib, NULL), and the bundled glibc binds
+	# that unversioned reference to the obsolete realpath@GLIBC_2.0 which
+	# rejects resolved==NULL with EINVAL!
+	#
+	# glycin is then unable to bind /lib into the sandbox and the image
+	# decoders fail, crashing the app when glycin tries to render any image
+	#
+	# cross-libc-dlopen's version-compat interposes that unversioned realpath
+	# and forwards to glibc's default (GLIBC_2.3) definition, fixing the crash
+	# and keeping the gtk3 platform theme working on musl systems.
+	#
+	# And just like that this problem can also manifest with applications
+	# that have optional plugin libraries that we forgot to bundle
+	# they may end up loading those plugins from the host and crash due to
+	# hitting the same realpath incompatiblity between musl/glibc.
+
+	if [ ! -f "$target" ]; then
+		if [ ! -f "$cld_lib" ]; then
+			_echo "* Downloading cross-libc-dlopen..."
+			_download "$cld_lib" "$CROSS_LIBC_DLOPEN_LIB_LINK"
+		fi
+
+		mv -f "$cld_lib" "$target"
+		_echo "* cross-libc-dlopen successfully added!"
+	fi
+
+	if ! grep -qxF 'cross-libc-dlopen.so' "$APPDIR"/.preload 2>/dev/null; then
+		echo "cross-libc-dlopen.so" >> "$APPDIR"/.preload
 	fi
 
 	if ! grep -q 'CROSS_LIBC_DLOPEN_ROOT=' "$APPENV" 2>/dev/null; then
@@ -4376,7 +4430,8 @@ _check_main_bin
 _map_paths_ld_preload_open
 _map_paths_binary_patch
 _add_anylinux_lib
-_add_cross_libc_dlopen_lib
+_use_host_drivers_experimental
+_add_cross_libc_dlopen
 _check_window_class
 _add_gtk_class_fix
 
