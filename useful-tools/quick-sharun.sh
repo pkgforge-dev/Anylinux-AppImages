@@ -1489,7 +1489,8 @@ _lib4bin_get_lib_dst_dir() {
 	  -e 's|^/opt||'     \
 	  -e 's|^/lib64||'   \
 	  -e 's|^/lib32||'   \
-	  -e 's|^/lib||'     \
+	  -e 's|^/lib/||'    \
+	  -e 's|^/lib$||'    \
 	  -e 's|^/[^/]*-linux-gnu||'
 	)
 	echo "$DST_LIB_DIR"/"$p"
