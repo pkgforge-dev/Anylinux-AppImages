@@ -242,6 +242,7 @@ _help_msg() {
 	  DEPLOY_VULKAN       Set to 1 to force deployment of Vulkan.
 	  DEPLOY_IMAGEMAGICK  Set to 1 to force deployment of ImageMagick.
 	  DEPLOY_LIBHEIF      Set to 1 to force deployment of libheif.
+	  DEPLOY_LIBPEAS      Set to 1 to force deployment of libpeas plugin loaders.
 	  DEPLOY_GEGL         Set to 1 to force deployment of GEGL.
 	  DEPLOY_BABL         Set to 1 to force deployment of babl.
 	  DEPLOY_GLIBC        Set to 1 to force the deployment of glibc and gconv.
@@ -749,6 +750,14 @@ _determine_what_to_deploy() {
 				*libsoup-*.so*)
 					DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
 					;;
+				*libpeas-2*.so*)
+					DEPLOY_LIBPEAS=${DEPLOY_LIBPEAS:-1}
+					LIBPEAS_DIR=libpeas-2
+					;;
+				*libpeas-1*.so*)
+					DEPLOY_LIBPEAS=${DEPLOY_LIBPEAS:-1}
+					LIBPEAS_DIR=libpeas-1.0
+					;;
 				*libSDL*.so*)
 					DEPLOY_SDL=${DEPLOY_SDL:-1}
 					;;
@@ -813,6 +822,16 @@ _determine_what_to_deploy() {
 		_err_msg "GTK_DIR to the name of the gtk dir in $LIB_DIR"
 		_err_msg
 		GTK_DIR=gtk-3.0
+	fi
+
+	if [ "$DEPLOY_LIBPEAS" = 1 ] && [ -z "$LIBPEAS_DIR" ]; then
+		_err_msg
+		_err_msg "WARNING: libpeas deployment was forced but we do not know"
+		_err_msg "what version of libpeas needs to be deployed!"
+		_err_msg "Defaulting to libpeas-2, if you do not want that set"
+		_err_msg "LIBPEAS_DIR to the name of the libpeas dir in $LIB_DIR"
+		_err_msg
+		LIBPEAS_DIR=libpeas-2
 	fi
 }
 
@@ -1080,6 +1099,12 @@ _make_deployment_array() {
 			"$LIB_DIR"/libudev.so*   \
 			"$LIB_DIR"/libusb-1*.so* \
 			"$LIB_DIR"/libdecor*.so*
+	fi
+	if [ "$DEPLOY_LIBPEAS" = 1 ]; then
+		_echo "* Deploying $LIBPEAS_DIR"
+		set -- "$@" \
+			"$LIB_DIR"/"$LIBPEAS_DIR"/loaders/* \
+			"$LIB_DIR"/"$LIBPEAS_DIR"/loaders/*/*
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying GNOME glycin"
@@ -4596,6 +4621,35 @@ for lib do case "$lib" in
 		dst_gtk_immodule_cache=${lib%/*}.cache
 		_try_cp "$src_gtk_immodule_cache" "$dst_gtk_immodule_cache"
 		sed -i -e 's|/usr/lib/.*/immodules/||g' "$dst_gtk_immodule_cache" || :
+		;;
+	*/libpeas-*/loaders/*.so*)
+		# libpeas hardcodes /usr/lib/libpeas-*/loaders
+		#
+		# The PEAS_PLUGIN_LOADERS_DIR env var can relocate that lookup,
+		# but we can't just set it to SHARUN_DIR/lib/libpeas-*/loaders
+		# Because when the variable is set, libpeas expects that each
+		# loader library will nested inside a subdir in the loaders dir
+		#
+		# So we have to make relative symlinks inside the loaders dir
+		dst_loaders_dir=${lib%/*}
+		case "${lib##*/}" in
+			libpythonloader.so)  d=python;;
+			libpython3loader.so) d=python3;;
+			liblua51loader.so)   d=lua5.1;;
+			libgjsloader.so)     d=gjs;;
+			*)                   continue;;
+		esac
+		# NOTE: the symlinks point to the parent dir on purpose
+		# so do not use 'find -L' or similar tools on lib* after this!
+		if [ ! -L "$dst_loaders_dir"/"$d" ] && [ ! -d "$dst_loaders_dir"/"$d" ]; then
+			ln -sfn . "$dst_loaders_dir"/"$d"
+			_echo "* added libpeas loader symlink '$d' -> '$dst_loaders_dir'"
+		fi
+
+		# TODO: add to sharun
+		if ! grep -q 'PEAS_PLUGIN_LOADERS_DIR=' "$APPENV" 2>/dev/null; then
+			echo "PEAS_PLUGIN_LOADERS_DIR=\${SHARUN_DIR}/${DST_LIB_DIR##*/}/${dst_loaders_dir#$DST_LIB_DIR/}" >> "$APPENV"
+		fi
 		;;
 	*/libglycin*.so*)
 		if [ "$GNOME_GLYCIN" != 1 ]; then
