@@ -378,6 +378,7 @@ See the ready-to-use demo scripts in [`useful-tools/demo/`](https://github.com/p
 - [gtk4-demo (host drivers)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-host-drivers-appimage.sh) - GTK4 demo shipping zero gpu drivers, those get loaded from the host system at runtime via `USE_HOST_DRIVERS_EXPERIMENTAL=1`
 - [qt6-dbus-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-appimage.sh) - Qt6 application with D-Bus
 - [qt6-dbus-demo (host drivers)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-host-drivers-appimage.sh) - Qt6 demo shipping zero gpu drivers, those get loaded from the host system at runtime via `USE_HOST_DRIVERS_EXPERIMENTAL=1`
+- [xterm-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/xterm-demo-appimage.sh) - Bundles xterm to test that `anylinux.so` cleans the environment of the shell spawned inside the terminal
 
 ### Real-world examples
 

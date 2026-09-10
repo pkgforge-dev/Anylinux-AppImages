@@ -242,11 +242,14 @@ _download() {
 }
 
 _check_shasum() {
-	if echo "$2  $1" | sha256sum -c - >/dev/null 2>&1; then
+	if [ "$SKIP_INTEGRITY_CHECKS" = 1 ]; then
+		_err_msg "Integrity check disabled by SKIP_INTEGRITY_CHECKS=1"
+	elif echo "$2  $1" | sha256sum -c - >/dev/null 2>&1; then
 		_echo "* checksum verified!"
 	else
 		_err_msg "ERROR: sha256 check failed for $1!"
 		_err_msg "This is usually caused by network issues"
+		_err_msg "set SKIP_INTEGRITY_CHECKS=1 if you want to skip this"
 		rm -f "$1"
 		exit 1
 	fi
