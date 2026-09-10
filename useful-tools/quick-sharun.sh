@@ -248,8 +248,9 @@ _check_shasum() {
 		_echo "* checksum verified!"
 	else
 		_err_msg "ERROR: sha256 check failed for $1!"
-		_err_msg "This is usually caused by network issues"
-		_err_msg "set SKIP_INTEGRITY_CHECKS=1 if you want to skip this"
+		_err_msg "This is usually caused by network issues or by a release"
+		_err_msg "artifact that changed after the checksum was pinned"
+		_err_msg "set SKIP_INTEGRITY_CHECKS=1 if you want to skip this check"
 		rm -f "$1"
 		exit 1
 	fi
@@ -307,6 +308,9 @@ _help_msg() {
 	  LIB_DIR          Set source library directory if autodetection fails.
 	  NO_STRIP         Disable stripping binaries and libraries if set.
 	  APPDIR           Destination AppDir (default: ./AppDir).
+	  SKIP_INTEGRITY_CHECKS  Set to 1 to skip the sha256 checks of the files
+	                     downloaded by quick-sharun. Only do this if you are
+	                     overriding the *_LINK variables with your own artifacts.
 	  ANYLINUX_LIB     Preloads a library that unsets environment variables known to
 	                     cause problems to child processes. Set to 0 to disable.
 	                     Additionally you can set ANYLINUX_DO_NOT_LOAD_LIBS to a
@@ -512,6 +516,19 @@ _sanity_check() {
 		PRELOAD_DIR=$DST_LIB_DIR/sharun-preload
 		_err_msg "WARNING: 32bit deployment is experimental!"
 		set -- "$@" lib32
+	fi
+
+	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+		if [ "$LIB32" = 1 ]; then
+			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL cannot be used with 32bit applications!"
+			exit 1
+		elif [ "$ANYLINUX_LIB" != 1 ]; then
+			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires anylinux.so!"
+			exit 1
+		elif [ "$NO_CROSS_LIBC_DLOPEN" = 1 ]; then
+			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires cross-libc-dlopen!"
+			exit 1
+		fi
 	fi
 
 	for d do
@@ -927,13 +944,6 @@ _make_deployment_array() {
 			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is not supported for SDL applications, ignoring it!"
 			USE_HOST_DRIVERS_EXPERIMENTAL=0
 		else
-			if [ "$ANYLINUX_LIB" != 1 ]; then
-				_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires ANYLINUX_LIB=1"
-				exit 1
-			elif [ "$LIB32" = 1 ]; then
-				_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL cannot be used with 32bit applications!"
-				exit 1
-			fi
 			DEPLOY_OPENGL=0
 			DEPLOY_VULKAN=0
 		fi

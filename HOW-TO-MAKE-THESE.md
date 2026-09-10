@@ -158,6 +158,7 @@ All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook
 - `STRIP=1` - Strips debug symbols to reduce size (default: enabled unless `NO_STRIP` is set)
 - `DEBLOAT_LOCALE=1` - Removes unneeded locale files to reduce size (default: enabled)
 - `QUICK_SHARUN_SKIP_DEPS_FOR` - Space/newline-separated list of library names to skip dependency deployment for (e.g., `libqgtk3.so`). By default `libqgtk3.so` is always included to avoid deploying GTK3 in Qt apps when `QT_QPA_PLATFORMTHEME=fusion` is set.
+- `SKIP_INTEGRITY_CHECKS=1` - Skips the sha256 checks of the files that `quick-sharun` downloads (`sharun`, `appimagetool`, `onelf` and `cross-libc-dlopen`). The checksums are pinned to specific release versions, so if you override any of the `SHARUN_LINK`, `APPIMAGETOOL_LINK`, `ONELF_LINK` or `CROSS_LIBC_DLOPEN_LINK` variables with artifacts that do not match the pinned `*_SHA` values, the build fails unless this is set to `1`.
 
 -----------------------------------
 
