@@ -4,7 +4,7 @@
 # xterm spawns a shell for every terminal, so it is the perfect app to
 # test that anylinux.so cleans the environment of child/external
 # processes: the shell spawned inside the terminal must not inherit
-# AppDir-bound paths like GCONV_PATH, TEXTDOMAINDIR, TERMINFO, etc
+# AppDir-bound paths like GCONV_PATH, TEXTDOMAINDIR, etc
 
 set -eux
 
