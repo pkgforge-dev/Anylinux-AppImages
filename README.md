@@ -504,6 +504,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [QDash](https://git.crueter.xyz/QFRC/QDash) |
 | [RSS Guard](https://github.com/martinrotter/rssguard) |
 | [Stoat](https://github.com/stoatchat/for-desktop) |
+| [VSCodium](https://github.com/VSCodium/vscodium) |
 | [ZapZap](https://github.com/rafatosta/zapzap) |
 
 ---
