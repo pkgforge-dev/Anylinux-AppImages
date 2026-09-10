@@ -43,27 +43,15 @@ APPDIR=${APPDIR:-$PWD/AppDir}
 APPENV=$APPDIR/.env
 DIRICON=$APPDIR/.DirIcon
 DST_LIB_DIR=$APPDIR/lib
+PRELOAD_DIR=$DST_LIB_DIR/sharun-preload
 DST_BIN_DIR=$APPDIR/bin
 SHARUN_BIN_DIR=$APPDIR/shared/bin
 MAIN_BIN=${MAIN_BIN##*/}
-
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/sharun/releases/download/2.3.0/sharun-$APPIMAGE_ARCH}
-ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/latest/download/onelf-$APPIMAGE_ARCH-linux}
-LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
-
 OUTPATH=${OUTPATH:-$PWD}
-OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
-
-APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.3.6/appimagetool-$APPIMAGE_ARCH-linux}
-APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
 
 ANYLINUX_LIB=${ANYLINUX_LIB:-1}
-ANYLINUX_LIB_SOURCE=${ANYLINUX_LIB_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/anylinux.c}
+OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
 GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
-GTK_CLASS_FIX_SOURCE=${GTK_CLASS_FIX_SOURCE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/lib/gtk-class-fix.c}
-CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/latest/download/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
-CROSS_LIBC_DLOPEN_LIB_LINK=${CROSS_LIBC_DLOPEN_LIB_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/latest/download/$APPIMAGE_ARCH-cross-libc-dlopen.so}
-
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
@@ -74,7 +62,6 @@ STRACE_TIME=${STRACE_TIME:-5}
 
 DEPENDENCIES="
 	awk
-	cc
 	cp
 	env
 	find
@@ -83,8 +70,10 @@ DEPENDENCIES="
 	mv
 	patchelf
 	rm
+	sha256sum
 	sleep
 	strings
+	tar
 	tr
 "
 
@@ -96,6 +85,52 @@ QUICK_SHARUN_SKIP_DEPS_FOR="
 	$QUICK_SHARUN_SKIP_DEPS_FOR
 	libqgtk3.so
 "
+
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.1.0/sharun+helper-libs-$APPIMAGE_ARCH.tar}
+SHARUN_TARBALL=$TMPDIR/sharun+helper-libs-$APPIMAGE_ARCH.tar
+APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.3.6/appimagetool-$APPIMAGE_ARCH-linux}
+APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
+CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.4/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
+CROSS_LIBC_DLOPEN_TARBALL=$TMPDIR/cross-libc-dlopen-$APPIMAGE_ARCH.tar
+ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/download/0.3.3/onelf-$APPIMAGE_ARCH-linux}
+ONELF=${ONELF:-$TMPDIR/onelf}
+
+# known sha256 of all the artifacts downloaded by quick-sharun
+# these need to be updated every time the download versions are bumped
+case "$APPIMAGE_ARCH" in
+	x86_64)
+		APPIMAGETOOL_SHA=ca381e473175b451ac5bfe397c572663fe1bf7d0a8f62fd31197bad37438c1ca
+		SHARUN_SHA=ea6ba0cca37b26716a392adc68e4f2b54e8fa01ffd1f3f488fc29d53321a1ff8
+		ONELF_SHA=3a990243790c026c902330a7744e8c21b25fdc8c694a88e79d6fb25d761a6351
+		CROSS_LIBC_DLOPEN_TAR_SHA=6c545c639f0272a62abf1fa2ea64df832dc83aa80470158381a7b0207ef695b1
+		;;
+	aarch64)
+		APPIMAGETOOL_SHA=ffcb14443de4f19b0cd5246bd8a3893344e1a538589cbfeb24400efa9a424542
+		SHARUN_SHA=74d88c67edd29495b77ef2db2a1f2c6f3ce10864c4a955b954da3eaf4a479c72
+		ONELF_SHA=9b5b2c3d031756a064bd9a71a977e229cb359f324937a5ba8a28db1568bae15b
+		CROSS_LIBC_DLOPEN_TAR_SHA=0ec0f785aa07c790d61dd24a857acbc2cb39e4861cefd0bbda08398a191930da
+		;;
+	riscv64)
+		APPIMAGETOOL_SHA=af66716024238f487e89fc28013b115ce864709fef125805137fddbd49ba76cb
+		SHARUN_SHA=8cd2774f20b876ef3b3b4def76d02bb9e3e044b4094f8b57d7708acbd91bf35f
+		CROSS_LIBC_DLOPEN_TAR_SHA=c66f58b53847914d92eb231ad6f292574a83cd02a12dbba73f6865fcc12ee890
+		;;
+	ppc64)
+		APPIMAGETOOL_SHA=01bd0ae6634e7861db5a0f91769320451d6b47c8bf909528bf22159639d002ea
+		SHARUN_SHA=d05d4743756a25b60968469f799b735479a1035496a3970483676e987be0a467
+		CROSS_LIBC_DLOPEN_TAR_SHA=ea8037bdcec726ed43c484a48a8c5773e3b006ee032215938749c92d982bc002
+		;;
+	ppc64le)
+		APPIMAGETOOL_SHA=d113d3d235b1e2f2c744e1e4e44a3c35ba1dcd95036a1b2ce5a4ca23a0373c43
+		SHARUN_SHA=f2c658e5fb54f57cea6f1bad0c80aa3734a2fbb5d4c5e6fb0bc756fe9d96f40c
+		CROSS_LIBC_DLOPEN_TAR_SHA=7a90992db5e4e4ad7f59e3f413a5d369b3e41477db440b2732267989f65a20b2
+		;;
+	loongarch64)
+		APPIMAGETOOL_SHA=1f60df299900b3f14ecd7ebf7d3337dd35ddea0e9638ac00c85269d467945873
+		SHARUN_SHA=b2cc5e1f23bd1ebf6d7cc0d34770a3f7b5e0542b9aa7886b054021a73f385cfa
+		CROSS_LIBC_DLOPEN_TAR_SHA=df8b1abf0ccc811c0978740568ccbe8653184140367fb9647cdcd571b52a7d3d
+		;;
+esac
 
 # prevent Qt from dlopening libqtgtk3.so via strace mode
 export QT_QPA_PLATFORMTHEME=${QT_QPA_PLATFORMTHEME:-fusion}
@@ -204,6 +239,17 @@ _download() {
 	done
 	_err_msg "ERROR: Failed to download 5 times!"
 	return 1
+}
+
+_check_shasum() {
+	if echo "$2  $1" | sha256sum -c - >/dev/null 2>&1; then
+		_echo "* checksum verified!"
+	else
+		_err_msg "ERROR: sha256 check failed for $1!"
+		_err_msg "This is usually caused by network issues"
+		rm -f "$1"
+		exit 1
+	fi
 }
 
 _help_msg() {
@@ -460,6 +506,7 @@ _sanity_check() {
 	set -- lib
 	if [ "$LIB32" = 1 ]; then
 		DST_LIB_DIR=$APPDIR/lib32
+		PRELOAD_DIR=$DST_LIB_DIR/sharun-preload
 		_err_msg "WARNING: 32bit deployment is experimental!"
 		set -- "$@" lib32
 	fi
@@ -1465,14 +1512,41 @@ _get_sharun() {
 		return 0
 	fi
 	_echo "Downloading sharun..."
-	_download "$APPDIR"/sharun "$SHARUN_LINK"
-	if _is_elf "$APPDIR"/sharun; then
-		chmod +x "$APPDIR"/sharun
-	else
-		_err_msg "ERROR: What was downloaded is not sharun!"
-		_err_msg "This is usually caused by network issues"
-		exit 1
+	_download "$SHARUN_TARBALL" "$SHARUN_LINK"
+	_check_shasum "$SHARUN_TARBALL" "$SHARUN_SHA"
+
+	tar -xf "$SHARUN_TARBALL" -C "$APPDIR" sharun
+	chmod +x "$APPDIR"/sharun
+}
+
+_add_helper_libs() {
+	# the helper libraries are prebuilt for 64bit only
+	if [ "$LIB32" = 1 ]; then
+		_err_msg "WARNING: The helper libraries are for 64bit only!"
+		_err_msg "Deploy your own helper libraries to $PRELOAD_DIR if needed"
+		return 0
 	fi
+
+	# just in case someone deleted the tarball between runs
+	if [ ! -f "$SHARUN_TARBALL" ]; then
+		_echo "Downloading helper libraries..."
+		_download "$SHARUN_TARBALL" "$SHARUN_LINK"
+		_check_shasum "$SHARUN_TARBALL" "$SHARUN_SHA"
+	fi
+
+	# extract everything, then delete what is not wanted
+	mkdir -p "$PRELOAD_DIR"
+	tar -xf "$SHARUN_TARBALL" -C "$PRELOAD_DIR"
+	rm -f "$PRELOAD_DIR"/sharun
+
+	if [ "$ANYLINUX_LIB" = 1 ]; then _echo "* anylinux.so successfully added!"
+	else rm -f "$PRELOAD_DIR"/anylinux.so; fi
+	if [ -n "$PATH_MAPPING" ]; then _echo "* path-mapping.so successfully added!"
+	else rm -f "$PRELOAD_DIR"/path-mapping.so; fi
+	if [ "$GNOME_GLYCIN" = 1 ]; then _err_msg "* added glycin-fix.so for gnome glycin"
+	else rm -f "$PRELOAD_DIR"/glycin-fix.so; fi
+	if [ "$GTK_CLASS_FIX" = 1 ]; then _echo "* gtk-fix-nonsense.so successfully added!"
+	else rm -f "$PRELOAD_DIR"/gtk-fix-nonsense.so; fi
 }
 
 _deploy_libs() {
@@ -1828,85 +1902,12 @@ _fix_shebangs() {
 	EOF
 }
 
-_add_anylinux_lib() {
-	cfile=$APPDIR/.anylinux.c
-	target=$DST_LIB_DIR/anylinux.so
-
-	if [ "$ANYLINUX_LIB" != 1 ]; then
-		return 0
-	elif [ ! -f "$target" ]; then
-		_echo "* Building anylinux.so..."
-		_download "$cfile" "$ANYLINUX_LIB_SOURCE"
-
-		set -- -shared -fPIC -O2 "$cfile" -o "$target"
-		if [ "$LIB32" = 1 ]; then
-			set -- -m32 "$@"
-		fi
-		cc "$@"
-	fi
-
-	if ! grep -q 'anylinux.so' "$APPDIR"/.preload 2>/dev/null; then
-		echo "anylinux.so" >> "$APPDIR"/.preload
-	fi
-
-	_echo "* anylinux.so successfully added!"
-}
-
-_use_host_drivers_experimental() {
-	[ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] || return 0
-	cld_tar=$TMPDIR/cross-libc-dlopen-$APPIMAGE_ARCH.tar
-	cld_dir=$DST_LIB_DIR/cross-libc-dlopen
-	target=$cld_dir/cross-libc-dlopen.so
-
-	if [ ! -f "$target" ]; then
-		if ! _is_cmd tar; then
-			_err_msg "ERROR: Deploying cross-libc-dlopen requires tar"
-			exit 1
-		fi
-
-		if [ ! -f "$cld_tar" ]; then
-			_echo "* Downloading cross-libc-dlopen..."
-			_download "$cld_tar" "$CROSS_LIBC_DLOPEN_LINK"
-		fi
-
-		if ! tar -tf "$cld_tar" >/dev/null 2>&1; then
-			_err_msg "ERROR: unable to extract $cld_tar!"
-			_err_msg "This is usually caused by network issues"
-			rm -f "$cld_tar"
-			exit 1
-		fi
-
-		_echo "* Adding cross-libc-dlopen..."
-		mkdir -p "$cld_dir"
-		tar -xf "$cld_tar" -C "$cld_dir"
-		rm -f "$cld_tar"
-
-		# runtime-select is not used by us
-		rm -f "$cld_dir"/runtime-select
-
-		for lib in "$cld_dir"/*.so; do
-			lib=${lib##*/}
-			if ! grep -qxF "$lib" "$APPDIR"/.preload 2>/dev/null; then
-				echo "$lib" >> "$APPDIR"/.preload
-			fi
-		done
-		_echo "* cross-libc-dlopen successfully added!"
-	fi
-
-	if ! grep -q 'CROSS_LIBC_DLOPEN_ROOT=' "$APPENV" 2>/dev/null; then
-		echo 'CROSS_LIBC_DLOPEN_ROOT=${SHARUN_DIR}' >> "$APPENV"
-	fi
-}
-
 _add_cross_libc_dlopen() {
-	# _use_host_drivers_experimental already deploys cross-libc-dlopen
-	# together with the GL forwarders, nothing to do here
-	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ] || [ "$NO_CROSS_LIBC_DLOPEN" = 1 ]; then
+	target=$PRELOAD_DIR/cross-libc-dlopen.so
+
+	if [ "$NO_CROSS_LIBC_DLOPEN" = 1 ]; then
 		return 0
 	fi
-
-	cld_lib=$TMPDIR/cross-libc-dlopen.so
-	target=$DST_LIB_DIR/cross-libc-dlopen.so
 
 	# cross-libc-dlopen is always preloaded since it allows dlopening host
 	# libs that were built against a different libc than the bundled one.
@@ -1933,17 +1934,25 @@ _add_cross_libc_dlopen() {
 	# hitting the same realpath incompatiblity between musl/glibc.
 
 	if [ ! -f "$target" ]; then
-		if [ ! -f "$cld_lib" ]; then
+		if [ ! -f "$CROSS_LIBC_DLOPEN_TARBALL" ]; then
 			_echo "* Downloading cross-libc-dlopen..."
-			_download "$cld_lib" "$CROSS_LIBC_DLOPEN_LIB_LINK"
+			_download "$CROSS_LIBC_DLOPEN_TARBALL" "$CROSS_LIBC_DLOPEN_LINK"
+			_check_shasum "$CROSS_LIBC_DLOPEN_TARBALL" "$CROSS_LIBC_DLOPEN_TAR_SHA"
 		fi
 
-		mv -f "$cld_lib" "$target"
+		_echo "* Adding cross-libc-dlopen..."
+		mkdir -p "$PRELOAD_DIR"
+		tar -xf "$CROSS_LIBC_DLOPEN_TARBALL" -C "$PRELOAD_DIR"
+		rm -f \
+			"$PRELOAD_DIR"/LICENSE  \
+			"$PRELOAD_DIR"/runtime-select \
+			"$PRELOAD_DIR"/build-manifest.json
 		_echo "* cross-libc-dlopen successfully added!"
 	fi
 
-	if ! grep -qxF 'cross-libc-dlopen.so' "$APPDIR"/.preload 2>/dev/null; then
-		echo "cross-libc-dlopen.so" >> "$APPDIR"/.preload
+	# remove the gl forwards if we are not using USE_HOST_DRIVERS_EXPERIMENTAL
+	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" != 1 ]; then
+		rm -f "$PRELOAD_DIR"/egl-fwd.so "$PRELOAD_DIR"/gl-fwd.so "$PRELOAD_DIR"/gles-fwd.so
 	fi
 
 	if ! grep -q 'CROSS_LIBC_DLOPEN_ROOT=' "$APPENV" 2>/dev/null; then
@@ -1952,27 +1961,12 @@ _add_cross_libc_dlopen() {
 }
 
 _add_gtk_class_fix() {
-	cfile=$APPDIR/.gtk-class-fix.c
-	target=$DST_LIB_DIR/gtk-class-fix.so
-
 	if [ "$GTK_CLASS_FIX" != 1 ]; then
 		return 0
 	elif [ ! -f "$DESKTOP_ENTRY" ]; then
 		_err_msg "ERROR: Using GTK_CLASS_FIX requires a desktop entry in $APPDIR"
 		exit 1
-	elif [ "$ANYLINUX_LIB" != 1 ]; then
-		_err_msg "ERROR: GTK_CLASS_FIX requires ANYLINUX_LIB=1"
-		exit 1
 	fi
-
-	_echo "* Building gtk-class-fix.so"
-	_download "$cfile" "$GTK_CLASS_FIX_SOURCE"
-
-	set -- -shared -fPIC -O2 "$cfile" -o "$target" -ldl
-	if [ "$LIB32" = 1 ]; then
-		set -- -m32 "$@"
-	fi
-	cc "$@"
 
 	# _check_window_class will make sure StartupWMClass is added to desktop entry
 	# for this to work in wayland, the class needs to have one dot in its name
@@ -1982,68 +1976,10 @@ _add_gtk_class_fix() {
 
 	class=$(awk -F'=| ' '/^StartupWMClass=/{print $2; exit}' "$DESKTOP_ENTRY")
 
-	echo "GTK_WINDOW_CLASS=$class"  >> "$APPDIR"/.env
-	echo "gtk-class-fix.so"         >> "$APPDIR"/.preload
-	_echo "* gtk-class-fix.so successfully added!"
-}
-
-_fix_broken_gnome_glycin() {
-	cfile=$APPDIR/.fix-gnome-glycin.c
-	target=$DST_LIB_DIR/fix-gnome-glycin.so
-
-	if [ -f "$target" ]; then
-		return 0
-	fi
-
-	cat <<-'EOF' > "$cfile"
-	/*
-	 * Glycin forces sandboxing which fails 100% of the time here because the
-	 * library is horribly written and does not resolve the full path of the
-	 * binaries it passes to bwrap, it does not even check if bwrap is present!
-	 */
-
-	#define _GNU_SOURCE
-	#include <dlfcn.h>
-	#include <stddef.h>
-
-	#ifndef GLY_SANDBOX_SELECTOR_NOT_SANDBOXED
-	#define GLY_SANDBOX_SELECTOR_NOT_SANDBOXED 3
-	#endif
-
-	static void force_not_sandboxed(void *loader) {
-	    if (!loader) return;
-	    void (*set_sandbox)(void*, int) = dlsym(RTLD_DEFAULT, "gly_loader_set_sandbox_selector");
-	    if (set_sandbox)
-	        set_sandbox(loader, GLY_SANDBOX_SELECTOR_NOT_SANDBOXED);
-	}
-
-	#define GLY_LOADER_WRAPPER(name) \
-	    void* gly_##name(void* arg) { \
-	        static void* (*real)(void*) = NULL; \
-	        if (!real) { \
-	            real = dlsym(RTLD_NEXT, "gly_" #name); \
-	            if (!real) real = dlsym(RTLD_DEFAULT, "gly_" #name); \
-	        } \
-	        void *loader = real ? real(arg) : NULL; \
-	        force_not_sandboxed(loader); \
-	        return loader; \
-	    }
-
-	GLY_LOADER_WRAPPER(loader_new)
-	GLY_LOADER_WRAPPER(loader_new_for_stream)
-	GLY_LOADER_WRAPPER(loader_new_for_bytes)
-	EOF
-
-	set -- -shared -fPIC -O2 "$cfile" -o "$target" -ldl
-	if [ "$LIB32" = 1 ]; then
-		set -- -m32 "$@"
-	fi
-	cc "$@"
-
-	if ! grep -q 'fix-gnome-glycin.so' "$APPDIR"/.preload 2>/dev/null; then
-		echo "fix-gnome-glycin.so" >> "$APPDIR"/.preload
-	fi
-	_err_msg "* detected gnome glycin was added and fixed it with a preload hack"
+	# gtk-fix-nonsense.so is only deployed when GTK_CLASS_FIX is set
+	# it is a passthrough unless GTK_WINDOW_CLASS is declared
+	echo "GTK_WINDOW_CLASS=$class" >> "$APPDIR"/.env
+	_echo "* gtk-fix-nonsense.so applied with GTK_WINDOW_CLASS=$class"
 }
 
 _check_always_software() {
@@ -3125,31 +3061,16 @@ _add_qs_hooks() {
 	fi
 }
 
-_map_paths_ld_preload_open() {
+_map_paths() {
 	# format new line entries in PATH_MAPPING into comma separated
 	# entries for sharun, pathmap accepts new lines in the variable
 	# but the .env library used by sharun does not
-	if [ -n "$PATH_MAPPING" ] && [ ! -f "$DST_LIB_DIR"/path-mapping.so ]; then
+	# the path-mapping.so helper library ships with sharun and is only
+	# preloaded by sharun when PATH_MAPPING is set
+	if [ -n "$PATH_MAPPING" ]; then
 		PATH_MAPPING=$(echo "$PATH_MAPPING"   \
 			| tr '\n' ',' | tr -d '[:space:]' | sed 's/,*$//; s/^,*//'
 		)
-
-		deps="git make"
-		if ! _is_cmd $deps; then
-			_err_msg "ERROR: Using PATH_MAPPING requires $deps"
-			exit 1
-		fi
-
-		_echo "* Building $LD_PRELOAD_OPEN..."
-
-		rm -rf "$TMPDIR"/ld-preload-open
-		git clone "$LD_PRELOAD_OPEN" "$TMPDIR"/ld-preload-open && (
-			cd "$TMPDIR"/ld-preload-open
-			make all
-		)
-
-		mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$DST_LIB_DIR"
-		echo "path-mapping.so" >> "$APPDIR"/.preload
 		echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPENV"
 		_echo "* PATH_MAPPING successfully added!"
 		echo ""
@@ -3724,6 +3645,7 @@ _check_hardcoded_lib_dirs() {
 			pipewire*   |\
 			pulseaudio  |\
 			qt|qt?|qt?? |\
+			sharun-*    |\
 			spa*        |\
 			vdpau       )
 				continue
@@ -4259,11 +4181,20 @@ _check_main_bin() {
 }
 
 _make_static_bin() (
-	ONELF=$TMPDIR/onelf
+	# onelf is only built for these arches, refuse to proceed on any other
+	case "$APPIMAGE_ARCH" in
+		x86_64|aarch64) :;;
+		*)
+			_err_msg "ERROR: --make-static-bin unsupported arch: $APPIMAGE_ARCH!"
+			exit 1
+			;;
+	esac
+
 	if [ ! -x "$ONELF" ]; then
 		_echo "Downloading onelf..."
 		_download "$ONELF" "$ONELF_LINK"
 		chmod +x "$ONELF"
+		_check_shasum "$ONELF" "$ONELF_SHA"
 	fi
 
 	mkdir -p "$DST_BIN_DIR"
@@ -4335,6 +4266,7 @@ _make_appimage() {
 		_echo "Downloading appimagetool from $APPIMAGETOOL_LINK"
 		_download "$APPIMAGETOOL" "$APPIMAGETOOL_LINK"
 		chmod +x "$APPIMAGETOOL"
+		_check_shasum "$APPIMAGETOOL" "$APPIMAGETOOL_SHA"
 	fi
 
 	_echo "------------------------------------------------------------"
@@ -4402,6 +4334,7 @@ _echo "Now jumping to deploying..."
 _echo "------------------------------------------------------------"
 
 _get_sharun
+_add_helper_libs
 _deploy_libs "$@"
 _check_always_software
 _handle_bins_scripts
@@ -4453,10 +4386,8 @@ _echo "------------------------------------------------------------"
 echo ""
 
 _check_main_bin
-_map_paths_ld_preload_open
+_map_paths
 _map_paths_binary_patch
-_add_anylinux_lib
-_use_host_drivers_experimental
 _add_cross_libc_dlopen
 _check_window_class
 _add_gtk_class_fix
@@ -4646,17 +4577,11 @@ for lib do case "$lib" in
 			ln -sfn . "$dst_loaders_dir"/"$d"
 			_echo "* added libpeas loader symlink '$d' -> '$dst_loaders_dir'"
 		fi
-
-		# TODO: add to sharun
-		if ! grep -q 'PEAS_PLUGIN_LOADERS_DIR=' "$APPENV" 2>/dev/null; then
-			echo "PEAS_PLUGIN_LOADERS_DIR=\${SHARUN_DIR}/${DST_LIB_DIR##*/}/${dst_loaders_dir#$DST_LIB_DIR/}" >> "$APPENV"
-		fi
 		;;
 	*/libglycin*.so*)
 		if [ "$GNOME_GLYCIN" != 1 ]; then
 			continue # only GNOME glycin needs handling
 		fi
-		_fix_broken_gnome_glycin
 		_add_bwrap_wrapper
 		src_glycin_conf_dir=/usr/share/glycin-loaders
 		dst_glycin_conf_dir=$APPDIR/share/glycin-loaders
