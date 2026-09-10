@@ -35,8 +35,7 @@ pacman -Syu --noconfirm \
 	libxtst          \
 	patchelf         \
 	wget             \
-	xorg-server-xvfb \
-	zsync
+	xorg-server-xvfb
 
 echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
