@@ -56,6 +56,7 @@ DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
 LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
+CROSS_LIBC_DLOPEN=${CROSS_LIBC_DLOPEN:-1}
 
 STRACE_MODE=${STRACE_MODE:-1}
 STRACE_TIME=${STRACE_TIME:-5}
@@ -86,11 +87,11 @@ QUICK_SHARUN_SKIP_DEPS_FOR="
 	libqgtk3.so
 "
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.2.0/sharun+helper-libs-$APPIMAGE_ARCH.tar}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.2.1/sharun+helper-libs-$APPIMAGE_ARCH.tar}
 SHARUN_TARBALL=$TMPDIR/sharun+helper-libs-$APPIMAGE_ARCH.tar
 APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.4.2/appimagetool-$APPIMAGE_ARCH-linux}
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
-CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.4/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
+CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.5/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
 CROSS_LIBC_DLOPEN_TARBALL=$TMPDIR/cross-libc-dlopen-$APPIMAGE_ARCH.tar
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/download/0.3.3/onelf-$APPIMAGE_ARCH-linux}
 ONELF=${ONELF:-$TMPDIR/onelf}
@@ -100,35 +101,34 @@ ONELF=${ONELF:-$TMPDIR/onelf}
 case "$APPIMAGE_ARCH" in
 	x86_64)
 		APPIMAGETOOL_SHA=f29cfe794718bad077339e4e1aa65a32635361b9bcad5c4b585b6685430b1bd8
-		SHARUN_SHA=e42a006fa2a13758f574b8b23323a51e11c4fd436fabb0fc7e7c58145f2fdb6f
+		SHARUN_SHA=f746f070143aba3de16c62e16d31e07ecae9d999fa6795273900b38b600675a6
 		ONELF_SHA=3a990243790c026c902330a7744e8c21b25fdc8c694a88e79d6fb25d761a6351
-		CROSS_LIBC_DLOPEN_TAR_SHA=6c545c639f0272a62abf1fa2ea64df832dc83aa80470158381a7b0207ef695b1
+		CROSS_LIBC_DLOPEN_TAR_SHA=f9f7d2b3a29e34e68a67d65e25eeb4cef009746fb6f38a9dbfb6a0cd1be50e83
 		;;
 	aarch64)
 		APPIMAGETOOL_SHA=988c44cca6060d4c6b6680e2bda445f0bddbe8596510b0ed95017da5cd045cfc
-		SHARUN_SHA=665da186d8e2a1ef103a3872b12387b41716cb5f56b2b4ad56327008d4d18541
+		SHARUN_SHA=79787b450793b1678e8753d4ce8fc69298b429d93ec1b962fc42c217659c470b
 		ONELF_SHA=9b5b2c3d031756a064bd9a71a977e229cb359f324937a5ba8a28db1568bae15b
-		CROSS_LIBC_DLOPEN_TAR_SHA=0ec0f785aa07c790d61dd24a857acbc2cb39e4861cefd0bbda08398a191930da
+		CROSS_LIBC_DLOPEN_TAR_SHA=1543b02adb8bb0fa5cfdfaad904f3c581f75dc70ddd5f0ff888129effd7f2655
 		;;
 	riscv64)
 		APPIMAGETOOL_SHA=d6686ade4fb3c225d5b2dee9ceea01b4295676a95646d4e97eaf48fc6bdcadff
-		SHARUN_SHA=4b80cb5399940f77ccff6cdfee94b129142d70554e05ad6b0533b5ca0a1ebcab
-		CROSS_LIBC_DLOPEN_TAR_SHA=c66f58b53847914d92eb231ad6f292574a83cd02a12dbba73f6865fcc12ee890
+		SHARUN_SHA=d7ea6012c51aa6c228be1eebf7751aa973b1e504adc01291621dfe9d95d3b3df
+		CROSS_LIBC_DLOPEN_TAR_SHA=05ca25a9e58ad9eee356617beeb5cafe29478ef2ddfd36a163542e8ada1b7e3b
 		;;
 	ppc64)
 		APPIMAGETOOL_SHA=81673a75fdee6e082d6d213815a9ef37986a2009fc58f6a3dd14e53e7e166b01
-		SHARUN_SHA=d0237c7c31f823fc9d966aaa7a0674f4bf24a6213a68c5d6d4a2903e8557f8a3
-		CROSS_LIBC_DLOPEN_TAR_SHA=ea8037bdcec726ed43c484a48a8c5773e3b006ee032215938749c92d982bc002
+		SHARUN_SHA=f424b02d23a11a56b101f48d11949f9fe6636270dfce8daa38cdf25b599af582
 		;;
 	ppc64le)
 		APPIMAGETOOL_SHA=b57f6c3cd3bdd04f08c7d608396e5030793cb9854a86015e2e9a53a7a465473c
-		SHARUN_SHA=8cad74be51afbc63c20c77816a54fbbabcb180fc2b57a3293697cd3ac41d689f
-		CROSS_LIBC_DLOPEN_TAR_SHA=7a90992db5e4e4ad7f59e3f413a5d369b3e41477db440b2732267989f65a20b2
+		SHARUN_SHA=a541624a50bb0870c9b82fe1b673e9b424f62d0bed8faa6c5d820b82b18b1817
+		CROSS_LIBC_DLOPEN_TAR_SHA=54356c7a62142aedc0cf575fa06e9d9ea37963cdf80de530cab7d6235ab4e592
 		;;
 	loongarch64)
 		APPIMAGETOOL_SHA=517903024c1813cce1208336bffb26f7246c99ed04397a0540169b906a811d3d
-		SHARUN_SHA=55c57673b597f7625f4e383ba257df4da1c1649753de738864656eec81d30075
-		CROSS_LIBC_DLOPEN_TAR_SHA=df8b1abf0ccc811c0978740568ccbe8653184140367fb9647cdcd571b52a7d3d
+		SHARUN_SHA=44b66394ca11b541af258103ec8f30f328b6fe4dc673fb5932ae5033bc398ea2
+		CROSS_LIBC_DLOPEN_TAR_SHA=256983c558d8add8b7167508c2fbabce6c479660e936e621b67c489ed1c2ba1a
 		;;
 esac
 
@@ -323,6 +323,11 @@ _help_msg() {
 	                     applications use software rendering only, use this option
 	                     when you do not want hardware acceleration.
 	                     Will fail if application makes use of mesa during deployment.
+	  CROSS_LIBC_DLOPEN  Set to 0 to prevent cross-libc-dlopen from being deployed.
+	                     It is enabled by default and preloaded to allow dlopening
+	                     host libraries built against a different libc than the
+	                     bundled one. Not supported on ppc64 due to the ELFv1 and
+	                     ELFv2 ABI split, where it is disabled automatically.
 	  USE_HOST_DRIVERS_EXPERIMENTAL  Set to 1 to ship zero gpu drivers, the drivers
 	                     are instead loaded from the host system at runtime with
 	                     the help of cross-libc-dlopen that allows using the host
@@ -345,6 +350,8 @@ _help_msg() {
 	                       anymore in the next decade and then we will have
 	                       applications that no longer work.
 	                     TLDR: DO NOT USE THIS FEATURE WITH EMULATORS!!!
+	                     Not supported on ppc64 (ELFv1/ELFv2 ABI split), where
+	                     it becomes a no-op and the drivers are deployed instead.
 	  STRACE_MODE      Sets the strace mode, the mechanism quick-sharun uses
 	                     to find and deploy the libraries the application loads
 	                     at runtime via dlopen. Enabled by default, set to 0 to
@@ -518,6 +525,22 @@ _sanity_check() {
 		set -- "$@" lib32
 	fi
 
+	# cross-libc-dlopen is not possible in BE ppc64
+	if [ "$ARCH" = ppc64 ]; then
+		_err_msg "WARNING: cross-libc-dlopen is not supported on ppc64"
+		_err_msg "ppc64 distributions are split between the ELFv1 and ELFv2 ABIs"
+		CROSS_LIBC_DLOPEN=0
+
+		# BE ppc64 hardware predates Vulkan, so only OpenGL needs to be deployed
+		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is not supported on ppc64"
+			_err_msg "so host libraries cannot be dlopened, drivers will be deployed instead"
+			USE_HOST_DRIVERS_EXPERIMENTAL=0
+			DEPLOY_OPENGL=1
+			DEPLOY_VULKAN=0
+		fi
+	fi
+
 	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
 		if [ "$LIB32" = 1 ]; then
 			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL cannot be used with 32bit applications!"
@@ -525,7 +548,7 @@ _sanity_check() {
 		elif [ "$ANYLINUX_LIB" != 1 ]; then
 			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires anylinux.so!"
 			exit 1
-		elif [ "$NO_CROSS_LIBC_DLOPEN" = 1 ]; then
+		elif [ "$CROSS_LIBC_DLOPEN" != 1 ]; then
 			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires cross-libc-dlopen!"
 			exit 1
 		fi
@@ -1918,7 +1941,7 @@ _fix_shebangs() {
 _add_cross_libc_dlopen() {
 	target=$PRELOAD_DIR/cross-libc-dlopen.so
 
-	if [ "$NO_CROSS_LIBC_DLOPEN" = 1 ]; then
+	if [ "$CROSS_LIBC_DLOPEN" != 1 ]; then
 		return 0
 	fi
 
