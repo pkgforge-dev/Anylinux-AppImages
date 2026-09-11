@@ -56,6 +56,7 @@ DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
 LOCALE_DIR=${LOCALE_DIR:-/usr/share/locale}
+CROSS_LIBC_DLOPEN=${CROSS_LIBC_DLOPEN:-1}
 
 STRACE_MODE=${STRACE_MODE:-1}
 STRACE_TIME=${STRACE_TIME:-5}
@@ -323,6 +324,11 @@ _help_msg() {
 	                     applications use software rendering only, use this option
 	                     when you do not want hardware acceleration.
 	                     Will fail if application makes use of mesa during deployment.
+	  CROSS_LIBC_DLOPEN  Set to 0 to prevent cross-libc-dlopen from being deployed.
+	                     It is enabled by default and preloaded to allow dlopening
+	                     host libraries built against a different libc than the
+	                     bundled one. Not supported on ppc64 due to the ELFv1 and
+	                     ELFv2 ABI split, where it is disabled automatically.
 	  USE_HOST_DRIVERS_EXPERIMENTAL  Set to 1 to ship zero gpu drivers, the drivers
 	                     are instead loaded from the host system at runtime with
 	                     the help of cross-libc-dlopen that allows using the host
@@ -345,6 +351,8 @@ _help_msg() {
 	                       anymore in the next decade and then we will have
 	                       applications that no longer work.
 	                     TLDR: DO NOT USE THIS FEATURE WITH EMULATORS!!!
+	                     Not supported on ppc64 (ELFv1/ELFv2 ABI split), where
+	                     it becomes a no-op and the drivers are deployed instead.
 	  STRACE_MODE      Sets the strace mode, the mechanism quick-sharun uses
 	                     to find and deploy the libraries the application loads
 	                     at runtime via dlopen. Enabled by default, set to 0 to
@@ -518,6 +526,19 @@ _sanity_check() {
 		set -- "$@" lib32
 	fi
 
+	# cross-libc-dlopen is not possible in BE ppc64
+	if [ "$ARCH" = ppc64 ]; then
+		_err_msg "WARNING: cross-libc-dlopen is not supported on ppc64"
+		_err_msg "ppc64 distributions are split between the ELFv1 and ELFv2 ABIs"
+		_err_msg "so host libraries cannot be dlopened, drivers will be deployed instead"
+		CROSS_LIBC_DLOPEN=0
+		USE_HOST_DRIVERS_EXPERIMENTAL=0
+		# BE ppc64 hardware predates Vulkan capable GPUs, so only the
+		# OpenGL drivers need to be deployed
+		DEPLOY_OPENGL=1
+		DEPLOY_VULKAN=0
+	fi
+
 	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
 		if [ "$LIB32" = 1 ]; then
 			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL cannot be used with 32bit applications!"
@@ -525,7 +546,7 @@ _sanity_check() {
 		elif [ "$ANYLINUX_LIB" != 1 ]; then
 			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires anylinux.so!"
 			exit 1
-		elif [ "$NO_CROSS_LIBC_DLOPEN" = 1 ]; then
+		elif [ "$CROSS_LIBC_DLOPEN" != 1 ]; then
 			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires cross-libc-dlopen!"
 			exit 1
 		fi
@@ -1918,7 +1939,7 @@ _fix_shebangs() {
 _add_cross_libc_dlopen() {
 	target=$PRELOAD_DIR/cross-libc-dlopen.so
 
-	if [ "$NO_CROSS_LIBC_DLOPEN" = 1 ]; then
+	if [ "$CROSS_LIBC_DLOPEN" != 1 ]; then
 		return 0
 	fi
 
