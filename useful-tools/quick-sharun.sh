@@ -531,7 +531,7 @@ _sanity_check() {
 		_err_msg "ppc64 distributions are split between the ELFv1 and ELFv2 ABIs"
 		CROSS_LIBC_DLOPEN=0
 
-		# BE ppc64 hardare predates Vulkan, so only OpenGL needs to be deployed
+		# BE ppc64 hardware predates Vulkan, so only OpenGL needs to be deployed
 		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
 			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is not supported on ppc64"
 			_err_msg "so host libraries cannot be dlopened, drivers will be deployed instead"
