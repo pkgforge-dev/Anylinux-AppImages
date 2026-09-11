@@ -529,13 +529,16 @@ _sanity_check() {
 	if [ "$ARCH" = ppc64 ]; then
 		_err_msg "WARNING: cross-libc-dlopen is not supported on ppc64"
 		_err_msg "ppc64 distributions are split between the ELFv1 and ELFv2 ABIs"
-		_err_msg "so host libraries cannot be dlopened, drivers will be deployed instead"
 		CROSS_LIBC_DLOPEN=0
-		USE_HOST_DRIVERS_EXPERIMENTAL=0
-		# BE ppc64 hardware predates Vulkan capable GPUs, so only the
-		# OpenGL drivers need to be deployed
-		DEPLOY_OPENGL=1
-		DEPLOY_VULKAN=0
+
+		# BE ppc64 hardare predates Vulkan, so only OpenGL needs to be deployed
+		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is not supported on ppc64"
+			_err_msg "so host libraries cannot be dlopened, drivers will be deployed instead"
+			USE_HOST_DRIVERS_EXPERIMENTAL=0
+			DEPLOY_OPENGL=1
+			DEPLOY_VULKAN=0
+		fi
 	fi
 
 	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
