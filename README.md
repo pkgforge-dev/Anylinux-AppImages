@@ -84,6 +84,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Catfish](https://github.com/pkgforge-dev/Catfish-AppImage) |
 | [C-Dogs_SDL](https://github.com/pkgforge-dev/C-Dogs_SDL-AppImage) |
 | [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
+| [ChiPass](https://github.com/pkgforge-dev/ChiPass-AppImage) |
 | [Chrome](https://github.com/pkgforge-dev/Chrome-Appimage) |
 | [Cine](https://github.com/pkgforge-dev/Cine-AppImage) |
 | [Clapper](https://github.com/pkgforge-dev/Clapper-AppImage) |
@@ -269,6 +270,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Mixxx](https://github.com/pkgforge-dev/Mixxx-AppImage) |
 | [Mousai](https://github.com/pkgforge-dev/Mousai-AppImage) |
 | [mpv](https://github.com/pkgforge-dev/mpv-AppImage) |
+| [Myth II](https://github.com/pkgforge-dev/Myth-II-AppImage) |
 | [NBlood](https://github.com/pkgforge-dev/NBlood-AppImage) |
 | [NeoChat](https://github.com/pkgforge-dev/NeoChat-AppImage) |
 | [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage) |
@@ -298,6 +300,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [openMSX](https://github.com/pkgforge-dev/openMSX-AppImage) |
 | [OpenRA](https://github.com/pkgforge-dev/OpenRA-AppImage-Enhanced) |
 | [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced) |
+| [OpenSnitch](https://github.com/pkgforge-dev/OpenSnitch-AppImage) |
 | [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage) |
 | [OpenTESArena](https://github.com/pkgforge-dev/OpenTESArena-AppImage) |
 | [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage) |
@@ -334,6 +337,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [PrimeHack](https://github.com/pkgforge-dev/PrimeHack-AppImage) |
 | [PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced) |
 | [Protontricks](https://github.com/pkgforge-dev/Protontricks-AppImage) |
+| [PrusaSlicer](https://github.com/pkgforge-dev/PrusaSlicer-AppImage) |
 | [Ptyxis](https://github.com/pkgforge-dev/Ptyxis-AppImage) |
 | [puddletag](https://github.com/pkgforge-dev/puddletag-AppImage) |
 | [Pyglossary](https://github.com/pkgforge-dev/PyGlossary-AppImage) |
@@ -502,6 +506,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [QDash](https://git.crueter.xyz/QFRC/QDash) |
 | [RSS Guard](https://github.com/martinrotter/rssguard) |
 | [Stoat](https://github.com/stoatchat/for-desktop) |
+| [VSCodium](https://github.com/VSCodium/vscodium) |
 | [ZapZap](https://github.com/rafatosta/zapzap) |
 
 ---

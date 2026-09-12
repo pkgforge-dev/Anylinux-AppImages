@@ -10,11 +10,11 @@ fi
 
 set -e
 
-ARCH="$(uname -m)"
-TMPFILE="$(mktemp)"
-TMPDIR="$(mktemp -d)"
+ARCH=$(uname -m)
+TMPFILE=$(mktemp)
+TMPDIR=$(mktemp -d)
 SOURCE=${SOURCE:-https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/releases/latest}
-ERRLOG="$TMPDIR"/.errlog
+ERRLOG=$TMPDIR/.errlog
 
 COMMON_PACKAGES=${COMMON_PACKAGES:-0}
 PREFER_NANO=${PREFER_NANO:-0}
@@ -151,9 +151,12 @@ if [ -n "$GITHUB_TOKEN" ]; then
 fi
 
 case "$ARCH" in
-	x86_64)  SUFFIX='x86_64.pkg.tar.zst'       ;;
-	aarch64) SUFFIX='aarch64.pkg.tar.xz'       ;;
-	''|*)    _error "Unsupported Arch: '$ARCH'";;
+	x86_64)  SUFFIX=x86_64.pkg.tar.zst;;
+	aarch64) SUFFIX=aarch64.pkg.tar.xz;;
+	*)
+		_echo2 "Skipping '$ARCH': only x86_64 and aarch64 are supported."
+		exit 0
+		;;
 esac
 
 while :; do case "$1" in
