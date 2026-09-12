@@ -3292,6 +3292,12 @@ _deploy_datadirs() {
 			mkdir -p "$APPDIR"/share/icons
 			cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
 			_remove_empty_dirs "$APPDIR"/share/icons/hicolor
+			# meson/make install do not run the pacman hook that
+			# regenerates the cache, so the copied cache may not
+			# list icons installed after it was last generated
+			if _is_cmd gtk-update-icon-cache; then
+				gtk-update-icon-cache -f -t "$APPDIR"/share/icons/hicolor || :
+			fi
 		fi
 	fi
 }
