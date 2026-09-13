@@ -290,6 +290,20 @@ _help_msg() {
 	  DEPLOY_GLYCIN       Set to 1 to force deployment of Glycin.
 	  DEPLOY_OPENGL       Set to 1 to force deployment of OpenGL.
 	  DEPLOY_VULKAN       Set to 1 to force deployment of Vulkan.
+	  DEPLOY_VULKAN_ALL   Set to 1 to deploy ALL Vulkan drivers.
+	                        By default the nouveau and swrast (lavapipe) drivers are
+	                        NOT deployed:
+	                        - nouveau: Only works with very recent kernels, shipping it
+	                        does not guarantee it will work on most systems,
+	                        it is also experimental and has poor performance.
+	                        - swrast: Has a massive dependency on LLVM.
+	                        Both can be loaded from the host anyway since cross-libc-dlopen
+	                        is deployed by default.
+	                        NOTE: vulkan-radeon has the same new kernel requirement, but the
+	                        version we ship from archlinux-pkgs-debloated is patched to work
+	                        on older kernels. It is recommended to always ship the latest
+	                        vulkan-radeon to prevent bugs from older versions,
+	                        emulators are specially affected by this.
 	  DEPLOY_IMAGEMAGICK  Set to 1 to force deployment of ImageMagick.
 	  DEPLOY_LIBHEIF      Set to 1 to force deployment of libheif.
 	  DEPLOY_LIBPEAS      Set to 1 to force deployment of libpeas plugin loaders.
@@ -1249,9 +1263,18 @@ _make_deployment_array() {
 		fi
 		if [ "$DEPLOY_VULKAN" = 1 ]; then
 			_echo "* Deploying vulkan"
-			set -- "$@" \
-				"$LIB_DIR"/libvulkan*.so*  \
-				"$LIB_DIR"/libVkLayer*.so*
+			for l in "$LIB_DIR"/libvulkan*.so*; do
+				# skip nouveau (experimental, needs recent kernels)
+				# and swrast (pulls in LLVM), both can be loaded
+				# from the host via cross-libc-dlopen.
+				case "${l##*/}" in
+					libvulkan_nouveau.so*|libvulkan_lvp.so*)
+						[ "$DEPLOY_VULKAN_ALL" = 1 ] || continue
+						;;
+				esac
+				set -- "$@" "$l"
+			done
+			set -- "$@" "$LIB_DIR"/libVkLayer*.so*
 			ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}vulkan-check.hook"
 		fi
 	fi
@@ -1717,6 +1740,13 @@ _lib4bin_collect_strace() {
 		                                                     -e '/pipewire/d'    \
 		                                                     -e '/libspa/d'
 		)
+		# skip nouveau/swrast here unless explicitly wanted
+		if [ "$DEPLOY_VULKAN_ALL" != 1 ]; then
+			out=$(printf '%s\n' "$out" | sed \
+				-e '/libvulkan_nouveau/d' \
+				-e '/libvulkan_lvp/d'
+			)
+		fi
 		# keep driver bits on the host, pairs with cross-libc-dlopen,
 		# ldd collected libs are unaffected. Note that every
 		# unwanted lib needs its own pattern, filtering a parent does not
@@ -2709,14 +2739,12 @@ _add_vulkan_check_hook() {
 	set -e
 	# hook that checks several potential issues vulkan related
 
-	# On aarch64 device drivers are all over the place and often they ship with
+	# On non x86_64 device drivers are all over the place and often they ship with
 	# modifications not upstreamed to mesa, so we need to allow the host vulkan
 
 	_vulkan_hook_dir=${TMPDIR:-/tmp}/.vulkan-hook
 
-	if [ "$APPIMAGE_ARCH" = 'aarch64' ]; then
-	        export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
-	fi
+	[ "$APPIMAGE_ARCH" = 'x86_64' ] || export SHARUN_ALLOW_SYS_VKICD="${SHARUN_ALLOW_SYS_VKICD:-1}"
 
 	# TODO remove once sharun does this automatically
 	XDG_DATA_DIRS=${XDG_DATA_DIRS:+$XDG_DATA_DIRS:}/usr/local/share:/usr/share:/etc
@@ -4670,8 +4698,16 @@ for lib do case "$lib" in
 		dst_vulkan_dir=$APPDIR/share/vulkan/icd.d
 		if [ -d "$src_vulkan_dir" ] && [ ! -d "$dst_vulkan_dir" ]; then
 			mkdir -p "$dst_vulkan_dir"
-			cp -v "$src_vulkan_dir"/*.json "$dst_vulkan_dir"
-			sed -i -e 's|/usr/lib.*/||g' "$dst_vulkan_dir"/*.json
+			for f in "$src_vulkan_dir"/*.json; do
+				# skip nouveau/swrast here unless explicitly wanted
+				case "${f##*/}" in
+					nouveau_icd*|lvp_icd*)
+						[ "$DEPLOY_VULKAN_ALL" = 1 ] || continue
+						;;
+				esac
+				cp -v "$f" "$dst_vulkan_dir"
+			done
+			sed -i -e 's|/usr/lib.*/||g' "$dst_vulkan_dir"/*.json 2>/dev/null || :
 			_echo "* added $src_vulkan_dir"
 		fi
 		;;
