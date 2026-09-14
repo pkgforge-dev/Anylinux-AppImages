@@ -60,8 +60,8 @@ _help_msg() {
 	--add-common   Install a curated set of common packages, implies --add-mesa
 	--add-opengl   Include Mesa OpenGL package
 	--add-vulkan   Include Mesa Vulkan drivers
-	            x86_64:  vulkan-{intel,radeon,nouveau}
-	            aarch64: vulkan-{freedreno,panfrost,broadcom,asahi,radeon,nouveau}
+	            x86_64:  vulkan-{intel,radeon}
+	            aarch64: vulkan-{freedreno,panfrost,broadcom,asahi,radeon}
 	--add-mesa     Include all of mesa, implies --add-opengl and --add-vulkan
 	--prefer-nano  Prefer 'nano' variants of packages instead of 'mini'
 
@@ -244,7 +244,6 @@ if [ "$ADD_VULKAN" = 1 ]; then
 	fi
 	set -- "$@" \
 		vulkan-radeon-"$PKG_TYPE"  \
-		vulkan-nouveau-"$PKG_TYPE" \
 		vulkan-virtio-"$PKG_TYPE"
 fi
 

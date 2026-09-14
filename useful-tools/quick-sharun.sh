@@ -87,11 +87,11 @@ QUICK_SHARUN_SKIP_DEPS_FOR="
 	libqgtk3.so
 "
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.2.1/sharun+helper-libs-$APPIMAGE_ARCH.tar}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.2.2/sharun+helper-libs-$APPIMAGE_ARCH.tar}
 SHARUN_TARBALL=$TMPDIR/sharun+helper-libs-$APPIMAGE_ARCH.tar
-APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.4.2/appimagetool-$APPIMAGE_ARCH-linux}
+APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.5.1/appimagetool-full-$APPIMAGE_ARCH-linux}
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
-CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.5/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
+CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.6/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
 CROSS_LIBC_DLOPEN_TARBALL=$TMPDIR/cross-libc-dlopen-$APPIMAGE_ARCH.tar
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/download/0.3.3/onelf-$APPIMAGE_ARCH-linux}
 ONELF=${ONELF:-$TMPDIR/onelf}
@@ -100,35 +100,35 @@ ONELF=${ONELF:-$TMPDIR/onelf}
 # these need to be updated every time the download versions are bumped
 case "$APPIMAGE_ARCH" in
 	x86_64)
-		APPIMAGETOOL_SHA=f29cfe794718bad077339e4e1aa65a32635361b9bcad5c4b585b6685430b1bd8
-		SHARUN_SHA=f746f070143aba3de16c62e16d31e07ecae9d999fa6795273900b38b600675a6
+		APPIMAGETOOL_SHA=6025afd9d452360ffe84e5cc4e4e7d029a2d500b893f058de1ff396aacee1d79
+		SHARUN_SHA=9972aba5d3e05a00701eeba43e1d8229a2a66a88a94cf253e7aed01cc3c56947
 		ONELF_SHA=3a990243790c026c902330a7744e8c21b25fdc8c694a88e79d6fb25d761a6351
-		CROSS_LIBC_DLOPEN_TAR_SHA=f9f7d2b3a29e34e68a67d65e25eeb4cef009746fb6f38a9dbfb6a0cd1be50e83
+		CROSS_LIBC_DLOPEN_TAR_SHA=ba3a017077596634c09563dd89b5a7a5c2e215a00d5f266a976f536f32a3903d
 		;;
 	aarch64)
-		APPIMAGETOOL_SHA=988c44cca6060d4c6b6680e2bda445f0bddbe8596510b0ed95017da5cd045cfc
-		SHARUN_SHA=79787b450793b1678e8753d4ce8fc69298b429d93ec1b962fc42c217659c470b
+		APPIMAGETOOL_SHA=d6cd734693f597edd6349d467794818a6b812d95c445c3d612def3d055679d10
+		SHARUN_SHA=ce395ba08ad19fff4f929891c0d2205a3f8399fee020464b9643cbd38ce70cdc
 		ONELF_SHA=9b5b2c3d031756a064bd9a71a977e229cb359f324937a5ba8a28db1568bae15b
-		CROSS_LIBC_DLOPEN_TAR_SHA=1543b02adb8bb0fa5cfdfaad904f3c581f75dc70ddd5f0ff888129effd7f2655
+		CROSS_LIBC_DLOPEN_TAR_SHA=a25ad081d1d7d0181ecce0cf4af70ddaa8d6dca9999401bc5cf7a71469ea24b2
 		;;
 	riscv64)
-		APPIMAGETOOL_SHA=d6686ade4fb3c225d5b2dee9ceea01b4295676a95646d4e97eaf48fc6bdcadff
-		SHARUN_SHA=d7ea6012c51aa6c228be1eebf7751aa973b1e504adc01291621dfe9d95d3b3df
-		CROSS_LIBC_DLOPEN_TAR_SHA=05ca25a9e58ad9eee356617beeb5cafe29478ef2ddfd36a163542e8ada1b7e3b
+		APPIMAGETOOL_SHA=f5cc1a2771aa40ef4e912132831c526dff8e1f50743416c61690e43e2a9f6423
+		SHARUN_SHA=3ba0b2281350855350f1784334784276bb483dd07f428c58e17c565584a43c02
+		CROSS_LIBC_DLOPEN_TAR_SHA=05a8c47f32e36185120e57666c92f8cff651f1e93dc4f9d0d4e2f5fded460899
 		;;
 	ppc64)
-		APPIMAGETOOL_SHA=81673a75fdee6e082d6d213815a9ef37986a2009fc58f6a3dd14e53e7e166b01
-		SHARUN_SHA=f424b02d23a11a56b101f48d11949f9fe6636270dfce8daa38cdf25b599af582
+		APPIMAGETOOL_SHA=2aa6e596474761f836c0f7e8ca1a414d126a907361cc765b0e999032cc6de51c
+		SHARUN_SHA=27d639cf1b84f19fc5e5209725ad538c82edf0545683d00ef2e61f1929013795
 		;;
 	ppc64le)
-		APPIMAGETOOL_SHA=b57f6c3cd3bdd04f08c7d608396e5030793cb9854a86015e2e9a53a7a465473c
-		SHARUN_SHA=a541624a50bb0870c9b82fe1b673e9b424f62d0bed8faa6c5d820b82b18b1817
-		CROSS_LIBC_DLOPEN_TAR_SHA=54356c7a62142aedc0cf575fa06e9d9ea37963cdf80de530cab7d6235ab4e592
+		APPIMAGETOOL_SHA=e3bc516883e3e3948febf7a3a4e657778f96543c5fe465143ab601dde0565368
+		SHARUN_SHA=74c0cc7c909f3752ce060bea7d96c9b5413742df4083e5e7cbd02044c2e09b14
+		CROSS_LIBC_DLOPEN_TAR_SHA=7a186c988c1825e2422aa7a4d31cb63763256c5c734e66f854cacf14196f8458
 		;;
 	loongarch64)
-		APPIMAGETOOL_SHA=517903024c1813cce1208336bffb26f7246c99ed04397a0540169b906a811d3d
-		SHARUN_SHA=44b66394ca11b541af258103ec8f30f328b6fe4dc673fb5932ae5033bc398ea2
-		CROSS_LIBC_DLOPEN_TAR_SHA=256983c558d8add8b7167508c2fbabce6c479660e936e621b67c489ed1c2ba1a
+		APPIMAGETOOL_SHA=9fb7f22fb61490f203532740da2ff07c4fe22966792edc4da34fec208dfafca4
+		SHARUN_SHA=f325e5c51245fbe072a9e928ff65aaab19a6cbf369ec56d12f21fffaf1a55d76
+		CROSS_LIBC_DLOPEN_TAR_SHA=31ab481a27d4c87e811b409be28b9e3bf2f5c871f8534b35b81d0917e6936991
 		;;
 esac
 
@@ -290,6 +290,20 @@ _help_msg() {
 	  DEPLOY_GLYCIN       Set to 1 to force deployment of Glycin.
 	  DEPLOY_OPENGL       Set to 1 to force deployment of OpenGL.
 	  DEPLOY_VULKAN       Set to 1 to force deployment of Vulkan.
+	  DEPLOY_VULKAN_ALL   Set to 1 to deploy ALL Vulkan drivers.
+	                        By default the nouveau and swrast (lavapipe) drivers are
+	                        NOT deployed:
+	                        - nouveau: Only works with very recent kernels, shipping it
+	                        does not guarantee it will work on most systems,
+	                        it is also experimental and has poor performance.
+	                        - swrast: Has a massive dependency on LLVM.
+	                        Both can be loaded from the host anyway since cross-libc-dlopen
+	                        is deployed by default.
+	                        NOTE: vulkan-radeon has the same new kernel requirement, but the
+	                        version we ship from archlinux-pkgs-debloated is patched to work
+	                        on older kernels. It is recommended to always ship the latest
+	                        vulkan-radeon to prevent bugs from older versions,
+	                        emulators are specially affected by this.
 	  DEPLOY_IMAGEMAGICK  Set to 1 to force deployment of ImageMagick.
 	  DEPLOY_LIBHEIF      Set to 1 to force deployment of libheif.
 	  DEPLOY_LIBPEAS      Set to 1 to force deployment of libpeas plugin loaders.
@@ -1249,9 +1263,18 @@ _make_deployment_array() {
 		fi
 		if [ "$DEPLOY_VULKAN" = 1 ]; then
 			_echo "* Deploying vulkan"
-			set -- "$@" \
-				"$LIB_DIR"/libvulkan*.so*  \
-				"$LIB_DIR"/libVkLayer*.so*
+			for l in "$LIB_DIR"/libvulkan*.so*; do
+				# skip nouveau (experimental, needs recent kernels)
+				# and swrast (pulls in LLVM), both can be loaded
+				# from the host via cross-libc-dlopen.
+				case "${l##*/}" in
+					libvulkan_nouveau.so*|libvulkan_lvp.so*)
+						[ "$DEPLOY_VULKAN_ALL" = 1 ] || continue
+						;;
+				esac
+				set -- "$@" "$l"
+			done
+			set -- "$@" "$LIB_DIR"/libVkLayer*.so*
 			ADD_HOOKS="${ADD_HOOKS:+$ADD_HOOKS:}vulkan-check.hook"
 		fi
 	fi
@@ -1717,6 +1740,13 @@ _lib4bin_collect_strace() {
 		                                                     -e '/pipewire/d'    \
 		                                                     -e '/libspa/d'
 		)
+		# skip nouveau/swrast here unless explicitly wanted
+		if [ "$DEPLOY_VULKAN_ALL" != 1 ]; then
+			out=$(printf '%s\n' "$out" | sed \
+				-e '/libvulkan_nouveau/d' \
+				-e '/libvulkan_lvp/d'
+			)
+		fi
 		# keep driver bits on the host, pairs with cross-libc-dlopen,
 		# ldd collected libs are unaffected. Note that every
 		# unwanted lib needs its own pattern, filtering a parent does not
@@ -2709,14 +2739,12 @@ _add_vulkan_check_hook() {
 	set -e
 	# hook that checks several potential issues vulkan related
 
-	# On aarch64 device drivers are all over the place and often they ship with
+	# On non x86_64 device drivers are all over the place and often they ship with
 	# modifications not upstreamed to mesa, so we need to allow the host vulkan
 
 	_vulkan_hook_dir=${TMPDIR:-/tmp}/.vulkan-hook
 
-	if [ "$APPIMAGE_ARCH" = 'aarch64' ]; then
-	        export SHARUN_ALLOW_SYS_VKICD=${SHARUN_ALLOW_SYS_VKICD:-1}
-	fi
+	[ "$APPIMAGE_ARCH" = 'x86_64' ] || export SHARUN_ALLOW_SYS_VKICD="${SHARUN_ALLOW_SYS_VKICD:-1}"
 
 	# TODO remove once sharun does this automatically
 	XDG_DATA_DIRS=${XDG_DATA_DIRS:+$XDG_DATA_DIRS:}/usr/local/share:/usr/share:/etc
@@ -3292,6 +3320,12 @@ _deploy_datadirs() {
 			mkdir -p "$APPDIR"/share/icons
 			cp -r /usr/share/icons/hicolor "$APPDIR"/share/icons
 			_remove_empty_dirs "$APPDIR"/share/icons/hicolor
+			# meson/make install do not run the pacman hook that
+			# regenerates the cache, so the copied cache may not
+			# list icons installed after it was last generated
+			if _is_cmd gtk-update-icon-cache; then
+				gtk-update-icon-cache -f -t "$APPDIR"/share/icons/hicolor || :
+			fi
 		fi
 	fi
 }
@@ -3990,7 +4024,7 @@ _add_hooks_library() {
 	        set -- "INFO: $*"
 	        if   is_cmd kdialog;   then kdialog --msgbox "$*"
 	        elif is_cmd qarma;     then qarma --info --text "$*"
-	        elif is_cmd yad;       then yad --info --text "$*"
+	        elif is_cmd yad;       then yad --image=dialog-information --text "$*"
 	        elif is_cmd zenity;    then zenity --info --text "$*"
 	        elif is_cmd gxmessage; then gxmessage -center "$*"
 	        elif is_cmd xmessage;  then xmessage -center "$*"
@@ -4002,7 +4036,7 @@ _add_hooks_library() {
 	        set -- "ERROR: $*"
 	        if   is_cmd kdialog;   then kdialog --error "$*"
 	        elif is_cmd qarma;     then qarma --error --text "$*"
-	        elif is_cmd yad;       then yad --error --text "$*"
+	        elif is_cmd yad;       then yad --image=dialog-error --text "$*"
 	        elif is_cmd zenity;    then zenity --error --text "$*"
 	        elif is_cmd gxmessage; then gxmessage -center "$*"
 	        elif is_cmd xmessage;  then xmessage -center "$*"
@@ -4014,7 +4048,7 @@ _add_hooks_library() {
 	        set -- "WARNING: $*"
 	        if   is_cmd kdialog;   then kdialog --sorry "$*"
 	        elif is_cmd qarma;     then qarma --warning --text "$*"
-	        elif is_cmd yad;       then yad --warning --text "$*"
+	        elif is_cmd yad;       then yad --image=dialog-warning --text "$*"
 	        elif is_cmd zenity;    then zenity --warning --text "$*"
 	        elif is_cmd gxmessage; then gxmessage -center "$*"
 	        elif is_cmd xmessage;  then xmessage -center "$*"
@@ -4026,7 +4060,7 @@ _add_hooks_library() {
 	        set -- "QUESTION: $*"
 	        if   is_cmd kdialog;   then kdialog --yesno "$*"
 	        elif is_cmd qarma;     then qarma --question --text "$*"
-	        elif is_cmd yad;       then yad --question --text "$*"
+	        elif is_cmd yad;       then yad --image=dialog-question --button=yad-yes:0 --button=yad-no:1 --text "$*"
 	        elif is_cmd zenity;    then zenity --question --text "$*"
 	        elif is_cmd gxmessage; then gxmessage -center -buttons "Yes:0,No:1" "$*"
 	        elif is_cmd xmessage;  then xmessage -center -buttons "Yes:0,No:1" "$*"
@@ -4664,8 +4698,16 @@ for lib do case "$lib" in
 		dst_vulkan_dir=$APPDIR/share/vulkan/icd.d
 		if [ -d "$src_vulkan_dir" ] && [ ! -d "$dst_vulkan_dir" ]; then
 			mkdir -p "$dst_vulkan_dir"
-			cp -v "$src_vulkan_dir"/*.json "$dst_vulkan_dir"
-			sed -i -e 's|/usr/lib.*/||g' "$dst_vulkan_dir"/*.json
+			for f in "$src_vulkan_dir"/*.json; do
+				# skip nouveau/swrast here unless explicitly wanted
+				case "${f##*/}" in
+					nouveau_icd*|lvp_icd*)
+						[ "$DEPLOY_VULKAN_ALL" = 1 ] || continue
+						;;
+				esac
+				cp -v "$f" "$dst_vulkan_dir"
+			done
+			sed -i -e 's|/usr/lib.*/||g' "$dst_vulkan_dir"/*.json 2>/dev/null || :
 			_echo "* added $src_vulkan_dir"
 		fi
 		;;
