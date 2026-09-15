@@ -1633,7 +1633,7 @@ _lib4bin_get_lib_dst_dir() {
 	  -e 's|^/[^/]*-linux-gnu||'
 	)
 	if [ "$LIB32" = 1 ] && _is_elf64 "$1"; then
-		echo "$APPDIR/lib"/"$p"
+		echo "$APPDIR"/lib/"$p"
 	else
 		echo "$DST_LIB_DIR"/"$p"
 	fi
