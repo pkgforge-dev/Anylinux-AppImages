@@ -301,6 +301,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [openMSX](https://github.com/pkgforge-dev/openMSX-AppImage) |
 | [OpenRA](https://github.com/pkgforge-dev/OpenRA-AppImage-Enhanced) |
 | [OpenRCT2](https://github.com/pkgforge-dev/OpenRCT2-AppImage-Enhanced) |
+| [OpenSCAD](https://github.com/pkgforge-dev/OpenSCAD-AppImage) |
 | [OpenSnitch](https://github.com/pkgforge-dev/OpenSnitch-AppImage) |
 | [OpenSWE1R](https://github.com/pkgforge-dev/OpenSWE1R-AppImage) |
 | [OpenTESArena](https://github.com/pkgforge-dev/OpenTESArena-AppImage) |
