@@ -196,6 +196,12 @@ _is_elf() {
 	head -c 4 "$1" 2>/dev/null | grep -qa 'ELF'
 }
 
+# this function only gets used when deploying 32bit apps 
+# to prevent 64bit libs from landing in the wrong directory
+_is_elf64() {
+	[ "$(head -c 5 "$1" | tail -c 1)" = "$(printf '\002')" ]
+}
+
 _is_script() {
 	shebang=$(head -c 2 "$1" 2>/dev/null)
 	[ "$shebang" = '#!' ]
@@ -1626,7 +1632,11 @@ _lib4bin_get_lib_dst_dir() {
 	  -e 's|^/lib$||'    \
 	  -e 's|^/[^/]*-linux-gnu||'
 	)
-	echo "$DST_LIB_DIR"/"$p"
+	if [ "$LIB32" = 1 ] && _is_elf64 "$1"; then
+		echo "$APPDIR"/lib/"$p"
+	else
+		echo "$DST_LIB_DIR"/"$p"
+	fi
 }
 
 # collect ldd library dependencies
