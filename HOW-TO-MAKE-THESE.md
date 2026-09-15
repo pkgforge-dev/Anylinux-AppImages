@@ -30,7 +30,7 @@ title: How To Make These
 
 ## *Quick Start Guide*
 
-**TL;DR:** Use [quick-sharun.sh](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/quick-sharun.sh) to bundle your application with all its dependencies into a truly portable AppImage that works on any Linux system. Start with this [template](https://github.com/pkgforge-dev/TEMPLATE-AppImage).
+**TL;DR:** Use [quick-sharun.sh](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/quick-sharun.sh) to bundle your application with all its dependencies into a truly portable AppImage that works on any Linux system.
 
 -----------------------------------
 
@@ -75,33 +75,47 @@ That's it! The script will:
 
 ### *Step-by-step example*
 
-Let's create an AppImage for a simple application. Here's a minimal example:
+Here is a complete, minimal build script for compiling your application and packaging it into an AnyLinux AppImage:
 
 ```shell
 #!/bin/sh
 set -eux
 
 ARCH="$(uname -m)"
-SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+export ARCH
+export APPNAME="myapp"
+export OUTPATH="./dist"
+export OUTNAME="${APPNAME}-${VERSION:-1.0.0}-anylinux-${ARCH}.AppImage"
+export ADD_HOOKS="self-updater.hook:fix-namespaces.hook"
+export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*${ARCH}.AppImage.zsync"
 
-# Configure the AppImage
-export ICON=/usr/share/icons/hicolor/256x256/apps/myapp.png
-export DESKTOP=/usr/share/applications/myapp.desktop
-export OUTPATH=./dist
-export OUTNAME=myapp-"$ARCH".AppImage
+# 1. Install needed dependencies
+pacman -Syu --noconfirm base-devel wget
 
-# Install your application (example using pacman)
-pacman -Syu --noconfirm base-devel wget myapp
+# 2. Install debloated base packages (reduces AppImage size)
+if command -v get-debloated-pkgs >/dev/null 2>&1; then
+    get-debloated-pkgs --add-common --prefer-nano
+fi
 
-# Download and run quick-sharun
-wget "$SHARUN" -O ./quick-sharun
-chmod +x ./quick-sharun
+# 3. Build and install your application with prefix=/usr
+# (e.g. meson install, cmake --install, cargo install, pip install)
+meson setup build --prefix=/usr
+meson compile -C build
+meson install -C build
 
-# Bundle the application
-./quick-sharun /usr/bin/myapp
+# 4. Download quick-sharun if not already installed
+if ! command -v quick-sharun >/dev/null 2>&1; then
+    SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+    wget "$SHARUN" -O /usr/local/bin/quick-sharun
+    chmod +x /usr/local/bin/quick-sharun
+fi
 
-# Create the AppImage
-./quick-sharun --make-appimage
+# 5. Bundle dependencies and package AppImage
+quick-sharun "/usr/bin/${APPNAME}"
+quick-sharun --make-appimage
+
+# 6. Test the generated AppImage
+quick-sharun --simple-test "$OUTPATH"/*.AppImage
 ```
 
 **Using debloated packages** (smaller AppImages):
@@ -383,8 +397,14 @@ See the ready-to-use demo scripts in [`useful-tools/demo/`](https://github.com/p
 
 ### Real-world examples
 
-Browse through our production AppImage repositories for more complex examples:
+Browse through real-world projects and packages for examples of AnyLinux AppImages:
 
+- **Electron GUI**: [AM-GUI](https://github.com/Shikakiben/AM-GUI) ([build script](https://github.com/Shikakiben/AM-GUI/blob/main/scripts/make-appimage.sh))
+- **GTK4 / Libadwaita (Meson)**: [AppManager](https://github.com/kem-a/AppManager) ([build script](https://github.com/kem-a/AppManager/blob/main/scripts/make-anyimage.sh))
+- **Python CLI**: [cli-chess](https://github.com/trevorbayless/cli-chess) ([workflow](https://github.com/trevorbayless/cli-chess/blob/master/.github/workflows/appimage.yml))
+- **Complex Electron Editor**: [VSCodium](https://github.com/VSCodium/vscodium) ([build script](https://github.com/VSCodium/vscodium/blob/master/build/linux/anylinux-appimage/build.sh))
+- **Qt6 / PyQt6 WebEngine**: [ZapZap](https://github.com/rafatosta/zapzap) ([build script](https://github.com/rafatosta/zapzap/blob/main/.github/packaging/appimage/scripts/make-appimage.sh))
+- **GTK3 / C System Tool (CMake)**: [CPU-X](https://github.com/TheTumultuousUnicornOfDarkness/CPU-X) ([build script](https://github.com/TheTumultuousUnicornOfDarkness/CPU-X/blob/master/scripts/build_appimage.sh))
 - [Cromite](https://github.com/pkgforge-dev/Cromite-AppImage/blob/7e3171f1b2a6138cb27a7309c1e386435ea1fe12/cromite-appimage.sh#L38-L59) - Chromium-based browser
 - [Azahar](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/blob/d2e97d16ebce1f421187b9887767e6660ac57dcb/azahar-appimage.sh#L73-L97) - Nintendo 3DS emulator
 - [scrcpy](https://github.com/pkgforge-dev/scrcpy-AppImage/blob/97fb70cc3b2885753116f43d3f64106cae2227d1/scrcpy-appimage.sh#L11-L43) - Android screen mirroring
