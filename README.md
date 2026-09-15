@@ -441,6 +441,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage) |
 | [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage) |
 | [UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage) |
+| [Ungoogled-chromium](https://github.com/pkgforge-dev/Ungoogled-Chromium-AppImage) |
 | [Unity Hub](https://github.com/pkgforge-dev/UnityHub-AppImage) |
 | [UnleashedRecomp](https://github.com/pkgforge-dev/UnleashedRecomp-AppImage) |
 | [Unnamed SDVX clone](https://github.com/pkgforge-dev/Unnamed-SDVX-clone-AppImage) |
