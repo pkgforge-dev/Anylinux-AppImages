@@ -41,6 +41,7 @@ title: Frequently Asked Questions
   <img width="1193" height="671" alt="image" src="https://github.com/user-attachments/assets/473de2ba-f950-4e3a-9327-d741c70eda6e" />
 </details>
 
+
 # How come this only became possible in 2024?
 
 * For an application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
