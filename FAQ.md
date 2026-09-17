@@ -6,6 +6,11 @@ title: Frequently Asked Questions
 # Is it really any linux?
 
 <details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage">GIMP</a> running in Ubuntu <b>10.04</b></summary>
+  <img width="1414" height="861" alt="image" src="https://github.com/user-attachments/assets/876de873-38f0-46c6-a721-d830b1af18aa" />
+</details>
+
+<details>
   <summary>Here is <a href="https://github.com/pkgforge-dev/Cromite-AppImage">Cromite</a> running in NixOS <b>without any FHS-wrapper</b></summary>
   <img width="1096" height="671" alt="image" src="https://github.com/user-attachments/assets/a7eac601-3a00-428a-9777-c7b4cdb8a2ba" />
 </details>
@@ -35,7 +40,6 @@ title: Frequently Asked Questions
   <summary>Here is <a href="https://git.eden-emu.dev/eden-emu/eden">Eden</a> running in <b>FreeBSD</b> using Vulkan with NVIDIA via Linuxulator 👀</summary>
   <img width="1193" height="671" alt="image" src="https://github.com/user-attachments/assets/473de2ba-f950-4e3a-9327-d741c70eda6e" />
 </details>
-
 
 # How come this only became possible in 2024?
 
