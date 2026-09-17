@@ -50,7 +50,7 @@ title: Frequently Asked Questions
 **I didn't understand any of this**
 
 * You know when you have a shell script that it has shebang right? `#!/bin/sh` for example. And lets see our script is in `/usr/bin/myscript`. Well when you execute that file, you **actually just tell the kernel to execute** `/bin/sh /usr/bin/myscript`.
-* **So if we wanted to have a truly portable shell script**, we just would need to bundle our own `sh` and always execute `sh /path/to/script`. And this is true for shell scripts (with a few minor exceptions not worth mentioning heere).
+* **So if we wanted to have a truly portable shell script**, we just would need to bundle our own `sh` and always execute `sh /path/to/script`. And this is true for shell scripts (with a few minor exceptions not worth mentioning here).
 * In shell scripting there is this special parameter called `$0`, it tells you the path of the script that is being executed, remember this since it is very important.
 
 **So what's the problem with dynamic binaries?**
