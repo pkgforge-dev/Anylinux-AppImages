@@ -47,6 +47,20 @@ title: Frequently Asked Questions
 * [sharun](https://github.com/VHSgunzo/sharun) had to be made to fix the `/proc/self/exe` issues. And as far as I know, [brioche had been using the same approach before sharun as well](https://brioche.dev/blog/portable-dynamically-linked-packages-on-linux/).
 * Once all the pieces were ready, the next step was changing the way we deploy AppImages and sorting all the bugs that came with that, AppImage was originally made with the idea of relying on the host glibc and a set of libraries that always had to come from the host.
 
+**I didn't understand any of this**
+
+* You know when you have a shell script that it has shebang right? `#!/bin/sh` for example. And lets see our script is in `/usr/bin/myscript`. Well when you execute that file, you tell actually just tell the kernel to execute `/bin/sh /usr/bin/myscript`.
+* **So if we wanted to have a truly portable shell script**, we just would need to bundle our own `sh` and always execute `sh /path/to/script`. And this is true for shell scripts (with a few minor exceptions not worth mentioning heere).
+* In shell scripting there is this special parameter called `$0`, it tells you the path of the script that is being executed, remember this since it is very important.
+
+**So what's the problem with binaries?**
+
+* The equivalent of `$0` in binaries is reading `/proc/self/exe`, this is a magic symlink set by the kernel **that points to the current running process.**
+* So when a binary that was executed with the dynamic linker instad of directly (`ld-linux.so /path/to/binary`) if that binary consults `/proc/self/exe` **it will get the path to `ld-linux.so` instead of `/path/to/binary`** and manys apps will break horribly as result, some will even report `ld-linux.so` as the window class lol.
+* **This stupid problem is what has prevent true 100% binary compatiblity in linux for decades** 😹
+
+**This problem is what sharun fixes**, by using `userland-execve` and bypassing the kernel `execve`, since it is the kernel what sets `/proc/self/exe`, if we use `userland-execve` we can control where `/proc/self/exe` actually points to instead and fix this.
+
 # Why bundle glibc instead of musl?
 
 * Using musl would mean any hardware accelerated application will not work with the proprietary nvidia driver.
