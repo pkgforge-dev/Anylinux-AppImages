@@ -45,6 +45,8 @@ title: Frequently Asked Questions
 
 * Short answer: **2.6.17** (Ubuntu 6.10 era).
 
+* Anything older than 2.6.17 is not possible due to no `openat` (needed by `dwarfs`), which means we are unable to execute `sharun`.
+
 glibc on archlinux is compiled with `--enable-kernel=4.4`, that does not mean it is unable to run on kernels older than that, it will work as long as it doesn't attempt to use a syscall not present in such kernels. For example GIMP3 runs perfectly in Ubuntu 10.04 (kernel **2.6.32**) as shown above.
 
 However one problematic syscall is `statx`, which is kernel **4.11** which Qt depends on and apps will crash when missing.
