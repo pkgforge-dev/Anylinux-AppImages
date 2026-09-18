@@ -80,6 +80,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Bulky](https://github.com/pkgforge-dev/Bulky-AppImage) |
 | [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage) |
 | [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage) |
+| [Cataclysm-TLG](https://github.com/pkgforge-dev/Cataclysm-TLG-AppImage) |
 | [CatacombGL](https://github.com/pkgforge-dev/CatacombGL-AppImage) |
 | [Catfish](https://github.com/pkgforge-dev/Catfish-AppImage) |
 | [C-Dogs_SDL](https://github.com/pkgforge-dev/C-Dogs_SDL-AppImage) |
