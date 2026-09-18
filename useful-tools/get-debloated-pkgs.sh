@@ -151,8 +151,7 @@ if [ -n "$GITHUB_TOKEN" ]; then
 fi
 
 case "$ARCH" in
-	x86_64)  SUFFIX=x86_64.pkg.tar.zst;;
-	aarch64) SUFFIX=aarch64.pkg.tar.xz;;
+	x86_64|aarch64) :;;
 	*)
 		_echo2 "Skipping '$ARCH': only x86_64 and aarch64 are supported."
 		exit 0
@@ -268,11 +267,11 @@ elif [ -n "$REMOVE_PACKAGES" ]; then
 fi
 
 if ! LIST_ALL=$(_download - "$SOURCE" \
-	| sed 's/[()",{} ]/\n/g' | grep -o 'https.*pkg\.tar\.\(zst\|xz\)'); then
+	| sed 's/[()",{} ]/\n/g' | grep -o 'https.*pkg\.tar\.zst'); then
 	_error "Failed to download packages list!"
 fi
 
-LIST_ARCH=$(echo "$LIST_ALL" | grep "$SUFFIX")
+LIST_ARCH=$(echo "$LIST_ALL" | grep "$ARCH.pkg.tar.zst")
 
 for pkg do
 	if ! echo "$LIST_ARCH" | grep -m 1 "$pkg" >> "$TMPFILE"; then
@@ -317,11 +316,6 @@ else
 fi
 
 $SUDOCMD pacman -U --noconfirm --ask 4 "$TMPDIR"/*
-
-# the gdk-pixbuf2 package needs to have the loaders.cache regenerated
-if [ -f "$TMPDIR"/gdk-pixbuf2* ] && [ -x /usr/bin/gdk-pixbuf-query-loaders ]; then
-	$SUDOCMD /usr/bin/gdk-pixbuf-query-loaders --update-cache 2>/dev/null || :
-fi
 
 _echo "------------------------------------------------------------"
 _echo "                         ALL DONE!                          "

@@ -6,6 +6,11 @@ title: Frequently Asked Questions
 # Is it really any linux?
 
 <details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage">GIMP</a> running in Ubuntu <b>10.04</b></summary>
+  <img width="1414" height="861" alt="image" src="https://github.com/user-attachments/assets/876de873-38f0-46c6-a721-d830b1af18aa" />
+</details>
+
+<details>
   <summary>Here is <a href="https://github.com/pkgforge-dev/Cromite-AppImage">Cromite</a> running in NixOS <b>without any FHS-wrapper</b></summary>
   <img width="1096" height="671" alt="image" src="https://github.com/user-attachments/assets/a7eac601-3a00-428a-9777-c7b4cdb8a2ba" />
 </details>
@@ -46,6 +51,21 @@ title: Frequently Asked Questions
 * [But that runs into issues with `/proc/self/exe`](https://github.com/probonopd/go-appimage/issues/49).
 * [sharun](https://github.com/VHSgunzo/sharun) had to be made to fix the `/proc/self/exe` issues. And as far as I know, [brioche had been using the same approach before sharun as well](https://brioche.dev/blog/portable-dynamically-linked-packages-on-linux/).
 * Once all the pieces were ready, the next step was changing the way we deploy AppImages and sorting all the bugs that came with that, AppImage was originally made with the idea of relying on the host glibc and a set of libraries that always had to come from the host.
+
+**I didn't understand any of this**
+
+* You know when you have a shell script that it has shebang right? `#!/bin/sh` for example. And lets see our script is in `/usr/bin/myscript`. Well when you execute that file, you **actually just tell the kernel to execute** `/bin/sh /usr/bin/myscript`.
+* **So if we wanted to have a truly portable shell script**, we just would need to bundle our own `sh` and always execute `sh /path/to/script`. And this is true for shell scripts (with a few minor exceptions not worth mentioning here).
+* In shell scripting there is this special parameter called `$0`, it tells you the path of the script that is being executed, remember this since it is very important.
+
+**So what's the problem with dynamic binaries?**
+
+* The equivalent of `$0` in binaries is reading `/proc/self/exe`, this is a magic symlink set by the kernel **that points to the current running process.**
+* `/proc/self/exe` is **set by the kernel** when you execute a binary, **this is not something we can ask the kernel to change.**
+* So when a binary that was executed with the dynamic linker (`ld-linux.so /path/to/binary`) if that binary checks `/proc/self/exe` **it will get the path to `ld-linux.so` instead of `/path/to/binary`** and many apps **break horribly as result**, some will even report `ld-linux.so` as the window class lol.
+* **This stupid problem is what has prevented true 100% binary compatiblity in linux for decades** 😹
+
+**This problem is what sharun fixes**, by using `userland-execve` and bypassing the kernel `execve`, since it is the kernel what sets `/proc/self/exe`, if we use `userland-execve` we can control where `/proc/self/exe` actually points to instead and fix this.
 
 # Why bundle glibc instead of musl?
 
