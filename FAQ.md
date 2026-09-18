@@ -41,6 +41,15 @@ title: Frequently Asked Questions
   <img width="1193" height="671" alt="image" src="https://github.com/user-attachments/assets/473de2ba-f950-4e3a-9327-d741c70eda6e" />
 </details>
 
+# What's the minimum supported kernel version?
+
+* Short answer: **2.6.17** (Ubuntu 6.10 era).
+
+glibc on archlinux is compiled with `--enable-kernel=4.4`, that does not mean it is unable to run on kernels older than that, it will work as long as it doesn't attempt to use a syscall not present in such kernels. For example GIMP3 runs perfectly in Ubuntu 10.04 as shown above, which has kernel **2.6.32**
+
+However one problematic syscall is `statx`, which is kernel **4.11** which Qt needs and apps will crash when missing.
+
+To fix this and a several other potential issues, our fork of sharun now has a compatiblity layer for older kernels, for more details see the [Anylinux-sharun README](https://github.com/pkgforge-dev/Anylinux-sharun/blob/main/README.md#what-this-fork-adds).
 
 # How come this only became possible in 2024?
 
