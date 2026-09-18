@@ -53,6 +53,8 @@ However one problematic syscall is `statx`, which is kernel **4.11** which Qt de
 
 To fix this and a several other potential issues, our fork of sharun now has a compatiblity layer for older kernels, for more details see the [Anylinux-sharun README](https://github.com/pkgforge-dev/Anylinux-sharun/blob/main/README.md#what-this-fork-adds).
 
+<img width="880" height="696" alt="image" src="https://github.com/user-attachments/assets/78e6c7c0-40ec-4b93-b55b-360853b03181" />
+
 # How come this only became possible in 2024?
 
 * For an application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
