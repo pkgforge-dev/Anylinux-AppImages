@@ -196,7 +196,7 @@ _is_elf() {
 	head -c 4 "$1" 2>/dev/null | grep -qa 'ELF'
 }
 
-# this function only gets used when deploying 32bit apps 
+# this function only gets used when deploying 32bit apps
 # to prevent 64bit libs from landing in the wrong directory
 _is_elf64() {
 	[ "$(head -c 5 "$1" | tail -c 1)" = "$(printf '\002')" ]
@@ -4152,6 +4152,7 @@ _add_hooks_library() {
 	        elif is_cmd kitty;      then kitty      -e sh -c "$tcmd" &
 	        elif is_cmd urxvt;      then urxvt      -e sh -c "$tcmd" &
 	        elif is_cmd xterm;      then xterm      -e sh -c "$tcmd" &
+	        elif is_cmd foot;       then foot       -e sh -c "$tcmd" &
 	        # mmmm
 	        elif is_cmd gnome-terminal; then gnome-terminal -- sh -c "$tcmd" &
 	        # these need extra quotes for some reason
