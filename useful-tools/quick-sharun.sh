@@ -3852,7 +3852,7 @@ _add_apprun() {
 	# sharun needs to be the AppRun while our AppRun is named AppRun.sh, sharun will
 	# then execute AppRun.sh with whatever shell it can find on the system or AppDir
 	# this allows AppImages to work on systems without /bin/sh or /usr/bin/env
-	ln -f "$APPDIR"/sharun "$APPDIR"/AppRun
+	cp -f "$APPDIR"/sharun "$APPDIR"/AppRun
 
 	f=$APPDIR/AppRun.sh
 	if [ -f "$f" ]; then
