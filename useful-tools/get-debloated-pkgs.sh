@@ -151,9 +151,9 @@ if [ -n "$GITHUB_TOKEN" ]; then
 fi
 
 case "$ARCH" in
-	x86_64|aarch64) :;;
+	x86_64|aarch64|loongarch64|ppc64*|riscv64) :;;
 	*)
-		_echo2 "Skipping '$ARCH': only x86_64 and aarch64 are supported."
+		_echo2 "Skipping '$ARCH': only x86_64, aarch64, loongarch64, ppc64le, ppc64 and riscv64 are supported."
 		exit 0
 		;;
 esac
@@ -271,7 +271,7 @@ if ! LIST_ALL=$(_download - "$SOURCE" \
 	_error "Failed to download packages list!"
 fi
 
-LIST_ARCH=$(echo "$LIST_ALL" | grep "$ARCH.pkg.tar.zst")
+LIST_ARCH=$(echo "$LIST_ALL" | grep "$ARCH.pkg.tar.zst") || :
 
 for pkg do
 	if ! echo "$LIST_ARCH" | grep -m 1 "$pkg" >> "$TMPFILE"; then
@@ -286,6 +286,11 @@ for pkg do
 done
 
 TO_DOWNLOAD=$(sort -u "$TMPFILE")
+
+if [ -z "$TO_DOWNLOAD" ]; then
+	_echo2 "No packages available for $ARCH were requested, nothing to install."
+	exit 0
+fi
 
 _echo "------------------------------------------------------------"
 _echo "      WE ARE GOING TO INSTALL THE FOLLOWING PACKAGES        "
