@@ -5098,6 +5098,42 @@ if [ "$GNOME_GLYCIN" = 1 ]; then
 	_err_msg "------------------------------------------------------------"
 fi
 
+# check if the deployed libgallium links to libLLVM.so, which means bad news
+galliumllvmwarning="
+------------------------------------------------------------
+------------------------------------------------------------
+
+WARNING: Detected the bundled libgallium links to libLLVM.so!
+
+libgallium only needs libLLVM for llvmpipe, which is a software rasterizer that
+is basically never used, softpipe can be used instead and does not need LLVM
+and people normally have GPUs and do not any of this to begin with!!!
+
+Sou you are adding a +100 MiB library in the application for nothing!!!
+
+Even worse, you cannot simply bundle libgallium from any linux distribution
+because the radeonsi driver often needs relative new versions of the linux kernel
+to work, see: https://github.com/pkgforge-dev/Anylinux-AppImages/issues/640#issuecomment-4699732238
+
+Instead use our builds of mesa which have no LLVM dependency and work on older kernels as well
+
+* https://github.com/pkgforge-dev/archlinux-pkgs-debloated
+* https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/get-debloated-pkgs.sh
+
+------------------------------------------------------------
+------------------------------------------------------------
+"
+set -- "$DST_LIB_DIR"/libgallium*.so*
+if [ -f "$1" ]; then
+	for l do
+		if ldd "$l" | grep -q 'libLLVM'; then
+			_err_msg "$galliumllvmwarning"
+			sleep 5
+			break
+		fi
+	done
+fi
+
 echo ""
 if [ "$OUTPUT_APPIMAGE" = 1 ]; then
 	_make_appimage
