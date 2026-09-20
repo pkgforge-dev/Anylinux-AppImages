@@ -4526,6 +4526,31 @@ for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 	fi
 done
 
+# apps may crash when the host has no mime database
+_deploy_mime_db(){
+	src_mime_dir=/usr/share/mime
+	dst_mime_dir=$APPDIR/share/mime
+	_try_cp "$src_mime_dir" "$dst_mime_dir"
+
+	[ -z "$_mime_updated" ] || return 0
+	[ -d "$dst_mime_dir" ]  || return 0
+	if update-mime-database "$dst_mime_dir" 2>/dev/null; then
+		# while glib can work with just the mime.cache, this is
+		# not the case with Qt, they still end up parsing the
+		# individual .xml files. So in a system without
+		# mime database Qt apps fail to recognize file formats
+		# Keep the audio/image/video .xml for that case
+		for d in "$dst_mime_dir"/*; do
+			[ -d "$d" ] || continue
+			case "$d" in
+				*/audio|*/image|*/video) continue;;
+				*) rm -rf "$d";;
+			esac
+		done
+		_mime_updated=1
+	fi
+}
+
 # now start the post deployment hooks
 for lib do case "$lib" in
 	*/gio/modules/*.so*)
@@ -4597,30 +4622,10 @@ for lib do case "$lib" in
 		src_glib_schema_dir=/usr/share/glib-$_glibver/schemas
 		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
 		_try_cp "$src_glib_schema_dir" "$dst_glib_schema_dir"
+		_deploy_mime_db
 		;;
-	*/libQt*Core.so*|*/libglib-*.so*)
-		# apps may crash when the host has no mime database
-		src_mime_dir=/usr/share/mime
-		dst_mime_dir=$APPDIR/share/mime
-		_try_cp "$src_mime_dir" "$dst_mime_dir"
-
-		[ -z "$_mime_updated" ] || continue
-		[ -d "$dst_mime_dir" ]  || continue
-		if update-mime-database "$dst_mime_dir" 2>/dev/null; then
-			# while glib can work with just the mime.cache, this is
-			# not the case with Qt, they still end up parsing the
-			# individual .xml files. So in a system without
-			# mime database Qt apps fail to recognize file formats
-			# Keep the audio/image/video .xml for that case
-			for d in "$dst_mime_dir"/*; do
-				[ -d "$d" ] || continue
-				case "$d" in
-					*/audio|*/image|*/video) continue;;
-					*) rm -rf "$d";;
-				esac
-			done
-			_mime_updated=1
-		fi
+	*/libQt*Core.so*)
+		_deploy_mime_db
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
