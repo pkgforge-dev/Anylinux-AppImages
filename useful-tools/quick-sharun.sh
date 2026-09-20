@@ -2148,6 +2148,18 @@ _add_path_mapping_hardcoded_hook() {
 	_tmp_lib=""
 	_tmp_share=""
 
+	if [ ! -d /tmp ]; then
+	        err_msg "!!! WARNING WARNING WARNING WARNING WARNING WARNING !!!"
+	        err_msg "!!!                                                 !!!"
+	        err_msg "!!!    /tmp directory is missing in this system!    !!!"
+	        err_msg "!!!    this application needs to create symlinks    !!!"
+	        err_msg "!!!       in /tmp in order to work correctly.       !!!"
+	        err_msg "!!!                                                 !!!"
+	        err_msg "!!!      THIS APPLICATION MAY NOT WORK AT ALL!      !!!"
+	        err_msg "!!!                                                 !!!"
+	        err_msg "!!! WARNING WARNING WARNING WARNING WARNING WARNING !!!"
+	fi
+
 	if [ -n "$_tmp_bin" ]; then
 	        LC_ALL=C ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin" || :
 	fi
