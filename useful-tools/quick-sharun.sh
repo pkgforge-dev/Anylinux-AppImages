@@ -2096,21 +2096,25 @@ _add_check_ca_certs_hook() {
 	        fi
 	done
 
-	if [ -f "$c" ]; then
-	        # With p11kit we have to make a symlink in /tmp because the meme
-	        # library does not check any of these variables set by sharun:
+	if [ -f "$c" ] && [ -d "$APPDIR"/lib/pkcs11 ]; then
+	        # p11-kit-trust.so ignores the variables set by sharun:
 	        #
 	        # REQUESTS_CA_BUNDLE
 	        # CURL_CA_BUNDLE
 	        # SSL_CERT_FILE
 	        #
-	        # So we had to patch it to a path in /tmp and now symlink to the
-	        # found certificate at runtime...
-	        _host_cert=/tmp/.___host-certs/ca-certificates.crt
-	        if [ -d "$APPDIR"/lib/pkcs11 ] && [ ! -f "$_host_cert" ]; then
-	                mkdir -p /tmp/.___host-certs || :
-	                ln -sfn "$c" "$_host_cert" || :
-	        fi
+	        # so quick-sharun patches the hardcoded path to 
+	        # ~/.config/anylinux-ca/trust-anchors.pem
+	        # which p11-kit actually expands ~/.config to $XDG_CONFIG_HOME
+	        # (falling back to $HOME/.config) and we symlink to at runtime.
+	        #
+	        # This means this never creates a hardcoded ~/.config dir in the user's 
+	        # home since the library actually treats ~/.config string as a special 
+	        # token instead of as a literal path!
+	        #
+	        _host_cert=$CONFIGDIR/anylinux-ca/trust-anchors.pem
+	        mkdir -p "$CONFIGDIR"/anylinux-ca || :
+	        ln -sfn "$c" "$_host_cert" || :
 	fi
 	QS_HOOK
 	_echo "* Added $hook"
@@ -4883,16 +4887,20 @@ for lib do case "$lib" in
 		_patch_away_usr_share_dir "$lib" || :
 		;;
 	*/p11-kit-trust.so*)
-		# Because OpenSUSE had to ruin this, we will have to patch the
-		# the certificates to a path in /tmp that we will later make
-		# a symlink that points to the real host certs location
+		# p11-kit-trust.so does not check the cert env vars set by sharun
+		# and the path compiled into it may not exist on the host, so it
+		# gets patched to a path under ~/.config. p11-kit expands a leading
+		# '~/.config' using $XDG_CONFIG_HOME (falling back to $HOME/.config),
+		# which keeps the trust store per-user instead of the previous
+		# shared /tmp path that broke or could be hijacked when several
+		# users ran the same AppImage on one machine.
 
 		# Originally we just patch to etc/ssl/certs/ca-certificates.crt
 		# See https://github.com/kem-a/AppManager/issues/39
 
 		# string has to be same length
 		problem_path="/usr/share/ca-certificates/trust-source"
-		ssl_path_fix="/tmp/.___host-certs/ca-certificates.crt"
+		ssl_path_fix="~/.config/anylinux-ca/trust-anchors.pem"
 
 		if grep -Eaoq -m 1 "$ssl_path_fix" "$lib"; then
 			continue # all good nothing to fix
@@ -4904,7 +4912,7 @@ for lib do case "$lib" in
 
 		_add_check_ca_certs_hook
 
-		_echo "* fixed path to /etc/ssl/certs in $lib"
+		_echo "* fixed p11-kit-trust.so cert path to $ssl_path_fix"
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
 	*/libcrypto.so*)
