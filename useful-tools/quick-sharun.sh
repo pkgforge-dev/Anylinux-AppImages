@@ -2103,16 +2103,17 @@ _add_check_ca_certs_hook() {
 	        # CURL_CA_BUNDLE
 	        # SSL_CERT_FILE
 	        #
-	        # so quick-sharun patches the path compiled into it to a path
-	        # under ~/.config, which p11-kit expands using $XDG_CONFIG_HOME
-	        # (falling back to $HOME/.config).
+	        # so quick-sharun patches the hardcoded path to 
+	        # ~/.config/anylinux-ca/trust-anchors.pem
+	        # which p11-kit actually expands ~/.config to $XDG_CONFIG_HOME
+	        # (falling back to $HOME/.config) and we symlink to at runtime.
 	        #
-	        # This must stay per-user: the old shared /tmp path let the
-	        # first user's umask/permissions (or any other user that
-	        # created the path first) break or hijack the trust store of
-	        # everyone else running this same AppImage.
+	        # This means this never creates a hardcoded ~/.config dir in the user's 
+	        # home since the library actually treats ~/.config string as a special 
+	        # token instead of as a literal path!
+	        #
 	        _host_cert=$CONFIGDIR/anylinux-ca/trust-anchors.pem
-	        mkdir -p "$CONFIGDIR/anylinux-ca" || :
+	        mkdir -p "$CONFIGDIR"/anylinux-ca || :
 	        ln -sfn "$c" "$_host_cert" || :
 	fi
 	QS_HOOK
