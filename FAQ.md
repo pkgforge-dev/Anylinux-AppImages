@@ -31,6 +31,11 @@ title: Frequently Asked Questions
 </details>
 
 <details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/FeatherPad-AppImage">FeatherPad</a> running in <b>Ubuntu 6.10</b> 👀</summary>
+  <img width="1414" height="861" alt="image" src="https://github.com/user-attachments/assets/dd93cdde-f706-4143-b6db-c5c46f755c36" />
+</details>
+
+<details>
   <summary>Here is <code>aarch64</code> <a href="https://github.com/pkgforge-dev/Trelby-AppImage">Trelby</a> running on <b>32-bit</b> ARM debian 👀</summary>
   This is possible because this system had a 64bit kernel and CPU. <b>We barely depend on the host userland</b> besides some POSIX utils like <code>sh</code>.
   <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a76e02d2-8b8b-411c-92e0-07aa9c6c75aa" />
