@@ -46,7 +46,6 @@ title: Frequently Asked Questions
   <img width="1193" height="671" alt="image" src="https://github.com/user-attachments/assets/473de2ba-f950-4e3a-9327-d741c70eda6e" />
 </details>
 
-
 # What's the minimum supported kernel version?
 
 * Short answer: **2.6.17** (Ubuntu 6.10 era).
