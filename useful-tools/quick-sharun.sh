@@ -4897,15 +4897,9 @@ for lib do case "$lib" in
 		# Originally we just patch to etc/ssl/certs/ca-certificates.crt
 		# See https://github.com/kem-a/AppManager/issues/39
 
+		# string has to be same length
 		problem_path="/usr/share/ca-certificates/trust-source"
 		ssl_path_fix="~/.config/anylinux-ca/trust-anchors.pem"
-
-		# sed on a binary shifts every byte after the match, so the
-		# replacement has to be the exact same length as the original
-		if [ "${#problem_path}" != "${#ssl_path_fix}" ]; then
-			_err_msg "ERROR: $ssl_path_fix and $problem_path differ in length!"
-			exit 1
-		fi
 
 		if grep -Eaoq -m 1 "$ssl_path_fix" "$lib"; then
 			continue # all good nothing to fix
