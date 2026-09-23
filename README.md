@@ -314,6 +314,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OrcaSlicer](https://github.com/pkgforge-dev/OrcaSlicer-AppImage-Enhanced) |
 | [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage) |
 | [Oxicord](https://github.com/pkgforge-dev/Oxicord-AppImage) |
+| [Paperboat](https://github.com/pkgforge-dev/Paperboat-AppImage-Enhanced) |
 | [Parabolic](https://github.com/pkgforge-dev/Parabolic-AppImage) |
 | [Pattypan](https://github.com/pkgforge-dev/Pattypan-AppImage) |
 | [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage) |
