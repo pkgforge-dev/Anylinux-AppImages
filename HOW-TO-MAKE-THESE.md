@@ -119,6 +119,8 @@ chmod +x ./get-debloated-pkgs.sh
 ./get-debloated-pkgs.sh --add-common --prefer-nano ffmpeg-mini intel-media-driver-mini
 ```
 
+⚠️ `get-debloated-pkgs.sh` must run after any `pacman -S` command, otherwise `pacman` may replace the debloated packages. ⚠️
+
 -----------------------------------
 
 ### [Back to Index](#index)
