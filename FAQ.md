@@ -60,6 +60,12 @@ To fix this and a several other potential issues, our fork of sharun now has a c
 
 <img width="880" height="696" alt="image" src="https://github.com/user-attachments/assets/78e6c7c0-40ec-4b93-b55b-360853b03181" />
 
+Supporting old kernels has run into some interesting issues, for example: 
+
+* A missing syscall should return `ENOSYS` so the caller knows and can fall back if possible. Some 2.6-x kernels instead **return the syscall number itself:** `getrandom` returns `318`, `clone3` returns `435`. **This causes glibc to think the syscall works**, **while Rust's std panics with** `range start index 318 out of range for slice of length 16`. The fix is just to notice `rax == nr` and treat it as `ENOSYS`.
+
+* On 3.8.0-19 `prctl(PR_SET_NO_NEW_PRIVS)` followed by `execve` fails with `EPERM`. Yes `prctl` returns 0 and the very next `execve("/bin/sh", ...)` comes back `EPERM` lol? The fix is just probe if `execve` works, else don't use `prctl`.
+
 # How come this only became possible in 2024?
 
 * For an application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
