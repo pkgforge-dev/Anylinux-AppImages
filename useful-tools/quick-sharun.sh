@@ -2103,13 +2103,13 @@ _add_check_ca_certs_hook() {
 	        # CURL_CA_BUNDLE
 	        # SSL_CERT_FILE
 	        #
-	        # so quick-sharun patches the hardcoded path to 
+	        # so quick-sharun patches the hardcoded path to
 	        # ~/.config/anylinux-ca/trust-anchors.pem
 	        # which p11-kit actually expands ~/.config to $XDG_CONFIG_HOME
 	        # (falling back to $HOME/.config) and we symlink to at runtime.
 	        #
-	        # This means this never creates a hardcoded ~/.config dir in the user's 
-	        # home since the library actually treats ~/.config string as a special 
+	        # This means this never creates a hardcoded ~/.config dir in the user's
+	        # home since the library actually treats ~/.config string as a special
 	        # token instead of as a literal path!
 	        #
 	        _host_cert=$CONFIGDIR/anylinux-ca/trust-anchors.pem
@@ -5053,30 +5053,25 @@ fi
 # check if we have libjack.so in the AppImage, jack needs matching
 # server and client library versions to work, instead we need to use
 # pipewire-jack, which gives a libjack.so that does not have this limitation
-libjackwarning="
-------------------------------------------------------------
-------------------------------------------------------------
-
-WARNING: Detected libjack.so has been bundled in this application!
-If this app is going to connect to a jack server it is not going to work!
-jack needs matching library versions between clients and server to work!
-
-The only solution is bundling libjack.so from pipewire-jack
-package instead which does not have this issue.
-
-NOTE: This is only a problem if the application has the option to connect
-to a jack server, that is for example music players and music editing software
-libjack.so can be bundled as linked dependency of another library like
-ffmpeg and in that case this is not an issue.
-
-------------------------------------------------------------
-------------------------------------------------------------
-"
 set -- "$DST_LIB_DIR"/libjack.so*
-if [ -f "$1" ]; then
-	if ! ldd "$1" | grep -q 'libpipewire'; then
-		_err_msg "$libjackwarning"
-	fi
+if [ -f "$1" ] && ! ldd "$1" | grep -q 'libpipewire'; then
+	_err_msg "------------------------------------------------------------"
+	_err_msg "------------------------------------------------------------"
+	_err_msg ""
+	_err_msg "WARNING: Detected libjack.so has been bundled in this application!"
+	_err_msg "If this app is going to connect to a jack server it is not going to work!"
+	_err_msg "jack needs matching library versions between clients and server to work!"
+	_err_msg ""
+	_err_msg "The only solution is bundling libjack.so from pipewire-jack"
+	_err_msg "package instead which does not have this issue."
+	_err_msg ""
+	_err_msg "NOTE: This is only a problem if the application has the option to connect"
+	_err_msg "to a jack server, that is for example music players and music editing software"
+	_err_msg "libjack.so can be bundled as linked dependency of another library like"
+	_err_msg "ffmpeg and in that case this is not an issue."
+	_err_msg ""
+	_err_msg "------------------------------------------------------------"
+	_err_msg "------------------------------------------------------------"
 fi
 
 # also warn when several common qt theme plugins are missing, we only do this for qt6
@@ -5107,39 +5102,30 @@ if [ "$GNOME_GLYCIN" = 1 ]; then
 fi
 
 # check if the deployed libgallium links to libLLVM.so, which means bad news
-galliumllvmwarning="
-------------------------------------------------------------
-------------------------------------------------------------
-
-WARNING: Detected the bundled libgallium links to libLLVM.so!
-
-libgallium only needs libLLVM for llvmpipe, which is a software rasterizer that
-is basically never used, softpipe can be used instead and does not need LLVM
-and people normally have GPUs and do not any of this to begin with!!!
-
-Sou you are adding a +100 MiB library in the application for nothing!!!
-
-Even worse, you cannot simply bundle libgallium from any linux distribution
-because the radeonsi driver often needs relative new versions of the linux kernel
-to work, see: https://github.com/pkgforge-dev/Anylinux-AppImages/issues/640#issuecomment-4699732238
-
-Instead use our builds of mesa which have no LLVM dependency and work on older kernels as well
-
-* https://github.com/pkgforge-dev/archlinux-pkgs-debloated
-* https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/get-debloated-pkgs.sh
-
-------------------------------------------------------------
-------------------------------------------------------------
-"
-set -- "$DST_LIB_DIR"/libgallium*.so*
-if [ -f "$1" ]; then
-	for l do
-		if ldd "$l" | grep -q 'libLLVM'; then
-			_err_msg "$galliumllvmwarning"
-			sleep 5
-			break
-		fi
-	done
+if ldd "$DST_LIB_DIR"/libgallium*.so* 2>/dev/null | grep -q 'libLLVM'; then
+	_err_msg "------------------------------------------------------------"
+	_err_msg "------------------------------------------------------------"
+	_err_msg ""
+	_err_msg "WARNING: Detected the bundled libgallium links to libLLVM.so!"
+	_err_msg ""
+	_err_msg "libgallium only needs libLLVM for llvmpipe, which is a software rasterizer that"
+	_err_msg "is basically never used, softpipe can be used instead and does not need LLVM"
+	_err_msg "and people normally have GPUs and do not any of this to begin with!!!"
+	_err_msg ""
+	_err_msg "Sou you are adding a +100 MiB library in the application for nothing!!!"
+	_err_msg ""
+	_err_msg "Even worse, you cannot simply bundle libgallium from any linux distribution"
+	_err_msg "because the radeonsi driver often needs relative new versions of the linux kernel"
+	_err_msg "to work, see: https://github.com/pkgforge-dev/Anylinux-AppImages/issues/640#issuecomment-4699732238"
+	_err_msg ""
+	_err_msg "Instead use our builds of mesa which have no LLVM dependency and work on older kernels as well"
+	_err_msg ""
+	_err_msg "* https://github.com/pkgforge-dev/archlinux-pkgs-debloated"
+	_err_msg "* https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/get-debloated-pkgs.sh"
+	_err_msg ""
+	_err_msg "------------------------------------------------------------"
+	_err_msg "------------------------------------------------------------"
+	sleep 5
 fi
 
 echo ""
