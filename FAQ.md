@@ -6,6 +6,11 @@ title: Frequently Asked Questions
 # Is it really any linux?
 
 <details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage">GIMP</a> running in Ubuntu <b>10.04</b></summary>
+  <img width="1414" height="861" alt="image" src="https://github.com/user-attachments/assets/876de873-38f0-46c6-a721-d830b1af18aa" />
+</details>
+
+<details>
   <summary>Here is <a href="https://github.com/pkgforge-dev/Cromite-AppImage">Cromite</a> running in NixOS <b>without any FHS-wrapper</b></summary>
   <img width="1096" height="671" alt="image" src="https://github.com/user-attachments/assets/a7eac601-3a00-428a-9777-c7b4cdb8a2ba" />
 </details>
@@ -26,6 +31,11 @@ title: Frequently Asked Questions
 </details>
 
 <details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/FeatherPad-AppImage">FeatherPad</a> running in <b>Ubuntu 6.10</b> 👀</summary>
+  <img width="1414" height="861" alt="image" src="https://github.com/user-attachments/assets/dd93cdde-f706-4143-b6db-c5c46f755c36" />
+</details>
+
+<details>
   <summary>Here is <code>aarch64</code> <a href="https://github.com/pkgforge-dev/Trelby-AppImage">Trelby</a> running on <b>32-bit</b> ARM debian 👀</summary>
   This is possible because this system had a 64bit kernel and CPU. <b>We barely depend on the host userland</b> besides some POSIX utils like <code>sh</code>.
   <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a76e02d2-8b8b-411c-92e0-07aa9c6c75aa" />
@@ -36,6 +46,25 @@ title: Frequently Asked Questions
   <img width="1193" height="671" alt="image" src="https://github.com/user-attachments/assets/473de2ba-f950-4e3a-9327-d741c70eda6e" />
 </details>
 
+# What's the minimum supported kernel version?
+
+* Short answer: **2.6.17** (Ubuntu 6.10 era).
+
+* Anything older than 2.6.17 is not possible due to no `openat` (needed by `dwarfs`), which means we are unable to execute `sharun`.
+
+glibc on archlinux is compiled with `--enable-kernel=4.4`, that does not mean it is unable to run on kernels older than that, it will work as long as it doesn't attempt to use a syscall not present in such kernels. For example GIMP3 runs perfectly in Ubuntu 10.04 (kernel **2.6.32**) as shown above.
+
+However one problematic syscall is `statx`, which is kernel **4.11** which Qt depends on and apps will crash when missing.
+
+To fix this and a several other potential issues, our fork of sharun now has a compatiblity layer for older kernels, for more details see the [Anylinux-sharun README](https://github.com/pkgforge-dev/Anylinux-sharun/blob/main/README.md#what-this-fork-adds).
+
+<img width="880" height="696" alt="image" src="https://github.com/user-attachments/assets/78e6c7c0-40ec-4b93-b55b-360853b03181" />
+
+Supporting old kernels has run into some interesting issues, for example: 
+
+* A missing syscall should return `ENOSYS` so the caller knows and can fall back if possible. Some 2.6-x kernels instead **return the syscall number itself:** `getrandom` returns `318`, `clone3` returns `435`. **This causes glibc to think the syscall works**, **while Rust's std panics with** `range start index 318 out of range for slice of length 16`. The fix is just to notice `rax == nr` and treat it as `ENOSYS`.
+
+* On 3.8.0-19 `prctl(PR_SET_NO_NEW_PRIVS)` followed by `execve` fails with `EPERM`. Yes `prctl` returns 0 and the very next `execve("/bin/sh", ...)` comes back `EPERM` lol? The fix is just probe if `execve` works, else don't use `prctl`.
 
 # How come this only became possible in 2024?
 
@@ -46,6 +75,21 @@ title: Frequently Asked Questions
 * [But that runs into issues with `/proc/self/exe`](https://github.com/probonopd/go-appimage/issues/49).
 * [sharun](https://github.com/VHSgunzo/sharun) had to be made to fix the `/proc/self/exe` issues. And as far as I know, [brioche had been using the same approach before sharun as well](https://brioche.dev/blog/portable-dynamically-linked-packages-on-linux/).
 * Once all the pieces were ready, the next step was changing the way we deploy AppImages and sorting all the bugs that came with that, AppImage was originally made with the idea of relying on the host glibc and a set of libraries that always had to come from the host.
+
+**I didn't understand any of this**
+
+* You know when you have a shell script that it has shebang right? `#!/bin/sh` for example. And lets see our script is in `/usr/bin/myscript`. Well when you execute that file, you **actually just tell the kernel to execute** `/bin/sh /usr/bin/myscript`.
+* **So if we wanted to have a truly portable shell script**, we just would need to bundle our own `sh` and always execute `sh /path/to/script`. And this is true for shell scripts (with a few minor exceptions not worth mentioning here).
+* In shell scripting there is this special parameter called `$0`, it tells you the path of the script that is being executed, remember this since it is very important.
+
+**So what's the problem with dynamic binaries?**
+
+* The equivalent of `$0` in binaries is reading `/proc/self/exe`, this is a magic symlink set by the kernel **that points to the current running process.**
+* `/proc/self/exe` is **set by the kernel** when you execute a binary, **this is not something we can ask the kernel to change.**
+* So when a binary that was executed with the dynamic linker (`ld-linux.so /path/to/binary`) if that binary checks `/proc/self/exe` **it will get the path to `ld-linux.so` instead of `/path/to/binary`** and many apps **break horribly as result**, some will even report `ld-linux.so` as the window class lol.
+* **This stupid problem is what has prevented true 100% binary compatiblity in linux for decades** 😹
+
+**This problem is what sharun fixes**, by using `userland-execve` and bypassing the kernel `execve`, since it is the kernel what sets `/proc/self/exe`, if we use `userland-execve` we can control where `/proc/self/exe` actually points to instead and fix this.
 
 # Why bundle glibc instead of musl?
 

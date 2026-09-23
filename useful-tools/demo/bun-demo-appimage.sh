@@ -43,8 +43,7 @@ pacman -Syu --noconfirm \
 	ttf-dejavu       \
 	unzip            \
 	wget             \
-	xorg-server-xvfb \
-	zsync
+	xorg-server-xvfb
 
 echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"

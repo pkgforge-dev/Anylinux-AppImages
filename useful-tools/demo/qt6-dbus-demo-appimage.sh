@@ -30,8 +30,7 @@ pacman -Syu --noconfirm \
 	qt6ct            \
 	qt6-tools        \
 	wget             \
-	xorg-server-xvfb \
-	zsync
+	xorg-server-xvfb
 
 echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"

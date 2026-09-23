@@ -10,11 +10,11 @@ fi
 
 set -e
 
-ARCH="$(uname -m)"
-TMPFILE="$(mktemp)"
-TMPDIR="$(mktemp -d)"
+ARCH=$(uname -m)
+TMPFILE=$(mktemp)
+TMPDIR=$(mktemp -d)
 SOURCE=${SOURCE:-https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/releases/latest}
-ERRLOG="$TMPDIR"/.errlog
+ERRLOG=$TMPDIR/.errlog
 
 COMMON_PACKAGES=${COMMON_PACKAGES:-0}
 PREFER_NANO=${PREFER_NANO:-0}
@@ -60,8 +60,8 @@ _help_msg() {
 	--add-common   Install a curated set of common packages, implies --add-mesa
 	--add-opengl   Include Mesa OpenGL package
 	--add-vulkan   Include Mesa Vulkan drivers
-	            x86_64:  vulkan-{intel,radeon,nouveau}
-	            aarch64: vulkan-{freedreno,panfrost,broadcom,asahi,radeon,nouveau}
+	            x86_64:  vulkan-{intel,radeon}
+	            aarch64: vulkan-{freedreno,panfrost,broadcom,asahi,radeon}
 	--add-mesa     Include all of mesa, implies --add-opengl and --add-vulkan
 	--prefer-nano  Prefer 'nano' variants of packages instead of 'mini'
 
@@ -151,9 +151,11 @@ if [ -n "$GITHUB_TOKEN" ]; then
 fi
 
 case "$ARCH" in
-	x86_64)  SUFFIX='x86_64.pkg.tar.zst'       ;;
-	aarch64) SUFFIX='aarch64.pkg.tar.xz'       ;;
-	''|*)    _error "Unsupported Arch: '$ARCH'";;
+	x86_64|aarch64|loongarch64|ppc64*|riscv64) :;;
+	*)
+		_echo2 "Skipping '$ARCH': only x86_64, aarch64, loongarch64, ppc64le, ppc64 and riscv64 are supported."
+		exit 0
+		;;
 esac
 
 while :; do case "$1" in
@@ -241,7 +243,6 @@ if [ "$ADD_VULKAN" = 1 ]; then
 	fi
 	set -- "$@" \
 		vulkan-radeon-"$PKG_TYPE"  \
-		vulkan-nouveau-"$PKG_TYPE" \
 		vulkan-virtio-"$PKG_TYPE"
 fi
 
@@ -266,11 +267,11 @@ elif [ -n "$REMOVE_PACKAGES" ]; then
 fi
 
 if ! LIST_ALL=$(_download - "$SOURCE" \
-	| sed 's/[()",{} ]/\n/g' | grep -o 'https.*pkg\.tar\.\(zst\|xz\)'); then
+	| sed 's/[()",{} ]/\n/g' | grep -o 'https.*pkg\.tar\.zst'); then
 	_error "Failed to download packages list!"
 fi
 
-LIST_ARCH=$(echo "$LIST_ALL" | grep "$SUFFIX")
+LIST_ARCH=$(echo "$LIST_ALL" | grep "$ARCH.pkg.tar.zst") || :
 
 for pkg do
 	if ! echo "$LIST_ARCH" | grep -m 1 "$pkg" >> "$TMPFILE"; then
@@ -285,6 +286,11 @@ for pkg do
 done
 
 TO_DOWNLOAD=$(sort -u "$TMPFILE")
+
+if [ -z "$TO_DOWNLOAD" ]; then
+	_echo2 "No packages available for $ARCH were requested, nothing to install."
+	exit 0
+fi
 
 _echo "------------------------------------------------------------"
 _echo "      WE ARE GOING TO INSTALL THE FOLLOWING PACKAGES        "
@@ -315,11 +321,6 @@ else
 fi
 
 $SUDOCMD pacman -U --noconfirm --ask 4 "$TMPDIR"/*
-
-# the gdk-pixbuf2 package needs to have the loaders.cache regenerated
-if [ -f "$TMPDIR"/gdk-pixbuf2* ] && [ -x /usr/bin/gdk-pixbuf-query-loaders ]; then
-	$SUDOCMD /usr/bin/gdk-pixbuf-query-loaders --update-cache 2>/dev/null || :
-fi
 
 _echo "------------------------------------------------------------"
 _echo "                         ALL DONE!                          "

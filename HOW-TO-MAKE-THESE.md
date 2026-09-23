@@ -158,6 +158,7 @@ All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook
 - `STRIP=1` - Strips debug symbols to reduce size (default: enabled unless `NO_STRIP` is set)
 - `DEBLOAT_LOCALE=1` - Removes unneeded locale files to reduce size (default: enabled)
 - `QUICK_SHARUN_SKIP_DEPS_FOR` - Space/newline-separated list of library names to skip dependency deployment for (e.g., `libqgtk3.so`). By default `libqgtk3.so` is always included to avoid deploying GTK3 in Qt apps when `QT_QPA_PLATFORMTHEME=fusion` is set.
+- `SKIP_INTEGRITY_CHECKS=1` - Skips the sha256 checks of the files that `quick-sharun` downloads (`sharun`, `appimagetool`, `onelf` and `cross-libc-dlopen`). The checksums are pinned to specific release versions, so if you override any of the `SHARUN_LINK`, `APPIMAGETOOL_LINK`, `ONELF_LINK` or `CROSS_LIBC_DLOPEN_LINK` variables with artifacts that do not match the pinned `*_SHA` values, the build fails unless this is set to `1`.
 
 -----------------------------------
 
@@ -378,6 +379,7 @@ See the ready-to-use demo scripts in [`useful-tools/demo/`](https://github.com/p
 - [gtk4-demo (host drivers)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/gtk4-demo-host-drivers-appimage.sh) - GTK4 demo shipping zero gpu drivers, those get loaded from the host system at runtime via `USE_HOST_DRIVERS_EXPERIMENTAL=1`
 - [qt6-dbus-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-appimage.sh) - Qt6 application with D-Bus
 - [qt6-dbus-demo (host drivers)](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/qt6-dbus-demo-host-drivers-appimage.sh) - Qt6 demo shipping zero gpu drivers, those get loaded from the host system at runtime via `USE_HOST_DRIVERS_EXPERIMENTAL=1`
+- [xterm-demo](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/demo/xterm-demo-appimage.sh) - Bundles xterm to test that `anylinux.so` cleans the environment of the shell spawned inside the terminal
 
 ### Real-world examples
 

@@ -31,8 +31,7 @@ pacman -Syu --noconfirm \
 	fontconfig       \
 	ttf-dejavu       \
 	wget             \
-	xorg-server-xvfb \
-	zsync
+	xorg-server-xvfb
 
 echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"

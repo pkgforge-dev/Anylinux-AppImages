@@ -42,8 +42,7 @@ pacman -Syu --noconfirm \
 	vulkan-tools     \
 	wget             \
 	xcb-util-wm      \
-	xorg-server-xvfb \
-	zsync
+	xorg-server-xvfb
 
 echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
