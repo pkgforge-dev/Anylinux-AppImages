@@ -442,6 +442,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Tutanota Desktop](https://github.com/pkgforge-dev/Tutanota-Desktop-AppImage-Enhanced) |
 | [Tux Football](https://github.com/pkgforge-dev/Tux-Football-AppImage) |
 | [Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage) |
+| [Tweaks for COSMIC](https://github.com/pkgforge-dev/Tweaks-For-COSMIC-AppImage) |
 | [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage) |
 | [UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage) |
 | [Ungoogled-chromium](https://github.com/pkgforge-dev/Ungoogled-Chromium-AppImage) |
