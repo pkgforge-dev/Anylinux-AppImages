@@ -3935,6 +3935,7 @@ _add_apprun() {
 	        export LIBGL_DEBUG=verbose
 	        export EGL_LOG_LEVEL=debug
 	        export LC_ALL=C
+			export CROSS_LIBC_DLOPEN_DEBUG=1
 	        export SHARUN_PRINTENV=1
 	        "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
 	        >&2 echo "Debug log at: '$PWD/${APPIMAGE##*/}-debug.log'"
