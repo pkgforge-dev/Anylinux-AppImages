@@ -4704,6 +4704,8 @@ for lib do case "$lib" in
 		;;
 	*/libasound*.so*)
 		_try_cp /usr/share/alsa "$APPDIR"/share/alsa
+		# drop pipewire-alsa's default PCM when pipewire is not deployed
+		[ "$DEPLOY_PIPEWIRE" = 1 ] || rm -f "$APPDIR"/share/alsa/alsa.conf.d/*pipewire*.conf
 		# Adding alsa config dir is not enough, the file is harcoded
 		# to load additional files on the host
 		f=$APPDIR/share/alsa/alsa.conf
