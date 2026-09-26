@@ -1450,25 +1450,14 @@ _make_deployment_array() {
 		)
 		_fix_cpython_ldconfig_mess
 
-		# collect the native dependencies of the interpreter's own C
-		# extensions. _ssl and _hashlib pull OpenSSL and _tkinter pulls
-		# tcl/tk, which are large and only some applications need, so
-		# they are left out. the trace may still pick them up if the app
-		# loads them, but that is not guaranteed, a recipe that needs
-		# them should pass the module to quick-sharun directly.
+		# _ssl/_hashlib pull OpenSSL and _tkinter pulls tcl/tk, which are
+		# large and only some apps need, pass the module to force one
 		for f in "$d"/lib-dynload/*.so*; do
 			case "${f##*/}" in
 				_ssl.*|_hashlib.*|_tkinter.*) continue;;
 				_sqlite3.*)
-					# when libsqlite3 is built with ICU (as on
-					# debian) its closure is tens of MiB of libicu*,
-					# keep the host's libsqlite3 instead. ldd also
-					# catches transitive libicu deps
-					sqlite_lib=$(readlink -f "$LIB_DIR"/libsqlite3.so* 2>/dev/null | head -n 1)
-					if [ -n "$sqlite_lib" ] && [ -f "$sqlite_lib" ] \
-					  && ldd "$sqlite_lib" 2>/dev/null | grep -q 'libicudata\.so'; then
-						continue
-					fi
+					# skip if _sqlite3 links to libicudata
+					ldd "$f" 2>/dev/null | grep -q 'libicudata\.so' && continue
 					;;
 			esac
 			set -- "$@" "$f"
