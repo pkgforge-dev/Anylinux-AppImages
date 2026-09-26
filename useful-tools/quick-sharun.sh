@@ -1457,7 +1457,9 @@ _make_deployment_array() {
 				_ssl.*|_hashlib.*|_tkinter.*) continue;;
 				_sqlite3.*)
 					# skip if _sqlite3 links to libicudata
-					ldd "$f" 2>/dev/null | grep -q 'libicudata\.so' && continue
+					if ldd "$f" 2>/dev/null | grep -q 'libicudata\.so'; then
+						continue
+					fi
 					;;
 			esac
 			set -- "$@" "$f"
