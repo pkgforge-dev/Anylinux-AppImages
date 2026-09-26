@@ -19,7 +19,7 @@ The uruntime [automatically falls back to using namespaces](https://github.com/V
 | Traditional AppImages (made by linuxdeploy or similar tools) | **Hard dependency on glibc** (rarely works on distros older than 4 years), also has a soft dependency on **FUSE** since the user has to manually extract when FUSE is unavailable, they also need an FHS compliant system to work. |
 | Flatpak | **Hard dependency on bubblewrap and FUSE**. Must be supported by your distribution or be manually built and installed systemwide which requires elevated rights. |
 | Snap | Similar requirements to flatpak minus bubblewrap, has a **hard dependency on systemd**. |
-| **AnyLinux AppImages** (made with sharun) | Use **FUSE if available**, else **fallback to using namespaces** and if that is not possible then we automatically extract to `TMPDIR` and run with post cleanup, we **do not need an FHS filesystem** and **do not depend on the host libc**, so eh make sure you have write access to `/tmp`??? (If you can boot to a graphical session you already met those requirements). **How is this possible?** See: [How to guide](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/HOW-TO-MAKE-THESE.md) |
+| **AnyLinux AppImages** (made with sharun) | Use **FUSE if available**, else **fallback to using namespaces** and if that is not possible then we automatically extract to `TMPDIR` and run with post cleanup, we **do not need an FHS filesystem** and **do not depend on the host libc**, so eh make sure you have write access to `/tmp`??? (If you can boot to a graphical session you already met those requirements). **How is this possible?** See: [How to guide](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/HOW-TO-MAKE-THESE.md)<br><br>**The minimum supported kernel version is 2.6.17 (Ubuntu 6.10 era)**. See [FAQ](FAQ.md) for more details. |
 
 For more useful documentation about Anylinux-AppImages, see the pages below:
 
@@ -80,6 +80,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Bulky](https://github.com/pkgforge-dev/Bulky-AppImage) |
 | [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage) |
 | [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage) |
+| [Cataclysm-TLG](https://github.com/pkgforge-dev/Cataclysm-TLG-AppImage) |
 | [CatacombGL](https://github.com/pkgforge-dev/CatacombGL-AppImage) |
 | [Catfish](https://github.com/pkgforge-dev/Catfish-AppImage) |
 | [C-Dogs_SDL](https://github.com/pkgforge-dev/C-Dogs_SDL-AppImage) |
@@ -142,6 +143,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [dunst](https://github.com/pkgforge-dev/dunst-AppImage) |
 | [Dwarf Fortress](https://github.com/pkgforge-dev/Dwarf-Fortress-AppImage) |
 | [Dwarf Fortress Legacy](https://github.com/pkgforge-dev/Dwarf-Fortress-Legacy-AppImage) |
+| [EasyEffects](https://github.com/pkgforge-dev/EasyEffects-AppImage) |
 | [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage) |
 | [ECWolf](https://github.com/pkgforge-dev/ECWolf-AppImage) |
 | [EDuke32](https://github.com/pkgforge-dev/EDuke32-AppImage) |
@@ -312,6 +314,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OrcaSlicer](https://github.com/pkgforge-dev/OrcaSlicer-AppImage-Enhanced) |
 | [Oversteer](https://github.com/pkgforge-dev/Oversteer-AppImage) |
 | [Oxicord](https://github.com/pkgforge-dev/Oxicord-AppImage) |
+| [Paperboat](https://github.com/pkgforge-dev/Paperboat-AppImage-Enhanced) |
 | [Parabolic](https://github.com/pkgforge-dev/Parabolic-AppImage) |
 | [Pattypan](https://github.com/pkgforge-dev/Pattypan-AppImage) |
 | [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage) |
@@ -440,6 +443,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Tutanota Desktop](https://github.com/pkgforge-dev/Tutanota-Desktop-AppImage-Enhanced) |
 | [Tux Football](https://github.com/pkgforge-dev/Tux-Football-AppImage) |
 | [Tuxpuck](https://github.com/pkgforge-dev/Tuxpuck-AppImage) |
+| [Tweaks for COSMIC](https://github.com/pkgforge-dev/Tweaks-For-COSMIC-AppImage) |
 | [uad-ng](https://github.com/pkgforge-dev/uad-ng-AppImage) |
 | [UEFITool](https://github.com/pkgforge-dev/UEFITool-AppImage) |
 | [Ungoogled-chromium](https://github.com/pkgforge-dev/Ungoogled-Chromium-AppImage) |
@@ -459,6 +463,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
 | [VypressChat](https://github.com/pkgforge-dev/VypressChat-AppImage) |
 | [Warp](https://github.com/pkgforge-dev/Warp-AppImage) |
+| [Warpinator](https://github.com/pkgforge-dev/Warpinator-AppImage) |
 | [Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced) |
 | [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage) |
 | [WebCord](https://github.com/pkgforge-dev/WebCord-AppImage-Enhanced) |
@@ -475,6 +480,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage) |
 | [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage) |
 | [xournalpp](https://github.com/pkgforge-dev/xournalpp-AppImage-Enhanced) |
+| [Xreader](https://github.com/pkgforge-dev/Xreader-AppImage) |
 | [Xsnow](https://github.com/pkgforge-dev/Xsnow-AppImage) |
 | [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage) |
 | [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage) |

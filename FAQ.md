@@ -31,6 +31,11 @@ title: Frequently Asked Questions
 </details>
 
 <details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/FeatherPad-AppImage">FeatherPad</a> running in <b>Ubuntu 6.10</b> 👀</summary>
+  <img width="1414" height="861" alt="image" src="https://github.com/user-attachments/assets/dd93cdde-f706-4143-b6db-c5c46f755c36" />
+</details>
+
+<details>
   <summary>Here is <code>aarch64</code> <a href="https://github.com/pkgforge-dev/Trelby-AppImage">Trelby</a> running on <b>32-bit</b> ARM debian 👀</summary>
   This is possible because this system had a 64bit kernel and CPU. <b>We barely depend on the host userland</b> besides some POSIX utils like <code>sh</code>.
   <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a76e02d2-8b8b-411c-92e0-07aa9c6c75aa" />
@@ -41,6 +46,25 @@ title: Frequently Asked Questions
   <img width="1193" height="671" alt="image" src="https://github.com/user-attachments/assets/473de2ba-f950-4e3a-9327-d741c70eda6e" />
 </details>
 
+# What's the minimum supported kernel version?
+
+* Short answer: **2.6.17** (Ubuntu 6.10 era).
+
+* Anything older than 2.6.17 is not possible due to no `openat` (needed by `dwarfs`), which means we are unable to execute `sharun`.
+
+glibc on archlinux is compiled with `--enable-kernel=4.4`, that does not mean it is unable to run on kernels older than that, it will work as long as it doesn't attempt to use a syscall not present in such kernels. For example GIMP3 runs perfectly in Ubuntu 10.04 (kernel **2.6.32**) as shown above.
+
+However one problematic syscall is `statx`, which is kernel **4.11** which Qt depends on and apps will crash when missing.
+
+To fix this and a several other potential issues, our fork of sharun now has a compatiblity layer for older kernels, for more details see the [Anylinux-sharun README](https://github.com/pkgforge-dev/Anylinux-sharun/blob/main/README.md#what-this-fork-adds).
+
+<img width="880" height="696" alt="image" src="https://github.com/user-attachments/assets/78e6c7c0-40ec-4b93-b55b-360853b03181" />
+
+Supporting old kernels has run into some interesting issues, for example: 
+
+* A missing syscall should return `ENOSYS` so the caller knows and can fall back if possible. Some 2.6-x kernels instead **return the syscall number itself:** `getrandom` returns `318`, `clone3` returns `435`. **This causes glibc to think the syscall works**, **while Rust's std panics with** `range start index 318 out of range for slice of length 16`. The fix is just to notice `rax == nr` and treat it as `ENOSYS`.
+
+* On 3.8.0-19 `prctl(PR_SET_NO_NEW_PRIVS)` followed by `execve` fails with `EPERM`. Yes `prctl` returns 0 and the very next `execve("/bin/sh", ...)` comes back `EPERM` lol? The fix is just probe if `execve` works, else don't use `prctl`.
 
 # How come this only became possible in 2024?
 

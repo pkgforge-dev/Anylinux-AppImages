@@ -87,11 +87,11 @@ QUICK_SHARUN_SKIP_DEPS_FOR="
 	libqgtk3.so
 "
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.2.2/sharun+helper-libs-$APPIMAGE_ARCH.tar}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.4.1/sharun+helper-libs-$APPIMAGE_ARCH.tar}
 SHARUN_TARBALL=$TMPDIR/sharun+helper-libs-$APPIMAGE_ARCH.tar
-APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.5.1/appimagetool-full-$APPIMAGE_ARCH-linux}
+APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.5.2/appimagetool-full-$APPIMAGE_ARCH-linux}
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
-CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.6/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
+CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.7/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
 CROSS_LIBC_DLOPEN_TARBALL=$TMPDIR/cross-libc-dlopen-$APPIMAGE_ARCH.tar
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/download/0.3.3/onelf-$APPIMAGE_ARCH-linux}
 ONELF=${ONELF:-$TMPDIR/onelf}
@@ -100,35 +100,35 @@ ONELF=${ONELF:-$TMPDIR/onelf}
 # these need to be updated every time the download versions are bumped
 case "$APPIMAGE_ARCH" in
 	x86_64)
-		APPIMAGETOOL_SHA=6025afd9d452360ffe84e5cc4e4e7d029a2d500b893f058de1ff396aacee1d79
-		SHARUN_SHA=9972aba5d3e05a00701eeba43e1d8229a2a66a88a94cf253e7aed01cc3c56947
+		APPIMAGETOOL_SHA=49999e2ba854fd826aa00cb872a6b7294137d32346aec6e21be63cae49bdc854
+		SHARUN_SHA=044f014b6343886ec9d03e2064f9e5737ed4f956af9fa0c5e3d42ecb47f6fe62
 		ONELF_SHA=3a990243790c026c902330a7744e8c21b25fdc8c694a88e79d6fb25d761a6351
-		CROSS_LIBC_DLOPEN_TAR_SHA=ba3a017077596634c09563dd89b5a7a5c2e215a00d5f266a976f536f32a3903d
+		CROSS_LIBC_DLOPEN_TAR_SHA=5b4a9c799b4875e7687b9b4158105a64056031c6c8a8719cbf00fa20839c9cf3
 		;;
 	aarch64)
-		APPIMAGETOOL_SHA=d6cd734693f597edd6349d467794818a6b812d95c445c3d612def3d055679d10
-		SHARUN_SHA=ce395ba08ad19fff4f929891c0d2205a3f8399fee020464b9643cbd38ce70cdc
+		APPIMAGETOOL_SHA=f7fc30fa0aaed7e4d1652117d38b6945f2b2f02cb28e4aacf15b8300be11f0c4
+		SHARUN_SHA=335d4b99e21e834998d6adfd113394aa8901d48a078d7d31d1055952710f5931
 		ONELF_SHA=9b5b2c3d031756a064bd9a71a977e229cb359f324937a5ba8a28db1568bae15b
-		CROSS_LIBC_DLOPEN_TAR_SHA=a25ad081d1d7d0181ecce0cf4af70ddaa8d6dca9999401bc5cf7a71469ea24b2
+		CROSS_LIBC_DLOPEN_TAR_SHA=3933775b6ef92454992aab736119db08b17e994e14bf6e3b30f5206497aa82fe
 		;;
 	riscv64)
-		APPIMAGETOOL_SHA=f5cc1a2771aa40ef4e912132831c526dff8e1f50743416c61690e43e2a9f6423
-		SHARUN_SHA=3ba0b2281350855350f1784334784276bb483dd07f428c58e17c565584a43c02
-		CROSS_LIBC_DLOPEN_TAR_SHA=05a8c47f32e36185120e57666c92f8cff651f1e93dc4f9d0d4e2f5fded460899
+		APPIMAGETOOL_SHA=58c3968942e17c69cfb6ce074327d4eeee6a155eaedc20a6ced418dda2b4a1d6
+		SHARUN_SHA=45523034b97bb994d42bc3a8e4c5fb1d9363e4a0e784396c88c2811f9290fc4a
+		CROSS_LIBC_DLOPEN_TAR_SHA=2b2db022da847e3c2b4012459ffe2141769f3b1f7c44b2c73bc2200c254dc8c4
 		;;
 	ppc64)
-		APPIMAGETOOL_SHA=2aa6e596474761f836c0f7e8ca1a414d126a907361cc765b0e999032cc6de51c
-		SHARUN_SHA=27d639cf1b84f19fc5e5209725ad538c82edf0545683d00ef2e61f1929013795
+		APPIMAGETOOL_SHA=8613cb75c561eea643d0c4891cc697f440fe353909332ae64f28af3d430f3285
+		SHARUN_SHA=d75a1ec2da2dc10f4ca6fb1e08fa2da488de1d66dc3c485a190106c580d4adf8
 		;;
 	ppc64le)
-		APPIMAGETOOL_SHA=e3bc516883e3e3948febf7a3a4e657778f96543c5fe465143ab601dde0565368
-		SHARUN_SHA=74c0cc7c909f3752ce060bea7d96c9b5413742df4083e5e7cbd02044c2e09b14
-		CROSS_LIBC_DLOPEN_TAR_SHA=7a186c988c1825e2422aa7a4d31cb63763256c5c734e66f854cacf14196f8458
+		APPIMAGETOOL_SHA=9f6724de0cd555de3a8ffe233f2f4621d8f82ce3614e7f9cf7df151399fd20d7
+		SHARUN_SHA=51dd3a638b14ff31786e4046f27cb427f76d6b3b1c26291f9d7e3f91898a3e2b
+		CROSS_LIBC_DLOPEN_TAR_SHA=39df2b23af237383c0850be4dcbc2089b440dbb647f67c7ed09219afcef94555
 		;;
 	loongarch64)
-		APPIMAGETOOL_SHA=9fb7f22fb61490f203532740da2ff07c4fe22966792edc4da34fec208dfafca4
-		SHARUN_SHA=f325e5c51245fbe072a9e928ff65aaab19a6cbf369ec56d12f21fffaf1a55d76
-		CROSS_LIBC_DLOPEN_TAR_SHA=31ab481a27d4c87e811b409be28b9e3bf2f5c871f8534b35b81d0917e6936991
+		APPIMAGETOOL_SHA=ba608a2f7057be561b52ebb8bd960668ab4f772655b040f5dc3b162fa3dd00ca
+		SHARUN_SHA=c5d864248447116b49f004cda5d6b190a03e43f64ececdca37249fe243ef2a79
+		CROSS_LIBC_DLOPEN_TAR_SHA=875246a25357c913162f4db2e0f0c4e2a554e0ce5326ecd4cee9d24de8f71e40
 		;;
 esac
 
@@ -196,7 +196,7 @@ _is_elf() {
 	head -c 4 "$1" 2>/dev/null | grep -qa 'ELF'
 }
 
-# this function only gets used when deploying 32bit apps 
+# this function only gets used when deploying 32bit apps
 # to prevent 64bit libs from landing in the wrong directory
 _is_elf64() {
 	[ "$(head -c 5 "$1" | tail -c 1)" = "$(printf '\002')" ]
@@ -2096,21 +2096,25 @@ _add_check_ca_certs_hook() {
 	        fi
 	done
 
-	if [ -f "$c" ]; then
-	        # With p11kit we have to make a symlink in /tmp because the meme
-	        # library does not check any of these variables set by sharun:
+	if [ -f "$c" ] && [ -d "$APPDIR"/lib/pkcs11 ]; then
+	        # p11-kit-trust.so ignores the variables set by sharun:
 	        #
 	        # REQUESTS_CA_BUNDLE
 	        # CURL_CA_BUNDLE
 	        # SSL_CERT_FILE
 	        #
-	        # So we had to patch it to a path in /tmp and now symlink to the
-	        # found certificate at runtime...
-	        _host_cert=/tmp/.___host-certs/ca-certificates.crt
-	        if [ -d "$APPDIR"/lib/pkcs11 ] && [ ! -f "$_host_cert" ]; then
-	                mkdir -p /tmp/.___host-certs || :
-	                ln -sfn "$c" "$_host_cert" || :
-	        fi
+	        # so quick-sharun patches the hardcoded path to
+	        # ~/.config/anylinux-ca/trust-anchors.pem
+	        # which p11-kit actually expands ~/.config to $XDG_CONFIG_HOME
+	        # (falling back to $HOME/.config) and we symlink to at runtime.
+	        #
+	        # This means this never creates a hardcoded ~/.config dir in the user's
+	        # home since the library actually treats ~/.config string as a special
+	        # token instead of as a literal path!
+	        #
+	        _host_cert=$CONFIGDIR/anylinux-ca/trust-anchors.pem
+	        mkdir -p "$CONFIGDIR"/anylinux-ca || :
+	        ln -sfn "$c" "$_host_cert" || :
 	fi
 	QS_HOOK
 	_echo "* Added $hook"
@@ -2147,6 +2151,18 @@ _add_path_mapping_hardcoded_hook() {
 	_tmp_bin=""
 	_tmp_lib=""
 	_tmp_share=""
+
+	if [ ! -d /tmp ]; then
+	        err_msg "!!! WARNING WARNING WARNING WARNING WARNING WARNING !!!"
+	        err_msg "!!!                                                 !!!"
+	        err_msg "!!!    /tmp directory is missing in this system!    !!!"
+	        err_msg "!!!    this application needs to create symlinks    !!!"
+	        err_msg "!!!       in /tmp in order to work correctly.       !!!"
+	        err_msg "!!!                                                 !!!"
+	        err_msg "!!!      THIS APPLICATION MAY NOT WORK AT ALL!      !!!"
+	        err_msg "!!!                                                 !!!"
+	        err_msg "!!! WARNING WARNING WARNING WARNING WARNING WARNING !!!"
+	fi
 
 	if [ -n "$_tmp_bin" ]; then
 	        LC_ALL=C ln -sfn "$APPDIR"/bin /tmp/"$_tmp_bin" || :
@@ -3852,7 +3868,7 @@ _add_apprun() {
 	# sharun needs to be the AppRun while our AppRun is named AppRun.sh, sharun will
 	# then execute AppRun.sh with whatever shell it can find on the system or AppDir
 	# this allows AppImages to work on systems without /bin/sh or /usr/bin/env
-	ln -f "$APPDIR"/sharun "$APPDIR"/AppRun
+	cp -f "$APPDIR"/sharun "$APPDIR"/AppRun
 
 	f=$APPDIR/AppRun.sh
 	if [ -f "$f" ]; then
@@ -3919,6 +3935,7 @@ _add_apprun() {
 	        export LIBGL_DEBUG=verbose
 	        export EGL_LOG_LEVEL=debug
 	        export LC_ALL=C
+			export CROSS_LIBC_DLOPEN_DEBUG=1
 	        export SHARUN_PRINTENV=1
 	        "$@" 2>>"$PWD"/"${APPIMAGE##*/}"-debug.log || :
 	        >&2 echo "Debug log at: '$PWD/${APPIMAGE##*/}-debug.log'"
@@ -4152,6 +4169,7 @@ _add_hooks_library() {
 	        elif is_cmd kitty;      then kitty      -e sh -c "$tcmd" &
 	        elif is_cmd urxvt;      then urxvt      -e sh -c "$tcmd" &
 	        elif is_cmd xterm;      then xterm      -e sh -c "$tcmd" &
+	        elif is_cmd foot;       then foot       -e sh -c "$tcmd" &
 	        # mmmm
 	        elif is_cmd gnome-terminal; then gnome-terminal -- sh -c "$tcmd" &
 	        # these need extra quotes for some reason
@@ -4525,6 +4543,31 @@ for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 	fi
 done
 
+# apps may crash when the host has no mime database
+_deploy_mime_db(){
+	src_mime_dir=/usr/share/mime
+	dst_mime_dir=$APPDIR/share/mime
+	_try_cp "$src_mime_dir" "$dst_mime_dir"
+
+	[ -z "$_mime_updated" ] || return 0
+	[ -d "$dst_mime_dir" ]  || return 0
+	if update-mime-database "$dst_mime_dir" 2>/dev/null; then
+		# while glib can work with just the mime.cache, this is
+		# not the case with Qt, they still end up parsing the
+		# individual .xml files. So in a system without
+		# mime database Qt apps fail to recognize file formats
+		# Keep the audio/image/video .xml for that case
+		for d in "$dst_mime_dir"/*; do
+			[ -d "$d" ] || continue
+			case "$d" in
+				*/audio|*/image|*/video) continue;;
+				*) rm -rf "$d";;
+			esac
+		done
+		_mime_updated=1
+	fi
+}
+
 # now start the post deployment hooks
 for lib do case "$lib" in
 	*/gio/modules/*.so*)
@@ -4596,30 +4639,10 @@ for lib do case "$lib" in
 		src_glib_schema_dir=/usr/share/glib-$_glibver/schemas
 		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
 		_try_cp "$src_glib_schema_dir" "$dst_glib_schema_dir"
+		_deploy_mime_db
 		;;
-	*/libQt*Core.so*|*/libglib-*.so*)
-		# apps may crash when the host has no mime database
-		src_mime_dir=/usr/share/mime
-		dst_mime_dir=$APPDIR/share/mime
-		_try_cp "$src_mime_dir" "$dst_mime_dir"
-
-		[ -z "$_mime_updated" ] || continue
-		[ -d "$dst_mime_dir" ]  || continue
-		if update-mime-database "$dst_mime_dir" 2>/dev/null; then
-			# while glib can work with just the mime.cache, this is
-			# not the case with Qt, they still end up parsing the
-			# individual .xml files. So in a system without
-			# mime database Qt apps fail to recognize file formats
-			# Keep the audio/image/video .xml for that case
-			for d in "$dst_mime_dir"/*; do
-				[ -d "$d" ] || continue
-				case "$d" in
-					*/audio|*/image|*/video) continue;;
-					*) rm -rf "$d";;
-				esac
-			done
-			_mime_updated=1
-		fi
+	*/libQt*Core.so*)
+		_deploy_mime_db
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
@@ -4681,6 +4704,8 @@ for lib do case "$lib" in
 		;;
 	*/libasound*.so*)
 		_try_cp /usr/share/alsa "$APPDIR"/share/alsa
+		# drop pipewire-alsa's default PCM when pipewire is not deployed
+		[ "$DEPLOY_PIPEWIRE" = 1 ] || rm -f "$APPDIR"/share/alsa/alsa.conf.d/*pipewire*.conf
 		# Adding alsa config dir is not enough, the file is harcoded
 		# to load additional files on the host
 		f=$APPDIR/share/alsa/alsa.conf
@@ -4865,16 +4890,20 @@ for lib do case "$lib" in
 		_patch_away_usr_share_dir "$lib" || :
 		;;
 	*/p11-kit-trust.so*)
-		# Because OpenSUSE had to ruin this, we will have to patch the
-		# the certificates to a path in /tmp that we will later make
-		# a symlink that points to the real host certs location
+		# p11-kit-trust.so does not check the cert env vars set by sharun
+		# and the path compiled into it may not exist on the host, so it
+		# gets patched to a path under ~/.config. p11-kit expands a leading
+		# '~/.config' using $XDG_CONFIG_HOME (falling back to $HOME/.config),
+		# which keeps the trust store per-user instead of the previous
+		# shared /tmp path that broke or could be hijacked when several
+		# users ran the same AppImage on one machine.
 
 		# Originally we just patch to etc/ssl/certs/ca-certificates.crt
 		# See https://github.com/kem-a/AppManager/issues/39
 
 		# string has to be same length
 		problem_path="/usr/share/ca-certificates/trust-source"
-		ssl_path_fix="/tmp/.___host-certs/ca-certificates.crt"
+		ssl_path_fix="~/.config/anylinux-ca/trust-anchors.pem"
 
 		if grep -Eaoq -m 1 "$ssl_path_fix" "$lib"; then
 			continue # all good nothing to fix
@@ -4886,7 +4915,7 @@ for lib do case "$lib" in
 
 		_add_check_ca_certs_hook
 
-		_echo "* fixed path to /etc/ssl/certs in $lib"
+		_echo "* fixed p11-kit-trust.so cert path to $ssl_path_fix"
 		_patch_away_usr_share_dir "$lib" || continue
 		;;
 	*/libcrypto.so*)
@@ -5027,30 +5056,25 @@ fi
 # check if we have libjack.so in the AppImage, jack needs matching
 # server and client library versions to work, instead we need to use
 # pipewire-jack, which gives a libjack.so that does not have this limitation
-libjackwarning="
-------------------------------------------------------------
-------------------------------------------------------------
-
-WARNING: Detected libjack.so has been bundled in this application!
-If this app is going to connect to a jack server it is not going to work!
-jack needs matching library versions between clients and server to work!
-
-The only solution is bundling libjack.so from pipewire-jack
-package instead which does not have this issue.
-
-NOTE: This is only a problem if the application has the option to connect
-to a jack server, that is for example music players and music editing software
-libjack.so can be bundled as linked dependency of another library like
-ffmpeg and in that case this is not an issue.
-
-------------------------------------------------------------
-------------------------------------------------------------
-"
 set -- "$DST_LIB_DIR"/libjack.so*
-if [ -f "$1" ]; then
-	if ! ldd "$1" | grep -q 'libpipewire'; then
-		_err_msg "$libjackwarning"
-	fi
+if [ -f "$1" ] && ! ldd "$1" | grep -q 'libpipewire'; then
+	_err_msg "------------------------------------------------------------"
+	_err_msg "------------------------------------------------------------"
+	_err_msg ""
+	_err_msg "WARNING: Detected libjack.so has been bundled in this application!"
+	_err_msg "If this app is going to connect to a jack server it is not going to work!"
+	_err_msg "jack needs matching library versions between clients and server to work!"
+	_err_msg ""
+	_err_msg "The only solution is bundling libjack.so from pipewire-jack"
+	_err_msg "package instead which does not have this issue."
+	_err_msg ""
+	_err_msg "NOTE: This is only a problem if the application has the option to connect"
+	_err_msg "to a jack server, that is for example music players and music editing software"
+	_err_msg "libjack.so can be bundled as linked dependency of another library like"
+	_err_msg "ffmpeg and in that case this is not an issue."
+	_err_msg ""
+	_err_msg "------------------------------------------------------------"
+	_err_msg "------------------------------------------------------------"
 fi
 
 # also warn when several common qt theme plugins are missing, we only do this for qt6
@@ -5078,6 +5102,33 @@ if [ "$GNOME_GLYCIN" = 1 ]; then
 	_echo "* No dbus dependency"
 	_echo "https://github.com/QaidVoid/glycin-ng"
 	_err_msg "------------------------------------------------------------"
+fi
+
+# check if the deployed libgallium links to libLLVM.so, which means bad news
+if ldd "$DST_LIB_DIR"/libgallium*.so* 2>/dev/null | grep -q 'libLLVM'; then
+	_err_msg "------------------------------------------------------------"
+	_err_msg "------------------------------------------------------------"
+	_err_msg ""
+	_err_msg "WARNING: Detected the bundled libgallium links to libLLVM.so!"
+	_err_msg ""
+	_err_msg "libgallium only needs libLLVM for llvmpipe, which is a software rasterizer that"
+	_err_msg "is basically never used, softpipe can be used instead and does not need LLVM"
+	_err_msg "and people normally have GPUs and do not any of this to begin with!!!"
+	_err_msg ""
+	_err_msg "Sou you are adding a +100 MiB library in the application for nothing!!!"
+	_err_msg ""
+	_err_msg "Even worse, you cannot simply bundle libgallium from any linux distribution"
+	_err_msg "because the radeonsi driver often needs relative new versions of the linux kernel"
+	_err_msg "to work, see: https://github.com/pkgforge-dev/Anylinux-AppImages/issues/640#issuecomment-4699732238"
+	_err_msg ""
+	_err_msg "Instead use our builds of mesa which have no LLVM dependency and work on older kernels as well"
+	_err_msg ""
+	_err_msg "* https://github.com/pkgforge-dev/archlinux-pkgs-debloated"
+	_err_msg "* https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/get-debloated-pkgs.sh"
+	_err_msg ""
+	_err_msg "------------------------------------------------------------"
+	_err_msg "------------------------------------------------------------"
+	sleep 5
 fi
 
 echo ""
