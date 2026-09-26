@@ -1431,6 +1431,7 @@ _make_deployment_array() {
 			_err_msg "ERROR: Cannot find python installation in $LIB_DIR"
 			exit 1
 		fi
+
 		mkdir -p "$DST_LIB_DIR"
 		cp -r "$d" "$DST_LIB_DIR"
 		(
@@ -1445,6 +1446,25 @@ _make_deployment_array() {
 			fi
 		)
 		_fix_cpython_ldconfig_mess
+
+		# Add compiled Python C extensions to the dependency resolution list
+		_py_so_count=0
+		while IFS= read -r dst_file; do
+			[ -f "$dst_file" ] || continue
+			rel_path="${dst_file#$DST_LIB_DIR/}"
+			src_file="$LIB_DIR/$rel_path"
+			if [ -f "$src_file" ]; then
+				set -- "$@" "$src_file"
+			else
+				set -- "$@" "$dst_file"
+			fi
+			_py_so_count=$((_py_so_count + 1))
+		done <<-EOF
+		$(find "$DST_LIB_DIR"/python* -type f \( -path '*/lib-dynload/*.so*' -o -path '*/*-packages/*.so*' \) 2>/dev/null)
+		EOF
+		if [ "$_py_so_count" -gt 0 ]; then
+			_echo "* Found $_py_so_count Python C extensions for dependency collection"
+		fi
 	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Deploying gegl"
