@@ -318,7 +318,9 @@ _help_msg() {
 	  DEPLOY_GLIBC        Set to 1 to force the deployment of glibc and gconv.
 	  DEPLOY_LOCALE       Set to 1 to deploy locale data.
 	  DEPLOY_PYTHON       Set to 1 to deploy system Python. Will remove all
-	                        pycache files, set DEBLOAT_PYTHON to 0 to prevent this.
+	                        pycache files and the idlelib, pydoc_data, Tools and
+	                        turtledemo directories, set DEBLOAT_PYTHON to 0 to
+	                        prevent this.
 	  DEPLOY_P11KIT       Set to 1 to force deployment of p11-kit.
 	  DEPLOY_PIPEWIRE     Set to 1 to force deployment of Pipewire.
 	  DEPLOY_PULSE        Set to 1 to force deployment of pulseaudio.
@@ -1450,13 +1452,24 @@ _make_deployment_array() {
 
 		# collect the native dependencies of the interpreter's own C
 		# extensions. _ssl and _hashlib pull OpenSSL and _tkinter pulls
-		# tcl/tk, which are large and only some applications need, the
-		# runtime LD_DEBUG trace still deploys them when the app imports
-		# them, and a recipe can force one by passing the module to
-		# quick-sharun directly.
+		# tcl/tk, which are large and only some applications need, so
+		# they are left out. the trace may still pick them up if the app
+		# loads them, but that is not guaranteed, a recipe that needs
+		# them should pass the module to quick-sharun directly.
 		for f in "$d"/lib-dynload/*.so*; do
 			case "${f##*/}" in
 				_ssl.*|_hashlib.*|_tkinter.*) continue;;
+				_sqlite3.*)
+					# when libsqlite3 is built with ICU (as on
+					# debian) its closure is tens of MiB of libicu*,
+					# keep the host's libsqlite3 instead. ldd also
+					# catches transitive libicu deps
+					sqlite_lib=$(readlink -f "$LIB_DIR"/libsqlite3.so* 2>/dev/null | head -n 1)
+					if [ -n "$sqlite_lib" ] && [ -f "$sqlite_lib" ] \
+					  && ldd "$sqlite_lib" 2>/dev/null | grep -q 'libicudata\.so'; then
+						continue
+					fi
+					;;
 			esac
 			set -- "$@" "$f"
 		done
