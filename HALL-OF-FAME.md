@@ -88,6 +88,16 @@ This is a general failure of linux that there is no standard path to the certifi
 
 [You need to recompile the library to enable environment variables to make it relocatable.](https://github.com/p11-glue/p11-kit/issues/700) And none of the vars are documented!
 
+# Horrible - fontconfig
+
+It's cache model has beeng a total PITA **since at least 2019.** [snap hit it and couldn't pin it down](https://forum.snapcraft.io/t/snapped-app-not-loading-fonts-on-fedora-and-arch/12484), eventually they just decided to make apps [not share the cache](https://forum.snapcraft.io/t/snapped-app-not-loading-fonts-on-fedora-and-arch/12484). 
+
+We eventually hit it too [1](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/657) [2](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/58) [3](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/59), the solution we have is a hack of setting a dedicated `XDG_CACHE_HOME` for appimage because the meme library doesn't have an env variable to relocate the fontconfig cache only.
+
+After I [reported the nonsense](https://gitlab.freedesktop.org/fontconfig/fontconfig/-/work_items/538) and fontconfig "fixed it", the maintainer opened [this issue at flatpak](https://github.com/flatpak/flatpak/issues/6738) warning them about the problem. The ["fix"](https://github.com/flatpak/flatpak/issues/6738#issuecomment-5163577399) was [to make the host write backward-compatible cache symlinks](https://gitlab.freedesktop.org/fontconfig/fontconfig/-/commit/366787e49c69c1fdd66b70b4a48f8c6bae6ab036) **and that resulted in even more stuff breaking!!!** [1](https://gitlab.freedesktop.org/fontconfig/fontconfig/-/work_items/565) 🤯
+
+And good luck if you are a person that uses plasma or similar, [this bug can cause the entire session to crash if you happen to run an app that statically links a different version of fontconfig](https://issues.chromium.org/issues/565052667).
+
 # Horrible - Glibc
 
 glibc supports the `LOCPATH` env variable but this doesn't work with locale archives, This problem affects NixOS and they have to [patch](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/libraries/glibc/nix-locale-archive.patch) it so that locale-archives can be made relocatable. We also have to set `GCONV_PATH` and good luck figuring out which gconv plugin your app exactly needs, and when the plugin is missing there is no error about it, [it is just totally random what happens](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/20)
