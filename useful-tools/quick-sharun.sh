@@ -318,7 +318,9 @@ _help_msg() {
 	  DEPLOY_GLIBC        Set to 1 to force the deployment of glibc and gconv.
 	  DEPLOY_LOCALE       Set to 1 to deploy locale data.
 	  DEPLOY_PYTHON       Set to 1 to deploy system Python. Will remove all
-	                        pycache files, set DEBLOAT_PYTHON to 0 to prevent this.
+	                        pycache files and the idlelib, pydoc_data, Tools and
+	                        turtledemo directories, set DEBLOAT_PYTHON to 0 to
+	                        prevent this.
 	  DEPLOY_P11KIT       Set to 1 to force deployment of p11-kit.
 	  DEPLOY_PIPEWIRE     Set to 1 to force deployment of Pipewire.
 	  DEPLOY_PULSE        Set to 1 to force deployment of pulseaudio.
@@ -1436,6 +1438,8 @@ _make_deployment_array() {
 		(
 			if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
 				cd "$DST_LIB_DIR"/"${d##*/}"
+				# not used by applications
+				rm -rf ./idlelib ./pydoc_data ./Tools ./turtledemo
 				for f in $(find ./ -type f -name '*.pyc' -print); do
 					case "$f" in
 						*/"$MAIN_BIN"*) :;;
@@ -1445,6 +1449,21 @@ _make_deployment_array() {
 			fi
 		)
 		_fix_cpython_ldconfig_mess
+
+		# _ssl/_hashlib pull OpenSSL and _tkinter pulls tcl/tk, which are
+		# large and only some apps need, pass the module to force one
+		for f in "$d"/lib-dynload/*.so*; do
+			case "${f##*/}" in
+				_ssl.*|_hashlib.*|_tkinter.*) continue;;
+				_sqlite3.*)
+					# skip if _sqlite3 links to libicudata
+					if ldd "$f" 2>/dev/null | grep -q 'libicudata\.so'; then
+						continue
+					fi
+					;;
+			esac
+			set -- "$@" "$f"
+		done
 	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Deploying gegl"
