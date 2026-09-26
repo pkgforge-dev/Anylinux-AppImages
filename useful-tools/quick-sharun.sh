@@ -1436,6 +1436,8 @@ _make_deployment_array() {
 		(
 			if [ "$DEBLOAT_SYS_PYTHON" = 1 ]; then
 				cd "$DST_LIB_DIR"/"${d##*/}"
+				# not used by applications
+				rm -rf ./idlelib ./pydoc_data ./Tools ./turtledemo
 				for f in $(find ./ -type f -name '*.pyc' -print); do
 					case "$f" in
 						*/"$MAIN_BIN"*) :;;
@@ -1445,6 +1447,19 @@ _make_deployment_array() {
 			fi
 		)
 		_fix_cpython_ldconfig_mess
+
+		# collect the native dependencies of the interpreter's own C
+		# extensions. _ssl and _hashlib pull OpenSSL and _tkinter pulls
+		# tcl/tk, which are large and only some applications need, the
+		# runtime LD_DEBUG trace still deploys them when the app imports
+		# them, and a recipe can force one by passing the module to
+		# quick-sharun directly.
+		for f in "$d"/lib-dynload/*.so*; do
+			case "${f##*/}" in
+				_ssl.*|_hashlib.*|_tkinter.*) continue;;
+			esac
+			set -- "$@" "$f"
+		done
 	fi
 	if [ "$DEPLOY_GEGL" = 1 ]; then
 		_echo "* Deploying gegl"
