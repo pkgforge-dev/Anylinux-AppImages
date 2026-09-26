@@ -90,7 +90,7 @@ This is a general failure of linux that there is no standard path to the certifi
 
 # Horrible - fontconfig
 
-It's cache model has beeng a total PITA **since at least 2019.** [snap hit it and couldn't pin it down](https://forum.snapcraft.io/t/snapped-app-not-loading-fonts-on-fedora-and-arch), eventually they just decided to make apps [not share the cache](https://forum.snapcraft.io/t/snapped-app-not-loading-fonts-on-fedora-and-arch/12484/125). 
+It's cache model has beeng a total PITA **since at least 2019.** [snap hit it](https://forum.snapcraft.io/t/snapped-app-not-loading-fonts-on-fedora-and-arch), eventually they just decided to make apps [not share the cache](https://forum.snapcraft.io/t/snapped-app-not-loading-fonts-on-fedora-and-arch/12484/125). 
 
 We eventually hit it too [1](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/657) [2](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/58) [3](https://github.com/pkgforge-dev/Dolphin-emu-AppImage/issues/59), the solution we have is a hack of setting a dedicated `XDG_CACHE_HOME` for appimage because the meme library doesn't have an env variable to relocate the fontconfig cache only.
 
