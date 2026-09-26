@@ -463,6 +463,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
 | [VypressChat](https://github.com/pkgforge-dev/VypressChat-AppImage) |
 | [Warp](https://github.com/pkgforge-dev/Warp-AppImage) |
+| [Warpinator](https://github.com/pkgforge-dev/Warpinator-AppImage) |
 | [Webamp-Desktop](https://github.com/pkgforge-dev/Webamp-Desktop-AppImage-Enhanced) |
 | [Webcamoid](https://github.com/pkgforge-dev/Webcamoid-AppImage) |
 | [WebCord](https://github.com/pkgforge-dev/WebCord-AppImage-Enhanced) |
