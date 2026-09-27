@@ -51,7 +51,7 @@ OUTPATH=${OUTPATH:-$PWD}
 
 ANYLINUX_LIB=${ANYLINUX_LIB:-1}
 OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
-GTK_CLASS_FIX=${GTK_CLASS_FIX:-0}
+GTK_FIX_NONSENSE=${GTK_FIX_NONSENSE:-0}
 DEPLOY_DATADIR=${DEPLOY_DATADIR:-1}
 DEPLOY_LOCALE=${DEPLOY_LOCALE:-1}
 DEBLOAT_LOCALE=${DEBLOAT_LOCALE:-1}
@@ -87,7 +87,7 @@ QUICK_SHARUN_SKIP_DEPS_FOR="
 	libqgtk3.so
 "
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.4.1/sharun+helper-libs-$APPIMAGE_ARCH.tar}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.5.0/sharun+helper-libs-$APPIMAGE_ARCH.tar}
 SHARUN_TARBALL=$TMPDIR/sharun+helper-libs-$APPIMAGE_ARCH.tar
 APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.5.2/appimagetool-full-$APPIMAGE_ARCH-linux}
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
@@ -101,33 +101,33 @@ ONELF=${ONELF:-$TMPDIR/onelf}
 case "$APPIMAGE_ARCH" in
 	x86_64)
 		APPIMAGETOOL_SHA=49999e2ba854fd826aa00cb872a6b7294137d32346aec6e21be63cae49bdc854
-		SHARUN_SHA=044f014b6343886ec9d03e2064f9e5737ed4f956af9fa0c5e3d42ecb47f6fe62
+		SHARUN_SHA=a84935e91826cc38834f35eee099269ab643f97a47d3aaf5c171d87fda3d3c1f
 		ONELF_SHA=3a990243790c026c902330a7744e8c21b25fdc8c694a88e79d6fb25d761a6351
 		CROSS_LIBC_DLOPEN_TAR_SHA=5b4a9c799b4875e7687b9b4158105a64056031c6c8a8719cbf00fa20839c9cf3
 		;;
 	aarch64)
 		APPIMAGETOOL_SHA=f7fc30fa0aaed7e4d1652117d38b6945f2b2f02cb28e4aacf15b8300be11f0c4
-		SHARUN_SHA=335d4b99e21e834998d6adfd113394aa8901d48a078d7d31d1055952710f5931
+		SHARUN_SHA=71af83a5980aeb568e10479e9fe1e0f3ddcaea0be3c406015c53e83124389215
 		ONELF_SHA=9b5b2c3d031756a064bd9a71a977e229cb359f324937a5ba8a28db1568bae15b
 		CROSS_LIBC_DLOPEN_TAR_SHA=3933775b6ef92454992aab736119db08b17e994e14bf6e3b30f5206497aa82fe
 		;;
 	riscv64)
 		APPIMAGETOOL_SHA=58c3968942e17c69cfb6ce074327d4eeee6a155eaedc20a6ced418dda2b4a1d6
-		SHARUN_SHA=45523034b97bb994d42bc3a8e4c5fb1d9363e4a0e784396c88c2811f9290fc4a
+		SHARUN_SHA=6f297763580633c3bf1bd0e7a3ae76282ff8e9d6ad81a19cf344dae7190a72a1
 		CROSS_LIBC_DLOPEN_TAR_SHA=2b2db022da847e3c2b4012459ffe2141769f3b1f7c44b2c73bc2200c254dc8c4
 		;;
 	ppc64)
 		APPIMAGETOOL_SHA=8613cb75c561eea643d0c4891cc697f440fe353909332ae64f28af3d430f3285
-		SHARUN_SHA=d75a1ec2da2dc10f4ca6fb1e08fa2da488de1d66dc3c485a190106c580d4adf8
+		SHARUN_SHA=0eb9dcc81a68f645e9880ebddafc37963af5b9424c93706edac65cf73271d91a
 		;;
 	ppc64le)
 		APPIMAGETOOL_SHA=9f6724de0cd555de3a8ffe233f2f4621d8f82ce3614e7f9cf7df151399fd20d7
-		SHARUN_SHA=51dd3a638b14ff31786e4046f27cb427f76d6b3b1c26291f9d7e3f91898a3e2b
+		SHARUN_SHA=8128fa17379faff469686664cbf502d81ffdde62514b83617e0a47eef232517a
 		CROSS_LIBC_DLOPEN_TAR_SHA=39df2b23af237383c0850be4dcbc2089b440dbb647f67c7ed09219afcef94555
 		;;
 	loongarch64)
 		APPIMAGETOOL_SHA=ba608a2f7057be561b52ebb8bd960668ab4f772655b040f5dc3b162fa3dd00ca
-		SHARUN_SHA=c5d864248447116b49f004cda5d6b190a03e43f64ececdca37249fe243ef2a79
+		SHARUN_SHA=574a77bb6c4432b7ef76546ab863fbaa122116976dc0733e5ebbf315513ea352
 		CROSS_LIBC_DLOPEN_TAR_SHA=875246a25357c913162f4db2e0f0c4e2a554e0ce5326ecd4cee9d24de8f71e40
 		;;
 esac
@@ -161,6 +161,11 @@ if [ "$DEPLOY_SYS_PYTHON" = 1 ]; then
 		DEBLOAT_SYS_PYTHON=${DEBLOAT_SYS_PYTHON:-0}
 	fi
 	DEBLOAT_SYS_PYTHON=${DEBLOAT_SYS_PYTHON:-1}
+fi
+
+# GTK_CLASS_FIX is the old name of GTK_FIX_NONSENSE, kept for backwards compatibility
+if [ "$GTK_CLASS_FIX" = 1 ]; then
+	GTK_FIX_NONSENSE=1
 fi
 
 # github actions doesn't set USER and XDG_RUNTIME_DIR
@@ -1629,7 +1634,7 @@ _add_helper_libs() {
 	else rm -f "$PRELOAD_DIR"/path-mapping.so; fi
 	if [ "$GNOME_GLYCIN" = 1 ]; then _err_msg "* added glycin-fix.so for gnome glycin"
 	else rm -f "$PRELOAD_DIR"/glycin-fix.so; fi
-	if [ "$GTK_CLASS_FIX" = 1 ]; then _echo "* gtk-fix-nonsense.so successfully added!"
+	if [ "$GTK_FIX_NONSENSE" = 1 ]; then _echo "* gtk-fix-nonsense.so successfully added!"
 	else rm -f "$PRELOAD_DIR"/gtk-fix-nonsense.so; fi
 }
 
@@ -2055,11 +2060,11 @@ _add_cross_libc_dlopen() {
 	fi
 }
 
-_add_gtk_class_fix() {
-	if [ "$GTK_CLASS_FIX" != 1 ]; then
+_add_gtk_fix_nonsense() {
+	if [ "$GTK_FIX_NONSENSE" != 1 ]; then
 		return 0
 	elif [ ! -f "$DESKTOP_ENTRY" ]; then
-		_err_msg "ERROR: Using GTK_CLASS_FIX requires a desktop entry in $APPDIR"
+		_err_msg "ERROR: Using GTK_FIX_NONSENSE requires a desktop entry in $APPDIR"
 		exit 1
 	fi
 
@@ -2071,7 +2076,7 @@ _add_gtk_class_fix() {
 
 	class=$(awk -F'=| ' '/^StartupWMClass=/{print $2; exit}' "$DESKTOP_ENTRY")
 
-	# gtk-fix-nonsense.so is only deployed when GTK_CLASS_FIX is set
+	# gtk-fix-nonsense.so is only deployed when GTK_FIX_NONSENSE is set
 	# it is a passthrough unless GTK_WINDOW_CLASS is declared
 	echo "GTK_WINDOW_CLASS=$class" >> "$APPDIR"/.env
 	_echo "* gtk-fix-nonsense.so applied with GTK_WINDOW_CLASS=$class"
@@ -4507,7 +4512,7 @@ _map_paths
 _map_paths_binary_patch
 _add_cross_libc_dlopen
 _check_window_class
-_add_gtk_class_fix
+_add_gtk_fix_nonsense
 
 echo ""
 _echo "------------------------------------------------------------"
@@ -4814,16 +4819,21 @@ for lib do case "$lib" in
 		)
 		;;
 	*/libgirepository-*.so*)
-		_girver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
-		src_girepository_dir=$LIB_DIR/girepository-$_girver
-		dst_girepository_dir=$DST_LIB_DIR/girepository-$_girver
+		# libgirepository-2.0.so.0 still ships its typelibs in girepository-1.0
+		# lets still loop just in case this changes in the future
+		for d in "$LIB_DIR"/girepository-*; do
+			[ -d "$d" ] || continue
+			src_girepository_dir=$d
+			break
+		done
+		dst_girepository_dir=$DST_LIB_DIR/${src_girepository_dir##*/}
 		if [ -d "$src_girepository_dir" ] && [ ! -d "$dst_girepository_dir" ]; then
 			cp -r "$src_girepository_dir" "$dst_girepository_dir"
 			_echo "* added $src_girepository_dir"
 
 			# there might be more .typelib files around, we need to copy them
 			_typelibfiles=$(find "$LIB_DIR"/*/* -type f -name '*.typelib' 2>/dev/null \
-			  | grep -v "$src_girepository_dir" | grep girepository-"$_girver"
+			  | grep -v "$src_girepository_dir" | grep "${src_girepository_dir##*/}"
 			 ) || :
 			for f in $_typelibfiles; do
 				[ -f "$f" ] || continue

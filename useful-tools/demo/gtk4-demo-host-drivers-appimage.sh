@@ -16,7 +16,7 @@ export DESKTOP=/usr/share/applications/org.gtk.Demo4.desktop
 export OUTPATH=./dist
 export OUTNAME=gtk4-demo-host-drivers-"$ARCH".AppImage
 export STARTUPWMCLASS=fuck.gnome
-export GTK_CLASS_FIX=1
+export GTK_FIX_NONSENSE=1
 # ship zero gpu drivers, quick-sharun excludes everything the binaries
 # merely dlopen at runtime (dri plugins, gallium, vulkan layers, etc)
 # while libraries linked directly like libvulkan.so stay bundled

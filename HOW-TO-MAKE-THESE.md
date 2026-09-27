@@ -154,7 +154,7 @@ All hooks are sourced by the generated `AppRun`. Older `.bg.hook` and `.src.hook
 - `DEPLOY_PYTHON=1`   - Bundles the system Python installation (default: disabled). **needs to be set manually if needed.** You will also need to set `DEPLOY_QT`, `DEPLOY_GTK`, `DEPLOY_OPENGL`, etc. depending on the app requirements since there is no automatic detection for python scripts. See `quick-sharun --help` to know more about all the deployment options and settings.
 - `DEPLOY_LOCALE=1`   - Deploys locale files (default: enabled).
 - `ANYLINUX_LIB=1`    - Preloads library that fixes several common issues that affect AppImage (default: enabled).
-- `GTK_CLASS_FIX=1`   - Bundles a small shim that fixes the WM_CLASS for GTK apps (default: disabled).
+- `GTK_FIX_NONSENSE=1` - Bundles a small shim that fixes several problems that affect GTK applications (default: disabled).
 - `OPTIMIZE_LAUNCH=1` - Speeds up AppImage launch time using a DWARFS profile image (default: disabled). This is very similar to PGO optimizations in compilers. You often do not need to enable this, since DWARFS on its own is many times faster than SquashFS. In many cases, launch times are near-identical to those of native applications (±300 ms on a system with a 2016 CPU).
 - `STRACE_MODE=1` - Uses strace to find dynamically loaded libraries (default: enabled). To control which binaries are traced and with what flags, use `STRACE_BINARY` (space/newline-separated binary names) and `STRACE_FLAGS` instead of the old positional argument approach.
 - `STRIP=1` - Strips debug symbols to reduce size (default: enabled unless `NO_STRIP` is set)

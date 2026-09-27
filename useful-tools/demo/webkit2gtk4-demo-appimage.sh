@@ -13,7 +13,7 @@ export DESKTOP=DUMMY
 export OUTPATH=./dist
 export OUTNAME=webkit2gtk4-demo-"$ARCH".AppImage
 export MAIN_BIN=webkit2gtk4-demo
-export GTK_CLASS_FIX=1
+export GTK_FIX_NONSENSE=1
 
 pacman -Syu --noconfirm \
 	base-devel       \
