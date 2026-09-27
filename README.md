@@ -474,6 +474,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [WiVRn](https://github.com/pkgforge-dev/WiVRn-AppImage) |
 | [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced) |
 | [xclock](https://github.com/pkgforge-dev/xclock-AppImage) |
+| [xed](https://github.com/pkgforge-dev/Xed-AppImage) |
 | [xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced) |
 | [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage) |
 | [xeyes](https://github.com/pkgforge-dev/xeyes-AppImage) |
