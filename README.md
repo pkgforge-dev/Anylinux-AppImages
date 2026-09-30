@@ -293,8 +293,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [okteta](https://github.com/pkgforge-dev/okteta-AppImage) |
 | [OpenBoardView](https://github.com/pkgforge-dev/OpenBoardView-AppImage) |
 | [OpenClaw](https://github.com/pkgforge-dev/OpenClaw-AppImage) |
-| [Open CoD:UO Client](https://github.com/pkgforge-dev/opencoduo-client-AppImage) |
-| [Open CoD:UO Server](https://github.com/pkgforge-dev/opencoduo-server-AppImage) |
+| [Open CoD:UO](https://github.com/pkgforge-dev/opencoduo-AppImage) |
 | [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced) |
 | [opencode-cli](https://github.com/pkgforge-dev/opencode-cli-AppImage) |
 | [OpenGothic](https://github.com/pkgforge-dev/OpenGothic-AppImage) |
