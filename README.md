@@ -247,6 +247,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [KStars](https://github.com/pkgforge-dev/KStars-AppImage) |
 | [KTorrent](https://github.com/pkgforge-dev/KTorrent-AppImage) |
 | [KTouch](https://github.com/pkgforge-dev/KTouch-AppImage) |
+| [KytyPS5](https://github.com/pkgforge-dev/KytyPS5-AppImage) |
 | [Ladybird](https://github.com/pkgforge-dev/ladybird-appimage) |
 | [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
 | [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
