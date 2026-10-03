@@ -32,6 +32,8 @@ title: How To Make These
 
 **TL;DR:** Use [quick-sharun.sh](https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/useful-tools/quick-sharun.sh) to bundle your application with all its dependencies into a truly portable AppImage that works on any Linux system. Start with this [template](https://github.com/pkgforge-dev/TEMPLATE-AppImage).
 
+Already have a hand-made AppDir packaged with the legacy `appimagetool`? See [Migrating from legacy appimagetool](MIGRATING-FROM-APPIMAGETOOL.md).
+
 -----------------------------------
 
 ### [Back to Index](#index)

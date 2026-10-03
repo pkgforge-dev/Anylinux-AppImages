@@ -25,6 +25,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 
 - [FAQ](FAQ.md)
 - [How to make these](HOW-TO-MAKE-THESE.md)
+- [Migrating from legacy appimagetool](MIGRATING-FROM-APPIMAGETOOL.md)
 - [Hall of fame/shame](HALL-OF-FAME.md)
 - [Size comparison](disk-usage-vs-flatpak.md)
 - [Build tools and scripts](useful-tools/)
