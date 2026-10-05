@@ -750,8 +750,10 @@ _is_bun_binary() {
 	grep -aq -m 1 '__bun_' "$1"
 }
 
+# `pydata` is the ELF section PyInstaller appends its archive to, so split on
+# NUL to match the section name and not the same bytes inside a normal string
 _is_pyinstaller_binary() {
-	grep -aq -m 1 'pydata' "$1"
+	tr '\000' '\n' < "$1" | grep -qx 'pydata'
 }
 
 # .NET can come in multiple forms:
