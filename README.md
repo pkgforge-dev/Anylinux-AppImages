@@ -171,6 +171,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [freac](https://github.com/pkgforge-dev/freac-AppImage-Enhanced) |
 | [FreeTube](https://github.com/pkgforge-dev/FreeTube-Appimage-Enhanced) |
 | [Fretboard](https://github.com/pkgforge-dev/Fretboard-AppImage) |
+| [FS-UAE](https://github.com/pkgforge-dev/FS-UAE-AppImage) |
 | [Galculator](https://github.com/pkgforge-dev/Galculator-AppImage) |
 | [gamescope](https://github.com/pkgforge-dev/gamescope-AppImage) |
 | [Gapless](https://github.com/pkgforge-dev/Gapless-AppImage) |
