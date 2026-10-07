@@ -508,6 +508,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | --- |
 | [AM-GUI](https://github.com/Shikakiben/AM-GUI) |
 | [AppManager](https://github.com/kem-a/AppManager) |
+| [Carpocalypse2](https://github.com/Link4Electronics/Carpocalypse2) |
 | [Citron Neo](https://github.com/citron-neo) |
 | [cli-chess](https://github.com/trevorbayless/cli-chess/) |
 | [Converseen](https://github.com/Faster3ck/Converseen) |
