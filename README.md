@@ -330,6 +330,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [PCSX-Redux](https://github.com/pkgforge-dev/PCSX-Redux-AppImage-Enhanced) |
 | [PCSX2](https://github.com/pkgforge-dev/PCSX2-AppImage-Enhanced) |
 | [PDF Arranger](https://github.com/pkgforge-dev/PDF-Arranger-AppImage) |
+| [PdfCraft](https://github.com/pkgforge-dev/PdfCraft-AppImage) |
 | [PDF Tricks](https://github.com/pkgforge-dev/PDF-Tricks-AppImage) |
 | [Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage) |
 | [Phantom-Satellite](https://github.com/pkgforge-dev/Phantom-Satellite-AppImage) |
@@ -350,7 +351,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Powermanga](https://github.com/pkgforge-dev/Powermanga-AppImage) |
 | [Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage) |
 | [PrimeHack](https://github.com/pkgforge-dev/PrimeHack-AppImage) |
-| [PrintCraft](https://github.com/pkgforge-dev/PrintCraft-AppImage) |
 | [PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced) |
 | [Protontricks](https://github.com/pkgforge-dev/Protontricks-AppImage) |
 | [PrusaSlicer](https://github.com/pkgforge-dev/PrusaSlicer-AppImage) |
