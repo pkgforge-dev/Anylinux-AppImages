@@ -120,6 +120,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Deepin Calculator](https://github.com/pkgforge-dev/Deepin-Calculator-AppImage) |
 | [Defold](https://github.com/pkgforge-dev/Defold-AppImage) |
 | [Denise](https://github.com/pkgforge-dev/Denise-AppImage) |
+| [DesignCraft](https://github.com/pkgforge-dev/DesignCraft-AppImage) |
 | [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage) |
 | [dethrace](https://github.com/pkgforge-dev/dethrace-AppImage) |
 | [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced) |
@@ -147,6 +148,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [EasyTAG](https://github.com/pkgforge-dev/EasyTAG-AppImage) |
 | [ECWolf](https://github.com/pkgforge-dev/ECWolf-AppImage) |
 | [EDuke32](https://github.com/pkgforge-dev/EDuke32-AppImage) |
+| [EffectCraft](https://github.com/pkgforge-dev/EffectCraft-AppImage) |
 | [Elastic](https://github.com/pkgforge-dev/Elastic-AppImage) |
 | [Element Desktop](https://github.com/pkgforge-dev/Element-Desktop-AppImage) |
 | [ePSXe](https://github.com/pkgforge-dev/ePSXe-AppImage) |
@@ -160,6 +162,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [FeatherPad](https://github.com/pkgforge-dev/FeatherPad-AppImage) |
 | [FFmpeg](https://github.com/pkgforge-dev/FFmpeg-AppImage) |
 | [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage) |
+| [FilmCraft](https://github.com/pkgforge-dev/FilmCraft-AppImage) |
 | [Firefox](https://github.com/pkgforge-dev/Firefox-AppImage) |
 | [Flacon](https://github.com/pkgforge-dev/Flacon-AppImage-Enhanced) |
 | [Flashrom](https://github.com/pkgforge-dev/Flashrom-AppImage) |
@@ -253,6 +256,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Libation](https://github.com/pkgforge-dev/Libation-AppImage) |
 | [LibreCAD](https://github.com/pkgforge-dev/LibreCAD-AppImage) |
 | [LibreWolf](https://github.com/pkgforge-dev/LibreWolf-AppImage-Enhanced) |
+| [LightCraft](https://github.com/pkgforge-dev/LightCraft-AppImage) |
 | [Lighthouse](https://github.com/pkgforge-dev/Lighthouse-AppImage-Enhanced) |
 | [LightZone](https://github.com/pkgforge-dev/LightZone-AppImage) |
 | [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage) |
@@ -330,6 +334,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Perfect Dark](https://github.com/pkgforge-dev/Perfect-Dark-AppImage) |
 | [Phantom-Satellite](https://github.com/pkgforge-dev/Phantom-Satellite-AppImage) |
 | [phoenix-x-server](https://github.com/pkgforge-dev/phoenix-x-server-AppImage) |
+| [PhotoCraft](https://github.com/pkgforge-dev/PhotoCraft-AppImage) |
 | [Piglit](https://github.com/pkgforge-dev/Piglit-AppImage) |
 | [Pinta](https://github.com/pkgforge-dev/Pinta-AppImage) |
 | [Pinta-GTK3](https://github.com/pkgforge-dev/Pinta-GTK3-AppImage) |
@@ -345,6 +350,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Powermanga](https://github.com/pkgforge-dev/Powermanga-AppImage) |
 | [Prey2006](https://github.com/pkgforge-dev/Prey2006-AppImage) |
 | [PrimeHack](https://github.com/pkgforge-dev/PrimeHack-AppImage) |
+| [PrintCraft](https://github.com/pkgforge-dev/PrintCraft-AppImage) |
 | [PrismLauncher](https://github.com/pkgforge-dev/PrismLauncher-AppImage-Enhanced) |
 | [Protontricks](https://github.com/pkgforge-dev/Protontricks-AppImage) |
 | [PrusaSlicer](https://github.com/pkgforge-dev/PrusaSlicer-AppImage) |
@@ -458,6 +464,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Unnamed SDVX clone](https://github.com/pkgforge-dev/Unnamed-SDVX-clone-AppImage) |
 | [Varia](https://github.com/pkgforge-dev/Varia-AppImage) |
 | [vcmi](https://github.com/pkgforge-dev/vcmi-AppImage) |
+| [VectorCraft](https://github.com/pkgforge-dev/VectorCraft-AppImage) |
 | [VeraCrypt](https://github.com/pkgforge-dev/VeraCrypt-AppImage) |
 | [Vibeprint Studio](https://github.com/pkgforge-dev/Vibeprint-Studio-AppImage) |
 | [Viber](https://github.com/pkgforge-dev/Viber-AppImage-Enhanced) |
