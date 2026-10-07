@@ -493,6 +493,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Yamagi Quake II](https://github.com/pkgforge-dev/Yamagi-Quake-II-AppImage) |
 | [Ymir](https://github.com/pkgforge-dev/Ymir-AppImage) |
 | [yt-dlp](https://github.com/pkgforge-dev/yt-dlp-AppImage) |
+| [Zathura](https://github.com/pkgforge-dev/Zathura-AppImage) |
 | [Zed](https://github.com/pkgforge-dev/Zed-AppImage) |
 | [Zelda64Recomp](https://github.com/pkgforge-dev/Zelda64Recomp-AppImage) |
 | [Zen Browser](https://github.com/pkgforge-dev/Zen-Browser-AppImage-Enhanced) |
@@ -509,6 +510,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | --- |
 | [AM-GUI](https://github.com/Shikakiben/AM-GUI) |
 | [AppManager](https://github.com/kem-a/AppManager) |
+| [Carpocalypse2](https://github.com/Link4Electronics/Carpocalypse2) |
 | [Citron Neo](https://github.com/citron-neo) |
 | [cli-chess](https://github.com/trevorbayless/cli-chess/) |
 | [Converseen](https://github.com/Faster3ck/Converseen) |
