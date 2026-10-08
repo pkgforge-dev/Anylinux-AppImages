@@ -117,6 +117,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Daggerfall-Unity](https://github.com/pkgforge-dev/Daggerfall-Unity-AppImage) |
 | [DarkPlaces](https://github.com/pkgforge-dev/DarkPlaces-AppImage) |
 | [DeaDBeeF](https://github.com/pkgforge-dev/DeaDBeeF-AppImage) |
+| [DeckCraft](https://github.com/pkgforge-dev/DeckCraft-AppImage) |
 | [Deepin Calculator](https://github.com/pkgforge-dev/Deepin-Calculator-AppImage) |
 | [Defold](https://github.com/pkgforge-dev/Defold-AppImage) |
 | [Denise](https://github.com/pkgforge-dev/Denise-AppImage) |
