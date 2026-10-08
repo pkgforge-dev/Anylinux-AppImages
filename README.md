@@ -485,6 +485,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [wine](https://github.com/pkgforge-dev/wine-AppImage) |
 | [wipEout-Rewrite](https://github.com/pkgforge-dev/wipEout-Rewrite-AppImage) |
 | [WiVRn](https://github.com/pkgforge-dev/WiVRn-AppImage) |
+| [WordCraft](https://github.com/pkgforge-dev/WordCraft-AppImage) |
 | [Xash3D-FWGS](https://github.com/pkgforge-dev/Xash3D-FWGS-AppImage-Enhanced) |
 | [xclock](https://github.com/pkgforge-dev/xclock-AppImage) |
 | [xed](https://github.com/pkgforge-dev/Xed-AppImage) |
