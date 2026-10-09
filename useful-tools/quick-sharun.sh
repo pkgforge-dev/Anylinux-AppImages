@@ -3595,14 +3595,13 @@ _fix_electron_libc_nonsense() {
 	# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/786
 	#
 	set -- $(find "$APPDIR"/ -type f \( -name 'app.asar' -o -name '*.js' \) -print 2>/dev/null)
-	_ldd_stub=""
 	for f do
 		_patched=""
 		[ -f "$f" ] || continue
 		# string has to be the same length
-		if grep -aq -m 1 '/usr/bin/ldd' "$f"; then
-			_patched=1 _ldd_stub=1
+		if grep -aq -m 1 '/usr/bin/ldd' "$f"; then _patched=1
 			sed -i -e 's|/usr/bin/ldd|/tmp/.qs-ldd|g' "$f"
+			_add_ldd_stub_hook
 		fi
 		if grep -aq -m 1 'ldd --version' "$f"; then _patched=1
 			sed -i -e 's|ldd --version|___ --version|g' "$f"
@@ -3614,10 +3613,6 @@ _fix_electron_libc_nonsense() {
 			_echo "* patched away host libc detection from $f"
 		fi
 	done
-
-	if [ -n "$_ldd_stub" ]; then
-		_add_ldd_stub_hook
-	fi
 }
 
 _add_ldd_stub_hook() {
@@ -3628,13 +3623,11 @@ _add_ldd_stub_hook() {
 
 	cat <<-'QS_HOOK' > "$hook"
 	#!/bin/sh
-
 	# libraries like detect-libc read this file to know whether the host is
 	# glibc or musl, but we always ship glibc. Answering glibc here also keeps
 	# them away from process.report.getReport(), which hard crashes some
-	# electron builds (https://github.com/pkgforge-dev/Anylinux-AppImages/issues/786)
-	rm -f /tmp/.qs-ldd 2>/dev/null || :
-	printf '%s\n' 'GNU C Library (GNU libc)' >/tmp/.qs-ldd 2>/dev/null || :
+	# electron builds: https://github.com/pkgforge-dev/Anylinux-AppImages/issues/786
+	echo 'GNU C Library (GNU libc)' > /tmp/.qs-ldd 2>/dev/null || :
 	QS_HOOK
 	_echo "* Added $hook"
 }
