@@ -3589,13 +3589,19 @@ _fix_electron_libc_nonsense() {
 	#
 	# This causes apps to crash because they think their libc is musl when it is not
 	#
+	# NOTE: the ldd path cannot just be deleted. Libraries like detect-libc
+	# fallback to process.report.getReport() when the file is missing, and that
+	# call hard crashes some electron builds. See:
+	# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/786
+	#
 	set -- $(find "$APPDIR"/ -type f \( -name 'app.asar' -o -name '*.js' \) -print 2>/dev/null)
 	for f do
 		_patched=""
 		[ -f "$f" ] || continue
 		# string has to be the same length
 		if grep -aq -m 1 '/usr/bin/ldd' "$f"; then _patched=1
-			sed -i -e 's|/usr/bin/ldd|/XXX/YYY/ZZZ|g' "$f"
+			sed -i -e 's|/usr/bin/ldd|/tmp/.qs-ldd|g' "$f"
+			_add_ldd_stub_hook
 		fi
 		if grep -aq -m 1 'ldd --version' "$f"; then _patched=1
 			sed -i -e 's|ldd --version|___ --version|g' "$f"
@@ -3607,6 +3613,23 @@ _fix_electron_libc_nonsense() {
 			_echo "* patched away host libc detection from $f"
 		fi
 	done
+}
+
+_add_ldd_stub_hook() {
+	hook=$DST_BIN_DIR/00-fix-electron-ldd.hook
+	if [ -f "$hook" ]; then
+		return 0
+	fi
+
+	cat <<-'QS_HOOK' > "$hook"
+	#!/bin/sh
+	# libraries like detect-libc read this file to know whether the host is
+	# glibc or musl, but we always ship glibc. Answering glibc here also keeps
+	# them away from process.report.getReport(), which hard crashes some
+	# electron builds: https://github.com/pkgforge-dev/Anylinux-AppImages/issues/786
+	echo 'GNU C Library (GNU libc) stable release version 2.42' > /tmp/.qs-ldd 2>/dev/null || :
+	QS_HOOK
+	_echo "* Added $hook"
 }
 
 _fix_cpython_ldconfig_mess() {
