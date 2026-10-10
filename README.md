@@ -85,6 +85,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Catfish](https://github.com/pkgforge-dev/Catfish-AppImage) |
 | [C-Dogs_SDL](https://github.com/pkgforge-dev/C-Dogs_SDL-AppImage) |
 | [Cemu](https://github.com/pkgforge-dev/Cemu-AppImage-Enhanced) |
+| [ChatGPT](https://github.com/pkgforge-dev/ChatGPT-Desktop-AppImage) |
 | [ChiPass](https://github.com/pkgforge-dev/ChiPass-AppImage) |
 | [Chocolate Stunts](https://github.com/pkgforge-dev/Chocolate-Stunts-AppImage) |
 | [Chrome](https://github.com/pkgforge-dev/Chrome-Appimage) |
