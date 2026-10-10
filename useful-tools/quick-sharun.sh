@@ -3627,7 +3627,7 @@ _add_ldd_stub_hook() {
 	# glibc or musl, but we always ship glibc. Answering glibc here also keeps
 	# them away from process.report.getReport(), which hard crashes some
 	# electron builds: https://github.com/pkgforge-dev/Anylinux-AppImages/issues/786
-	echo 'GNU C Library (GNU libc)' > /tmp/.qs-ldd 2>/dev/null || :
+	echo 'GNU C Library (GNU libc) stable release version 2.42' > /tmp/.qs-ldd 2>/dev/null || :
 	QS_HOOK
 	_echo "* Added $hook"
 }
