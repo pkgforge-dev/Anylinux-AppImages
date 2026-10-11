@@ -212,6 +212,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Gradia](https://github.com/pkgforge-dev/Gradia-AppImage) |
 | [Gram](https://github.com/pkgforge-dev/Gram-AppImage-Enhanced) |
 | [Graphs](https://github.com/pkgforge-dev/Graphs-AppImage) |
+| [GridCraft](https://github.com/pkgforge-dev/GridCraft-AppImage) |
 | [gThumb](https://github.com/pkgforge-dev/gThumb-AppImage) |
 | [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage) |
 | [Haruna](https://github.com/pkgforge-dev/Haruna-AppImage) |
