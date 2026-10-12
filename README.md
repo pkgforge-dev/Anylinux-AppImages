@@ -197,6 +197,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [gImageReader](https://github.com/pkgforge-dev/gImageReader-AppImage) |
 | [GIMP-and-PhotoGIMP](https://github.com/pkgforge-dev/GIMP-and-PhotoGIMP-AppImage) |
 | [GitHub Desktop Plus](https://github.com/pkgforge-dev/GitHub-Desktop-Plus-AppImage-Enhanced) |
+| [Glypha](https://github.com/pkgforge-dev/Glypha-AppImage) |
 | [Gnome Calculator](https://github.com/pkgforge-dev/Gnome-Calculator-AppImage) |
 | [Gnome Pomodoro](https://github.com/pkgforge-dev/gnome-pomodoro-appimage) |
 | [Gnome System Monitor](https://github.com/pkgforge-dev/Gnome-System-Monitor-AppImage) |
