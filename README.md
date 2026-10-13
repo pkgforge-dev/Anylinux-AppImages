@@ -302,8 +302,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced) |
 | [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage) |
 | [Obsidian](https://github.com/pkgforge-dev/Obsidian-AppImage-Enhanced) |
-| [Odamex](https://github.com/pkgforge-dev/Odamex-AppImage) |
 | [OCRmyPDF](https://github.com/pkgforge-dev/OCRmyPDF-AppImage) |
+| [Odamex](https://github.com/pkgforge-dev/Odamex-AppImage) |
 | [okteta](https://github.com/pkgforge-dev/okteta-AppImage) |
 | [OpenBoardView](https://github.com/pkgforge-dev/OpenBoardView-AppImage) |
 | [OpenClaw](https://github.com/pkgforge-dev/OpenClaw-AppImage) |
