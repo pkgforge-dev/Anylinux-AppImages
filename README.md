@@ -480,7 +480,6 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Video Trimmer](https://github.com/pkgforge-dev/Video-Trimmer-AppImage) |
 | [Visual Studio Code](https://github.com/pkgforge-dev/Visual-Studio-Code-AppImage) |
 | [VisualBoyAdvance-M](https://github.com/pkgforge-dev/VisualBoyAdvance-M-AppImage) |
-| [Vita3K](https://github.com/pkgforge-dev/Vita3K-AppImage-Enhanced) |
 | [vokoscreenNG](https://github.com/pkgforge-dev/vokoscreenNG-AppImage) |
 | [VypressChat](https://github.com/pkgforge-dev/VypressChat-AppImage) |
 | [Warp](https://github.com/pkgforge-dev/Warp-AppImage) |
@@ -540,6 +539,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [QDash](https://git.crueter.xyz/QFRC/QDash) |
 | [RSS Guard](https://github.com/martinrotter/rssguard) |
 | [Stoat](https://github.com/stoatchat/for-desktop) |
+| [Vita3K](https://github.com/vita3k/vita3k) |
 | [VSCodium](https://github.com/VSCodium/vscodium) |
 | [ZapZap](https://github.com/rafatosta/zapzap) |
 
