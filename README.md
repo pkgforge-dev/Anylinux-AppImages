@@ -44,8 +44,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [2ship2harkinian](https://github.com/pkgforge-dev/2ship2harkinian-AppImage-Enhanced) |
 | [86Box](https://github.com/pkgforge-dev/86box-AppImage-Enhanced) |
 | [AAAAXY](https://github.com/pkgforge-dev/AAAAXY-AppImage-Enhanced) |
-| [Adobe Flash Player](https://github.com/pkgforge-dev/Adobe-Flash-Player-AppImage) |
 | [Abaddon](https://github.com/pkgforge-dev/Abaddon-AppImage) |
+| [Adobe Flash Player](https://github.com/pkgforge-dev/Adobe-Flash-Player-AppImage) |
 | [Aerofoil](https://github.com/pkgforge-dev/Aerofoil-AppImage) |
 | [Akhenaten](https://github.com/pkgforge-dev/Akhenaten-AppImage) |
 | [alacritty](https://github.com/pkgforge-dev/alacritty-AppImage) |
@@ -301,8 +301,8 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced) |
 | [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced) |
 | [OBS Studio](https://github.com/pkgforge-dev/OBS-Studio-AppImage) |
-| [Odamex](https://github.com/pkgforge-dev/Odamex-AppImage) |
 | [Obsidian](https://github.com/pkgforge-dev/Obsidian-AppImage-Enhanced) |
+| [Odamex](https://github.com/pkgforge-dev/Odamex-AppImage) |
 | [OCRmyPDF](https://github.com/pkgforge-dev/OCRmyPDF-AppImage) |
 | [okteta](https://github.com/pkgforge-dev/okteta-AppImage) |
 | [OpenBoardView](https://github.com/pkgforge-dev/OpenBoardView-AppImage) |
@@ -420,9 +420,9 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Slack](https://github.com/pkgforge-dev/Slack-AppImage) |
 | [Snes9x](https://github.com/pkgforge-dev/Snes9x-AppImage-Enhanced) |
 | [SnowboardKids2Recomp](https://github.com/pkgforge-dev/SnowboardKids2Recomp-AppImage) |
+| [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced) |
 | [Solaar](https://github.com/pkgforge-dev/Solaar-AppImage) |
 | [SongRec](https://github.com/pkgforge-dev/SongRec-AppImage) |
-| [soh](https://github.com/pkgforge-dev/soh-AppImage-Enhanced) |
 | [Sonic 3 A.I.R.](https://github.com/pkgforge-dev/Sonic-3-AIR-AppImage) |
 | [Sonic-Mania-Decompilation](https://github.com/pkgforge-dev/Sonic-Mania-Decompilation-AppImage) |
 | [Sonic Robo Blast 2](https://github.com/pkgforge-dev/SRB2-AppImage) |
@@ -451,11 +451,11 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [tachoparser](https://github.com/pkgforge-dev/tachoparser-AppImage) |
 | [Tagger](https://github.com/pkgforge-dev/Tagger-AppImage) |
 | [Taisei Project](https://github.com/pkgforge-dev/Taisei-Project-AppImage) |
-| [Tokodon](https://github.com/pkgforge-dev/Tokodon-AppImage) |
 | [Taradino](https://github.com/pkgforge-dev/Taradino-AppImage) |
 | [Tauon](https://github.com/pkgforge-dev/Tauon-AppImage) |
 | [Telegram](https://github.com/pkgforge-dev/Telegram-AppImage) |
 | [Themix](https://github.com/pkgforge-dev/Themix-GUI-AppImage) |
+| [Tokodon](https://github.com/pkgforge-dev/Tokodon-AppImage) |
 | [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage) |
 | [TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage) |
 | [transmission-qt](https://github.com/pkgforge-dev/transmission-qt-AppImage) |
