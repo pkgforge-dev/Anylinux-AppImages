@@ -381,6 +381,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Reco](https://github.com/pkgforge-dev/Reco-AppImage) |
 | [Rednukem](https://github.com/pkgforge-dev/Rednukem-AppImage) |
 | [REDRIVER2](https://github.com/pkgforge-dev/REDRIVER2-AppImage) |
+| [RetroArch](https://github.com/pkgforge-dev/RetroArch-AppImage-Enhanced) |
 | [Rewaita](https://github.com/pkgforge-dev/Rewaita-AppImage) |
 | [RigelEngine](https://github.com/pkgforge-dev/RigelEngine-AppImage) |
 | [Rigs-of-Rods](https://github.com/pkgforge-dev/Rigs-of-Rods-AppImage) |
