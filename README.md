@@ -297,6 +297,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Nitrogen](https://github.com/pkgforge-dev/Nitrogen-AppImage) |
 | [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage) |
 | [NP2kai](https://github.com/pkgforge-dev/Neko-Project-II-Kai-AppImage) |
+| [NSCB Desktop](https://github.com/pkgforge-dev/NSCB-Desktop-Enhanced-AppImage) |
 | [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage) |
 | [Nugget-Doom](https://github.com/pkgforge-dev/Nugget-Doom-AppImage-Enhanced) |
 | [NXEngine-evo](https://github.com/pkgforge-dev/NXEngine-evo-AppImage-Enhanced) |
