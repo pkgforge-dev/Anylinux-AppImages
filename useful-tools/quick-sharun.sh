@@ -4895,6 +4895,20 @@ for lib do case "$lib" in
 				fi
 			fi
 		fi
+
+		# Some .NET apps dlopen 'libc.so' and if that fails they try libc.so.6
+		# The problem is that at least on archlinux, libc.so is actually not
+		# a library but a linker sript, so quick-sharun never deploys it
+		# so .NET normally sees a non valid ELF then tries libc.so.6
+		#
+		# However on alpine linux, libc.so is real and a symlink to musl which 
+		# causes .NET to load a second libc into the process namespace and crash
+		#
+		_libc=$DST_LIB_DIR/libc.so.6
+		_symlink=$DST_LIB_DIR/libc.so
+		if [ -f "$_libc" ] && [ ! -e "$_symlink" ]; then
+			ln -sf "${_libc##*/}" "$_symlink" || :
+		fi
 		;;
 	*/ld-linux*.so*|*/ld-musl*.so*)
 		# do not let the dynamic linker read /etc ever
