@@ -4901,13 +4901,13 @@ for lib do case "$lib" in
 		# a library but a linker sript, so quick-sharun never deploys it
 		# so .NET normally sees a non valid ELF then tries libc.so.6
 		#
-		# However on alpine linux, libc.so is real and and a symlink to musl
-		# which causes .NET to load a second libc into the process namespace and crash
+		# However on alpine linux, libc.so is real and a symlink to musl which 
+		# causes .NET to load a second libc into the process namespace and crash
 		#
 		_libc=$DST_LIB_DIR/libc.so.6
 		_symlink=$DST_LIB_DIR/libc.so
 		if [ -f "$_libc" ] && [ ! -e "$_symlink" ]; then
-			ln -s "${_libc##*/}" "$_symlink" || :
+			ln -sf "${_libc##*/}" "$_symlink" || :
 		fi
 		;;
 	*/ld-linux*.so*|*/ld-musl*.so*)
