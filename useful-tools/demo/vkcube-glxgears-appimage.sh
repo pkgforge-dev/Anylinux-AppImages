@@ -72,7 +72,14 @@ chmod +x ./quick-sharun
 # becasue this app launches vkcube and there is no gpu in the CI, we have to
 # install vkswrast, we do not normally bundle this since it is slow and has
 # a massive dependency to llvm
-pacman -S --noconfirm vulkan-swrast
+#
+# on riscv64, loongarch64, ppc64 and ppc64le the debloated mesa still ships
+# the files that upstream now splits into vulkan-mesa-implicit-layers, which
+# vulkan-swrast depends on, so the transaction collides with its own mesa
+pacman -S --noconfirm \
+	--overwrite '/usr/lib/libVkLayer_MESA_*' \
+	--overwrite '/usr/share/vulkan/implicit_layer.d/*' \
+	vulkan-swrast
 
 # test the final app
 ./quick-sharun --test ./dist/*.AppImage
