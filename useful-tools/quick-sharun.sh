@@ -36,7 +36,7 @@ fi
 
 _START_TIME=$(date +%s) || :
 STRACED_LIBS=""
-APPIMAGE_ARCH=$(uname -m)
+APPIMAGE_ARCH=${APPIMAGE_ARCH:-$(uname -m)}
 ARCH=${ARCH:-$APPIMAGE_ARCH}
 TMPDIR=${TMPDIR:-/tmp}
 APPDIR=${APPDIR:-$PWD/AppDir}
