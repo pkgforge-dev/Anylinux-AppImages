@@ -15,12 +15,10 @@ export ICON=DUMMY
 export DESKTOP=DUMMY
 export OUTPATH=./dist
 export OUTNAME=vkcube+glxgears-demo-"$ARCH".AppImage
-# there are no vulkan drivers for ppc64, ppc64le, loongarch64 and riscv64
-# (neither in the repos nor in archlinux-pkgs-debloated), so vkcube cannot
-# work there and glxgears becomes the default binary instead
+# BE ppc64 predates vulkan, so glxgears is the default binary there
 export MAIN_BIN=vkcube
 case "$ARCH" in
-	ppc64|ppc64le|loongarch64|riscv64) export MAIN_BIN=glxgears;;
+	ppc64) export MAIN_BIN=glxgears;;
 esac
 # vkmark is hardcoded to look in /usr/share/vkmark and /usr/lib/vkmark
 export PATH_MAPPING='
@@ -74,10 +72,7 @@ chmod +x ./quick-sharun
 # becasue this app launches vkcube and there is no gpu in the CI, we have to
 # install vkswrast, we do not normally bundle this since it is slow and has
 # a massive dependency to llvm
-# the other arches test glxgears instead, which uses the bundled llvmpipe
-case "$ARCH" in
-	x86_64|aarch64) pacman -S --noconfirm vulkan-swrast;;
-esac
+pacman -S --noconfirm vulkan-swrast
 
 # test the final app
 ./quick-sharun --test ./dist/*.AppImage
