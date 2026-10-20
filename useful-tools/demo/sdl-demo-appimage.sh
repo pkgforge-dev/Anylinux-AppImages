@@ -15,6 +15,13 @@ export OUTNAME=sdl2-demo-"$ARCH".AppImage
 export DEPLOY_OPENGL=1
 export MAIN_BIN=SDL-demo
 
+# riscv64 and loongarch64 only ship sdl2-compat, which provides sdl2 (SDL3
+# behind the scenes) and installs the same headers, libs and sdl2.pc
+case "$ARCH" in
+	riscv64|loongarch64) SDL2_PKG=sdl2-compat;;
+	*) SDL2_PKG=sdl2;;
+esac
+
 pacman -Syu --noconfirm \
 	base-devel       \
 	git              \
@@ -26,7 +33,7 @@ pacman -Syu --noconfirm \
 	libxrandr        \
 	libxtst          \
 	patchelf         \
-	sdl2             \
+	"$SDL2_PKG"      \
 	sdl2_ttf         \
 	fontconfig       \
 	ttf-dejavu       \
