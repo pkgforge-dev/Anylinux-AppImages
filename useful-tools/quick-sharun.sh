@@ -1613,8 +1613,10 @@ _get_sharun() {
 	chmod +x "$APPDIR"/sharun
 	if tar -xf "$SHARUN_TARBALL" -C "$APPDIR" dash; then
 		chmod +x "$APPDIR"/dash
-		# the BSD-3-Clause notice has to travel with the binary
-		tar -xf "$SHARUN_TARBALL" -C "$APPDIR" dash-COPYING 2>/dev/null || :
+		# the BSD-3-Clause notice has to travel with the binary, in the place
+		# the FHS and the appimage conventions put license files
+		mkdir -p "$APPDIR"/share/licenses
+		tar -xf "$SHARUN_TARBALL" -C "$APPDIR"/share/licenses dash-COPYING 2>/dev/null || :
 		_echo "* dash deployed next to sharun"
 	else
 		_err_msg "WARNING: this sharun tarball has no dash in it"
