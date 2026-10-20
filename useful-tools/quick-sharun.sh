@@ -1599,7 +1599,7 @@ _make_deployment_array() {
 }
 
 _get_sharun() {
-	if [ -x "$APPDIR"/sharun ]; then
+	if [ -x "$APPDIR"/sharun ] && [ -x "$APPDIR"/dash ]; then
 		return 0
 	fi
 	_echo "Downloading sharun..."
@@ -1607,9 +1607,17 @@ _get_sharun() {
 	_check_shasum "$SHARUN_TARBALL" "$SHARUN_SHA"
 
 	# dash is what sharun runs AppRun.sh with when it sits next to sharun,
-	# so both have to land in the AppDir root
-	tar -xf "$SHARUN_TARBALL" -C "$APPDIR" sharun dash
-	chmod +x "$APPDIR"/sharun "$APPDIR"/dash
+	# so both have to land in the AppDir root. sharun is required, dash is
+	# not present in tarballs older than 3.7.0, so it is extracted on its own
+	tar -xf "$SHARUN_TARBALL" -C "$APPDIR" sharun
+	chmod +x "$APPDIR"/sharun
+	if tar -xf "$SHARUN_TARBALL" -C "$APPDIR" dash; then
+		chmod +x "$APPDIR"/dash
+		_echo "* dash deployed next to sharun"
+	else
+		_err_msg "WARNING: this sharun tarball has no dash in it"
+		_err_msg "AppRun.sh will be run with a shell found on the host"
+	fi
 }
 
 _add_helper_libs() {
