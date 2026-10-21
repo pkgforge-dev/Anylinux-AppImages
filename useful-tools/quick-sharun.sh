@@ -3268,7 +3268,7 @@ _deploy_datadirs() {
 			  bin=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$1")
 			  bin=${bin##*/}
 			  strings "$SHARUN_BIN_DIR"/"$bin" \
-			    | grep -v '[;:,.(){}?<>*]' | tr '/' '\n' > "$_dirs_to_check_file"
+			    | grep -v '[;:,.(){}?<>*]' | tr '/[:blank:]' '\n' > "$_dirs_to_check_file"
 			) &
 			_dirs_to_check_pid=$!
 		fi
@@ -3312,7 +3312,9 @@ _deploy_datadirs() {
 			# the scan started before the loop above
 			if [ -n "$_dirs_to_check_pid" ]; then
 				wait "$_dirs_to_check_pid" || :
-				possible_dirs=$(cat "$_dirs_to_check_file" 2>/dev/null) || :
+				# only the words that name a share directory
+				possible_dirs=$(set -- /usr/local/share/* /usr/share/* &&
+				  printf '%s\n' "$@" | sed 's|.*/||' | grep -Fxf - "$_dirs_to_check_file") || :
 				rm -f "$_dirs_to_check_file"
 			fi
 
