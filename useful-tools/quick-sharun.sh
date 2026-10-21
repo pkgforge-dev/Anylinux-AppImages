@@ -391,8 +391,9 @@ _help_msg() {
 	                     at runtime via dlopen. Enabled by default, set to 0 to
 	                     disable it. Disabling may result in a non-working AppImage
 	                     because important dlopened libraries may not be bundled!
-	  STRACE_TIME      Seconds to run the application for during strace mode
-	                     to discover dlopened libraries (default: 5).
+	  STRACE_TIME      Seconds to run the main binary for during strace mode
+	                     to discover dlopened libraries (default: 5). Additional
+	                     binaries are also run but only for 1 second.
 	  STRACE_BINARY    Space or newline-separated list of binaries to trace dlopen
 	                     during strace mode. By default ALL given binaries
 	                     are traced. Use this to trace only specific binaries.
@@ -1784,7 +1785,14 @@ _lib4bin_collect_strace() {
 		pid=$!
 		set +m
 
-		sleep "$STRACE_TIME"
+		# make sure only the main binary waits the full STRACE_TIME
+		# everything else only gets 1 second instead
+		_strace_time=$STRACE_TIME
+		if [ -n "$MAIN_BIN" ] && [ "${b##*/}" != "$MAIN_BIN" ]; then
+			_strace_time=1
+		fi
+
+		sleep "$_strace_time"
 		_kill_traced $pid
 		wait $pid 2>/dev/null || :
 
