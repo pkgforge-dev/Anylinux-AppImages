@@ -3936,16 +3936,24 @@ _strip_bins_and_libs() {
 		return 0
 	fi
 
+	_strip_libs_pid=
 	if [ "$NO_STRIP" != 'libraries' ]; then
-		find "$APPDIR" -type f -name '*.so*' \
-			-exec strip -s -R .comment --strip-unneeded {} + || :
-		_echo "* stripped libraries"
+		(
+		  find "$APPDIR" -type f -name '*.so*' \
+		    -exec strip -s -R .comment --strip-unneeded {} + || :
+		  _echo "* stripped libraries"
+		) &
+		_strip_libs_pid=$!
 	fi
 
 	if [ "$NO_STRIP" != 'binaries' ]; then
 		_strip_list=$TMPDIR/.strip.$$
 		:> "$_strip_list"
 		while IFS="" read -r f; do
+			case "$f" in
+				*.so*)     continue;;
+				*/python*) continue;; # python interpreter also breaks
+			esac
 			if [ ! -x "$f" ]; then
 				continue
 			elif _is_bun_binary "$f"; then
@@ -3955,9 +3963,6 @@ _strip_bins_and_libs() {
 			elif _is_dotnet_single_file_self_contained_binary "$f"; then
 				continue # same story as bun binaries
 			fi
-			case "$f" in
-				*/python*) continue;; # python interpreter also breaks
-			esac
 			printf '%s\n' "$f" >> "$_strip_list"
 		done <<-EOF
 		$(find "$SHARUN_BIN_DIR"/ "$APPDIR"/lib*/ -type f)
@@ -3976,6 +3981,8 @@ _strip_bins_and_libs() {
 		rm -f "$_strip_list"
 		_echo "* stripped binaries"
 	fi
+
+	[ -z "$_strip_libs_pid" ] || wait "$_strip_libs_pid"
 }
 
 _add_apprun() {
