@@ -920,12 +920,12 @@ _determine_what_to_deploy() {
 					DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 					;;
 				# libc.so.6 is glibc only, musl does not have it
-				*libc.so.6*    |\
-				*libdl.so*     |\
-				*libpthread.so*|\
-				*ld-linux*.so* |\
-				*/ld64.so*     |\
-				*librt.so*     )
+				*/libc.so.6*    |\
+				*/libdl.so*     |\
+				*/libpthread.so*|\
+				*/ld-linux*.so* |\
+				*/ld64.so*      |\
+				*/librt.so*     )
 					DEPLOY_GLIBC=${DEPLOY_GLIBC:-1}
 					;;
 			esac
@@ -1707,7 +1707,6 @@ _lib4bin_collect_ldd() {
 		fi
 	done
 
-	# one ldd for every file on glibc; the helper loops on musl
 	if [ -s "$_ldd_list" ]; then
 		(
 		  set --
