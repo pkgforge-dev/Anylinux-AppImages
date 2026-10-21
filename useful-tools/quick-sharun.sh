@@ -222,7 +222,14 @@ _is_so() {
 }
 
 _lib4bin_ldd_libs() {
-	ldd "$1" 2>/dev/null | awk '/=>/{print $3} $1 ~ /^\//{print $1}' | sort -u
+	# only glibc ldd can accept multiple files
+	if grep -q 'GNU C Library' "$(command -v ldd)"; then
+		ldd -- "$@" 2>/dev/null
+	else
+		for b do
+			ldd "$b" 2>/dev/null
+		done
+	fi | awk '/=>/{print $3} $1 ~ /^\// && $0 !~ /:$/{print $1}' | sort -u
 }
 
 _download() {
@@ -916,6 +923,7 @@ _determine_what_to_deploy() {
 				*libdl.so*     |\
 				*libpthread.so*|\
 				*ld-linux*.so* |\
+				*ld64.so*      |\
 				*librt.so*     )
 					DEPLOY_GLIBC=${DEPLOY_GLIBC:-1}
 					;;
@@ -1670,7 +1678,9 @@ _lib4bin_collect_ldd() {
 	# accumulate in a temp file instead of a variable since the variable
 	# ends up being way slower with applications that have +300 libs
 	_libs_list=$TMPDIR/.libs.$$
+	_ldd_list=$TMPDIR/.ldd.$$
 	:> "$_libs_list"
+	:> "$_ldd_list"
 
 	for b do
 		[ -f "$b" ]  || continue
@@ -1688,13 +1698,25 @@ _lib4bin_collect_ldd() {
 		EOF
 
 		if [ -z "$skip" ]; then
-			_lib4bin_ldd_libs "$b" >> "$_libs_list"
+			printf '%s\n' "$b" >> "$_ldd_list"
 		fi
 
 		if _is_so "$b"; then
 			printf '%s\n' "$b" >> "$_libs_list"
 		fi
 	done
+
+	# one ldd for every file on glibc; the helper loops on musl
+	if [ -s "$_ldd_list" ]; then
+		(
+		  set --
+		  while IFS= read -r b; do
+		  	set -- "$@" "$b"
+		  done < "$_ldd_list"
+		  _lib4bin_ldd_libs "$@" >> "$_libs_list"
+		) || :
+	fi
+	rm -f "$_ldd_list"
 
 	# It turns out you can have one library act as multiple libraries via
 	# symlinks, for example libtinfo.so.5 -> libncurses.so.5
@@ -3227,6 +3249,22 @@ _map_paths_binary_patch() {
 
 _deploy_datadirs() {
 	if [ "$DEPLOY_DATADIR" = 1 ]; then
+		set -- "$APPDIR"/*.desktop
+
+		possible_dirs=
+		_dirs_to_check_pid=
+		if [ -f "$1" ]; then
+			_dirs_to_check_file=$TMPDIR/.dirs_to_check.$$
+			# run in the background since strings is slow with big binaries
+			(
+			  bin=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$1")
+			  bin=${bin##*/}
+			  strings "$SHARUN_BIN_DIR"/"$bin" \
+			    | grep -v '[;:,.(){}?<>*]' | tr '/' '\n' > "$_dirs_to_check_file"
+			) &
+			_dirs_to_check_pid=$!
+		fi
+
 		# find if there is a datadir that matches bundled binary name
 		set -- "$DST_BIN_DIR"/*
 		for bin do
@@ -3240,15 +3278,21 @@ _deploy_datadirs() {
 				dotnet) continue;;
 			esac
 
-			for datadir in /usr/local/share/* /usr/share/*; do
-				if echo "${datadir##*/}" | grep -qi "$bin"; then
-					_echo "* Adding datadir $datadir..."
-					# fallback to cp -r if cp -Lr fails
-					# due to broken symlinks in datadir
-					cp -Lr "$datadir" "$APPDIR"/share \
-					  || cp -r "$datadir" "$APPDIR"/share
-					break
-				fi
+			# one find per share dir instead of a grep for every entry
+			for path in /usr/local/share /usr/share; do
+				[ -d "$path" ] || continue
+				datadir=$(
+				  export LC_ALL=C
+				  find "$path"/* -maxdepth 0 -iname "*$bin*" 2>/dev/null \
+				    | sort | head -n 1
+				)
+				[ -n "$datadir" ] || continue
+				_echo "* Adding datadir $datadir..."
+				# fallback to cp -r if cp -Lr fails
+				# due to broken symlinks in datadir
+				cp -Lr "$datadir" "$APPDIR"/share \
+				  || cp -r "$datadir" "$APPDIR"/share
+				break
 			done
 		done
 
@@ -3257,14 +3301,12 @@ _deploy_datadirs() {
 		# Some apps have a datadir that does not match the binary name
 		# in that case we need to get it by reading the binary
 		if [ -f "$1" ]; then
-
-			bin=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$1")
-			bin=${bin##*/}
-			possible_dirs=$(
-				strings "$SHARUN_BIN_DIR"/"$bin" \
-				  | grep -v '[;:,.(){}?<>*]' \
-				  | tr '/' '\n'
-			)
+			# the scan started before the loop above
+			if [ -n "$_dirs_to_check_pid" ]; then
+				wait "$_dirs_to_check_pid" || :
+				possible_dirs=$(cat "$_dirs_to_check_file" 2>/dev/null) || :
+				rm -f "$_dirs_to_check_file"
+			fi
 
 			for datadir in $possible_dirs; do
 				# skip dirs not wanted or handled by sharun
@@ -3332,12 +3374,9 @@ _deploy_datadirs() {
 				esac
 
 				for path in /usr/local/share /usr/share; do
-
 					src_datadir="$path"/"$datadir"
 					dst_datadir="$APPDIR"/share/"$datadir"
-
-					if [ -d "$src_datadir" ] \
-						&& [ ! -d  "$dst_datadir" ]; then
+					if [ -d "$src_datadir" ] && [ ! -d "$dst_datadir" ]; then
 						_echo "* Adding datadir $src_datadir..."
 						# cp can fail here if src_datadir contains broken links
 						if ! cp -Lr "$src_datadir" "$dst_datadir"; then
@@ -3797,14 +3836,14 @@ _check_hardcoded_lib_dirs() {
 				;;
 		esac
 
-		for f in "$DST_LIB_DIR"/*.so* "$SHARUN_BIN_DIR"/*; do
-			if [ ! -f "$f" ]; then
-				continue
-			elif grep -aoq -m 1 "$LIB_DIR"/"$d" "$f"; then
-				_echo "* Detected hardcoded path to $LIB_DIR/$d in $f"
-				_patch_away_usr_lib_dir "$f" || :
-			fi
-		done
+		# one grep for all files instead of one per file
+		_matches=$TMPDIR/.matches.$$
+		grep -alF -m 1 -- "$LIB_DIR"/"$d" "$DST_LIB_DIR"/*.so* "$SHARUN_BIN_DIR"/* > "$_matches" 2>/dev/null || :
+		while IFS= read -r f; do
+			_echo "* Detected hardcoded path to $LIB_DIR/$d in $f"
+			_patch_away_usr_lib_dir "$f" || :
+		done < "$_matches"
+		rm -f "$_matches"
 	done
 }
 
@@ -3850,14 +3889,14 @@ _check_hardcoded_data_dirs() {
 				;;
 		esac
 
-		for f in "$DST_LIB_DIR"/*.so* "$SHARUN_BIN_DIR"/*; do
-			if [ ! -f "$f" ]; then
-				continue
-			elif grep -aoq -m 1 /usr/share/"$d" "$f"; then
-				_echo "* Detected hardcoded path to /usr/share/$d in $f"
-				_patch_away_usr_share_dir "$f" || :
-			fi
-		done
+		# one grep for all files instead of one per file
+		_matches=$TMPDIR/.matches.$$
+		grep -alF -m 1 -- /usr/share/"$d" "$DST_LIB_DIR"/*.so* "$SHARUN_BIN_DIR"/* > "$_matches" 2>/dev/null || :
+		while IFS= read -r f; do
+			_echo "* Detected hardcoded path to /usr/share/$d in $f"
+			_patch_away_usr_share_dir "$f" || :
+		done < "$_matches"
+		rm -f "$_matches"
 	done
 }
 
@@ -3887,11 +3926,13 @@ _strip_bins_and_libs() {
 
 	if [ "$NO_STRIP" != 'libraries' ]; then
 		find "$APPDIR" -type f -name '*.so*' \
-			-exec strip -s -R .comment --strip-unneeded {} \; || :
+			-exec strip -s -R .comment --strip-unneeded {} + || :
 		_echo "* stripped libraries"
 	fi
 
 	if [ "$NO_STRIP" != 'binaries' ]; then
+		_strip_list=$TMPDIR/.strip.$$
+		:> "$_strip_list"
 		while IFS="" read -r f; do
 			if [ ! -x "$f" ]; then
 				continue
@@ -3905,10 +3946,22 @@ _strip_bins_and_libs() {
 			case "$f" in
 				*/python*) continue;; # python interpreter also breaks
 			esac
-			strip -s -R .comment --strip-unneeded "$f" || :
+			printf '%s\n' "$f" >> "$_strip_list"
 		done <<-EOF
 		$(find "$SHARUN_BIN_DIR"/ "$APPDIR"/lib*/ -type f)
 		EOF
+
+		if [ -s "$_strip_list" ]; then
+			(
+			  set --
+			  while IFS= read -r f; do
+			  	set -- "$@" "$f"
+			  done < "$_strip_list"
+			  find "$@" -maxdepth 0 -type f \
+			    -exec strip -s -R .comment --strip-unneeded {} +
+			) || :
+		fi
+		rm -f "$_strip_list"
 		_echo "* stripped binaries"
 	fi
 }
@@ -4584,14 +4637,23 @@ for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 				;;
 		esac
 	done
-
-	if [ "$no_pipewire" = 1 ] && grep -aq -m 1 'libpipewire-0.3.so' "$lib"; then
-		sed -i -e 's|libpipewire-0.3.so|no-pipewire-kek.so|g' "$lib"
-	fi
-	if [ "$no_libdecor" = 1 ] && grep -aq -m 1 'libdecor-0.so' "$lib"; then
-		sed -i -e 's|libdecor-0.so|fuck-gnome.so|g' "$lib"
-	fi
 done
+
+# one grep finds every file to patch, so these are one pass each
+_matches=$TMPDIR/.matches.$$
+if [ "$no_pipewire" = 1 ]; then
+	grep -alF -m 1 libpipewire-0.3.so "$@" "$SHARUN_BIN_DIR"/* > "$_matches" 2>/dev/null || :
+	while IFS= read -r lib; do
+		sed -i -e 's|libpipewire-0.3.so|no-pipewire-kek.so|g' "$lib" || :
+	done < "$_matches"
+fi
+if [ "$no_libdecor" = 1 ]; then
+	grep -alF -m 1 libdecor-0.so "$@" "$SHARUN_BIN_DIR"/* > "$_matches" 2>/dev/null || :
+	while IFS= read -r lib; do
+		sed -i -e 's|libdecor-0.so|fuck-gnome.so|g' "$lib" || :
+	done < "$_matches"
+fi
+rm -f "$_matches"
 
 # apps may crash when the host has no mime database
 _deploy_mime_db(){
@@ -4901,7 +4963,7 @@ for lib do case "$lib" in
 		# a library but a linker sript, so quick-sharun never deploys it
 		# so .NET normally sees a non valid ELF then tries libc.so.6
 		#
-		# However on alpine linux, libc.so is real and a symlink to musl which 
+		# However on alpine linux, libc.so is real and a symlink to musl which
 		# causes .NET to load a second libc into the process namespace and crash
 		#
 		_libc=$DST_LIB_DIR/libc.so.6
@@ -4910,7 +4972,7 @@ for lib do case "$lib" in
 			ln -sf "${_libc##*/}" "$_symlink" || :
 		fi
 		;;
-	*/ld-linux*.so*|*/ld-musl*.so*)
+	*/ld-linux*.so*|*/ld64.so*|*/ld-musl*.so*)
 		# do not let the dynamic linker read /etc ever
 		if grep -qa -m 1 '/etc' "$lib"; then
 			sed -i -e 's|/etc|/KEK|g' "$lib"
