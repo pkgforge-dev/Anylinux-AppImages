@@ -3313,8 +3313,10 @@ _deploy_datadirs() {
 			if [ -n "$_dirs_to_check_pid" ]; then
 				wait "$_dirs_to_check_pid" || :
 				# only the words that name a share directory
-				possible_dirs=$(set -- /usr/local/share/* /usr/share/* &&
-				  printf '%s\n' "$@" | sed 's|.*/||' | grep -Fxf - "$_dirs_to_check_file") || :
+				possible_dirs=$(
+				  set -- /usr/local/share/* /usr/share/*
+				  printf '%s\n' "$@" | sed 's|.*/||' | grep -Fxf - "$_dirs_to_check_file"
+				) || :
 				rm -f "$_dirs_to_check_file"
 			fi
 
