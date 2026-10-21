@@ -1787,8 +1787,9 @@ _lib4bin_collect_strace() {
 
 		# make sure only the main binary waits the full STRACE_TIME
 		# everything else only gets 1 second instead
-		_strace_time=$STRACE_TIME
-		if [ -n "$MAIN_BIN" ] && [ "${b##*/}" != "$MAIN_BIN" ]; then
+		if [ "${b##*/}" = "$MAIN_BIN" ]; then
+			_strace_time=$STRACE_TIME
+		else
 			_strace_time=1
 		fi
 
