@@ -923,7 +923,7 @@ _determine_what_to_deploy() {
 				*libdl.so*     |\
 				*libpthread.so*|\
 				*ld-linux*.so* |\
-				*ld64.so*      |\
+				*/ld64.so*     |\
 				*librt.so*     )
 					DEPLOY_GLIBC=${DEPLOY_GLIBC:-1}
 					;;
