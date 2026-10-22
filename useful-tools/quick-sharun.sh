@@ -997,6 +997,14 @@ _make_deployment_array() {
 			"$LIB_DIR"/gconv/EUC-JP.so*   \
 			"$LIB_DIR"/gconv/EUC-KR.so*   \
 			"$LIB_DIR"/gconv/EUC-CN.so*
+
+		# locale takes a while to build, do it in the background
+		_localedef_pid=
+		if _is_cmd localedef; then
+			mkdir -p /tmp/usr/lib/locale
+			( localedef --prefix /tmp --no-archive -i en_US -f UTF-8 en_US.UTF-8 || : ) &
+			_localedef_pid=$!
+		fi
 	fi
 	# LIB32 builds always bundle their drivers, 32bit driver stacks are not
 	# something users have installed for these apps
@@ -1905,31 +1913,27 @@ _lib4bin_deploy_shared_libs() {
 
 # deploy binaries, download sharun if needed
 _lib4bin_deploy_binaries() {
+	[ -x "$APPDIR"/sharun ]  || _get_sharun
+	[ -d "$SHARUN_BIN_DIR" ] || mkdir -p "$SHARUN_BIN_DIR"
 	seen=""
 	for b do
-		echo "$seen" | grep -Fxq "$b" && continue
-		seen=$(printf '%s\n%s' "$seen" "$b")
-
 		[ -f "$b" ] || continue
+		[ -x "$b" ] || continue
 
 		if _is_script "$b"; then
 			dst=$DST_BIN_DIR/${b##*/}
 			mkdir -p "$DST_BIN_DIR"
-			if [ ! -f "$dst" ]; then
-				cp -fv "$b" "$dst"
-				chmod 755 "$dst"
-			fi
+			[ -f "$dst" ] || cp -fv "$b" "$dst"
 			continue
 		fi
 
+		# most arguments are libraries, skip them before anything forks
+		if _is_so "$b" || echo "$seen" | grep -Fxq "$b"; then
+			continue
+		fi
 		_is_elf "$b" || continue
-		[ -x "$b" ]  || continue
-		if _is_so "$b"; then
-			continue
-		fi
 
-		[ -x "$APPDIR/sharun" ] || _get_sharun
-
+		seen=$(printf '%s\n%s' "$seen" "$b")
 		bin_basename=${b##*/}
 
 		if [ -L "$b" ]; then
@@ -1940,12 +1944,7 @@ _lib4bin_deploy_binaries() {
 		fi
 
 		dst=$SHARUN_BIN_DIR/$readlink_basename
-
-		mkdir -p "$SHARUN_BIN_DIR"
-		if [ ! -f "$dst" ]; then
-			cp -fv "$b" "$dst"
-			chmod +x "$dst"
-		fi
+		[ -f "$dst" ] || cp -fv "$b" "$dst"
 
 		if [ "$bin_basename" != "$readlink_basename" ]; then
 			ln -sf "$readlink_basename" "$SHARUN_BIN_DIR"/"$bin_basename"
@@ -4967,9 +4966,11 @@ for lib do case "$lib" in
 		# Because distros use a locale-archive these days, we have to compile it
 		#
 		dst_en_locale_dir=$DST_LIB_DIR/locale/en_US.utf8
-		if [ ! -d "$dst_en_locale_dir" ] && _is_cmd localedef; then
-			mkdir -p /tmp/usr/lib/locale
-			localedef --prefix /tmp --no-archive -i en_US -f UTF-8 en_US.UTF-8 || :
+		if [ ! -d "$dst_en_locale_dir" ]; then
+			# it was started before the hooks loop
+			if [ -n "$_localedef_pid" ]; then
+				wait "$_localedef_pid" || :
+			fi
 			if cp -r /tmp/usr/lib/locale/en_US.utf8/. "$dst_en_locale_dir"; then
 				_echo "* added en_US.UTF-8 locale"
 				# the LC_COLLATE from en_US.UTF-8 is massive (2.5 MiB)
