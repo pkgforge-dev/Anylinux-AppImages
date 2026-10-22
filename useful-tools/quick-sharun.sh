@@ -1913,6 +1913,8 @@ _lib4bin_deploy_shared_libs() {
 
 # deploy binaries, download sharun if needed
 _lib4bin_deploy_binaries() {
+	[ -x "$APPDIR"/sharun ]  || _get_sharun
+	[ -d "$SHARUN_BIN_DIR" ] || mkdir -p "$SHARUN_BIN_DIR"
 	seen=""
 	for b do
 		[ -f "$b" ] || continue
@@ -1942,12 +1944,7 @@ _lib4bin_deploy_binaries() {
 		fi
 
 		dst=$SHARUN_BIN_DIR/$readlink_basename
-		[ -d "$SHARUN_BIN_DIR" ] || mkdir -p "$SHARUN_BIN_DIR"
-
-		if [ ! -f "$dst" ]; then
-			cp -fv "$b" "$dst"
-			chmod +x "$dst"
-		fi
+		[ -f "$dst" ] || cp -fv "$b" "$dst"
 
 		if [ "$bin_basename" != "$readlink_basename" ]; then
 			ln -sf "$readlink_basename" "$SHARUN_BIN_DIR"/"$bin_basename"
@@ -1979,7 +1976,6 @@ _lib4bin_main() {
 	_lib4bin_deploy_shared_libs $all_libs
 
 	_echo "Deploying binaries..."
-	[ -x "$APPDIR"/sharun ] || _get_sharun
 	_lib4bin_deploy_binaries "$@"
 
 	_echo "Generating lib.path..."
