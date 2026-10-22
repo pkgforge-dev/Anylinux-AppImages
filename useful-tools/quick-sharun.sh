@@ -1002,7 +1002,7 @@ _make_deployment_array() {
 		_localedef_pid=
 		if _is_cmd localedef; then
 			mkdir -p /tmp/usr/lib/locale
-			( localedef --prefix /tmp --no-archive -i en_US -f UTF-8 en_US.UTF-8 || : ) &
+			( localedef --prefix /tmp --no-archive -i en_US -f UTF-8 en_US.UTF-8 || : ) >/dev/null 2>&1 &
 			_localedef_pid=$!
 		fi
 	fi
