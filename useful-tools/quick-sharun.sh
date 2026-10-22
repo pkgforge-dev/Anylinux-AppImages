@@ -1846,6 +1846,8 @@ _lib4bin_collect_strace() {
 
 # deploy shared libraries to DST_LIB_DIR
 _lib4bin_deploy_shared_libs() {
+	_cache_src=
+	_cache_dst=
 	for l do
 		[ -f "$l" ] || continue
 		if ! _is_elf "$l"; then
@@ -1853,27 +1855,39 @@ _lib4bin_deploy_shared_libs() {
 			continue
 		fi
 
-		l_name=${l##*/}
-
+		lib_basename=${l##*/}
 		if [ -L "$l" ]; then
 			readlink_path=$(readlink -f "$l") || continue
-			readlink_path_name=${readlink_path##*/}
-			dst_dir=$(_lib4bin_get_lib_dst_dir "$readlink_path")
+			readlink_basename=${readlink_path##*/}
+			_target=$readlink_path
+		else
+			readlink_basename=$lib_basename
+			_target=$l
+		fi
+
+		# the list is sorted, so nearby libraries share a source directory
+		# 32-bit apps map by ELF class too, so they skip the cache
+		_src_dir=${_target%/*}
+		# _src_dir can be empty if lib happens to live directly in / (unlikely)
+		if [ "$LIB32" != 1 ] \
+		  && [ -n "$_src_dir" ] && [ "$_src_dir" = "$_cache_src" ]; then
+			dst_dir=$_cache_dst
+		else
+			dst_dir=$(_lib4bin_get_lib_dst_dir "$_target")
+			_cache_src=$_src_dir
+			_cache_dst=$dst_dir
+		fi
+		# a library in its target's directory lands where the target lands
+		if [ "${l%/*}" = "$_src_dir" ]; then
+			sym_dst_dir=$dst_dir
+		else
 			sym_dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
-		else
-			readlink_path_name=""
-			dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
-			sym_dst_dir="$dst_dir"
 		fi
 
-		if [ -n "$readlink_path_name" ]; then
-			dst=$dst_dir/$readlink_path_name
-		else
-			dst=$dst_dir/$l_name
-		fi
+		dst=$dst_dir/$readlink_basename
 
-		mkdir -p "$dst_dir"
-		[ -f "$dst" ] || cp -fv "$l" "$dst"
+		[ -d "$dst_dir" ] || mkdir -p "$dst_dir"
+		[ -f "$dst" ]     || cp -fv "$l" "$dst"
 
 		# symlink may land in a "wrong" subdir if it targets a relative dir
 		# example: libfltk.so.1.3.11 -> fltk1.3/libfltk.so.1.3.11 on archlinux
@@ -1882,10 +1896,9 @@ _lib4bin_deploy_shared_libs() {
 		#
 		# UPDATE, things actually broke, because stuff like radeonsi_drv_video.so
 		# need to be inside the dri subdir and cannot be in lib!
-		if [ -n "$readlink_path_name" ] \
-		  && [ "$l_name" != "$readlink_path_name" ]; then
-			mkdir -p "$sym_dst_dir"
-			ln -sfrv "$dst" "$sym_dst_dir"/"$l_name"
+		if [ "$lib_basename" != "$readlink_basename" ]; then
+			[ -d "$sym_dst_dir" ] || mkdir -p "$sym_dst_dir"
+			ln -sfrv "$dst" "$sym_dst_dir"/"$lib_basename"
 		fi
 	done
 }
@@ -1917,20 +1930,16 @@ _lib4bin_deploy_binaries() {
 
 		[ -x "$APPDIR/sharun" ] || _get_sharun
 
-		b_name=${b##*/}
+		bin_basename=${b##*/}
 
 		if [ -L "$b" ]; then
 			readlink_path=$(readlink -f "$b") || continue
-			readlink_path_name=${readlink_path##*/}
+			readlink_basename=${readlink_path##*/}
 		else
-			readlink_path_name=""
+			readlink_basename=$bin_basename
 		fi
 
-		if [ -n "$readlink_path_name" ]; then
-			dst=$SHARUN_BIN_DIR/$readlink_path_name
-		else
-			dst=$SHARUN_BIN_DIR/$b_name
-		fi
+		dst=$SHARUN_BIN_DIR/$readlink_basename
 
 		mkdir -p "$SHARUN_BIN_DIR"
 		if [ ! -f "$dst" ]; then
@@ -1938,18 +1947,16 @@ _lib4bin_deploy_binaries() {
 			chmod +x "$dst"
 		fi
 
-		if [ -n "$readlink_path_name" ] \
-		  && [ "$b_name" != "$readlink_path_name" ]; then
-			ln -sf "$readlink_path_name" "$SHARUN_BIN_DIR"/"$b_name"
+		if [ "$bin_basename" != "$readlink_basename" ]; then
+			ln -sf "$readlink_basename" "$SHARUN_BIN_DIR"/"$bin_basename"
 		fi
 
 		# hardlink in bin/ -> ../sharun
 		mkdir -p "$DST_BIN_DIR" && (
 			cd "$DST_BIN_DIR"
-			ln -f ../sharun "$b_name"
-			if [ -n "$readlink_path_name" ] \
-			  && [ "$b_name" != "$readlink_path_name" ]; then
-				ln -f ../sharun "$readlink_path_name"
+			ln -f ../sharun "$bin_basename"
+			if [ "$bin_basename" != "$readlink_basename" ]; then
+				ln -f ../sharun "$readlink_basename"
 			fi
 		) || exit 1
 	done
