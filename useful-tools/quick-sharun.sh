@@ -637,7 +637,7 @@ _wait_for_dlopened() {
 	# before the first library loads, wait for the X server to come up,
 	# -a sleeps 3s before the app starts. A static binary has no dynamic
 	# loader so it never logs and the wait runs to its limit
-	end=6
+	end=$checks
 	[ -z "$XVFB_CMD" ] || end=40
 
 	i=0
@@ -645,8 +645,9 @@ _wait_for_dlopened() {
 	while [ "$i" -lt "$end" ]; do
 		sleep 0.2
 		i=$((i + 1))
-		# a dead binary cannot dlopen anything else
-		kill -0 "$3" 2>/dev/null || break
+		# a launcher may exit after backgrounding a child, so wait for the
+		# whole process group, not just the pid that was launched
+		kill -0 -"$3" 2>/dev/null || break
 		if [ -z "$started" ]; then
 			if grep -q 'calling init' "$1" 2>/dev/null; then
 				started=1
@@ -1958,8 +1959,10 @@ _lib4bin_deploy_shared_libs() {
 			sym_dst_dir=$dst_dir
 		elif [ "$LIB32" = 1 ]; then
 			sym_dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
-		elif [ "${l%/*}" = "$_sym_cache_src" ]; then
+		elif [ -n "${l%/*}" ] \
+		  && [ "${l%/*}" = "$_sym_cache_src" ]; then
 			# same cache as above, for the symlink's own directory
+			# ${l%/*} is empty when the lib lives directly in /
 			sym_dst_dir=$_sym_cache_dst
 		else
 			sym_dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
