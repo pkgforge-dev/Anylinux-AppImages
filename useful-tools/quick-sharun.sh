@@ -1778,11 +1778,13 @@ _lib4bin_collect_ldd() {
 
 		skip=""
 		# do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
+		set -f
 		for d in $QUICK_SHARUN_SKIP_DEPS_FOR; do
 			case "${b##*/}" in
 				$d) skip=1; break ;;
 			esac
 		done
+		set +f
 
 		if [ -z "$skip" ]; then
 			printf '%s\n' "$b" >> "$_ldd_list"
