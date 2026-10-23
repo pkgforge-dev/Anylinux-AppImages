@@ -629,13 +629,12 @@ _kill_traced() {
 }
 
 # wait for a traced binary to stop opening libraries
-# $1 log file, $2 STRACE_TIME in seconds
+# $1 log file, $2 budget in seconds, $3 pid
 _wait_for_dlopened() {
 	checks=$(( $2 * 5 ))
-	# idle time before calling it done, scaled to the budget, min 0.6s max 1s
-	idle_max=$(( $2 / 2 ))
-	[ "$idle_max" -ge 3 ] || idle_max=3
-	[ "$idle_max" -le 5 ] || idle_max=5
+	# stop once nothing new has been loaded for half of the budget
+	idle_max=$(( $2 * 5 / 2 ))
+	[ "$idle_max" -ge 1 ] || idle_max=1
 
 	i=0
 	idle=0
@@ -643,6 +642,8 @@ _wait_for_dlopened() {
 	while [ "$i" -lt "$checks" ]; do
 		sleep 0.2
 		i=$((i + 1))
+		# a binary that is gone cannot dlopen anything else
+		kill -0 "$3" 2>/dev/null || break
 		# LD_DEBUG also logs searched paths, which keep trickling in after
 		# the last library, so count loaded libraries instead of bytes
 		count=$(grep -c 'calling init' "$1" 2>/dev/null) || count=0
@@ -1872,13 +1873,15 @@ _lib4bin_collect_strace() {
 
 		# make sure only the main binary waits the full STRACE_TIME
 		# everything else only gets 1 second instead
+		# the wait for the X server happens before the app starts, so it comes
+		# out of this budget, add a second back so the app really gets its time
 		if [ "${b##*/}" = "$MAIN_BIN" ]; then
-			_strace_time=$STRACE_TIME
+			_strace_time=$((STRACE_TIME + 1))
 		else
-			_strace_time=1
+			_strace_time=2
 		fi
 
-		_wait_for_dlopened "$dlopened" "$_strace_time"
+		_wait_for_dlopened "$dlopened" "$_strace_time" "$pid"
 		_kill_traced $pid
 		wait $pid 2>/dev/null || :
 
