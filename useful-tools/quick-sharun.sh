@@ -697,13 +697,8 @@ _test_appimage() {
 	set +m
 
 	# let the app run for 10 seconds, if it exits early it means something is wrong
-	# -a sleeps 3s before the app starts, do not count that against the app
-	_test_time=10
-	case "$XVFB_CMD" in
-		*" -a "*) _test_time=13 ;;
-	esac
 	COUNT=0
-	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt "$_test_time" ]; do
+	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt 10 ]; do
 		sleep 1
 		COUNT=$((COUNT + 1))
 	done
