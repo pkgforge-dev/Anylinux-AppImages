@@ -4738,8 +4738,7 @@ set -- \
 # and a symlink whose target is not bundled is never touched, that would
 # modify a file outside the AppDir
 for lib in "$@" "$SHARUN_BIN_DIR"/*; do
-	[ -f "$lib" ] || continue
-	if [ -L "$lib" ]; then
+	if [ ! -f "$lib" ] || [ -L "$lib" ]; then
 		continue
 	fi
 
