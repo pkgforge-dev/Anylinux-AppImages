@@ -1837,7 +1837,8 @@ _lib4bin_collect_strace() {
 	[ "$STRACE_MODE" = 1 ] || return 0
 
 	libs=""
-	seen=""
+	_seen=$TMPDIR/.seen.$$
+	:> "$_seen"
 	for b do
 		[ -f "$b" ]  || continue
 		_is_elf "$b" || _is_script "$b" || continue
@@ -1846,10 +1847,10 @@ _lib4bin_collect_strace() {
 			continue
 		fi
 
-		if echo "$seen" | grep -Fxq "$b"; then
+		if grep -Fxq "$b" "$_seen"; then
 			continue
 		fi
-		seen=$(printf '%s\n%s' "$seen" "$b")
+		printf '%s\n' "$b" >> "$_seen"
 
 		if [ -n "$STRACE_BINARY" ]; then
 			match=""
@@ -1933,6 +1934,7 @@ _lib4bin_collect_strace() {
 		[ -n "$out" ] || continue
 		libs=$(printf '%s\n%s' "$libs" "$out")
 	done
+	rm -f "$_seen"
 	STRACED_LIBS=$(echo "$libs" | sort -u | sed '/^$/d')
 }
 
