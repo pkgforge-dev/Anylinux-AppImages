@@ -698,9 +698,9 @@ _test_appimage() {
 	pid=$!
 	set +m
 
-	# let the app run for 7 seconds, if it exits early it means something is wrong
+	# let the app run for 10 seconds, if it exits early it means something is wrong
 	COUNT=0
-	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt 7 ]; do
+	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt 10 ]; do
 		sleep 1
 		COUNT=$((COUNT + 1))
 	done
