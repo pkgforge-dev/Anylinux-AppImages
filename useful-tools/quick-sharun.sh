@@ -4745,9 +4745,8 @@ for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 
 	# one patchelf call prints the rpath first and then the needed libs
 	# this used to be two calls per library, which added up fast
-	dyn=$(patchelf --print-rpath --print-needed "$lib" 2>/dev/null) || :
 	first=1
-	while IFS="" read -r l; do
+	patchelf --print-rpath --print-needed "$lib" 2>/dev/null | while IFS="" read -r l; do
 		# make sure to remove any full rpath from the libs
 		if [ "$first" = 1 ]; then
 			first=0
@@ -4768,9 +4767,7 @@ for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 				_echo "* removed full needed lib path $l from $lib"
 				;;
 		esac
-	done <<-EOF
-		$dyn
-	EOF
+	done
 done
 
 # one grep finds every file to patch, so these are one pass each
