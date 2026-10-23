@@ -526,9 +526,7 @@ _sanity_check() {
 
 	if [ "$STRACE_MODE" = 1 ]; then
 		if _is_cmd xvfb-run; then
-			# -d waits for the X server to report its display, which means the
-			# 3 second STARTWAIT that -a needs can be skipped entirely, this is
-			# 3 seconds of the STRACE_TIME budget that the app actually gets
+			# -d waits for Xvfb to report its display, so -a's 3s wait is not needed
 			if xvfb-run --help 2>&1 | grep -q -- '--auto-display'; then
 				XVFB_CMD="xvfb-run -d -w 0 --"
 			else
@@ -614,13 +612,12 @@ _kill_tree() {
 _kill_traced() {
 	if kill -0 -"$1" 2>/dev/null; then
 		kill -TERM -"$1" 2>/dev/null || :
-		# the app is only kept around to flush its LD_DEBUG output, which it
-		# has already done by the time we get here, so do not wait a full
-		# second on a process group that Xvfb and friends can outlive
+		# the app already flushed its LD_DEBUG output, and Xvfb can outlive
+		# TERM, so do not wait a full second on the whole process group
 		i=0
 		while [ "$i" -lt 2 ]; do
 			kill -0 -"$1" 2>/dev/null || break
-			sleep 0.1
+			sleep 0.2
 			i=$((i + 1))
 		done
 		kill -KILL -"$1" 2>/dev/null || :
@@ -632,26 +629,23 @@ _kill_traced() {
 }
 
 # wait for a traced binary to stop opening libraries
-# STRACE_TIME is the maximum, not a fixed cost: an app that has already
-# loaded everything does not get anything from being kept alive longer
-# $1 log file  $2 maximum in tenths of a second
+# $1 log file, $2 STRACE_TIME in seconds
 _wait_for_dlopened() {
-	# how long to wait without seeing a new library before calling it done
-	# scaled to the budget so short lived helpers are not kept around as long
-	# as the main binary, but never less than half a second
-	idle_max=$(( $2 / 5 ))
-	[ "$idle_max" -ge 5 ]  || idle_max=5
-	[ "$idle_max" -le 10 ] || idle_max=10
+	# $1 log file, $2 seconds
+	checks=$(( $2 * 5 ))
+	# idle time before calling it done, scaled to the budget, min 0.6s max 1s
+	idle_max=$(( $2 / 2 ))
+	[ "$idle_max" -ge 3 ] || idle_max=3
+	[ "$idle_max" -le 5 ] || idle_max=5
 
 	i=0
 	idle=0
 	last=-1
-	while [ "$i" -lt "$2" ]; do
-		sleep 0.1
+	while [ "$i" -lt "$checks" ]; do
+		sleep 0.2
 		i=$((i + 1))
-		# only the libraries that actually get loaded matter here, LD_DEBUG
-		# also logs every path it searches and that keeps trickling in long
-		# after the last library was loaded, so watch the init count instead
+		# LD_DEBUG also logs searched paths, which keep trickling in after
+		# the last library, so count loaded libraries instead of bytes
 		count=$(grep -c 'calling init' "$1" 2>/dev/null) || count=0
 		if [ "$count" != "$last" ]; then
 			idle=0
@@ -1885,7 +1879,7 @@ _lib4bin_collect_strace() {
 			_strace_time=1
 		fi
 
-		_wait_for_dlopened "$dlopened" $((_strace_time * 10))
+		_wait_for_dlopened "$dlopened" "$_strace_time"
 		_kill_traced $pid
 		wait $pid 2>/dev/null || :
 
@@ -4774,9 +4768,9 @@ for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 				_echo "* removed full needed lib path $l from $lib"
 				;;
 		esac
-	done <<EOF
-$dyn
-EOF
+	done <<-EOF
+		$dyn
+	EOF
 done
 
 # one grep finds every file to patch, so these are one pass each
