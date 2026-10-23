@@ -503,6 +503,15 @@ _get_icon() {
 	fi
 }
 
+# -d waits for Xvfb to report its display, so -a's 3s wait is not needed
+_set_xvfb_cmd() {
+	if xvfb-run --help 2>&1 | grep -q -- '--auto-display'; then
+		XVFB_CMD="xvfb-run -d -w 0.5 --"
+	else
+		XVFB_CMD="xvfb-run -a --"
+	fi
+}
+
 _sanity_check() {
 	for d in $DEPENDENCIES; do
 		if ! _is_cmd "$d"; then
@@ -526,7 +535,7 @@ _sanity_check() {
 
 	if [ "$STRACE_MODE" = 1 ]; then
 		if _is_cmd xvfb-run; then
-			XVFB_CMD="xvfb-run -a --"
+			_set_xvfb_cmd
 		else
 			_err_msg "WARNING: xvfb-run was not detected on the system"
 			_err_msg "xvfb-run is used in strace mode to provide a display"
@@ -644,7 +653,8 @@ _test_appimage() {
 	export APPIMAGE_EXTRACT_AND_RUN=1
 
 	set -m
-	xvfb-run -a -- "$APP" "$@" &
+	_set_xvfb_cmd
+	$XVFB_CMD "$APP" "$@" &
 	pid=$!
 	set +m
 
@@ -1779,6 +1789,8 @@ _lib4bin_collect_strace() {
 	[ "$STRACE_MODE" = 1 ] || return 0
 
 	libs=""
+	_seen=$TMPDIR/.seen.$$
+	:> "$_seen"
 	for b do
 		[ -f "$b" ]  || continue
 		_is_elf "$b" || _is_script "$b" || continue
@@ -1786,6 +1798,13 @@ _lib4bin_collect_strace() {
 		if _is_so "$b"; then
 			continue
 		fi
+
+		# the deployment array is built from overlapping globs, so the same
+		# binary shows up more than once, tracing it again only costs time
+		if grep -Fxq "$b" "$_seen"; then
+			continue
+		fi
+		printf '%s\n' "$b" >> "$_seen"
 
 		if [ -n "$STRACE_BINARY" ]; then
 			match=""
@@ -1869,6 +1888,7 @@ _lib4bin_collect_strace() {
 		[ -n "$out" ] || continue
 		libs=$(printf '%s\n%s' "$libs" "$out")
 	done
+	rm -f "$_seen"
 	STRACED_LIBS=$(echo "$libs" | sort -u | sed '/^$/d')
 }
 
