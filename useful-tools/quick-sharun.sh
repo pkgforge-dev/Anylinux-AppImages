@@ -637,8 +637,14 @@ _wait_for_dlopened() {
 	# polls of 0.2s, STRACE_TIME may be fractional
 	checks=$(awk -v t="$2" 'BEGIN { printf "%d", t * 5 }')
 	[ "$checks" -ge 1 ] || checks=1
-	# give up if nothing is ever loaded, static binaries never log
-	grace=6
+	# give up if nothing is ever loaded, static binaries never log. With
+	# xvfb-run the app only starts once the X server is up, and -a sleeps 3s
+	# before that, so wait long enough for that instead of for the app
+	if [ -n "$XVFB_CMD" ]; then
+		grace=40
+	else
+		grace=6
+	fi
 
 	i=0
 	used=0
@@ -699,8 +705,13 @@ _test_appimage() {
 	set +m
 
 	# let the app run for 10 seconds, if it exits early it means something is wrong
+	# -a sleeps 3s before the app starts, do not count that against the app
+	_test_time=10
+	case "$XVFB_CMD" in
+		*" -a "*) _test_time=13 ;;
+	esac
 	COUNT=0
-	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt 10 ]; do
+	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt "$_test_time" ]; do
 		sleep 1
 		COUNT=$((COUNT + 1))
 	done
