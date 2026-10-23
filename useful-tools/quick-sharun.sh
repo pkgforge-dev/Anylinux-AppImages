@@ -1843,11 +1843,8 @@ _lib4bin_collect_strace() {
 		[ -f "$b" ]  || continue
 		_is_elf "$b" || _is_script "$b" || continue
 		[ -x "$b" ]  || continue
-		if _is_so "$b"; then
-			continue
-		fi
 
-		if grep -Fxq "$b" "$_seen"; then
+		if _is_so "$b" || grep -Fxq "$b" "$_seen"; then
 			continue
 		fi
 		printf '%s\n' "$b" >> "$_seen"
@@ -2024,12 +2021,7 @@ _lib4bin_deploy_binaries() {
 		fi
 
 		# most arguments are libraries, skip them before anything forks
-		if _is_so "$b"; then
-			continue
-		fi
-		_is_elf "$b" || continue
-
-		if grep -Fxq "$b" "$_seen"; then
+		if _is_so "$b" || ! _is_elf "$b" || grep -Fxq "$b" "$_seen"; then
 			continue
 		fi
 		printf '%s\n' "$b" >> "$_seen"
