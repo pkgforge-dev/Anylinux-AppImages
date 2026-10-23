@@ -503,6 +503,15 @@ _get_icon() {
 	fi
 }
 
+# -d waits for Xvfb to report its display, so -a's 3s wait is not needed
+_set_xvfb_cmd() {
+	if xvfb-run --help 2>&1 | grep -q -- '--auto-display'; then
+		XVFB_CMD="xvfb-run -d -w 0.5 --"
+	else
+		XVFB_CMD="xvfb-run -a --"
+	fi
+}
+
 _sanity_check() {
 	for d in $DEPENDENCIES; do
 		if ! _is_cmd "$d"; then
@@ -526,12 +535,7 @@ _sanity_check() {
 
 	if [ "$STRACE_MODE" = 1 ]; then
 		if _is_cmd xvfb-run; then
-			# -d waits for Xvfb to report its display, so -a's 3s wait is not needed
-			if xvfb-run --help 2>&1 | grep -q -- '--auto-display'; then
-				XVFB_CMD="xvfb-run -d -w 0.5 --"
-			else
-				XVFB_CMD="xvfb-run -a --"
-			fi
+			_set_xvfb_cmd
 		else
 			_err_msg "WARNING: xvfb-run was not detected on the system"
 			_err_msg "xvfb-run is used in strace mode to provide a display"
@@ -612,8 +616,6 @@ _kill_tree() {
 _kill_traced() {
 	if kill -0 -"$1" 2>/dev/null; then
 		kill -TERM -"$1" 2>/dev/null || :
-		# same one second ceiling as before, but stop waiting as soon as the
-		# group is gone instead of always paying it in full
 		i=0
 		while [ "$i" -lt 5 ]; do
 			kill -0 -"$1" 2>/dev/null || break
@@ -630,8 +632,7 @@ _kill_traced() {
 
 # wait for a traced binary to stop opening libraries
 # $1 log file, $2 seconds to run the app for, $3 pid
-# the budget starts when the app loads its first library, so the wait for the
-# X server cannot eat into it
+# the budget starts at the first library, so the Xvfb wait cannot eat into it
 _wait_for_dlopened() {
 	# polls of 0.2s, STRACE_TIME may be fractional
 	checks=$(awk -v t="$2" 'BEGIN { printf "%d", t * 5 }')
@@ -692,13 +693,14 @@ _test_appimage() {
 	export APPIMAGE_EXTRACT_AND_RUN=1
 
 	set -m
-	xvfb-run -a -- "$APP" "$@" &
+	_set_xvfb_cmd
+	$XVFB_CMD "$APP" "$@" &
 	pid=$!
 	set +m
 
-	# let the app run for 12 seconds, if it exits early it means something is wrong
+	# let the app run for 7 seconds, if it exits early it means something is wrong
 	COUNT=0
-	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt 12 ]; do
+	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt 7 ]; do
 		sleep 1
 		COUNT=$((COUNT + 1))
 	done
@@ -1765,8 +1767,6 @@ _lib4bin_collect_ldd() {
 
 		skip=""
 		# do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
-		# case is a builtin, the loop this replaces forked a subshell per
-		# argument and there are hundreds of them
 		for d in $QUICK_SHARUN_SKIP_DEPS_FOR; do
 			case "${b##*/}" in
 				$d) skip=1; break ;;
@@ -1782,8 +1782,6 @@ _lib4bin_collect_ldd() {
 		fi
 	done
 
-	# the deployment array is built from overlapping globs, so the same
-	# library shows up many times, ldd runs a loader per file it is given
 	if [ -s "$_ldd_list" ]; then
 		sort -u -o "$_ldd_list" "$_ldd_list"
 	fi
@@ -1807,9 +1805,6 @@ _lib4bin_collect_ldd() {
 	#
 	# Verify with patchelf --print-needed and find the library instead
 	#
-	# every needed entry of every binary into one list, then a single grep
-	# tells which of them are not bundled yet. This used to fork twice per
-	# entry, which is a lot of forks for an application with many binaries
 	_needed=$TMPDIR/.needed.$$
 	_basenames=$TMPDIR/.basenames.$$
 	_missing=$TMPDIR/.missing.$$
@@ -1851,8 +1846,6 @@ _lib4bin_collect_strace() {
 			continue
 		fi
 
-		# the deployment array is built from overlapping globs, so the same
-		# binary shows up more than once, tracing it again only costs time
 		if echo "$seen" | grep -Fxq "$b"; then
 			continue
 		fi
@@ -1984,9 +1977,7 @@ _lib4bin_deploy_shared_libs() {
 		elif [ "$LIB32" = 1 ]; then
 			sym_dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
 		elif [ "${l%/*}" = "$_sym_cache_src" ]; then
-			# same cache as above, for the symlink's own directory. The list
-			# is sorted so this hits almost every time, and computing it per
-			# library was one of the most expensive parts of the deployment
+			# same cache as above, for the symlink's own directory
 			sym_dst_dir=$_sym_cache_dst
 		else
 			sym_dst_dir=$(_lib4bin_get_lib_dst_dir "$l")
@@ -4746,16 +4737,14 @@ set -- \
 	"$DST_LIB_DIR"/*/*/*/*/*/*.so*
 
 # include binaries in this check, since apps may statically link SDL and try dlopen pipewire
-# patching a symlink patches its target, so only the real files are visited
-# and a symlink whose target is not bundled is never touched, that would
-# modify a file outside the AppDir
+# patching a symlink patches its target, so skip symlinks. One pointing
+# outside the AppDir would modify a file that is not ours
 for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 	if [ ! -f "$lib" ] || [ -L "$lib" ]; then
 		continue
 	fi
 
-	# one patchelf call prints the rpath first and then the needed libs
-	# this used to be two calls per library, which added up fast
+	# patchelf prints the rpath first, then the needed libs
 	first=1
 	patchelf --print-rpath --print-needed "$lib" 2>/dev/null | while IFS="" read -r l; do
 		# make sure to remove any full rpath from the libs
