@@ -638,7 +638,8 @@ _wait_for_dlopened() {
 	checks=$(awk -v t="$2" 'BEGIN { printf "%d", t * 5 }')
 	[ "$checks" -ge 1 ] || checks=1
 	# before the first library loads, wait for the X server to come up,
-	# -a sleeps 3s before the app starts
+	# -a sleeps 3s before the app starts. A static binary has no dynamic
+	# loader so it never logs and the wait runs to its limit
 	if [ -n "$XVFB_CMD" ]; then
 		end=40
 	else
@@ -1854,13 +1855,6 @@ _lib4bin_collect_strace() {
 			continue
 		fi
 		seen=$(printf '%s\n%s' "$seen" "$b")
-
-		# a static binary never logs anything, LD_DEBUG is not honoured
-		if _is_elf "$b"; then
-			if ! patchelf --print-interpreter "$b" >/dev/null 2>&1; then
-				continue
-			fi
-		fi
 
 		if [ -n "$STRACE_BINARY" ]; then
 			match=""
