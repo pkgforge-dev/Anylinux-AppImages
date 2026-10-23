@@ -658,9 +658,9 @@ _test_appimage() {
 	pid=$!
 	set +m
 
-	# let the app run for 12 seconds, if it exits early it means something is wrong
+	# let the app run for 10 seconds, if it exits early it means something is wrong
 	COUNT=0
-	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt 12 ]; do
+	while kill -0 $pid 2>/dev/null && [ "$COUNT" -lt 10 ]; do
 		sleep 1
 		COUNT=$((COUNT + 1))
 	done
@@ -1721,20 +1721,18 @@ _lib4bin_collect_ldd() {
 	:> "$_libs_list"
 	:> "$_ldd_list"
 
+	set -f
 	for b do
 		[ -f "$b" ]  || continue
 		_is_elf "$b" || continue
 
 		skip=""
 		# do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
-		while read -r d; do
-			if [ "$d" = "${b##*/}" ]; then
-				skip=1
-				break
-			fi
-		done <<-EOF
-		$QUICK_SHARUN_SKIP_DEPS_FOR
-		EOF
+		for d in $QUICK_SHARUN_SKIP_DEPS_FOR; do
+			case "${b##*/}" in
+				$d) skip=1; break ;;
+			esac
+		done
 
 		if [ -z "$skip" ]; then
 			printf '%s\n' "$b" >> "$_ldd_list"
@@ -1744,6 +1742,7 @@ _lib4bin_collect_ldd() {
 			printf '%s\n' "$b" >> "$_libs_list"
 		fi
 	done
+	set +f
 
 	if [ -s "$_ldd_list" ]; then
 		(
