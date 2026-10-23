@@ -616,11 +616,9 @@ _kill_tree() {
 _kill_traced() {
 	if kill -0 -"$1" 2>/dev/null; then
 		kill -TERM -"$1" 2>/dev/null || :
-		i=0
-		while [ "$i" -lt 5 ]; do
+		for _ in 1 2 3 4 5; do
 			kill -0 -"$1" 2>/dev/null || break
 			sleep 0.2
-			i=$((i + 1))
 		done
 		kill -KILL -"$1" 2>/dev/null || :
 	else
@@ -635,16 +633,12 @@ _kill_traced() {
 # the budget starts at the first library, so the Xvfb wait cannot eat into it
 _wait_for_dlopened() {
 	# polls of 0.2s, STRACE_TIME may be fractional
-	checks=$(awk -v t="$2" 'BEGIN { printf "%d", t * 5 }')
-	[ "$checks" -ge 1 ] || checks=1
+	checks=$(awk -v t="$2" 'BEGIN { c = t * 5; printf "%d", c < 1 ? 1 : c }')
 	# before the first library loads, wait for the X server to come up,
 	# -a sleeps 3s before the app starts. A static binary has no dynamic
 	# loader so it never logs and the wait runs to its limit
-	if [ -n "$XVFB_CMD" ]; then
-		end=40
-	else
-		end=6
-	fi
+	end=6
+	[ -z "$XVFB_CMD" ] || end=40
 
 	i=0
 	started=""
@@ -660,7 +654,6 @@ _wait_for_dlopened() {
 			fi
 		fi
 	done
-	return 0
 }
 
 # do a basic test to make sure at least the application is not totally broken
@@ -1759,19 +1752,18 @@ _lib4bin_collect_ldd() {
 	:> "$_libs_list"
 	:> "$_ldd_list"
 
+	set -f
 	for b do
 		[ -f "$b" ]  || continue
 		_is_elf "$b" || continue
 
 		skip=""
 		# do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
-		set -f
 		for d in $QUICK_SHARUN_SKIP_DEPS_FOR; do
 			case "${b##*/}" in
 				$d) skip=1; break ;;
 			esac
 		done
-		set +f
 
 		if [ -z "$skip" ]; then
 			printf '%s\n' "$b" >> "$_ldd_list"
@@ -1781,12 +1773,10 @@ _lib4bin_collect_ldd() {
 			printf '%s\n' "$b" >> "$_libs_list"
 		fi
 	done
+	set +f
 
 	if [ -s "$_ldd_list" ]; then
 		sort -u -o "$_ldd_list" "$_ldd_list"
-	fi
-
-	if [ -s "$_ldd_list" ]; then
 		(
 		  set --
 		  while IFS= read -r b; do
@@ -1805,27 +1795,20 @@ _lib4bin_collect_ldd() {
 	#
 	# Verify with patchelf --print-needed and find the library instead
 	#
-	_needed=$TMPDIR/.needed.$$
 	_basenames=$TMPDIR/.basenames.$$
-	_missing=$TMPDIR/.missing.$$
 	awk -F'/' '{print $NF}' "$_libs_list" | sort -u > "$_basenames"
-	:> "$_needed"
 	for b do
 		if _is_so "$b" || ! _is_elf "$b"; then
 			continue
 		fi
-		patchelf --print-needed "$b" 2>/dev/null >> "$_needed" || :
+		patchelf --print-needed "$b" 2>/dev/null || :
+	done | sort -u | grep -vxF -f "$_basenames" | while IFS= read -r s; do
+		if [ -e "$LIB_DIR"/"$s" ]; then
+			# Was not found by ldd / LD_DEBUG=libs
+			printf '%s\n' "$LIB_DIR"/"$s" >> "$_libs_list"
+		fi
 	done
-	if [ -s "$_needed" ]; then
-		sort -u "$_needed" | grep -vxF -f "$_basenames" > "$_missing" || :
-		while IFS= read -r s; do
-			if [ -e "$LIB_DIR"/"$s" ]; then
-				# Was not found by ldd / LD_DEBUG=libs
-				printf '%s\n' "$LIB_DIR"/"$s" >> "$_libs_list"
-			fi
-		done < "$_missing"
-	fi
-	rm -f "$_needed" "$_basenames" "$_missing"
+	rm -f "$_basenames"
 
 	sort -u "$_libs_list" | sed '/^$/d'
 	rm -f "$_libs_list"
@@ -4743,30 +4726,28 @@ for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 		continue
 	fi
 
-	# patchelf prints the rpath first, then the needed libs
-	first=1
-	patchelf --print-rpath --print-needed "$lib" 2>/dev/null | while IFS="" read -r l; do
+	# the first line patchelf prints is the rpath, then one needed lib per line
+	patchelf --print-rpath --print-needed "$lib" 2>/dev/null | {
+		IFS="" read -r l || :
 		# make sure to remove any full rpath from the libs
-		if [ "$first" = 1 ]; then
-			first=0
-			case "$l" in
-				/*)
-					patchelf --remove-rpath "$lib"
-					_echo "* removed full rpath from $lib"
-					;;
-			esac
-			continue
-		fi
+		case "$l" in
+			/*)
+				patchelf --remove-rpath "$lib"
+				_echo "* removed full rpath from $lib"
+				;;
+		esac
 
 		# also remove full paths from needed libs, for example
 		# a library may depend on /usr/lib/libkek.so instead of libkek.so
-		case "$l" in
-			/*)
-				patchelf --replace-needed "$l" "${l##*/}" "$lib"
-				_echo "* removed full needed lib path $l from $lib"
-				;;
-		esac
-	done
+		while IFS="" read -r l; do
+			case "$l" in
+				/*)
+					patchelf --replace-needed "$l" "${l##*/}" "$lib"
+					_echo "* removed full needed lib path $l from $lib"
+					;;
+			esac
+		done
+	}
 done
 
 # one grep finds every file to patch, so these are one pass each
