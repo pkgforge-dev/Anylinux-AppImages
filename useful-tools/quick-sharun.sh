@@ -87,11 +87,11 @@ QUICK_SHARUN_SKIP_DEPS_FOR="
 	libqgtk3.so
 "
 
-SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.5.1/sharun+helper-libs-$APPIMAGE_ARCH.tar}
+SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/releases/download/3.7.1/sharun+helper-libs-$APPIMAGE_ARCH.tar}
 SHARUN_TARBALL=$TMPDIR/sharun+helper-libs-$APPIMAGE_ARCH.tar
 APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.5.3/appimagetool-full-$APPIMAGE_ARCH-linux}
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
-CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.7/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
+CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.8/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
 CROSS_LIBC_DLOPEN_TARBALL=$TMPDIR/cross-libc-dlopen-$APPIMAGE_ARCH.tar
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/download/0.3.3/onelf-$APPIMAGE_ARCH-linux}
 ONELF=${ONELF:-$TMPDIR/onelf}
@@ -101,34 +101,34 @@ ONELF=${ONELF:-$TMPDIR/onelf}
 case "$APPIMAGE_ARCH" in
 	x86_64)
 		APPIMAGETOOL_SHA=9a6fd46ee6bc5910e7acfa68f9d8090f3751e956840b90304ef57d64321a530d
-		SHARUN_SHA=3aa5be5c429b47536861d702d32677fdfcddbb3fc17a82f51b0e07eadcac28bb
+		SHARUN_SHA=457efae5913c6a2390a996c3aeb6af2e543c8f16f12e2acd905a7ea39a7bc094
 		ONELF_SHA=3a990243790c026c902330a7744e8c21b25fdc8c694a88e79d6fb25d761a6351
-		CROSS_LIBC_DLOPEN_TAR_SHA=5b4a9c799b4875e7687b9b4158105a64056031c6c8a8719cbf00fa20839c9cf3
+		CROSS_LIBC_DLOPEN_TAR_SHA=7fc594fca7203eee26e651b4b0d5c09bd8f8cc34ed84df2ffed2a5d3e060214c
 		;;
 	aarch64)
 		APPIMAGETOOL_SHA=26ba53913627ec35cf6edd564fb338ff277f385d401b5fdef3b5b83ddbe3a75d
-		SHARUN_SHA=79494abb988a763e8b907ccce3e0ce09649812e28544c28a3d0672d6c68ab5d7
+		SHARUN_SHA=9262162608824022b9d64c665ab2a8614b8b8017e310fffffa80cf8ed6d210cc
 		ONELF_SHA=9b5b2c3d031756a064bd9a71a977e229cb359f324937a5ba8a28db1568bae15b
-		CROSS_LIBC_DLOPEN_TAR_SHA=3933775b6ef92454992aab736119db08b17e994e14bf6e3b30f5206497aa82fe
+		CROSS_LIBC_DLOPEN_TAR_SHA=673a4489b59bb5f7c129648b94bdba97006e9e2992f91f3d0b7fcc5661d1b832
 		;;
 	riscv64)
 		APPIMAGETOOL_SHA=fb0158358ad9d58cc99f89edaa8f87186c14899654de5fb774e795de4d643231
-		SHARUN_SHA=6fd37897e0763ee47acc4749306a032dad8fb34c61f0858a68f85ed8a5e7fce2
-		CROSS_LIBC_DLOPEN_TAR_SHA=2b2db022da847e3c2b4012459ffe2141769f3b1f7c44b2c73bc2200c254dc8c4
+		SHARUN_SHA=54aa6bca21e3e39651285c8433b5adb8ed5824244a916165ccb55792914de325
+		CROSS_LIBC_DLOPEN_TAR_SHA=bb0df8dd44ef12bf3bfaf3d9b360184b435045a1a9717e503da2a1b5a778280d
 		;;
 	ppc64)
 		APPIMAGETOOL_SHA=d70d27db028302aa8fa3e2d7af4513010354d4e73c38e528a93bcbd1f0243fc3
-		SHARUN_SHA=0264cb2e64a59a5f1b21d17d48124d38d62c8a7746ef05c6d3a69e9731ee5509
+		SHARUN_SHA=6a61f45c93ef017607faa26ec23a7e2f66b9ef229e4feb7441551e3115eba5bd
 		;;
 	ppc64le)
 		APPIMAGETOOL_SHA=f7ad7b9c4ed3b6985599628465f89bb4af467637cb5a2c72f29fcf89eeb63fac
-		SHARUN_SHA=65f6f91adbbb376817be82625887b847766238ef406c6805529f3faffad521ac
-		CROSS_LIBC_DLOPEN_TAR_SHA=39df2b23af237383c0850be4dcbc2089b440dbb647f67c7ed09219afcef94555
+		SHARUN_SHA=37af80cd16465ad61fbe4d0555546a30ef1d879d1de0d81d3ce155d965a98135
+		CROSS_LIBC_DLOPEN_TAR_SHA=ee382fbce2fa8df61563edd0d20d7b7895c04d087e398b9b748cae9c6248a735
 		;;
 	loongarch64)
 		APPIMAGETOOL_SHA=90f33314d5f8e824ca5c9a80869553bcc33f14a0b331309d36ae60c7bf7be008
-		SHARUN_SHA=7e54196aca59d2c8038bd2db4c7c472b3d7c49087a73f6272fb2003b71d40177
-		CROSS_LIBC_DLOPEN_TAR_SHA=875246a25357c913162f4db2e0f0c4e2a554e0ce5326ecd4cee9d24de8f71e40
+		SHARUN_SHA=1d71354361b91defd9e3d92bb009c3e58a566f0d10d9b406085b298f0a0a86c1
+		CROSS_LIBC_DLOPEN_TAR_SHA=2aefc166801069345653b5348206ce1f58c3716e377a95ac31a87613d215225a
 		;;
 esac
 
@@ -1616,15 +1616,33 @@ _make_deployment_array() {
 }
 
 _get_sharun() {
-	if [ -x "$APPDIR"/sharun ]; then
+	if [ -x "$APPDIR"/sharun ] && [ -x "$APPDIR"/dash ]; then
 		return 0
 	fi
 	_echo "Downloading sharun..."
 	_download "$SHARUN_TARBALL" "$SHARUN_LINK"
 	_check_shasum "$SHARUN_TARBALL" "$SHARUN_SHA"
 
+	# dash is what sharun runs AppRun.sh with when it sits next to sharun,
+	# so both have to land in the AppDir root. sharun is required, dash is
+	# not present in tarballs older than 3.7.0, so it is extracted on its own
 	tar -xf "$SHARUN_TARBALL" -C "$APPDIR" sharun
 	chmod +x "$APPDIR"/sharun
+	if tar -xf "$SHARUN_TARBALL" -C "$APPDIR" dash; then
+		chmod +x "$APPDIR"/dash
+		# the BSD-3-Clause notice has to travel with the binary, in the place
+		# the FHS and the appimage conventions put license files. 3.7.0 has
+		# the dash but not the notice, so the directory is only made once
+		# there is something to put in it
+		if tar -tf "$SHARUN_TARBALL" | grep -qx 'dash-COPYING'; then
+			mkdir -p "$APPDIR"/share/licenses
+			tar -xf "$SHARUN_TARBALL" -C "$APPDIR"/share/licenses dash-COPYING
+		fi
+		_echo "* dash deployed next to sharun"
+	else
+		_err_msg "WARNING: this sharun tarball has no dash in it"
+		_err_msg "AppRun.sh will be run with a shell found on the host"
+	fi
 }
 
 _add_helper_libs() {
@@ -1645,7 +1663,9 @@ _add_helper_libs() {
 	# extract everything, then delete what is not wanted
 	mkdir -p "$PRELOAD_DIR"
 	tar -xf "$SHARUN_TARBALL" -C "$PRELOAD_DIR"
-	rm -f "$PRELOAD_DIR"/sharun
+	# sharun and dash live in the AppDir root, not in the preload dir, and so
+	# does the notice that has to travel with dash
+	rm -f "$PRELOAD_DIR"/sharun "$PRELOAD_DIR"/dash "$PRELOAD_DIR"/dash-COPYING
 
 	if [ "$ANYLINUX_LIB" = 1 ]; then _echo "* anylinux.so successfully added!"
 	else rm -f "$PRELOAD_DIR"/anylinux.so; fi
