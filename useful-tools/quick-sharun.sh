@@ -528,7 +528,7 @@ _sanity_check() {
 		if _is_cmd xvfb-run; then
 			# -d waits for Xvfb to report its display, so -a's 3s wait is not needed
 			if xvfb-run --help 2>&1 | grep -q -- '--auto-display'; then
-				XVFB_CMD="xvfb-run -d -w 0.1 --"
+				XVFB_CMD="xvfb-run -d -w 0.5 --"
 			else
 				XVFB_CMD="xvfb-run -a --"
 			fi
@@ -612,10 +612,10 @@ _kill_tree() {
 _kill_traced() {
 	if kill -0 -"$1" 2>/dev/null; then
 		kill -TERM -"$1" 2>/dev/null || :
-		# the app already flushed its LD_DEBUG output, and Xvfb can outlive
-		# TERM, so do not wait a full second on the whole process group
+		# same one second ceiling as before, but stop waiting as soon as the
+		# group is gone instead of always paying it in full
 		i=0
-		while [ "$i" -lt 2 ]; do
+		while [ "$i" -lt 5 ]; do
 			kill -0 -"$1" 2>/dev/null || break
 			sleep 0.2
 			i=$((i + 1))
@@ -631,7 +631,6 @@ _kill_traced() {
 # wait for a traced binary to stop opening libraries
 # $1 log file, $2 STRACE_TIME in seconds
 _wait_for_dlopened() {
-	# $1 log file, $2 seconds
 	checks=$(( $2 * 5 ))
 	# idle time before calling it done, scaled to the budget, min 0.6s max 1s
 	idle_max=$(( $2 / 2 ))
