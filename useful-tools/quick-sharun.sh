@@ -528,7 +528,7 @@ _sanity_check() {
 		if _is_cmd xvfb-run; then
 			# -d waits for Xvfb to report its display, so -a's 3s wait is not needed
 			if xvfb-run --help 2>&1 | grep -q -- '--auto-display'; then
-				XVFB_CMD="xvfb-run -d -w 0 --"
+				XVFB_CMD="xvfb-run -d -w 0.1 --"
 			else
 				XVFB_CMD="xvfb-run -a --"
 			fi
