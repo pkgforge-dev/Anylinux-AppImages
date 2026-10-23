@@ -1730,7 +1730,7 @@ _lib4bin_collect_ldd() {
 		# do not deploy dependencies for libs in QUICK_SHARUN_SKIP_DEPS_FOR
 		for d in $QUICK_SHARUN_SKIP_DEPS_FOR; do
 			case "${b##*/}" in
-				$d) skip=1; break ;;
+				$d) skip=1; break;;
 			esac
 		done
 
