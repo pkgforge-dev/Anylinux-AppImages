@@ -630,16 +630,24 @@ _kill_traced() {
 
 # wait for a traced binary to stop opening libraries
 # $1 log file, $2 budget in seconds, $3 pid
+# wait for a traced binary to stop opening libraries
+# $1 log file, $2 seconds to run the app for, $3 pid
+# the budget only starts once the app loads its first library, so the wait for
+# the X server, which happens before the app runs, cannot eat into it
 _wait_for_dlopened() {
 	checks=$(( $2 * 5 ))
-	# stop once nothing new has been loaded for half of the budget
-	idle_max=$(( $2 * 5 / 2 ))
-	[ "$idle_max" -ge 1 ] || idle_max=1
+	# only give up early once the app has been quiet for its whole budget, so
+	# this can never cut the budget short for something that loads late
+	idle_max=$checks
+	# never hang when the app does not start at all
+	limit=$(( checks + 25 ))
 
 	i=0
+	used=0
 	idle=0
+	started=0
 	last=-1
-	while [ "$i" -lt "$checks" ]; do
+	while [ "$i" -lt "$limit" ]; do
 		sleep 0.2
 		i=$((i + 1))
 		# a binary that is gone cannot dlopen anything else
@@ -647,9 +655,17 @@ _wait_for_dlopened() {
 		# LD_DEBUG also logs searched paths, which keep trickling in after
 		# the last library, so count loaded libraries instead of bytes
 		count=$(grep -c 'calling init' "$1" 2>/dev/null) || count=0
+		if [ "$started" = 0 ]; then
+			[ "$count" -gt 0 ] || continue
+			started=1
+		fi
+		used=$((used + 1))
+		if [ "$used" -gt "$checks" ]; then
+			return 0
+		fi
 		if [ "$count" != "$last" ]; then
 			idle=0
-		elif [ "$count" -gt 0 ]; then
+		else
 			idle=$((idle + 1))
 			if [ "$idle" -ge "$idle_max" ]; then
 				return 0
@@ -1838,6 +1854,7 @@ _lib4bin_collect_strace() {
 	[ "$STRACE_MODE" = 1 ] || return 0
 
 	libs=""
+	seen=""
 	for b do
 		[ -f "$b" ]  || continue
 		_is_elf "$b" || _is_script "$b" || continue
@@ -1845,6 +1862,13 @@ _lib4bin_collect_strace() {
 		if _is_so "$b"; then
 			continue
 		fi
+
+		# the deployment array is built from overlapping globs, so the same
+		# binary shows up more than once, tracing it again only costs time
+		if echo "$seen" | grep -Fxq "$b"; then
+			continue
+		fi
+		seen=$(printf '%s\n%s' "$seen" "$b")
 
 		if [ -n "$STRACE_BINARY" ]; then
 			match=""
@@ -1873,12 +1897,10 @@ _lib4bin_collect_strace() {
 
 		# make sure only the main binary waits the full STRACE_TIME
 		# everything else only gets 1 second instead
-		# the wait for the X server happens before the app starts, so it comes
-		# out of this budget, add a second back so the app really gets its time
 		if [ "${b##*/}" = "$MAIN_BIN" ]; then
-			_strace_time=$((STRACE_TIME + 1))
+			_strace_time=$STRACE_TIME
 		else
-			_strace_time=2
+			_strace_time=1
 		fi
 
 		_wait_for_dlopened "$dlopened" "$_strace_time" "$pid"
