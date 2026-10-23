@@ -629,49 +629,37 @@ _kill_traced() {
 }
 
 # wait for a traced binary to stop opening libraries
-# $1 log file, $2 budget in seconds, $3 pid
-# wait for a traced binary to stop opening libraries
 # $1 log file, $2 seconds to run the app for, $3 pid
-# the budget only starts once the app loads its first library, so the wait for
-# the X server, which happens before the app runs, cannot eat into it
+# the budget starts when the app loads its first library, so the wait for the
+# X server cannot eat into it
 _wait_for_dlopened() {
-	checks=$(( $2 * 5 ))
-	# only give up early once the app has been quiet for its whole budget, so
-	# this can never cut the budget short for something that loads late
-	idle_max=$checks
-	# never hang when the app does not start at all
-	limit=$(( checks + 25 ))
+	# polls of 0.2s, STRACE_TIME may be fractional
+	checks=$(awk -v t="$2" 'BEGIN { printf "%d", t * 5 }')
+	[ "$checks" -ge 1 ] || checks=1
+	# give up if nothing is ever loaded, static binaries never log
+	grace=6
 
 	i=0
 	used=0
-	idle=0
 	started=0
-	last=-1
-	while [ "$i" -lt "$limit" ]; do
+	while [ "$i" -lt $((checks + grace)) ]; do
 		sleep 0.2
 		i=$((i + 1))
-		# a binary that is gone cannot dlopen anything else
+		# a dead binary cannot dlopen anything else
 		kill -0 "$3" 2>/dev/null || break
-		# LD_DEBUG also logs searched paths, which keep trickling in after
-		# the last library, so count loaded libraries instead of bytes
-		count=$(grep -c 'calling init' "$1" 2>/dev/null) || count=0
 		if [ "$started" = 0 ]; then
-			[ "$count" -gt 0 ] || continue
-			started=1
+			count=$(grep -c 'calling init' "$1" 2>/dev/null) || count=0
+			if [ "$count" -gt 0 ]; then
+				started=1
+			elif [ "$i" -ge "$grace" ]; then
+				break
+			fi
+			continue
 		fi
 		used=$((used + 1))
 		if [ "$used" -gt "$checks" ]; then
-			return 0
+			break
 		fi
-		if [ "$count" != "$last" ]; then
-			idle=0
-		else
-			idle=$((idle + 1))
-			if [ "$idle" -ge "$idle_max" ]; then
-				return 0
-			fi
-		fi
-		last=$count
 	done
 	return 0
 }
