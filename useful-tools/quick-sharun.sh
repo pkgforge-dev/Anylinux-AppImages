@@ -637,35 +637,26 @@ _wait_for_dlopened() {
 	# polls of 0.2s, STRACE_TIME may be fractional
 	checks=$(awk -v t="$2" 'BEGIN { printf "%d", t * 5 }')
 	[ "$checks" -ge 1 ] || checks=1
-	# give up if nothing is ever loaded, static binaries never log. With
-	# xvfb-run the app only starts once the X server is up, and -a sleeps 3s
-	# before that, so wait long enough for that instead of for the app
+	# before the first library loads, wait for the X server to come up,
+	# -a sleeps 3s before the app starts
 	if [ -n "$XVFB_CMD" ]; then
-		grace=40
+		end=40
 	else
-		grace=6
+		end=6
 	fi
 
 	i=0
-	used=0
-	started=0
-	while [ "$i" -lt $((checks + grace)) ]; do
+	started=""
+	while [ "$i" -lt "$end" ]; do
 		sleep 0.2
 		i=$((i + 1))
 		# a dead binary cannot dlopen anything else
 		kill -0 "$3" 2>/dev/null || break
-		if [ "$started" = 0 ]; then
-			count=$(grep -c 'calling init' "$1" 2>/dev/null) || count=0
-			if [ "$count" -gt 0 ]; then
+		if [ -z "$started" ]; then
+			if grep -q 'calling init' "$1" 2>/dev/null; then
 				started=1
-			elif [ "$i" -ge "$grace" ]; then
-				break
+				end=$((i + checks + 1))
 			fi
-			continue
-		fi
-		used=$((used + 1))
-		if [ "$used" -gt "$checks" ]; then
-			break
 		fi
 	done
 	return 0
@@ -1863,6 +1854,13 @@ _lib4bin_collect_strace() {
 			continue
 		fi
 		seen=$(printf '%s\n%s' "$seen" "$b")
+
+		# a static binary never logs anything, LD_DEBUG is not honoured
+		if _is_elf "$b"; then
+			if ! patchelf --print-interpreter "$b" >/dev/null 2>&1; then
+				continue
+			fi
+		fi
 
 		if [ -n "$STRACE_BINARY" ]; then
 			match=""
