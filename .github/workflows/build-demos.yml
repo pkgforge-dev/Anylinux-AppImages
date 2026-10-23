@@ -106,9 +106,58 @@ jobs:
           name: AppImage-${{ matrix.arch }}-${{ matrix.script }}
           path: dist
 
+  # these run through qemu user emulation, so expect much longer CI times
+  build-additional-cpu-arches:
+    name: "${{ matrix.script }} (${{ matrix.arch }})"
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        script:
+          - vkcube-glxgears-appimage
+          - gtk3-demo-appimage
+          - gtk4-demo-appimage
+          - sdl-demo-appimage
+        arch: [riscv64, loongarch64, ppc64le, ppc64]
+        include:
+          - { arch: riscv64, platform: linux/riscv64 }
+          - { arch: loongarch64, platform: linux/loong64 }
+          - { arch: ppc64le, platform: linux/ppc64le }
+          - { arch: ppc64, platform: linux/ppc64 } # BE
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # the binfmt handlers must exist before the foreign arch container starts
+      # so this cannot use a job level container. The script of the setup action
+      # is reused because docker/setup-qemu-action ships no ppc64 (BE) handler
+      - name: Register QEMU binfmt handlers
+        run: |
+          curl -fsSL -o ./register-binfmt.sh \
+            https://raw.githubusercontent.com/pkgforge-dev/anylinux-setup-action/ba7321e11074f9e387a0634e653d09b115d576cd/emulated/register-binfmt.sh
+          sh ./register-binfmt.sh
+
+      - name: Make AppImage (emulated)
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          docker run --rm --platform "$PLATFORM" \
+            -e GITHUB_REPOSITORY \
+            -v "$PWD":/repo -w /repo \
+            ghcr.io/pkgforge-dev/archlinux:latest \
+            /bin/sh ./useful-tools/demo/${{ matrix.script }}.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: AppImage-${{ matrix.arch }}-${{ matrix.script }}
+          path: dist
+
   release:
-    if: ${{ github.ref_name == 'main' && needs.build.result == 'success' }}
-    needs: [build]
+    if: >-
+      ${{ !cancelled() && github.ref_name == 'main'
+      && needs.build.result == 'success'
+      && needs.build-additional-cpu-arches.result != 'failure' }}
+    needs: [build, build-additional-cpu-arches]
     permissions: write-all
     runs-on: ubuntu-latest
     steps:

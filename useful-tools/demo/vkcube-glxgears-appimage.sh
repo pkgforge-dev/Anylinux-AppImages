@@ -15,7 +15,11 @@ export ICON=DUMMY
 export DESKTOP=DUMMY
 export OUTPATH=./dist
 export OUTNAME=vkcube+glxgears-demo-"$ARCH".AppImage
+# BE ppc64 predates vulkan, so glxgears is the default binary there
 export MAIN_BIN=vkcube
+case "$ARCH" in
+	ppc64) export MAIN_BIN=glxgears;;
+esac
 # vkmark is hardcoded to look in /usr/share/vkmark and /usr/lib/vkmark
 export PATH_MAPPING='
 	/usr/share/vkmark:${SHARUN_DIR}/share/vkmark
