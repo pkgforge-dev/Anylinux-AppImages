@@ -1793,15 +1793,9 @@ _lib4bin_collect_strace() {
 	:> "$_seen"
 	for b do
 		[ -f "$b" ]  || continue
-		_is_elf "$b" || _is_script "$b" || continue
 		[ -x "$b" ]  || continue
-		if _is_so "$b"; then
-			continue
-		fi
-
-		# the deployment array is built from overlapping globs, so the same
-		# binary shows up more than once, tracing it again only costs time
-		if grep -Fxq "$b" "$_seen"; then
+		_is_elf "$b" || _is_script "$b" || continue
+		if _is_so "$b" || grep -Fxq "$b" "$_seen"; then
 			continue
 		fi
 		printf '%s\n' "$b" >> "$_seen"
