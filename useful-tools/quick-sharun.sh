@@ -91,7 +91,7 @@ SHARUN_LINK=${SHARUN_LINK:-https://github.com/pkgforge-dev/Anylinux-sharun/relea
 SHARUN_TARBALL=$TMPDIR/sharun+helper-libs-$APPIMAGE_ARCH.tar
 APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.5.3/appimagetool-full-$APPIMAGE_ARCH-linux}
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
-CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.8/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
+CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.9/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
 CROSS_LIBC_DLOPEN_TARBALL=$TMPDIR/cross-libc-dlopen-$APPIMAGE_ARCH.tar
 ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/download/0.3.3/onelf-$APPIMAGE_ARCH-linux}
 ONELF=${ONELF:-$TMPDIR/onelf}
@@ -103,18 +103,18 @@ case "$APPIMAGE_ARCH" in
 		APPIMAGETOOL_SHA=9a6fd46ee6bc5910e7acfa68f9d8090f3751e956840b90304ef57d64321a530d
 		SHARUN_SHA=457efae5913c6a2390a996c3aeb6af2e543c8f16f12e2acd905a7ea39a7bc094
 		ONELF_SHA=3a990243790c026c902330a7744e8c21b25fdc8c694a88e79d6fb25d761a6351
-		CROSS_LIBC_DLOPEN_TAR_SHA=7fc594fca7203eee26e651b4b0d5c09bd8f8cc34ed84df2ffed2a5d3e060214c
+		CROSS_LIBC_DLOPEN_TAR_SHA=765d1d8aeb08b27084be65e069fc26754808ee17707d30c27fd2b55789b6ef8f
 		;;
 	aarch64)
 		APPIMAGETOOL_SHA=26ba53913627ec35cf6edd564fb338ff277f385d401b5fdef3b5b83ddbe3a75d
 		SHARUN_SHA=9262162608824022b9d64c665ab2a8614b8b8017e310fffffa80cf8ed6d210cc
 		ONELF_SHA=9b5b2c3d031756a064bd9a71a977e229cb359f324937a5ba8a28db1568bae15b
-		CROSS_LIBC_DLOPEN_TAR_SHA=673a4489b59bb5f7c129648b94bdba97006e9e2992f91f3d0b7fcc5661d1b832
+		CROSS_LIBC_DLOPEN_TAR_SHA=92a31ce33bd17e13bfb255f0033f68eb0af92634a3d4d9f4a086546af364ebd9
 		;;
 	riscv64)
 		APPIMAGETOOL_SHA=fb0158358ad9d58cc99f89edaa8f87186c14899654de5fb774e795de4d643231
 		SHARUN_SHA=54aa6bca21e3e39651285c8433b5adb8ed5824244a916165ccb55792914de325
-		CROSS_LIBC_DLOPEN_TAR_SHA=bb0df8dd44ef12bf3bfaf3d9b360184b435045a1a9717e503da2a1b5a778280d
+		CROSS_LIBC_DLOPEN_TAR_SHA=316523a48e4bb34ae0d76123d74e6c5c572b26a6f06052862ce7bd6f90b0147d
 		;;
 	ppc64)
 		APPIMAGETOOL_SHA=d70d27db028302aa8fa3e2d7af4513010354d4e73c38e528a93bcbd1f0243fc3
@@ -123,12 +123,12 @@ case "$APPIMAGE_ARCH" in
 	ppc64le)
 		APPIMAGETOOL_SHA=f7ad7b9c4ed3b6985599628465f89bb4af467637cb5a2c72f29fcf89eeb63fac
 		SHARUN_SHA=37af80cd16465ad61fbe4d0555546a30ef1d879d1de0d81d3ce155d965a98135
-		CROSS_LIBC_DLOPEN_TAR_SHA=ee382fbce2fa8df61563edd0d20d7b7895c04d087e398b9b748cae9c6248a735
+		CROSS_LIBC_DLOPEN_TAR_SHA=6bc38315b137a9073474bd3bad4ab18acc28c49624d0b033c59900737863038e
 		;;
 	loongarch64)
 		APPIMAGETOOL_SHA=90f33314d5f8e824ca5c9a80869553bcc33f14a0b331309d36ae60c7bf7be008
 		SHARUN_SHA=1d71354361b91defd9e3d92bb009c3e58a566f0d10d9b406085b298f0a0a86c1
-		CROSS_LIBC_DLOPEN_TAR_SHA=2aefc166801069345653b5348206ce1f58c3716e377a95ac31a87613d215225a
+		CROSS_LIBC_DLOPEN_TAR_SHA=2396d08413680c859f85210316e47f347f7974605443122e49f08682be07c33b
 		;;
 esac
 
@@ -503,6 +503,15 @@ _get_icon() {
 	fi
 }
 
+# -d waits for Xvfb to report its display, so -a's 3s wait is not needed
+_set_xvfb_cmd() {
+	if xvfb-run --help 2>&1 | grep -q -- '--auto-display'; then
+		XVFB_CMD="xvfb-run -d -w 0.5 --"
+	else
+		XVFB_CMD="xvfb-run -a --"
+	fi
+}
+
 _sanity_check() {
 	for d in $DEPENDENCIES; do
 		if ! _is_cmd "$d"; then
@@ -526,7 +535,7 @@ _sanity_check() {
 
 	if [ "$STRACE_MODE" = 1 ]; then
 		if _is_cmd xvfb-run; then
-			XVFB_CMD="xvfb-run -a --"
+			_set_xvfb_cmd
 		else
 			_err_msg "WARNING: xvfb-run was not detected on the system"
 			_err_msg "xvfb-run is used in strace mode to provide a display"
@@ -644,7 +653,8 @@ _test_appimage() {
 	export APPIMAGE_EXTRACT_AND_RUN=1
 
 	set -m
-	xvfb-run -a -- "$APP" "$@" &
+	_set_xvfb_cmd
+	$XVFB_CMD "$APP" "$@" &
 	pid=$!
 	set +m
 
@@ -1779,6 +1789,8 @@ _lib4bin_collect_strace() {
 	[ "$STRACE_MODE" = 1 ] || return 0
 
 	libs=""
+	_seen=$TMPDIR/.seen.$$
+	:> "$_seen"
 	for b do
 		[ -f "$b" ]  || continue
 		_is_elf "$b" || _is_script "$b" || continue
@@ -1786,6 +1798,13 @@ _lib4bin_collect_strace() {
 		if _is_so "$b"; then
 			continue
 		fi
+
+		# the deployment array is built from overlapping globs, so the same
+		# binary shows up more than once, tracing it again only costs time
+		if grep -Fxq "$b" "$_seen"; then
+			continue
+		fi
+		printf '%s\n' "$b" >> "$_seen"
 
 		if [ -n "$STRACE_BINARY" ]; then
 			match=""
@@ -1869,6 +1888,7 @@ _lib4bin_collect_strace() {
 		[ -n "$out" ] || continue
 		libs=$(printf '%s\n%s' "$libs" "$out")
 	done
+	rm -f "$_seen"
 	STRACED_LIBS=$(echo "$libs" | sort -u | sed '/^$/d')
 }
 
@@ -1935,7 +1955,8 @@ _lib4bin_deploy_shared_libs() {
 _lib4bin_deploy_binaries() {
 	[ -x "$APPDIR"/sharun ]  || _get_sharun
 	[ -d "$SHARUN_BIN_DIR" ] || mkdir -p "$SHARUN_BIN_DIR"
-	seen=""
+	_seen=$TMPDIR/.seenbin.$$
+	:> "$_seen"
 	for b do
 		[ -f "$b" ] || continue
 		[ -x "$b" ] || continue
@@ -1948,12 +1969,12 @@ _lib4bin_deploy_binaries() {
 		fi
 
 		# most arguments are libraries, skip them before anything forks
-		if _is_so "$b" || echo "$seen" | grep -Fxq "$b"; then
+		if _is_so "$b" || grep -Fxq "$b" "$_seen"; then
 			continue
 		fi
 		_is_elf "$b" || continue
 
-		seen=$(printf '%s\n%s' "$seen" "$b")
+		printf '%s\n' "$b" >> "$_seen"
 		bin_basename=${b##*/}
 
 		if [ -L "$b" ]; then
@@ -1979,6 +2000,7 @@ _lib4bin_deploy_binaries() {
 			fi
 		) || exit 1
 	done
+	rm -f "$_seen"
 }
 
 _lib4bin_main() {
