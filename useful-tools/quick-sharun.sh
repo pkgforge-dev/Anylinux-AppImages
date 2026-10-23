@@ -645,9 +645,12 @@ _wait_for_dlopened() {
 	while [ "$i" -lt "$end" ]; do
 		sleep 0.2
 		i=$((i + 1))
-		# a launcher may exit after backgrounding a child, so wait for the
-		# whole process group, not just the pid that was launched
-		kill -0 -"$3" 2>/dev/null || break
+		# a launcher may exit after backgrounding a child, so prefer the whole
+		# process group. Without job control there is no group to check, then
+		# fall back to the pid so the budget is not cut to nothing
+		if ! kill -0 -"$3" 2>/dev/null && ! kill -0 "$3" 2>/dev/null; then
+			break
+		fi
 		if [ -z "$started" ]; then
 			if grep -q 'calling init' "$1" 2>/dev/null; then
 				started=1
