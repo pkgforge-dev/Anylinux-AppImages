@@ -2010,7 +2010,8 @@ _lib4bin_deploy_shared_libs() {
 _lib4bin_deploy_binaries() {
 	[ -x "$APPDIR"/sharun ]  || _get_sharun
 	[ -d "$SHARUN_BIN_DIR" ] || mkdir -p "$SHARUN_BIN_DIR"
-	seen=""
+	_seen=$TMPDIR/.seenbin.$$
+	:> "$_seen"
 	for b do
 		[ -f "$b" ] || continue
 		[ -x "$b" ] || continue
@@ -2023,12 +2024,15 @@ _lib4bin_deploy_binaries() {
 		fi
 
 		# most arguments are libraries, skip them before anything forks
-		if _is_so "$b" || echo "$seen" | grep -Fxq "$b"; then
+		if _is_so "$b"; then
 			continue
 		fi
 		_is_elf "$b" || continue
 
-		seen=$(printf '%s\n%s' "$seen" "$b")
+		if grep -Fxq "$b" "$_seen"; then
+			continue
+		fi
+		printf '%s\n' "$b" >> "$_seen"
 		bin_basename=${b##*/}
 
 		if [ -L "$b" ]; then
@@ -2054,6 +2058,7 @@ _lib4bin_deploy_binaries() {
 			fi
 		) || exit 1
 	done
+	rm -f "$_seen"
 }
 
 _lib4bin_main() {
