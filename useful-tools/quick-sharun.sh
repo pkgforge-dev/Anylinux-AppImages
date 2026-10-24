@@ -198,7 +198,10 @@ _is_cmd() {
 }
 
 _is_elf() {
-	head -c 4 "$1" 2>/dev/null | grep -qa 'ELF'
+	case "$(head -c 4 "$1" 2>/dev/null)" in
+		*ELF*) return 0;;
+	esac 2>/dev/null
+	return 1
 }
 
 # this function only gets used when deploying 32bit apps
@@ -1695,16 +1698,22 @@ _deploy_libs() {
 
 # compute destination path in DST_LIB_DIR from a source file path
 _lib4bin_get_lib_dst_dir() {
-	p=$(readlink -f "${1%/*}" | sed \
-	  -e "s|^$LIB_DIR||" \
-	  -e 's|^/usr||'     \
-	  -e 's|^/opt||'     \
-	  -e 's|^/lib64||'   \
-	  -e 's|^/lib32||'   \
-	  -e 's|^/lib/||'    \
-	  -e 's|^/lib$||'    \
-	  -e 's|^/[^/]*-linux-gnu||'
-	)
+	p=$(readlink -f "${1%/*}") || :
+	case "$p" in "$LIB_DIR"*) p=${p#"$LIB_DIR"};; esac
+	p=${p#/usr}
+	p=${p#/opt}
+	p=${p#/lib64}
+	p=${p#/lib32}
+	p=${p#/lib/}
+	case "$p" in
+		/lib) p="";;
+		/*)
+			_f=${p#/}
+			_f=${_f%%/*}
+			case "$_f" in
+				*-linux-gnu) p=${p#/"$_f"};; esac
+			;;
+	esac
 	if [ "$LIB32" = 1 ] && _is_elf64 "$1"; then
 		echo "$APPDIR"/lib/"$p"
 	else
@@ -4682,10 +4691,12 @@ set -- \
 for lib in "$@" "$SHARUN_BIN_DIR"/*; do
 	[ -f "$lib" ] || continue
 	# make sure to remove any full rpath from the libs
-	if patchelf --print-rpath "$lib" | grep -q '^/'; then
-		patchelf --remove-rpath "$lib"
-		_echo "* removed full rpath from $lib"
-	fi
+	case "$(patchelf --print-rpath "$lib" 2>/dev/null)" in
+		/*)
+			patchelf --remove-rpath "$lib"
+			_echo "* removed full rpath from $lib"
+			;;
+	esac
 
 	# also remove full paths from needed libs, for example
 	# a library may depend on /usr/lib/libkek.so instead of libkek.so
