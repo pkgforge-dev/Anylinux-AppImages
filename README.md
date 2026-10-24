@@ -296,6 +296,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [NFSIISE](https://github.com/pkgforge-dev/NFSIISE-AppImage) |
 | [Nitrogen](https://github.com/pkgforge-dev/Nitrogen-AppImage) |
 | [Nomacs](https://github.com/pkgforge-dev/Nomacs-AppImage) |
+| [Nota DAW](https://github.com/pkgforge-dev/Nota-DAW-AppImage-Enhanced) |
 | [NP2kai](https://github.com/pkgforge-dev/Neko-Project-II-Kai-AppImage) |
 | [NSCB Desktop](https://github.com/pkgforge-dev/NSCB-Desktop-AppImage-Enhanced) |
 | [NSZ](https://github.com/pkgforge-dev/NSZ-AppImage) |
