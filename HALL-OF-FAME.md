@@ -158,6 +158,8 @@ And what is worse is that she discarded all the results as bad faith because the
 
 So yeah, with people like this good luck if you ever get an issue with Wayland, because you will be blamed for it one way or another. This is the same GNOME that still insists on applications needing to draw their own decorations on wayland so it I really should not have wasted my time arguing with these people...
 
+Here is the [link to the entire conversation](https://discord.com/channels/1367654015269339267/1391062243625537566/1563758541771247739) at the Eden discord if you want to read it (and you should).
+
 # Utter Garbage - Python
 
 * Applications break horribly with the slightest version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215)
