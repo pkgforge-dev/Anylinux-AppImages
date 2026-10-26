@@ -144,6 +144,24 @@ Broken incomplete mess, what's crazy is that the Wayland issues are problems tha
 
 * I used to think that Wayland would be fixed if everyone used a common library like wlroots, but [guess what](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/212#issuecomment-3734437530) 😹
 
+Also yes, you can blame GNOME for Wayland being the broken mess that it is right now, recently a GNOME dev [@orowith2os](https://github.com/orowith2os) went to complain [to the Eden discord](https://i.imgur.com/Ftg4klS.png) about them forcing X11 (despite Wayland being a non-stop source of nightmares including issues like that remain unsolved like [this](https://github.com/ValveSoftware/gamescope/issues/2261) at the time of writting this), she had a massive issue with the way I phrased [this bug report](https://gitlab.freedesktop.org/mesa/mesa/-/work_items/16449) because I apparently I didn't put enough effort into it, **despite that I even went as far as getting in contact with someone with `aarch64` hardware** [**to carry all the tests we needed.**](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/927) 🤯
+
+Which fair, if you read that bug report and don't read the [original context](https://imgur.com/rl4QxEH) link (which this is already very bad if you don't read the links at a bug report) you will get a different idea that there is no problem to be fixed and everything was intended by Mesa, so I went and added [more details and even then it is not enough???](https://i.imgur.com/urq9BKS.png)
+
+This literary shows `distrobox-enter arch && eglgears_wayland` and shows all the `MESA-EGL: warning: failed to get driver name for fd -1` errors. **Yet this is NOT enough for this GNOME dev** 😹
+
+[why do you need me to confirm that Mesa did or did not intend to break QT or eglgears? what bad faith question is that?](https://i.imgur.com/nXxaYys.png)... 
+
+Eh [Maybe because of this response???](https://gitlab.freedesktop.org/mesa/mesa/-/work_items/16449#note_3688054)
+
+And what is worse is that she discarded all the results as bad faith because the solution we tested [**that fixed the issue**](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/927#issuecomment-5896525617) of using `-Dlegacy-wayland=bind-wayland-display` was suggested [by a bot](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/927#issuecomment-5878923053), and despite proving that it fixes the issue [it makes all of this unreliable and bad faith](https://i.imgur.com/H01Lvba.png) WTF?
+
+So yeah, with people like this good luck if you ever get an issue with Wayland, because you will be blamed for it one way or another. This is the same GNOME that still insists on applications needing to draw their own decorations on wayland so it I really should not have wasted my time arguing with these people...
+
+And [very selective memory](https://imgur.com/nGWxzxy) when [this](https://github.com/ValveSoftware/gamescope/issues/2261) was clearly shown along [with the Mesa issue where I didn't put enough effort](https://i.imgur.com/LpdQvlJ.png). 🙄
+
+Here is the [link to the entire conversation](https://discord.com/channels/1367654015269339267/1391062243625537566/1563758541771247739) at the Eden discord if you want to read it (and you should).
+
 # Utter Garbage - Python
 
 * Applications break horribly with the slightest version bump. [1](https://github.com/pkgforge-dev/puddletag-AppImage/pull/11) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/215)
