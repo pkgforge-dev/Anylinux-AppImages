@@ -448,6 +448,16 @@ details iframe {
   background: #36393e;
 }
 
+.chat-guild-icon {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0 0.5rem 0 0;
+  border: 0;
+  border-radius: 30%;
+  vertical-align: -0.35rem;
+}
+
 div[align="center"] {
   max-width: var(--text-width);
   margin-inline: 0;

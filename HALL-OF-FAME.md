@@ -163,7 +163,7 @@ And [very selective memory](https://imgur.com/nGWxzxy) when [this](https://githu
 Here is the [link to the entire conversation](https://discord.com/channels/1367654015269339267/1391062243625537566/1563758541771247739) at the Eden discord if you want to read it (and you should).
 
 <details>
-<summary>Expand to read the saved conversation right here</summary>
+<summary><img class="chat-guild-icon" src="https://cdn.discordapp.com/icons/1367654015269339267/cfd12cf843dd501b07a2ca3237bb08ac.png" alt=""> Expand to read the saved conversation right here</summary>
 <iframe src="Eden-Development%23dev-chat.html" title="Saved Eden Development dev-chat Discord conversation" loading="lazy" height="600"></iframe>
 </details>
 
