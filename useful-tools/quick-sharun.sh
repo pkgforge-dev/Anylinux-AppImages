@@ -551,12 +551,22 @@ _sanity_check() {
 
 	unset LIB32
 	if [ -z "$LIB_DIR" ]; then
-		if [ -d "/usr/lib/$APPIMAGE_ARCH-linux-gnu" ]; then
-			LIB_DIR="/usr/lib/$APPIMAGE_ARCH-linux-gnu"
-		elif [ -d "/usr/lib" ]; then
-			LIB_DIR="/usr/lib"
-		else
-			_err_msg "ERROR: there is no /usr/lib directory in this system"
+		set -- /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libc.so* /usr/lib/libc.so*
+		# prefer the multiarch dir, but only when it really is a library
+		# directory. A foreign build tree may have created it with nothing
+		# but static libraries in it, and every driver glob is relative to
+		# LIB_DIR, so the wrong one silently ships an appimage with no GPU
+		# drivers at all!
+		for l do
+			if [ -e "$l" ]; then
+				LIB_DIR=${l%/*}
+				break
+			elif [ -d "${l%/*}" ]; then
+				_err_msg "WARNING: '${l%/*}' has no libc.so*, ignoring it!"
+			fi
+		done
+		if [ -z "$LIB_DIR" ]; then
+			_err_msg "ERROR: no library directory found in this system"
 			_err_msg "set the LIB_DIR variable to where you have libraries"
 			exit 1
 		fi
