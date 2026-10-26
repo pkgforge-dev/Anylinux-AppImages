@@ -440,6 +440,14 @@ details[open] summary {
   margin-bottom: 0.75rem;
 }
 
+details iframe {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #36393e;
+}
+
 div[align="center"] {
   max-width: var(--text-width);
   margin-inline: 0;
