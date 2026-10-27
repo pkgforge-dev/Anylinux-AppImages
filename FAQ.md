@@ -42,6 +42,14 @@ title: Frequently Asked Questions
 </details>
 
 <details>
+  <summary>Here is <code>ppc64</code> <b>BE</b> <a href="https://github.com/pkgforge-dev/Galculator-AppImage">Galculator</a> running on a <b>32-bit</b> PowerPC system 👀</summary>
+  Once again because we do not depend on the host userland, <b>as long as the kernel and CPU can execute the payload, it will work!</b>.
+
+  <b>This also means our ppc64 BE ELFv2 AppImages work on ELFv1 systems!</b>
+  <img width="1440" height="900" alt="image" src="https://github.com/user-attachments/assets/772c8b90-2aeb-4b11-bf7c-e9a547c8c755" />
+</details>
+
+<details>
   <summary>Here is <a href="https://git.eden-emu.dev/eden-emu/eden">Eden</a> running in <b>FreeBSD</b> using Vulkan with NVIDIA via Linuxulator 👀</summary>
   <img width="1193" height="671" alt="image" src="https://github.com/user-attachments/assets/473de2ba-f950-4e3a-9327-d741c70eda6e" />
 </details>
