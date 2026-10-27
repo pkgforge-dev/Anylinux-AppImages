@@ -164,7 +164,7 @@ Here is the [link to the entire conversation](https://discord.com/channels/13676
 
 <details>
 <summary>Expand to read the saved conversation right here</summary>
-<iframe src="Eden-Development%23dev-chat.html" title="Saved Eden Development dev-chat Discord conversation" loading="lazy" height="600"></iframe>
+<iframe src="dev-chat/" title="Saved Eden Development dev-chat Discord conversation" loading="lazy" height="600"></iframe>
 </details>
 
 # Utter Garbage - Python
