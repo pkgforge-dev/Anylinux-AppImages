@@ -328,6 +328,8 @@ _help_msg() {
 	  DEPLOY_IMAGEMAGICK  Set to 1 to force deployment of ImageMagick.
 	  DEPLOY_LIBHEIF      Set to 1 to force deployment of libheif.
 	  DEPLOY_LIBPEAS      Set to 1 to force deployment of libpeas plugin loaders.
+	  DEPLOY_FOLKS        Set to 1 to force deployment of the folks backends and their
+	                      dependencies. Enabled automatically when libfolks is needed.
 	  DEPLOY_GEGL         Set to 1 to force deployment of GEGL.
 	  DEPLOY_BABL         Set to 1 to force deployment of babl.
 	  DEPLOY_GLIBC        Set to 1 to force the deployment of glibc and gconv.
@@ -900,6 +902,9 @@ _determine_what_to_deploy() {
 				*libsoup-*.so*)
 					DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
 					;;
+				*libfolks*.so*)
+					DEPLOY_FOLKS=${DEPLOY_FOLKS:-1}
+					;;
 				*libpeas-2*.so*)
 					DEPLOY_LIBPEAS=${DEPLOY_LIBPEAS:-1}
 					LIBPEAS_DIR=libpeas-2
@@ -1257,6 +1262,12 @@ _make_deployment_array() {
 		set -- "$@" \
 			"$LIB_DIR"/"$LIBPEAS_DIR"/loaders/* \
 			"$LIB_DIR"/"$LIBPEAS_DIR"/loaders/*/*
+	fi
+	if [ "$DEPLOY_FOLKS" = 1 ]; then
+		_echo "* Deploying folks backends"
+		# folks dlopens its backends (eds, bluez, ofono...), copying the
+		# directory is not enough, their own dependencies must be deployed
+		set -- "$@" "$LIB_DIR"/folks/*/backends/*/*.so*
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying GNOME glycin"
