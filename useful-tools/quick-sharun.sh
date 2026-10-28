@@ -4781,7 +4781,14 @@ for lib do case "$lib" in
 		_try_cp /etc/fonts/fonts.conf "$APPDIR"/etc/fonts/fonts.conf
 		;;
 	*/libfolks*.so*)
-		_try_cp "$LIB_DIR"/folks "$DST_LIB_DIR"/folks
+		# the deployed backends already created $DST_LIB_DIR/folks, so
+		# _try_cp would skip it. Merge the rest of the directory (data
+		# and config files) without overwriting the deployed libraries
+		if [ -d "$LIB_DIR"/folks ]; then
+			mkdir -p "$DST_LIB_DIR"/folks
+			cp -rn "$LIB_DIR"/folks/. "$DST_LIB_DIR"/folks/ 2>/dev/null || :
+			_echo "* merged $LIB_DIR/folks"
+		fi
 		;;
 	*/libthai*.so*)
 		_try_cp /usr/share/libthai "$APPDIR"/share/libthai
