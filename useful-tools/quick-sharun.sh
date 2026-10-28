@@ -1265,9 +1265,7 @@ _make_deployment_array() {
 	fi
 	if [ "$DEPLOY_FOLKS" = 1 ]; then
 		_echo "* Deploying folks backends"
-		# folks dlopens its backends (eds, bluez, ofono...), copying the
-		# directory is not enough, their own dependencies must be deployed
-		set -- "$@" "$LIB_DIR"/folks/*/backends/*/*.so*
+		set -- "$@" "$LIB_DIR"/folks/*/*/*/*.so*
 	fi
 	if [ "$DEPLOY_GLYCIN" = 1 ]; then
 		_echo "* Deploying GNOME glycin"
