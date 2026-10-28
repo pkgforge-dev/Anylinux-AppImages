@@ -167,6 +167,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Filelight](https://github.com/pkgforge-dev/Filelight-AppImage) |
 | [FilmCraft](https://github.com/pkgforge-dev/FilmCraft-AppImage) |
 | [Firefox](https://github.com/pkgforge-dev/Firefox-AppImage) |
+| [Firefox-PowerPC64](https://github.com/pkgforge-dev/Firefox-PowerPC64-AppImage) |
 | [Flacon](https://github.com/pkgforge-dev/Flacon-AppImage-Enhanced) |
 | [Flashrom](https://github.com/pkgforge-dev/Flashrom-AppImage) |
 | [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced) |
