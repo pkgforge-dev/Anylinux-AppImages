@@ -2,7 +2,7 @@ title: Anylinux AppImages
 description: AppImages that run on any Linux distribution
 baseurl: "/Anylinux-AppImages"
 url: "https://pkgforge-dev.github.io"
-logo: "/assets/logo.svg"
+logo: "/assets/logo.png"
 social_image: "/assets/logo.png"
 author: pkgforge-dev
 
