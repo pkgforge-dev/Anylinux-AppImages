@@ -1000,6 +1000,7 @@ _make_deployment_array() {
 			"$LIB_DIR"/libdl.so*      \
 			"$LIB_DIR"/librt.so*      \
 			"$LIB_DIR"/libm.so*       \
+			"$LIB_DIR"/libanl.so*     \
 			"$LIB_DIR"/libutil.so*    \
 			"$LIB_DIR"/libresolv.so*
 		# nss libs, not all apps need this but it is very hard to determine this
