@@ -3421,6 +3421,7 @@ _deploy_datadirs() {
 					icons       |\
 					info        |\
 					java        |\
+					kbd         |\
 					libdrm      |\
 					libthai     |\
 					locale      |\
