@@ -321,23 +321,19 @@ else
 	SUDOCMD=""
 fi
 
-# pacman needs a retry of its own. The packages are already in $TMPDIR, but
-# the dependencies they pull from the Arch mirrors are not: libalpm gives up
-# on a transfer that drops under a byte a second for ten seconds, and then
-# skips that mirror for the rest of the transaction, so one stalled download
-# fails the whole install. A retry starts a fresh transaction and the
-# packages it already fetched are reused.
+# retry since pacman might download dependencies for the debloated packages.
 COUNT=0
-while true; do
+while :; do
 	if $SUDOCMD pacman -U --noconfirm --ask 4 "$TMPDIR"/*; then
 		break
-	fi
-	COUNT=$(( COUNT + 1 ))
-	if [ "$COUNT" -ge 5 ]; then
+	else
+		COUNT=$(( COUNT + 1 ))
+		_echo2 "WARNING: pacman failed to install, trying again..."
+		sleep 5
+	fi	
+	if [ "$COUNT" -ge 3 ]; then
 		_error "Failed to install the debloated packages $COUNT times!"
 	fi
-	_echo2 "WARNING: pacman failed to install, trying again..."
-	sleep 5
 done
 
 _echo "------------------------------------------------------------"
