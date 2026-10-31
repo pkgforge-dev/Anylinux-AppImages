@@ -328,11 +328,12 @@ while :; do
 		break
 	else
 		COUNT=$(( COUNT + 1 ))
-		_echo2 "WARNING: pacman failed to install, trying again..."
-		sleep 5
-	fi	
-	if [ "$COUNT" -ge 3 ]; then
-		_error "Failed to install the debloated packages $COUNT times!"
+		if [ "$COUNT" -ge 3 ]; then
+			_error "Failed to install debloated packages $COUNT times!"
+		else
+			_echo2 "WARNING: pacman failed to install, trying again..."
+			sleep 5
+		fi
 	fi
 done
 
