@@ -321,7 +321,21 @@ else
 	SUDOCMD=""
 fi
 
-$SUDOCMD pacman -U --noconfirm --ask 4 "$TMPDIR"/*
+# retry since pacman might download dependencies for the debloated packages.
+COUNT=0
+while :; do
+	if $SUDOCMD pacman -U --noconfirm --ask 4 "$TMPDIR"/*; then
+		break
+	else
+		COUNT=$(( COUNT + 1 ))
+		if [ "$COUNT" -ge 3 ]; then
+			_error "Failed to install debloated packages $COUNT times!"
+		else
+			_echo2 "WARNING: pacman failed to install, trying again..."
+			sleep 5
+		fi
+	fi
+done
 
 _echo "------------------------------------------------------------"
 _echo "                         ALL DONE!                          "
