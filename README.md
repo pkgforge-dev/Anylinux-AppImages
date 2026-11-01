@@ -507,6 +507,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [xed](https://github.com/pkgforge-dev/Xed-AppImage) |
 | [xemu](https://github.com/pkgforge-dev/xemu-AppImage-Enhanced) |
 | [xenia-canary](https://github.com/pkgforge-dev/xenia-canary-AppImage) |
+| [Xepub](https://github.com/pkgforge-dev/Xepub-AppImage) |
 | [xeyes](https://github.com/pkgforge-dev/xeyes-AppImage) |
 | [Xiphos](https://github.com/pkgforge-dev/Xiphos-AppImage) |
 | [xoreos](https://github.com/pkgforge-dev/xoreos-AppImage) |
