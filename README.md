@@ -270,6 +270,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [LinuxToys](https://github.com/pkgforge-dev/LinuxToys-AppImage) |
 | [LMMS](https://github.com/pkgforge-dev/LMMS-AppImage-Enhanced) |
 | [LocalSend](https://github.com/pkgforge-dev/localsend-AppImage) |
+| [Lollypop](https://github.com/pkgforge-dev/Lollypop-AppImage) |
 | [Luanti](https://github.com/pkgforge-dev/Luanti-AppImage) |
 | [MAME](https://github.com/pkgforge-dev/MAME-AppImage) |
 | [ManiaDrive](https://github.com/pkgforge-dev/ManiaDrive-AppImage) |
