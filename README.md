@@ -464,6 +464,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Tauon](https://github.com/pkgforge-dev/Tauon-AppImage) |
 | [Telegram](https://github.com/pkgforge-dev/Telegram-AppImage) |
 | [Themix](https://github.com/pkgforge-dev/Themix-GUI-AppImage) |
+| [Tibia](https://github.com/pkgforge-dev/Tibia-AppImage) |
 | [Tokodon](https://github.com/pkgforge-dev/Tokodon-AppImage) |
 | [Torzu](https://github.com/pkgforge-dev/Torzu-AppImage) |
 | [TouchHLE](https://github.com/pkgforge-dev/TouchHLE-AppImage) |
