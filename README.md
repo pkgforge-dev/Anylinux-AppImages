@@ -293,6 +293,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [NBlood](https://github.com/pkgforge-dev/NBlood-AppImage) |
 | [NeoChat](https://github.com/pkgforge-dev/NeoChat-AppImage) |
 | [Nestopia](https://github.com/pkgforge-dev/Nestopia-AppImage) |
+| [NetHack-X11](https://github.com/pkgforge-dev/NetHack-X11-AppImage) |
 | [Neverball](https://github.com/pkgforge-dev/Neverball-AppImage) |
 | [NewPipe](https://github.com/pkgforge-dev/NewPipe-AppImage) |
 | [NewsFlash](https://github.com/pkgforge-dev/NewsFlash-AppImage) |
