@@ -317,6 +317,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Open CoD:UO](https://github.com/pkgforge-dev/opencoduo-AppImage) |
 | [opencode](https://github.com/pkgforge-dev/opencode-AppImage-Enhanced) |
 | [opencode-cli](https://github.com/pkgforge-dev/opencode-cli-AppImage) |
+| [OpenDungeonsPlus](https://github.com/pkgforge-dev/OpenDungeonsPlus-AppImage) |
 | [OpenGothic](https://github.com/pkgforge-dev/OpenGothic-AppImage) |
 | [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage) |
 | [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage) |
