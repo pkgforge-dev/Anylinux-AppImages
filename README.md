@@ -246,6 +246,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage) |
 | [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced) |
 | [KeePassXC](https://github.com/pkgforge-dev/KeePassXC-AppImage-Enhanced) |
+| [KeeperFX](https://github.com/pkgforge-dev/KeeperFX-AppImage) |
 | [Kega Fusion](https://github.com/pkgforge-dev/Kega-Fusion-AppImage) |
 | [Keypunch](https://github.com/pkgforge-dev/Keypunch-AppImage) |
 | [KiCad](https://github.com/pkgforge-dev/KiCad-AppImage) |
