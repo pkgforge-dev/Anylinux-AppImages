@@ -4982,7 +4982,7 @@ for lib do case "$lib" in
 			set -- "$DST_LIB_DIR"/libQt*Multimedia.so*
 			  [ -f "$1" ] || rm -f "$dst_qt_trans"/qtmultimedia*.qm
 			set -- "$DST_LIB_DIR"/libQt*WebEngineCore.so*
-			  [ -f "$1" ] || rm -f "$dst_qt_trans"/qtwebengine*.qm
+			  [ -f "$1" ] || rm -rf "$dst_qt_trans"/qtwebengine*
 			set -- "$DST_LIB_DIR"/libQt*SerialPort.so*
 			  [ -f "$1" ] || rm -f "$dst_qt_trans"/qtserialport*.qm
 			set -- "$DST_LIB_DIR"/libQt*WebSockets.so*
