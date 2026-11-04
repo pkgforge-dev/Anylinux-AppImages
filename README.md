@@ -78,6 +78,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [BMHeroRecomp](https://github.com/pkgforge-dev/BMHeroRecomp-AppImage-Enhanced) |
 | [Brave Origin](https://github.com/pkgforge-dev/Brave-Origin-AppImage) |
 | [Bulky](https://github.com/pkgforge-dev/Bulky-AppImage) |
+| [Candle](https://github.com/pkgforge-dev/Candle-AppImage) |
 | [Cannonball](https://github.com/pkgforge-dev/Cannonball-AppImage) |
 | [Cartridges](https://github.com/pkgforge-dev/Cartridges-AppImage) |
 | [Cataclysm-TLG](https://github.com/pkgforge-dev/Cataclysm-TLG-AppImage) |
