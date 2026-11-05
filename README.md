@@ -211,6 +211,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [GNU FreeDink](https://github.com/pkgforge-dev/GNU-FreeDink-AppImage) |
 | [GNU Octave](https://github.com/pkgforge-dev/GNU-Octave-AppImage) |
 | [Godot](https://github.com/pkgforge-dev/Godot-AppImage) |
+| [goose Desktop](https://github.com/pkgforge-dev/goose-Desktop-AppImage) |
 | [GoldenDict-ng](https://github.com/pkgforge-dev/GoldenDict-ng-AppImage) |
 | [Gopher64](https://github.com/pkgforge-dev/Gopher64-AppImage) |
 | [gPodder](https://github.com/pkgforge-dev/gPodder-AppImage) |
