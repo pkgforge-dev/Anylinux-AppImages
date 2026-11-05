@@ -128,6 +128,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [DeSmuME](https://github.com/pkgforge-dev/DeSmuME-AppImage) |
 | [dethrace](https://github.com/pkgforge-dev/dethrace-AppImage) |
 | [DevilutionX](https://github.com/pkgforge-dev/DevilutionX-AppImage-Enhanced) |
+| [Devin Desktop](https://github.com/pkgforge-dev/Devin-Desktop-AppImage) |
 | [dhewm3](https://github.com/pkgforge-dev/dhewm3-AppImage) |
 | [DiffPDF](https://github.com/pkgforge-dev/DiffPDF-AppImage) |
 | [Dillo](https://github.com/pkgforge-dev/Dillo-AppImage) |
