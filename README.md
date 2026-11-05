@@ -155,6 +155,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [EffectCraft](https://github.com/pkgforge-dev/EffectCraft-AppImage) |
 | [Elastic](https://github.com/pkgforge-dev/Elastic-AppImage) |
 | [Element Desktop](https://github.com/pkgforge-dev/Element-Desktop-AppImage) |
+| [Emacs](https://github.com/pkgforge-dev/Emacs-AppImage) |
 | [ePSXe](https://github.com/pkgforge-dev/ePSXe-AppImage) |
 | [ET Legacy](https://github.com/pkgforge-dev/ETLegacy-AppImage) |
 | [Extension Manager](https://github.com/pkgforge-dev/Extension-Manager-AppImage) |
