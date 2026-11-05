@@ -347,6 +347,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Oxicord](https://github.com/pkgforge-dev/Oxicord-AppImage) |
 | [Paperboat](https://github.com/pkgforge-dev/Paperboat-AppImage-Enhanced) |
 | [Parabolic](https://github.com/pkgforge-dev/Parabolic-AppImage) |
+| [Patchy](https://github.com/pkgforge-dev/Patchy-AppImage) |
 | [Pattypan](https://github.com/pkgforge-dev/Pattypan-AppImage) |
 | [pavucontrol-qt](https://github.com/pkgforge-dev/pavucontrol-qt-AppImage) |
 | [PCExhumed](https://github.com/pkgforge-dev/PCExhumed-AppImage) |
