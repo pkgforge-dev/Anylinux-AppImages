@@ -133,6 +133,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Dillo](https://github.com/pkgforge-dev/Dillo-AppImage) |
 | [DingusPPC](https://github.com/pkgforge-dev/DingusPPC-AppImage) |
 | [Discord](https://github.com/pkgforge-dev/Discord-AppImage) |
+| [Distrobox](https://github.com/pkgforge-dev/Distrobox-AppImage) |
 | [DNZHRecomp](https://github.com/pkgforge-dev/DNZHRecomp-AppImage) |
 | [Dolphin-emu](https://github.com/pkgforge-dev/Dolphin-emu-AppImage) |
 | [DonkeyKong64Recomp](https://github.com/pkgforge-dev/DonkeyKong64Recomp-AppImage) |
