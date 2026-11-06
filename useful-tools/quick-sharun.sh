@@ -1873,7 +1873,8 @@ _lib4bin_collect_strace() {
 		                                                     -e '/libncurses/d'  \
 		                                                     -e '/libcurses/d'   \
 		                                                     -e '/pipewire/d'    \
-		                                                     -e '/libspa/d'
+		                                                     -e '/libspa/d'      \
+		                                                     -e '/sudo/d'
 		)
 		# skip nouveau/swrast here unless explicitly wanted
 		if [ "$DEPLOY_VULKAN_ALL" != 1 ]; then
