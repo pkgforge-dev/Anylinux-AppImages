@@ -175,6 +175,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [Firefox-PowerPC64](https://github.com/pkgforge-dev/Firefox-PowerPC64-AppImage) |
 | [Flacon](https://github.com/pkgforge-dev/Flacon-AppImage-Enhanced) |
 | [Flashrom](https://github.com/pkgforge-dev/Flashrom-AppImage) |
+| [FlatCAM](https://github.com/pkgforge-dev/FlatCAM-AppImage) |
 | [Flycast](https://github.com/pkgforge-dev/Flycast-AppImage-Enhanced) |
 | [foobar2000](https://github.com/pkgforge-dev/foobar2000-AppImage) |
 | [Foobillard++](https://github.com/pkgforge-dev/Foobillardpp-AppImage) |
