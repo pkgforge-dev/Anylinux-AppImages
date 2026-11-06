@@ -224,6 +224,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [GridCraft](https://github.com/pkgforge-dev/GridCraft-AppImage) |
 | [gThumb](https://github.com/pkgforge-dev/gThumb-AppImage) |
 | [Gwenview](https://github.com/pkgforge-dev/Gwenview-AppImage) |
+| [halloy](https://github.com/pkgforge-dev/halloy-AppImage) |
 | [Haruna](https://github.com/pkgforge-dev/Haruna-AppImage) |
 | [Hatari](https://github.com/pkgforge-dev/Hatari-AppImage) |
 | [Helium Browser](https://github.com/pkgforge-dev/Helium-Browser-AppImage-Enhanced) |
