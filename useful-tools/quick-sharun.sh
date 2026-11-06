@@ -3414,6 +3414,7 @@ _deploy_datadirs() {
 					glib-*      |\
 					glvnd       |\
 					glycin*     |\
+					groff       |\
 					gtk-doc     |\
 					gtksource*  |\
 					gvfs        |\
