@@ -5331,7 +5331,7 @@ if ldd "$DST_LIB_DIR"/libgallium*.so* 2>/dev/null | grep -q 'libLLVM'; then
 	_err_msg "------------------------------------------------------------"
 	_err_msg "------------------------------------------------------------"
 	_err_msg ""
-	_err_msg "WARNING: Detected the bundled libgallium links to libLLVM.so!"
+	_err_msg "ERROR: Detected the bundled libgallium links to libLLVM.so!"
 	_err_msg ""
 	_err_msg "libgallium only needs libLLVM for llvmpipe, which is a software rasterizer that"
 	_err_msg "is basically never used, softpipe can be used instead and does not need LLVM"
@@ -5350,7 +5350,9 @@ if ldd "$DST_LIB_DIR"/libgallium*.so* 2>/dev/null | grep -q 'libLLVM'; then
 	_err_msg ""
 	_err_msg "------------------------------------------------------------"
 	_err_msg "------------------------------------------------------------"
-	sleep 5
+	_err_msg "Set I_WANT_FAT_APPIMAGE=1 if you want to ignore this"
+	_err_msg "------------------------------------------------------------"
+	[ "$I_WANT_FAT_APPIMAGE" = 1 ] || exit 1
 fi
 
 echo ""
