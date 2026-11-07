@@ -1003,12 +1003,10 @@ _make_deployment_array() {
 			"$LIB_DIR"/libanl.so*     \
 			"$LIB_DIR"/libutil.so*    \
 			"$LIB_DIR"/libresolv.so*
-		# nss libs, not all apps need this but it is very hard to determine this
+		# anylinux.so makes glibc only use dns and files
 		set -- "$@" \
-			"$LIB_DIR"/libnss_dns.so*     \
-			"$LIB_DIR"/libnss_files.so*   \
-			"$LIB_DIR"/libnss_resolve.so* \
-			"$LIB_DIR"/libnss_mymachines.so*
+			"$LIB_DIR"/libnss_dns.so*  \
+			"$LIB_DIR"/libnss_files.so*
 		# gconv is always deployed, removing it only saves ~30 KiB
 		# in the final appimage size and not worth the hassle
 		# It also causes hard to spot issues when needed and not present
@@ -1208,7 +1206,6 @@ _make_deployment_array() {
 			DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 			DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 			DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
-			set -- "$@" "$LIB_DIR"/libnss_mdns*minimal.so*
 			if b=$(command -v bwrap);  then set -- "$@" "$b"; fi
 			if b=$(command -v xdg-dbus-proxy);  then set -- "$@" "$b"; fi
 			if [ ! -d "$WEBKIT2GTK_DIR" ]; then
@@ -1285,10 +1282,10 @@ _make_deployment_array() {
 		DEPLOY_VULKAN=${DEPLOY_VULKAN:-1}
 		DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
 		set -- "$@" \
-			"$LIB_DIR"/libnss*.so*        \
-			"$LIB_DIR"/libsoftokn3.so*    \
-			"$LIB_DIR"/libfreeblpriv3.so* \
-			"$LIB_DIR"/libnss_mdns*_minimal.so*
+			"$LIB_DIR"/libnss3.so*     \
+			"$LIB_DIR"/libnssutil3.so* \
+			"$LIB_DIR"/libsoftokn3.so* \
+			"$LIB_DIR"/libfreeblpriv3.so*
 		# electron has a resources directory that may have binaries
 		d="${ELECTRON_BIN%/*}"/resources
 		if [ -d "$d" ]; then
