@@ -1282,6 +1282,8 @@ _make_deployment_array() {
 		DEPLOY_VULKAN=${DEPLOY_VULKAN:-1}
 		DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
 		set -- "$@" \
+			"$LIB_DIR"/libnss3.so*     \
+			"$LIB_DIR"/libnssutil3.so* \
 			"$LIB_DIR"/libsoftokn3.so* \
 			"$LIB_DIR"/libfreeblpriv3.so*
 		# electron has a resources directory that may have binaries
