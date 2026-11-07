@@ -1206,7 +1206,6 @@ _make_deployment_array() {
 			DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
 			DEPLOY_P11KIT=${DEPLOY_P11KIT:-1}
 			DEPLOY_GLIB_NETWORKING=${DEPLOY_GLIB_NETWORKING:-1}
-			set -- "$@" "$LIB_DIR"/libnss_mdns*minimal.so*
 			if b=$(command -v bwrap);  then set -- "$@" "$b"; fi
 			if b=$(command -v xdg-dbus-proxy);  then set -- "$@" "$b"; fi
 			if [ ! -d "$WEBKIT2GTK_DIR" ]; then
