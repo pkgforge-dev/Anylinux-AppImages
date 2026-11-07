@@ -1003,12 +1003,10 @@ _make_deployment_array() {
 			"$LIB_DIR"/libanl.so*     \
 			"$LIB_DIR"/libutil.so*    \
 			"$LIB_DIR"/libresolv.so*
-		# nss libs, not all apps need this but it is very hard to determine this
+		# anylinux.so makes glibc only use dns and files
 		set -- "$@" \
-			"$LIB_DIR"/libnss_dns.so*     \
-			"$LIB_DIR"/libnss_files.so*   \
-			"$LIB_DIR"/libnss_resolve.so* \
-			"$LIB_DIR"/libnss_mymachines.so*
+			"$LIB_DIR"/libnss_dns.so*  \
+			"$LIB_DIR"/libnss_files.so* 
 		# gconv is always deployed, removing it only saves ~30 KiB
 		# in the final appimage size and not worth the hassle
 		# It also causes hard to spot issues when needed and not present
