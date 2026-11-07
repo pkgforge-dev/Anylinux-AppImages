@@ -3399,6 +3399,7 @@ _deploy_datadirs() {
 					awk         |\
 					bash        |\
 					clang       |\
+					cmake       |\
 					dbus-1      |\
 					defaults    |\
 					doc         |\
