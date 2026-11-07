@@ -1006,7 +1006,7 @@ _make_deployment_array() {
 		# anylinux.so makes glibc only use dns and files
 		set -- "$@" \
 			"$LIB_DIR"/libnss_dns.so*  \
-			"$LIB_DIR"/libnss_files.so* 
+			"$LIB_DIR"/libnss_files.so*
 		# gconv is always deployed, removing it only saves ~30 KiB
 		# in the final appimage size and not worth the hassle
 		# It also causes hard to spot issues when needed and not present
@@ -1283,10 +1283,8 @@ _make_deployment_array() {
 		DEPLOY_VULKAN=${DEPLOY_VULKAN:-1}
 		DEPLOY_PIPEWIRE=${DEPLOY_PIPEWIRE:-1}
 		set -- "$@" \
-			"$LIB_DIR"/libnss*.so*        \
-			"$LIB_DIR"/libsoftokn3.so*    \
-			"$LIB_DIR"/libfreeblpriv3.so* \
-			"$LIB_DIR"/libnss_mdns*_minimal.so*
+			"$LIB_DIR"/libsoftokn3.so* \
+			"$LIB_DIR"/libfreeblpriv3.so*
 		# electron has a resources directory that may have binaries
 		d="${ELECTRON_BIN%/*}"/resources
 		if [ -d "$d" ]; then
