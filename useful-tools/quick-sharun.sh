@@ -34,6 +34,11 @@ if [ "$QUICK_SHARUN_DEBUG" = 1 ]; then
 	set -x
 fi
 
+# backwards compatibility for the old experimental variable name
+if [ -z "$USE_HOST_DRIVERS" ] && [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+	USE_HOST_DRIVERS=1
+fi
+
 _START_TIME=$(date +%s) || :
 STRACED_LIBS=""
 APPIMAGE_ARCH=${APPIMAGE_ARCH:-$(uname -m)}
@@ -367,12 +372,13 @@ _help_msg() {
 	                     host libraries built against a different libc than the
 	                     bundled one. Not supported on ppc64 due to the ELFv1 and
 	                     ELFv2 ABI split, where it is disabled automatically.
-	  USE_HOST_DRIVERS_EXPERIMENTAL  Set to 1 to ship zero gpu drivers, the drivers
+	  USE_HOST_DRIVERS  Set to 1 to ship zero gpu drivers, the drivers
 	                     are instead loaded from the host system at runtime with
 	                     the help of cross-libc-dlopen that allows using the host
 	                     drivers regardless of what libc they link against.
 	                     Only supported when deploying GTK or Qt applications,
 	                     for any other toolkit it automatically becomes a no-op.
+	                     The old USE_HOST_DRIVERS_EXPERIMENTAL name is still accepted.
 	                     Only use this option if the application meets the
 	                     following conditions:
 	                     * The application does not depend on a recent version of
@@ -591,24 +597,24 @@ _sanity_check() {
 		CROSS_LIBC_DLOPEN=0
 
 		# BE ppc64 hardware predates Vulkan, so only OpenGL needs to be deployed
-		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
-			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is not supported on ppc64"
+		if [ "$USE_HOST_DRIVERS" = 1 ]; then
+			_err_msg "WARNING: USE_HOST_DRIVERS is not supported on ppc64"
 			_err_msg "so host libraries cannot be dlopened, drivers will be deployed instead"
-			USE_HOST_DRIVERS_EXPERIMENTAL=0
+			USE_HOST_DRIVERS=0
 			DEPLOY_OPENGL=1
 			DEPLOY_VULKAN=0
 		fi
 	fi
 
-	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+	if [ "$USE_HOST_DRIVERS" = 1 ]; then
 		if [ "$LIB32" = 1 ]; then
-			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL cannot be used with 32bit applications!"
+			_err_msg "ERROR: USE_HOST_DRIVERS cannot be used with 32bit applications!"
 			exit 1
 		elif [ "$ANYLINUX_LIB" != 1 ]; then
-			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires anylinux.so!"
+			_err_msg "ERROR: USE_HOST_DRIVERS requires anylinux.so!"
 			exit 1
 		elif [ "$CROSS_LIBC_DLOPEN" != 1 ]; then
-			_err_msg "ERROR: USE_HOST_DRIVERS_EXPERIMENTAL requires cross-libc-dlopen!"
+			_err_msg "ERROR: USE_HOST_DRIVERS requires cross-libc-dlopen!"
 			exit 1
 		fi
 	fi
@@ -1035,10 +1041,10 @@ _make_deployment_array() {
 	fi
 	# LIB32 builds always bundle their drivers, 32bit driver stacks are not
 	# something users have installed for these apps
-	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+	if [ "$USE_HOST_DRIVERS" = 1 ]; then
 		if [ "$DEPLOY_SDL" = 1 ] && [ "$DEPLOY_GTK" != 1 ] && [ "$DEPLOY_QT" != 1 ]; then
-			_err_msg "WARNING: USE_HOST_DRIVERS_EXPERIMENTAL is not supported for SDL applications, ignoring it!"
-			USE_HOST_DRIVERS_EXPERIMENTAL=0
+			_err_msg "WARNING: USE_HOST_DRIVERS is not supported for SDL applications, ignoring it!"
+			USE_HOST_DRIVERS=0
 		else
 			DEPLOY_OPENGL=0
 			DEPLOY_VULKAN=0
@@ -1884,7 +1890,7 @@ _lib4bin_collect_strace() {
 		# ldd collected libs are unaffected. Note that every
 		# unwanted lib needs its own pattern, filtering a parent does not
 		# stop LD_DEBUG from listing its dependencies as separate lines
-		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+		if [ "$USE_HOST_DRIVERS" = 1 ]; then
 			out=$(printf '%s\n' "$out" | sed \
 				-e '/\/dri\//d'      \
 				-e '/_dri\.so/d'     \
@@ -2150,8 +2156,8 @@ _add_cross_libc_dlopen() {
 		_echo "* cross-libc-dlopen successfully added!"
 	fi
 
-	# remove the gl forwards if we are not using USE_HOST_DRIVERS_EXPERIMENTAL
-	if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" != 1 ]; then
+	# remove the gl forwards if we are not using USE_HOST_DRIVERS
+	if [ "$USE_HOST_DRIVERS" != 1 ]; then
 		rm -f "$PRELOAD_DIR"/egl-fwd.so "$PRELOAD_DIR"/gl-fwd.so "$PRELOAD_DIR"/gles-fwd.so
 	fi
 
@@ -4917,7 +4923,7 @@ for lib do case "$lib" in
 		fi
 		;;
 	*/libEGL_mesa.so*)
-		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+		if [ "$USE_HOST_DRIVERS" = 1 ]; then
 			continue
 		fi
 		src_glvnd_dir=/usr/share/glvnd/egl_vendor.d
@@ -4927,7 +4933,7 @@ for lib do case "$lib" in
 		_try_cp /usr/share/drirc.d "$APPDIR"/share/drirc.d
 		;;
 	*/libvulkan.so*)
-		if [ "$USE_HOST_DRIVERS_EXPERIMENTAL" = 1 ]; then
+		if [ "$USE_HOST_DRIVERS" = 1 ]; then
 			continue
 		fi
 		src_vulkan_dir=/usr/share/vulkan/icd.d

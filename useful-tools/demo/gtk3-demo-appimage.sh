@@ -15,7 +15,7 @@ export OUTNAME=gtk3-demo-"$ARCH".AppImage
 # gtk3 is not hardware accelerated, but supports GtkGLArea
 # to allow embedding opengl graphics inside gtk3 apps
 # very few apps use this, so lets just rely on the host drivers
-export USE_HOST_DRIVERS_EXPERIMENTAL=1
+export USE_HOST_DRIVERS=1
 
 pacman -Syu --noconfirm \
 	base-devel       \

@@ -19,7 +19,7 @@ export MAIN_BIN=vkcube
 # ship zero gpu drivers, quick-sharun excludes everything the binaries
 # merely dlopen at runtime (dri plugins, gallium, vulkan layers, etc)
 # while libraries linked directly like libvulkan.so stay bundled
-export USE_HOST_DRIVERS_EXPERIMENTAL=1
+export USE_HOST_DRIVERS=1
 # vkmark is hardcoded to look in /usr/share/vkmark and /usr/lib/vkmark
 export PATH_MAPPING='
 	/usr/share/vkmark:${SHARUN_DIR}/share/vkmark
