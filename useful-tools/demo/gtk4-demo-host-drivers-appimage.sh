@@ -20,7 +20,6 @@ export GTK_FIX_NONSENSE=1
 # ship zero gpu drivers, quick-sharun excludes everything the binaries
 # merely dlopen at runtime (dri plugins, gallium, vulkan layers, etc)
 # while libraries linked directly like libvulkan.so stay bundled
-export USE_HOST_DRIVERS_EXPERIMENTAL=1
 
 pacman -Syu --noconfirm \
 	base-devel       \
