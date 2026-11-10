@@ -155,7 +155,7 @@ We don't run into these problems with Nvidia, because Nvidia releases its propri
 
 ---
 
-**UPDATE: We now have a similar feature via [cross-libc-dlopen](https://github.com/pkgforge-dev/cross-libc-dlopen)**, enabled via `USE_HOST_DRIVERS_EXPERIMENTAL=1` in `quick-sharun`.
+**UPDATE: We now have a similar feature via [cross-libc-dlopen](https://github.com/pkgforge-dev/cross-libc-dlopen)**, enabled via `USE_HOST_DRIVERS=1` in `quick-sharun`.
 
 This feature is only going to be used if the applications meets the following conditions:
 
