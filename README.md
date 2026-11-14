@@ -342,6 +342,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OpenTESArena](https://github.com/pkgforge-dev/OpenTESArena-AppImage) |
 | [OpenTTD](https://github.com/pkgforge-dev/OpenTTD-AppImage) |
 | [OpenTyrian2000](https://github.com/pkgforge-dev/OpenTyrian2000-AppImage) |
+| [OpenUnleashed](https://github.com/pkgforge-dev/OpenUnleashed-AppImage) |
 | [OpenXRay](https://github.com/pkgforge-dev/OpenXRay-AppImage) |
 | [OptiImage](https://github.com/pkgforge-dev/OptiImage-AppImage) |
 | [OrcaSlicer](https://github.com/pkgforge-dev/OrcaSlicer-AppImage-Enhanced) |
