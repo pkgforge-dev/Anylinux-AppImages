@@ -1107,9 +1107,19 @@ _make_deployment_array() {
 						"$plugindir"/imageformats/* \
 						"$plugindir"/iconengines/*  \
 						"$plugindir"/styles/*       \
-						"$plugindir"/platform*/*    \
 						"$plugindir"/wayland-*/*    \
 						"$plugindir"/xcbglintegrations/*
+					# skip plugins for embedded systems without X11/Wayland
+					for p in "$plugindir"/platform*/*; do
+						[ -f "$p" ] || continue
+						case "${p##*/}" in
+							libqeglfs.so*|libqlinuxfb.so*|\
+							libqvkkhrdisplay.so*|libqvnc.so*)
+								continue
+								;;
+						esac
+						set -- "$@" "$p"
+					done
 					;;
 				*libQt*Network.so*)
 					set -- "$@" \
