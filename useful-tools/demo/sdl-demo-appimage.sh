@@ -18,6 +18,7 @@ export MAIN_BIN=SDL-demo
 pacman -Syu --noconfirm \
 	base-devel       \
 	git              \
+	libpulse         \
 	libxcb           \
 	libxcursor       \
 	libxi            \
