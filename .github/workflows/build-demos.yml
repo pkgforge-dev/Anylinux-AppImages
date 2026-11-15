@@ -92,6 +92,8 @@ jobs:
             runs-on: ubuntu-24.04-arm
             script: xterm-demo-appimage
     container: ghcr.io/pkgforge-dev/archlinux:latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
@@ -106,10 +108,28 @@ jobs:
           name: AppImage-${{ matrix.arch }}-${{ matrix.script }}
           path: dist
 
+      # release as soon as this appimage finishes instead of waiting for the
+      # whole matrix to complete
+      - name: release
+        if: ${{ github.ref_name == 'main' }}
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
+        with:
+          name: "demos"
+          tag_name: "demo"
+          prerelease: false
+          draft: false
+          generate_release_notes: false
+          make_latest: true
+          target_commitish: ${{ github.sha }}
+          files: |
+            dist/*.AppImage
+
   # these run through qemu user emulation, so expect much longer CI times
   build-additional-cpu-arches:
     name: "${{ matrix.script }} (${{ matrix.arch }})"
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -152,21 +172,10 @@ jobs:
           name: AppImage-${{ matrix.arch }}-${{ matrix.script }}
           path: dist
 
-  release:
-    if: >-
-      ${{ !cancelled() && github.ref_name == 'main'
-      && needs.build.result == 'success'
-      && needs.build-additional-cpu-arches.result != 'failure' }}
-    needs: [build, build-additional-cpu-arches]
-    permissions: write-all
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
-        with:
-          pattern: AppImage-*
-          merge-multiple: true
-
-      - name: Release Artifacts
+      # release as soon as this appimage finishes instead of waiting for the
+      # whole matrix to complete
+      - name: release
+        if: ${{ github.ref_name == 'main' }}
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
         with:
           name: "demos"
@@ -175,5 +184,6 @@ jobs:
           draft: false
           generate_release_notes: false
           make_latest: true
+          target_commitish: ${{ github.sha }}
           files: |
-            *.AppImage
+            dist/*.AppImage
