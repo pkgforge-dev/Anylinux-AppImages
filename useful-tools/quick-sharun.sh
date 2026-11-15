@@ -2038,13 +2038,6 @@ _stubs_enable() {
 		return 1
 	fi
 
-	stub_old_ld=$LD_LIBRARY_PATH
-	LD_LIBRARY_PATH=$stub_ld_dir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-	export LD_LIBRARY_PATH
-	return 0
-}
-
-_stubs_finish() {
 	if [ "$use_sndfile_stub" = 1 ]; then
 		if [ "$LIBSNDFILE_STUB" = 1 ]; then
 			_echo "* using the libsndfile stub (LIBSNDFILE_STUB=1)"
@@ -2055,6 +2048,14 @@ _stubs_finish() {
 	if [ "$use_systemd_stub" = 1 ]; then
 		_echo "* using the libsystemd stub (LIBSYSTEMD_STUB=1)"
 	fi
+
+	stub_old_ld=$LD_LIBRARY_PATH
+	LD_LIBRARY_PATH=$stub_ld_dir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+	export LD_LIBRARY_PATH
+	return 0
+}
+
+_stubs_finish() {
 	if [ -n "$stub_ld_dir" ]; then
 		if [ -n "$stub_old_ld" ]; then
 			export LD_LIBRARY_PATH="$stub_old_ld"
