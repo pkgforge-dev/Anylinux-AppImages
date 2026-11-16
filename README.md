@@ -252,6 +252,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [KCalc](https://github.com/pkgforge-dev/KCalc-AppImage) |
 | [kdeconnect](https://github.com/pkgforge-dev/kdeconnect-AppImage) |
 | [kdenlive](https://github.com/pkgforge-dev/kdenlive-AppImage-Enhanced) |
+| [KDE Partition Manager](https://github.com/pkgforge-dev/KDE-Partition-Manager-AppImage) |
 | [KeePassXC](https://github.com/pkgforge-dev/KeePassXC-AppImage-Enhanced) |
 | [KeeperFX](https://github.com/pkgforge-dev/KeeperFX-AppImage) |
 | [Kega Fusion](https://github.com/pkgforge-dev/Kega-Fusion-AppImage) |
