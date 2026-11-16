@@ -99,7 +99,7 @@ APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimaget
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
 CROSS_LIBC_DLOPEN_LINK=${CROSS_LIBC_DLOPEN_LINK:-https://github.com/pkgforge-dev/cross-libc-dlopen/releases/download/v0.2.11/cross-libc-dlopen-$APPIMAGE_ARCH.tar}
 CROSS_LIBC_DLOPEN_TARBALL=$TMPDIR/cross-libc-dlopen-$APPIMAGE_ARCH.tar
-ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/download/0.3.3/onelf-$APPIMAGE_ARCH-linux}
+ONELF_LINK=${ONELF_LINK:-https://github.com/QaidVoid/onelf/releases/download/0.6.2/onelf-$APPIMAGE_ARCH-linux}
 ONELF=${ONELF:-$TMPDIR/onelf}
 
 # known sha256 of all the artifacts downloaded by quick-sharun
@@ -108,13 +108,13 @@ case "$APPIMAGE_ARCH" in
 	x86_64)
 		APPIMAGETOOL_SHA=b62d9624971d4401605ee47307b620f0d12771f3e70e2a3a79f003b789efde73
 		SHARUN_SHA=cc820113162cd8a56ccc66a85b638d9c4fc3802819327719323911adc9311b2b
-		ONELF_SHA=3a990243790c026c902330a7744e8c21b25fdc8c694a88e79d6fb25d761a6351
+		ONELF_SHA=055810eb9a7df496b8442e6f6d6fc731ab4385154327b34464ae7aae941de17e
 		CROSS_LIBC_DLOPEN_TAR_SHA=35bd45e4d0ce94e8ac86b2dded676f4a371747d0f47004861d4c25f374351ec8
 		;;
 	aarch64)
 		APPIMAGETOOL_SHA=c2059c17b6c08cc0060d36e18b2b7afe3d0de47d77d897bd4cdc4295c0eee166
 		SHARUN_SHA=89357920749fc9f84eafa3f4be9e1cc1b238cf0a780d6a64f8a2894d303f6031
-		ONELF_SHA=9b5b2c3d031756a064bd9a71a977e229cb359f324937a5ba8a28db1568bae15b
+		ONELF_SHA=ab194577eb706acc846e99dd69ea77f78dd70f06ab12a4f0f0c25368031c07f2
 		CROSS_LIBC_DLOPEN_TAR_SHA=6d2a6bdfa5602656cb62975c2980f808cc26befd6904ba077d99522c1bb56802
 		;;
 	riscv64)
@@ -4643,6 +4643,34 @@ _check_main_bin() {
 	exit 1
 }
 
+_get_onelf() {
+	if [ ! -x "$ONELF" ]; then
+		_echo "Downloading onelf..."
+		_download "$ONELF" "$ONELF_LINK"
+		chmod +x "$ONELF"
+		_check_shasum "$ONELF" "$ONELF_SHA"
+	fi
+}
+
+_pack_static_bin() (
+	case "$APPIMAGE_ARCH" in
+		x86_64|aarch64) :;;
+		*)
+			_err_msg "ERROR: --pack-static-bin unsupported arch: $APPIMAGE_ARCH!"
+			exit 1
+			;;
+	esac
+
+	if [ "$#" -ne 3 ]; then
+		_err_msg "Usage: --pack-static-bin <directory> <output> <command>"
+		exit 1
+	fi
+
+	_get_onelf
+	_echo "Packing $1 with onelf..."
+	"$ONELF" pack "$1" -o "$2" --command "$3"
+)
+
 _make_static_bin() (
 	# onelf is only built for these arches, refuse to proceed on any other
 	case "$APPIMAGE_ARCH" in
@@ -4653,12 +4681,7 @@ _make_static_bin() (
 			;;
 	esac
 
-	if [ ! -x "$ONELF" ]; then
-		_echo "Downloading onelf..."
-		_download "$ONELF" "$ONELF_LINK"
-		chmod +x "$ONELF"
-		_check_shasum "$ONELF" "$ONELF_SHA"
-	fi
+	_get_onelf
 
 	mkdir -p "$DST_BIN_DIR"
 	_echo "------------------------------------------------------------"
@@ -4773,6 +4796,11 @@ case "$1" in
 	--make-static-bin)
 		shift
 		_make_static_bin "$@"
+		exit 0
+		;;
+	--pack-static-bin)
+		shift
+		_pack_static_bin "$@"
 		exit 0
 		;;
 	'')
