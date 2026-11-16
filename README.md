@@ -330,6 +330,7 @@ For more useful documentation about Anylinux-AppImages, see the pages below:
 | [OpenDungeonsPlus](https://github.com/pkgforge-dev/OpenDungeonsPlus-AppImage) |
 | [OpenGothic](https://github.com/pkgforge-dev/OpenGothic-AppImage) |
 | [OpenJazz](https://github.com/pkgforge-dev/OpenJazz-AppImage) |
+| [OpenKeeper](https://github.com/pkgforge-dev/OpenKeeper-AppImage) |
 | [OpenLara](https://github.com/pkgforge-dev/OpenLara-AppImage) |
 | [OpenLoco](https://github.com/pkgforge-dev/OpenLoco-AppImage) |
 | [OpenMoHAA](https://github.com/pkgforge-dev/OpenMoHAA-AppImage) |
