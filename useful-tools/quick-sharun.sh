@@ -313,6 +313,7 @@ _help_msg() {
 	                        Additional plugins may still need to be added manually.
 	  DEPLOY_SDL          Set to 1 to force deployment of SDL.
 	  DEPLOY_GTK          Set to 1 to force deployment of GTK.
+	  DEPLOY_GLIB         Set to 1 to force deployment of glib.
 	  DEPLOY_GDK          Set to 1 to force deployment of gdk-pixbuf.
 	  DEPLOY_GLYCIN       Set to 1 to force deployment of Glycin.
 	  DEPLOY_OPENGL       Set to 1 to force deployment of OpenGL.
@@ -841,6 +842,10 @@ _determine_what_to_deploy() {
 			if grep -aoq -m 1 'libpulse.so' "$bin"; then
 				DEPLOY_PULSE=${DEPLOY_PULSE:-1}
 			fi
+			# the same goes for glib, which must never be deployed alone
+			if grep -aoq -m 1 'libglib-2.0.so' "$bin"; then
+				DEPLOY_GLIB=${DEPLOY_GLIB:-1}
+			fi
 			if grep -aoq -m 1 'disable-gpu-sandbox' "$bin" \
 			  && grep -aoq -m 1 'no-zygote-sandbox' "$bin"; then
 				DEPLOY_ELECTRON=${DEPLOY_ELECTRON:-1}
@@ -896,6 +901,9 @@ _determine_what_to_deploy() {
 					;;
 				*libgdk_pixbuf*.so*)
 					DEPLOY_GDK=${DEPLOY_GDK:-1}
+					;;
+				*libglib-2.0.so*)
+					DEPLOY_GLIB=${DEPLOY_GLIB:-1}
 					;;
 				*libglycin*.so*)
 					# glycin-ng needs no special handling
@@ -1212,6 +1220,19 @@ _make_deployment_array() {
 				$qmldir
 			"
 		fi
+	fi
+	# libglib and libgobject are one unit, they share glib's private headers,
+	# gdatasetprivate.h among them, and GDataListUpdateAtomicFunc lost its
+	# key_id argument in 2.84. A host libgobject older than the deployed
+	# libglib therefore crashes in g_datalist_id_update_atomic as soon as a
+	# single gtk or gio module from the host is loaded, and the libqgtk3.so we
+	# deploy makes a Qt application do exactly that. gio and gmodule can stay
+	# on the host, they only use gobject's public ABI.
+	if [ "$DEPLOY_GLIB" = 1 ]; then
+		_echo "* Deploying glib"
+		set -- "$@" \
+			"$LIB_DIR"/libglib-2.0.so* \
+			"$LIB_DIR"/libgobject-2.0.so*
 	fi
 	if [ "$DEPLOY_GTK" = 1 ]; then
 		_echo "* Deploying $GTK_DIR"
