@@ -188,9 +188,8 @@ export ELECTRON_DISABLE_SANDBOX=1
 export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1
 export QTWEBENGINE_DISABLE_SANDBOX=1
 
-# Enable the fixed-size SquashFS metadata sidecar by default. It gives
-# SquashFS-only thumbnailers a .DirIcon and desktop entry while the runtime
-# keeps mounting the real DwarFS payload.
+# enable squashfs metadata sidecar for appimagetool. This makes
+# squashfs-only thumbnailers work even when the appimage is dwarfs
 export SQUASHFS_METADATA_SIDECAR="${SQUASHFS_METADATA_SIDECAR:-1}"
 
 _echo() {
