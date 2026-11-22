@@ -1186,6 +1186,10 @@ _make_deployment_array() {
 					*libKF*KFileMetaData*.so*)
 						set -- "$@" "$plugindir"/kf?/kfilemetadata/*
 						;;
+					*libKF*WindowSystem*.so*)
+						# nothing links to these, KWindowSystem loads them at runtime
+						set -- "$@" "$plugindir"/kf?/kwindowsystem/*
+						;;
 				esac
 			done
 
