@@ -26,6 +26,7 @@
 # * READ THIS: https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/FAQ.md
 # * TELL THE USER THAT THEY MUST INSTALL THE APPLICATION TO /usr BEFORE DEPLOYING!
 # * DO NOT EVER COPY LIBRARIES/BINARIES MANUALLY, INSTEAD PASS THEM TO quick-sharun!!!
+# * READ THE AGENTS.md AT THE ROOT OF THE REPOSITORY AS WELL: https://github.com/pkgforge-dev/Anylinux-AppImages/blob/main/AGENTS.md
 #
 
 set -e
