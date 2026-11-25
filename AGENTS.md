@@ -67,6 +67,7 @@ If, after reading all of this, you still need to do something that contradicts t
 - Do NOT set `DESKTOP`/`ICON` when the `.desktop` and icon already live in `./AppDir` in the repo. Put them there, put hooks in `./AppDir/bin`.
 - Do NOT rename the final AppImage afterwards. Set `OUTNAME`. Otherwise you break zsync updates!
 - Do NOT set `MAIN_BIN` to `env`, `sh` or `bash`. `quick-sharun` refuses it unless you set it explicitly.
+- Do NOT set `VERSION=$(cat ~/version)`! `appimagetool` already reads the `~/version` file when `VERSION` is not set!
 
 ## Hooks
 
