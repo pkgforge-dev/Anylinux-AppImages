@@ -327,37 +327,10 @@ _echo ""
 PKG_DIR="$TMPDIR/pkgs"
 mkdir -p "$PKG_DIR"
 
-# Fast path: when --add-common is requested against the default release, fetch
-# the pre-packed common-{mini,nano}-<arch>.tar bundle in a single HTTP request,
-# keep only the files that are in TO_DOWNLOAD (so `!` exclusions are honored),
-# and only download any remaining packages individually.
-if [ "$COMMON_PACKAGES" = 1 ] \
-	&& [ "$SOURCE" = "$RELEASE_BASE/packages.txt" ]; then
-	BUNDLE_URL="$RELEASE_BASE/common-${PKG_TYPE}-${ARCH}.tar"
-	BUNDLE_FILE="$TMPDIR/common-${PKG_TYPE}-${ARCH}.tar"
-	BUNDLE_DIR="$TMPDIR/bundle"
-	if _try_download "$BUNDLE_FILE" "$BUNDLE_URL"; then
-		mkdir -p "$BUNDLE_DIR"
-		if tar -xf "$BUNDLE_FILE" -C "$BUNDLE_DIR"; then
-			for pkg in $TO_DOWNLOAD; do
-				fname="${pkg##*/}"
-				if [ -f "$BUNDLE_DIR/$fname" ]; then
-					mv "$BUNDLE_DIR/$fname" "$PKG_DIR/$fname"
-				fi
-			done
-		fi
-		rm -rf "$BUNDLE_FILE" "$BUNDLE_DIR"
-	fi
-fi
-
 pids=""
 set -- $TO_DOWNLOAD
 for pkg do
-	fname="${pkg##*/}"
-	if [ -f "$PKG_DIR/$fname" ]; then
-		continue
-	fi
-	_download "$PKG_DIR/$fname" "$pkg" &
+	_download "$PKG_DIR"/"${pkg##*/}" "$pkg" &
 	pids="$pids $!"
 done
 
