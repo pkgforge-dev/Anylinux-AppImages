@@ -13,7 +13,7 @@ set -e
 ARCH=$(uname -m)
 TMPFILE=$(mktemp)
 TMPDIR=$(mktemp -d)
-SOURCE=${SOURCE:-https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/releases/latest}
+SOURCE=${SOURCE:-https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/packages.txt}
 ERRLOG=$TMPDIR/.errlog
 
 COMMON_PACKAGES=${COMMON_PACKAGES:-0}
@@ -113,42 +113,6 @@ elif command -v curl 1>/dev/null; then
 	DLCMD="curl --retry-connrefused --retry 30 -fLo"
 else
 	_error "We need wget or curl to download packages"
-fi
-
-# use wget-curl wrapper if GITHUB_TOKEN is set
-if [ -n "$GITHUB_TOKEN" ]; then
-	cat <<-'EOF' > "$TMPDIR"/.wget-curl-wrapper.sh
-	#!/bin/sh
-	# wrapper for wget and curl that automatically uses GITHUB_TOKEN
-	for link do
-	    case "$link" in
-	        *github.com*) GITHUB_LINK=1; break;;
-	    esac
-	done
-
-	if command -v wget 1>/dev/null; then
-	    set -- --retry-connrefused --tries=30 -O "$@"
-	    if [ "$GITHUB_LINK" = 1 ] && [ -n "$GITHUB_TOKEN" ]; then
-	        set -- \
-	            --header="Authorization: Bearer $GITHUB_TOKEN" \
-	            --header="Accept: application/vnd.github+json" \
-	            "$@"
-	    fi
-	    exec wget "$@"
-	elif command -v curl 1>/dev/null; then
-	    set -- --retry-connrefused --retry 30 -fLo "$@"
-	    if [ "$GITHUB_LINK" = 1 ] && [ -n "$GITHUB_TOKEN" ]; then
-	    set -- \
-	            --header "Authorization: Bearer $GITHUB_TOKEN" \
-	            --header "Accept: application/vnd.github+json" \
-	            "$@"
-	    fi
-	    exec curl "$@"
-	fi
-	EOF
-	chmod +x "$TMPDIR"/.wget-curl-wrapper.sh
-	DLCMD="$TMPDIR"/.wget-curl-wrapper.sh
-	_echo "GITHUB_TOKEN is set, we will use it for downloads."
 fi
 
 case "$ARCH" in
@@ -267,8 +231,7 @@ elif [ -n "$REMOVE_PACKAGES" ]; then
 	set -- $FILTERED
 fi
 
-if ! LIST_ALL=$(_download - "$SOURCE" \
-	| sed 's/[()",{} ]/\n/g' | grep -o 'https.*pkg\.tar\.zst'); then
+if ! LIST_ALL=$(_download - "$SOURCE" | grep 'pkg\.tar\.zst$'); then
 	_error "Failed to download packages list from $SOURCE!"
 fi
 
@@ -300,6 +263,7 @@ _echo2 "$TO_DOWNLOAD"
 _echo "------------------------------------------------------------"
 _echo ""
 
+pids=""
 set -- $TO_DOWNLOAD
 for pkg do
 	_download "$TMPDIR"/"${pkg##*/}" "$pkg" &
