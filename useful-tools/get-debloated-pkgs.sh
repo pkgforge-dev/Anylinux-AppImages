@@ -13,9 +13,7 @@ set -e
 ARCH=$(uname -m)
 TMPFILE=$(mktemp)
 TMPDIR=$(mktemp -d)
-RELEASE_BASE=${RELEASE_BASE:-https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous}
-SOURCE=${SOURCE:-$RELEASE_BASE/packages.txt}
-FALLBACK_SOURCE=https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/releases/latest
+SOURCE=${SOURCE:-https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/packages.txt}
 ERRLOG=$TMPDIR/.errlog
 
 COMMON_PACKAGES=${COMMON_PACKAGES:-0}
@@ -107,12 +105,6 @@ _download() {
 	done
 }
 
-# One-shot download without the 5x retry / 10m sleep loop, for optional fast
-# paths (like packages.txt or common-*.tar) that have an explicit fallback.
-_try_download() {
-	$DLCMD "$@" 2>/dev/null
-}
-
 if ! command -v pacman 1>/dev/null; then
 	_error "${0##*/} can only be used on Archlinux like systems!"
 elif command -v wget 1>/dev/null; then
@@ -121,45 +113,6 @@ elif command -v curl 1>/dev/null; then
 	DLCMD="curl --retry-connrefused --retry 30 -fLo"
 else
 	_error "We need wget or curl to download packages"
-fi
-
-# use wget-curl wrapper if GITHUB_TOKEN is set; only attach API headers for
-# api.github.com (sending Authorization to github.com/releases/download fails
-# with 401 when followed to S3 presigned URLs)
-if [ -n "$GITHUB_TOKEN" ]; then
-	cat <<-'EOF' > "$TMPDIR"/.wget-curl-wrapper.sh
-	#!/bin/sh
-	# wrapper for wget and curl that automatically uses GITHUB_TOKEN
-	GITHUB_API_LINK=0
-	for link do
-	    case "$link" in
-	        *api.github.com*) GITHUB_API_LINK=1; break;;
-	    esac
-	done
-
-	if command -v wget 1>/dev/null; then
-	    set -- --retry-connrefused --tries=30 -O "$@"
-	    if [ "$GITHUB_API_LINK" = 1 ] && [ -n "$GITHUB_TOKEN" ]; then
-	        set -- \
-	            --header="Authorization: Bearer $GITHUB_TOKEN" \
-	            --header="Accept: application/vnd.github+json" \
-	            "$@"
-	    fi
-	    exec wget "$@"
-	elif command -v curl 1>/dev/null; then
-	    set -- --retry-connrefused --retry 30 -fLo "$@"
-	    if [ "$GITHUB_API_LINK" = 1 ] && [ -n "$GITHUB_TOKEN" ]; then
-	        set -- \
-	            --header "Authorization: Bearer $GITHUB_TOKEN" \
-	            --header "Accept: application/vnd.github+json" \
-	            "$@"
-	    fi
-	    exec curl "$@"
-	fi
-	EOF
-	chmod +x "$TMPDIR"/.wget-curl-wrapper.sh
-	DLCMD="$TMPDIR"/.wget-curl-wrapper.sh
-	_echo "GITHUB_TOKEN is set, we will use it for API downloads."
 fi
 
 case "$ARCH" in
@@ -215,7 +168,7 @@ while :; do case "$1" in
 	esac
 done
 
-if [ "$PREFER_NANO" = 1 ]; then
+if [ "$PREFER_NANO"  = 1 ]; then
 	PKG_TYPE=nano
 else
 	PKG_TYPE=mini
@@ -278,21 +231,7 @@ elif [ -n "$REMOVE_PACKAGES" ]; then
 	set -- $FILTERED
 fi
 
-# Fetch the packages index from the CDN (packages.txt) without hitting the
-# GitHub REST API; fall back to the API only if the default packages.txt is not
-# published yet.
-LIST_RAW=""
-if LIST_RAW=$(_try_download - "$SOURCE") && [ -n "$LIST_RAW" ]; then
-	:
-elif [ "$SOURCE" = "$RELEASE_BASE/packages.txt" ]; then
-	_echo2 "WARNING: $SOURCE unavailable, falling back to $FALLBACK_SOURCE"
-	LIST_RAW=$(_download - "$FALLBACK_SOURCE")
-else
-	LIST_RAW=$(_download - "$SOURCE")
-fi
-
-if ! LIST_ALL=$(printf '%s\n' "$LIST_RAW" \
-	| sed 's/[()",{} ]/\n/g' | grep -o 'https\?://[^"]*pkg\.tar\.zst'); then
+if ! LIST_ALL=$(_download - "$SOURCE" | grep 'pkg\.tar\.zst$'); then
 	_error "Failed to download packages list from $SOURCE!"
 fi
 
@@ -324,13 +263,10 @@ _echo2 "$TO_DOWNLOAD"
 _echo "------------------------------------------------------------"
 _echo ""
 
-PKG_DIR="$TMPDIR/pkgs"
-mkdir -p "$PKG_DIR"
-
 pids=""
 set -- $TO_DOWNLOAD
 for pkg do
-	_download "$PKG_DIR"/"${pkg##*/}" "$pkg" &
+	_download "$TMPDIR"/"${pkg##*/}" "$pkg" &
 	pids="$pids $!"
 done
 
@@ -352,7 +288,7 @@ fi
 # retry since pacman might download dependencies for the debloated packages.
 COUNT=0
 while :; do
-	if $SUDOCMD pacman -U --noconfirm --ask 4 "$PKG_DIR"/*.pkg.tar.zst; then
+	if $SUDOCMD pacman -U --noconfirm --ask 4 "$TMPDIR"/*; then
 		break
 	else
 		COUNT=$(( COUNT + 1 ))
