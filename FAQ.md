@@ -176,14 +176,18 @@ DwarFS also offers PGO like optimizations, [which allows us to make small appima
 
 # AppImage has no thumbnail?
 
-Because we use DwarFS instead of SquashFS, you need an AppImage thumbnailer that supports DwarFS:
+Current AppImages include a small SquashFS **metadata sidecar**: a fixed 128 KiB SquashFS image between the runtime and the DwarFS payload. It contains the `.DirIcon`, the main `.desktop` file and a stub `AppRun`, so thumbnailers and desktop integration tools that only understand SquashFS can still read the icon and application metadata.
+
+This means SquashFS-only thumbnailers should work out of the box. If yours still does not, or if you are using an older AppImage without the sidecar, use a thumbnailer that supports DwarFS, which is what the actual application payload is compressed with:
 
 * [appimage-thumbnailer](https://github.com/kem-a/appimage-thumbnailer)
 * [simple-appimage-thumbnailer](https://github.com/Samueru-sama/simple-appimage-thumbnailer)
 
-# I get `ERROR: Can't find a valid SQUASHFS superblock` in NixOS
+# NixOS gives me a SquashFS or "not the real AppImage payload" error
 
-Once again this is because we use DwarFS instead of SquashFS, NixOS has something called `appimage-run` which lets you run old type appimages that need an FHS env and some host libraries, `appimage-run` manually mounts the appimage instead of letting it execute itself which results in that error since it expects it to be SquashFS.
+NixOS has something called `appimage-run` which lets you run old type appimages that need an FHS env and some host libraries, `appimage-run` manually extracts the appimage instead of letting it execute itself.
+
+Our AppImages use DwarFS, so older images without the metadata sidecar fail with `ERROR: Can't find a valid SQUASHFS superblock`. Newer images include the sidecar, but `appimage-run` then extracts only that sidecar and runs its stub `AppRun`, which says `This is not the real AppImage payload, this is a DwarFS AppImage`.
 
 **None of this is needed for our appimages, they run directly in NixOS, so all you have to do is disable `appimage-run`.**
 
