@@ -139,6 +139,10 @@ case "$APPIMAGE_ARCH" in
 		;;
 esac
 
+# enable squashfs metadata sidecar for appimagetool. This makes
+# squashfs-only thumbnailers work even when the appimage is dwarfs
+export SQUASHFS_METADATA_SIDECAR="${SQUASHFS_METADATA_SIDECAR:-1}"
+
 # prevent Qt from dlopening libqtgtk3.so via strace mode
 export QT_QPA_PLATFORMTHEME=${QT_QPA_PLATFORMTHEME:-fusion}
 
